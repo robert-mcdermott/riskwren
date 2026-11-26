@@ -7,6 +7,8 @@ import { plural } from "../core/format.js";
 import { navigate, query } from "../core/router.js";
 import { can } from "../core/session.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
+import { statePill } from "../components/control.js";
+import { coveragePill, mapCrosswalk } from "../components/crosswalk.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
@@ -177,6 +179,16 @@ function openRequirement(framework, code, reload) {
             item.baselines.map((baseline) => pill(baseline.title, "info")))),
         item.text ? h("div", { class: "prose" }, item.text) : h("p", { class: "subtle" }, "This entry has no text of its own."),
         item.guidance ? h("details", { class: "disclosure" }, h("summary", {}, "Guidance from the source"), h("div", { class: "prose muted" }, item.guidance)) : null,
+        item.is_citable ? h("div", { class: "stack-sm" },
+          h("div", { class: "row" }, h("h3", { class: "grow" }, item.controls.length ? `Controls (${item.controls.length})` : "Controls"),
+            can("steward") ? button("Map a control", { kind: "btn-sm", iconName: "link",
+              onclick: () => mapCrosswalk({ framework, requirement: item, onDone: () => openRequirement(framework, item.code, reload) }) }) : null),
+          item.controls.length ? h("ul", { class: "requirement-list stack-sm" }, item.controls.map((mapping) => h("li", { class: "mapped-control" },
+            h("div", { class: "grow" }, h("a", { class: "cell-main", href: `/controls/${mapping.control.ref}?tab=requirements` }, mapping.control.name),
+              h("div", { class: "cell-sub" }, [mapping.control.ref, mapping.note].filter(Boolean).join(" · "))),
+            statePill(mapping.control.state), coveragePill(mapping.coverage))))
+            : h("p", { class: "subtle" }, item.hidden ? "None that you have access to." : "No control is mapped to this requirement yet."),
+          item.hidden && item.controls.length ? h("p", { class: "subtle" }, `And ${item.hidden} more that you do not have access to.`) : null) : null,
         item.children_list.length ? h("div", { class: "stack-sm" }, h("h3", {}, `Beneath it (${item.children_list.length})`),
           h("ul", { class: "requirement-list" }, item.children_list.map((child) => h("li", {},
             h("button", { type: "button", class: "requirement-row", onclick: () => openRequirement(framework, child.code, reload) },
@@ -215,7 +227,8 @@ function requirementRow(framework, item, { nested, reload }) {
       item.title ? h("span", { class: item.is_citable ? "" : "cell-main" }, item.title) : null,
       !item.title && item.excerpt ? h("span", {}, item.excerpt) : null,
       item.title && item.excerpt && !nested ? h("span", { class: "cell-sub" }, item.excerpt) : null));
-  if (!nested || !item.children) return h("li", {}, h("div", { class: "requirement-line" }, h("span", { class: "requirement-toggle" }), label));
+  const mapped = item.controls ? h("span", { class: "mapped-count", title: `${item.controls} mapped` }, icon("control", "icon icon-sm"), String(item.controls)) : null;
+  if (!nested || !item.children) return h("li", {}, h("div", { class: "requirement-line" }, h("span", { class: "requirement-toggle" }), label, mapped));
   const beneath = h("ul", { class: "requirement-list", hidden: true });
   let loaded = false;
   const toggle = h("button", { type: "button", class: "requirement-toggle", "aria-expanded": "false",
@@ -237,7 +250,7 @@ function requirementRow(framework, item, { nested, reload }) {
       beneath.hidden = !opening;
       toggle.setAttribute("aria-expanded", String(opening));
     } }, icon("chevron-right", "icon icon-sm"));
-  return h("li", {}, h("div", { class: "requirement-line" }, toggle, label,
+  return h("li", {}, h("div", { class: "requirement-line" }, toggle, label, mapped,
     h("span", { class: "subtle numeric" }, String(item.children))), beneath);
 }
 
@@ -247,19 +260,23 @@ export function frameworkPage(main, params) {
     title: "Framework",
     load: async () => {
       const asked = query();
-      const filter = { q: asked.get("q") ?? undefined, baseline: asked.get("baseline") ?? undefined, cursor: asked.get("cursor") ?? undefined };
-      const [framework, page] = await Promise.all([
+      const filter = { q: asked.get("q") ?? undefined, baseline: asked.get("baseline") ?? undefined,
+        mapped: asked.get("mapped") ?? undefined, cursor: asked.get("cursor") ?? undefined };
+      const flat = Boolean(filter.q || filter.baseline || filter.mapped);
+      const [framework, page, coverage] = await Promise.all([
         get(api(key), undefined, { fresh: true }),
-        get(api(key, "/requirements"), { ...filter, limit: filter.q || filter.baseline ? 50 : 200 }, { fresh: true })]);
-      return { framework: framework.data, page, flat: Boolean(filter.q || filter.baseline) };
+        get(api(key, "/requirements"), { ...filter, limit: flat ? 50 : 200 }, { fresh: true }),
+        get(api(key, "/coverage"), undefined, { fresh: true })]);
+      return { framework: framework.data, page, flat, coverage: coverage.data };
     },
-    view: ({ framework, page, flat }, reload) => {
+    view: ({ framework, page, flat, coverage }, reload) => {
       document.title = document.title.replace(/^Framework/, framework.title);
       const rows = page.data;
       const search = searchBox("Search codes, titles, and text");
       keepSearchFocus(search);
       const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
-        framework.baselines.length ? filterSelect("baseline", [["", "The whole framework"], ...framework.baselines.map((b) => [b.key, `${b.title} (${b.count})`])], "Baseline") : null);
+        framework.baselines.length ? filterSelect("baseline", [["", "The whole framework"], ...framework.baselines.map((b) => [b.key, `${b.title} (${b.count})`])], "Baseline") : null,
+        filterSelect("mapped", [["", "With or without a control"], ["true", "With a control"], ["false", "With no control"]], "Controls"));
       const list = rows.length
         ? h("ul", { class: "requirement-list requirement-tree" }, rows.map((row) => requirementRow(framework, row, { nested: !flat, reload })))
         : emptyState(flat
@@ -280,6 +297,9 @@ export function frameworkPage(main, params) {
             reload();
           } }) }) : null,
       ].filter(Boolean);
+      queueMicrotask(() => {
+        for (const fill of document.querySelectorAll(".coverage-fill")) fill.style.setProperty("width", `${Math.round(Number(fill.dataset.share) * 100)}%`);
+      });
       const wanted = query().get("r");
       if (wanted) queueMicrotask(() => openRequirement(framework, wanted, reload));
       return h("div", { class: "stack-lg" },
@@ -291,6 +311,13 @@ export function frameworkPage(main, params) {
           h("div", { class: "stack" }, bar,
             card({ title: flat ? plural(page.meta.total, "match", "matches") : "Requirements", flush: true, footer: flat ? pager(page.meta, rows.length) : null }, list)),
           h("div", { class: "stack-lg" },
+            card({ title: "Coverage" },
+              h("div", { class: "coverage" },
+                h("div", { class: "coverage-bar", role: "img", "aria-label": `${coverage.mapped} of ${coverage.citable} requirements have a control` },
+                  h("span", { class: "coverage-fill", "data-share": String(coverage.citable ? coverage.mapped / coverage.citable : 0) })),
+                h("p", {}, h("strong", {}, `${coverage.mapped} of ${coverage.citable}`), " requirements have a control mapped to them."),
+                coverage.unmapped ? h("a", { href: `/frameworks/${framework.key}?mapped=false` }, `See the ${coverage.unmapped} with none`) : h("span", { class: "subtle" }, "Every requirement has at least one."),
+                h("p", { class: "subtle" }, "Counted from the controls you may see. Whether they work is another question, answered by testing them."))),
             card({ title: "About" }, facts([
               ["Requirements", `${framework.citable_count} to meet, in ${plural(framework.requirement_count, "entry", "entries")}`],
               [framework.origin === "local" ? "From" : "Publisher", framework.publisher],

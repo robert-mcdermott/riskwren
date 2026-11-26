@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from riskwren.access.policy import current
 from riskwren.api.common import clamp_limit, decode_cursor, envelope, reading, writing
 from riskwren.api.routers.inventory import paging
-from riskwren.compliance import frameworks
+from riskwren.compliance import crosswalk, frameworks
 
 router = APIRouter(prefix="/api/v1", tags=["frameworks"])
 
@@ -90,18 +90,35 @@ def list_requirements(
     parent: str | None = Query(default=None, description="A code; lists what is beneath it"),
     q: str | None = Query(default=None, description="Words to find in codes, titles, and text"),
     baseline: str | None = Query(default=None, description="A baseline's key"),
+    mapped: bool | None = Query(
+        default=None, description="true for those with a control, false for those with none"
+    ),
     limit: int | None = Query(default=None, ge=1, le=200),
     cursor: str | None = None,
 ) -> dict[str, Any]:
-    current(request)
+    principal = current(request)
     size = clamp_limit(limit)
     offset = int((decode_cursor(cursor) or {}).get("offset", 0))
     with reading(request) as session:
+        only = None if mapped is None else crosswalk.condition(session, principal, mapped=mapped)
         rows, total = frameworks.listing(
             session, frameworks.by_key(session, key), parent=parent, query=q, baseline=baseline,
-            limit=size, offset=offset,
+            only=only, limit=size, offset=offset,
         )  # fmt: skip
+        have = crosswalk.counts(session, principal, [row["id"] for row in rows])
+        for row in rows:
+            row["controls"] = have.get(row["id"], 0)
     return envelope(rows, **paging(total, offset, size, len(rows)))
+
+
+@router.get(
+    "/frameworks/{key}/coverage",
+    summary="How many of a framework's requirements have a control mapped to them",
+)
+def framework_coverage(request: Request, key: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(crosswalk.coverage(session, principal, frameworks.by_key(session, key)))
 
 
 @router.post(
@@ -130,11 +147,14 @@ def paste_requirements(
         return envelope(frameworks.paste(session, principal, framework, body.text, dry_run=dry_run))
 
 
-@router.get("/frameworks/{key}/requirement", summary="One requirement in full")
+@router.get("/frameworks/{key}/requirement", summary="One requirement in full, with its controls")
 def show_requirement(request: Request, key: str, code: str = CODE) -> dict[str, Any]:
-    current(request)
+    principal = current(request)
     with reading(request) as session:
-        return envelope(frameworks.detail(session, frameworks.by_key(session, key), code))
+        framework = frameworks.by_key(session, key)
+        found = frameworks.detail(session, framework, code)
+        row = frameworks.find(session, framework, code)
+        return envelope({**found, **crosswalk.controls_of(session, principal, row)})
 
 
 @router.patch("/frameworks/{key}/requirement", summary="Change a requirement of your own")

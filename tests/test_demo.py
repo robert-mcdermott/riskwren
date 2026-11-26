@@ -3,16 +3,22 @@ something on every screen and a history that verifies."""
 
 from __future__ import annotations
 
+import uuid
+from collections.abc import Iterator
+from contextlib import ExitStack
 from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select
+from sqlalchemy import create_engine, func, select, text
+from sqlalchemy.engine import make_url
 
 from riskwren.api.app import create_app
 from riskwren.cli import main
+from riskwren.config import example_config_text, load_config
 from riskwren.core.errors import RiskWrenError
+from riskwren.db import migrate
 from riskwren.db.engine import Database
 from riskwren.db.models import (
     Acceptance,
@@ -32,14 +38,51 @@ from riskwren.db.models import (
 from riskwren.demo import build as demo
 from riskwren.demo import content
 from riskwren.events import chain
-from tests.conftest import Instance
+from riskwren.home import DataHome
+from tests.conftest import POSTGRES, POSTGRES_URL, Instance
 
 TODAY = date(2026, 11, 18)
 
 
+@pytest.fixture(scope="module")
+def shared(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Instance, demo.Summary]]:
+    """One demo organization for every test here that only reads it. Building it is the
+    slowest thing the suite does, so it is built once."""
+    path = tmp_path_factory.mktemp("demo") / "riskwren.toml"
+    path.write_text(example_config_text(), encoding="utf-8")
+    with ExitStack() as stack:
+        env = {}
+        if POSTGRES:
+            name = f"t_{uuid.uuid4().hex[:24]}"
+            admin = create_engine(POSTGRES_URL, isolation_level="AUTOCOMMIT")
+            stack.callback(admin.dispose)
+            with admin.connect() as conn:
+                conn.execute(text(f'CREATE DATABASE "{name}"'))
+
+            def drop() -> None:
+                with admin.connect() as conn:
+                    conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+
+            stack.callback(drop)
+            url = make_url(POSTGRES_URL).set(database=name)
+            env["RISKWREN_DATABASE_URL"] = url.render_as_string(hide_password=False)
+        config = load_config(path, env=env)
+        home = DataHome(config.data.home)
+        home.create()
+        db = Database(config.database_url)
+        stack.callback(db.dispose)
+        migrate.upgrade(db.engine)
+        yield Instance(path, config, home, db), demo.build(db, seed=7, today=TODAY)
+
+
 @pytest.fixture
-def built(db: Database) -> demo.Summary:
-    return demo.build(db, seed=7, today=TODAY)
+def built(shared: tuple[Instance, demo.Summary]) -> demo.Summary:
+    return shared[1]
+
+
+@pytest.fixture
+def demo_db(shared: tuple[Instance, demo.Summary]) -> Database:
+    return shared[0].db
 
 
 def fingerprint(db: Database) -> list[tuple[object, ...]]:
@@ -55,7 +98,8 @@ def fingerprint(db: Database) -> list[tuple[object, ...]]:
         return [tuple(row) for row in rows]
 
 
-def test_it_has_something_of_everything(db: Database, built: demo.Summary) -> None:
+def test_it_has_something_of_everything(demo_db: Database, built: demo.Summary) -> None:
+    db = demo_db
     with db.read() as session:
         count = lambda model: session.execute(select(func.count()).select_from(model)).scalar_one()  # noqa: E731
         group = lambda column: dict(  # noqa: E731
@@ -107,7 +151,8 @@ def test_it_has_something_of_everything(db: Database, built: demo.Summary) -> No
         assert (last - first).days > 700
 
 
-def test_the_storylines_came_out_as_written(db: Database, built: demo.Summary) -> None:
+def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summary) -> None:
+    db = demo_db
     with db.read() as session:
         named = lambda name: session.scalars(select(Risk).where(Risk.name == name)).one()  # noqa: E731
         specimens = named("Loss of irreplaceable specimens from freezer failure")
@@ -152,6 +197,16 @@ def test_the_storylines_came_out_as_written(db: Database, built: demo.Summary) -
         agreement = held["data-use-agreement-open-cohort-trust"]
         assert (agreement.origin, agreement.citable_count) == ("local", 9)
         assert frameworks.find(session, agreement, "DUA-5.1").guidance
+        from riskwren.access.principal import Principal
+        from riskwren.compliance import crosswalk
+
+        reader = Principal.for_command()
+        assert crosswalk.coverage(session, reader, agreement) == {
+            "citable": 9, "mapped": 5, "unmapped": 4,
+        }  # fmt: skip
+        # Starter controls arrive mapped, so the public frameworks are partly covered at once.
+        assert crosswalk.coverage(session, reader, held["nist-csf"])["mapped"] >= 20
+        assert crosswalk.coverage(session, reader, held["hipaa-security"])["mapped"] >= 15
         closed = named("Loss of refrigerated medication from a failed pharmacy refrigerator")
         assert closed.status == "closed" and closed.closed_reason
         power = named("Emergency power cannot carry the freezer farm and animal facility")
@@ -164,7 +219,8 @@ def test_the_storylines_came_out_as_written(db: Database, built: demo.Summary) -
     assert built.counts["acceptances refused"] == 1
 
 
-def test_the_history_verifies_and_runs_forward(db: Database, built: demo.Summary) -> None:
+def test_the_history_verifies_and_runs_forward(demo_db: Database, built: demo.Summary) -> None:
+    db = demo_db
     with db.engine.connect() as conn:
         report = chain.verify(conn)
     assert report.ok and report.events > 4000
@@ -174,9 +230,9 @@ def test_the_history_verifies_and_runs_forward(db: Database, built: demo.Summary
 
 
 def test_nobody_in_the_demo_has_a_password_and_everyone_is_invented(
-    db: Database, built: demo.Summary
+    demo_db: Database, built: demo.Summary
 ) -> None:
-    with db.read() as session:
+    with demo_db.read() as session:
         assert session.execute(select(func.count()).select_from(Credential)).scalar_one() == 0
         emails = [email for (email,) in session.execute(select(Account.email))]
     assert all(email.endswith("@northmere.example") for email in emails)
@@ -200,19 +256,23 @@ def test_the_same_seed_gives_the_same_organization(tmp_path: Path) -> None:
     assert prints[0] != prints[2]
 
 
-def test_it_will_not_build_over_an_organization(db: Database, built: demo.Summary) -> None:
+def test_it_will_not_build_over_an_organization(demo_db: Database, built: demo.Summary) -> None:
+    db = demo_db
     with pytest.raises(RiskWrenError):
         demo.build(db, seed=7, today=TODAY)
 
 
 def test_sample_people_sign_in_with_one_click_only_on_a_demo(
-    instance: Instance, db: Database, client: TestClient
+    client: TestClient, shared: tuple[Instance, demo.Summary]
 ) -> None:
+    # An installation that is not a demo offers nothing of the kind.
     assert client.get("/api/v1/meta").json()["data"]["demo"] is None
     email = "mireille.lachance@northmere.example"
     assert client.post("/api/v1/session/demo", json={"email": email}).status_code == 404
 
-    demo.build(db, seed=7, today=TODAY)
+    instance, db = shared[0], shared[0].db
+    client = TestClient(create_app(instance.config))
+    client.__enter__()
     shown = client.get("/api/v1/meta").json()["data"]["demo"]
     assert [person["name"] for person in shown["accounts"]][:2] == [
         "Mireille Lachance", "Chidi Udoka"
@@ -239,11 +299,13 @@ def test_sample_people_sign_in_with_one_click_only_on_a_demo(
             "/api/v1/session/demo", json={"email": email}, headers={"origin": "http://testserver"}
         )
     assert away.status_code == 404
+    client.__exit__(None, None, None)
 
 
 def test_every_sample_person_has_something_to_look_at(
-    instance: Instance, db: Database, built: demo.Summary
+    shared: tuple[Instance, demo.Summary], built: demo.Summary
 ) -> None:
+    instance = shared[0]
     seen = {}
     for person in built.sample_accounts:
         with TestClient(create_app(instance.config)) as client:

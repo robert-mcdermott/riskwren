@@ -48,7 +48,7 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
 | 1 | Frameworks | The pack loader and text policies; the four built-in frameworks generated from their publishers' files; the organization's own frameworks; requirement browsing | ☑ |
-| 2 | Crosswalks | Controls mapped to requirements; the starter controls' crosswalk; coverage and gaps per framework | ☐ |
+| 2 | Crosswalks | Controls mapped to requirements; the starter controls' crosswalk; coverage and gaps per framework | ☑ |
 | 3 | Scopes and inheritance | Scopes with their boundary and frameworks, baselines, applicability with reasons, implementations, offered and inherited controls, the statement of applicability; information assets | ☐ |
 | 4 | Evidence and files | Content-addressed file storage, evidence items with owners and validity, reuse across controls, freshness | ☐ |
 | 5 | Assessments and tests | Assessments, the test queue, procedures and results with review, results flowing to controls, requirements, and risks; readiness in five states | ☐ |

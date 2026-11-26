@@ -991,13 +991,145 @@ CONTROL_ROWS: list[tuple[str, str, str, str, str, str, str]] = [
      "corrective", "manual", "as_needed", "impact"),
 ]  # fmt: skip
 
+# Which requirements of the built-in frameworks each starter control helps to satisfy. A
+# starting point, written for RiskWren and meant to be corrected: a control adopted from the
+# library arrives mapped, each mapping marked as partial until someone says it is more.
+# Every code here is checked against the framework packs by a test.
+CROSSWALK: dict[str, dict[str, list[str]]] = {
+    "access_removed_on_leaving": {
+        "nist-csf": ["PR.AA-01", "PR.AA-05", "GV.RR-04"],
+        "nist-800-53": ["PS-4", "PS-5", "AC-2"],
+        "nist-800-171": ["03.09.02", "03.01.01"],
+        "hipaa-security": ["164.308(a)(3)(ii)(C)"],
+    },
+    "access_reviewed": {
+        "nist-csf": ["PR.AA-05"],
+        "nist-800-53": ["AC-2", "AC-6(7)"],
+        "nist-800-171": ["03.01.01", "03.01.05"],
+        "hipaa-security": ["164.308(a)(4)(ii)(C)"],
+    },
+    "second_factor": {
+        "nist-csf": ["PR.AA-03"],
+        "nist-800-53": ["IA-2", "IA-2(1)", "IA-2(2)"],
+        "nist-800-171": ["03.05.03"],
+        "hipaa-security": ["164.312(d)"],
+    },
+    "privileged_access": {
+        "nist-csf": ["PR.AA-05"],
+        "nist-800-53": ["AC-6", "AC-6(2)", "AC-6(5)", "AC-6(9)"],
+        "nist-800-171": ["03.01.05", "03.01.06", "03.01.07"],
+        "hipaa-security": ["164.308(a)(4)(ii)(B)", "164.312(a)(2)(i)"],
+    },
+    "encryption_at_rest": {
+        "nist-csf": ["PR.DS-01"],
+        "nist-800-53": ["SC-28", "SC-28(1)"],
+        "nist-800-171": ["03.13.08"],
+        "hipaa-security": ["164.312(a)(2)(iv)"],
+    },
+    "backups_tested": {
+        "nist-csf": ["PR.DS-11", "RC.RP-03"],
+        "nist-800-53": ["CP-9", "CP-9(1)", "CP-10"],
+        "hipaa-security": ["164.308(a)(7)(ii)(A)", "164.308(a)(7)(ii)(D)", "164.310(d)(2)(iv)"],
+    },
+    "data_classified": {
+        "nist-csf": ["ID.AM-07", "ID.AM-05"],
+        "nist-800-53": ["RA-2", "MP-3"],
+        "nist-800-171": ["03.08.04"],
+    },
+    "data_sharing_approved": {
+        "nist-csf": ["GV.OC-03"],
+        "nist-800-53": ["AC-21", "CA-3"],
+        "nist-800-171": ["03.12.05"],
+        "hipaa-security": ["164.308(b)(1)", "164.314(a)(1)"],
+    },
+    "patching": {
+        "nist-csf": ["PR.PS-02", "ID.RA-01"],
+        "nist-800-53": ["SI-2", "RA-5"],
+        "nist-800-171": ["03.14.01", "03.11.02"],
+        "hipaa-security": ["164.308(a)(1)(ii)(B)"],
+    },
+    "malware_protection": {
+        "nist-csf": ["DE.CM-09", "PR.PS-05"],
+        "nist-800-53": ["SI-3"],
+        "nist-800-171": ["03.14.02"],
+        "hipaa-security": ["164.308(a)(5)(ii)(B)"],
+    },
+    "network_segmentation": {
+        "nist-csf": ["PR.IR-01"],
+        "nist-800-53": ["SC-7", "AC-4"],
+        "nist-800-171": ["03.13.01", "03.01.03"],
+    },
+    "unsupported_contained": {
+        "nist-csf": ["PR.PS-02", "ID.AM-08"],
+        "nist-800-53": ["SA-22"],
+        "nist-800-171": ["03.16.02"],
+        "hipaa-security": ["164.308(a)(1)(ii)(B)"],
+    },
+    "change_review": {
+        "nist-csf": ["PR.PS-01", "ID.RA-07"],
+        "nist-800-53": ["CM-3", "CM-4"],
+        "nist-800-171": ["03.04.03", "03.04.04"],
+    },
+    "logging_monitoring": {
+        "nist-csf": ["PR.PS-04", "DE.CM-01", "DE.CM-03", "DE.AE-02"],
+        "nist-800-53": ["AU-2", "AU-6", "AU-12", "SI-4"],
+        "nist-800-171": ["03.03.01", "03.03.05", "03.14.06"],
+        "hipaa-security": ["164.312(b)", "164.308(a)(1)(ii)(D)", "164.308(a)(5)(ii)(C)"],
+    },
+    "incident_response": {
+        "nist-csf": ["RS.MA-01", "ID.IM-04", "ID.IM-02"],
+        "nist-800-53": ["IR-8", "IR-3", "IR-4"],
+        "nist-800-171": ["03.06.01", "03.06.03", "03.06.05"],
+        "hipaa-security": ["164.308(a)(6)(i)", "164.308(a)(6)(ii)"],
+    },
+    "security_training": {
+        "nist-csf": ["PR.AT-01", "PR.AT-02"],
+        "nist-800-53": ["AT-2", "AT-2(3)", "AT-3"],
+        "nist-800-171": ["03.02.01", "03.02.02"],
+        "hipaa-security": ["164.308(a)(5)(i)", "164.308(a)(5)(ii)(A)"],
+    },
+    "backup_power_tested": {"nist-csf": ["PR.IR-02"], "nist-800-53": ["PE-11"]},
+    "environmental_monitoring": {"nist-csf": ["PR.IR-02"], "nist-800-53": ["PE-14"]},
+    "continuity_plan": {
+        "nist-csf": ["ID.IM-04", "PR.IR-03", "RC.RP-01"],
+        "nist-800-53": ["CP-2", "CP-4"],
+        "hipaa-security": ["164.308(a)(7)(i)", "164.308(a)(7)(ii)(C)", "164.308(a)(7)(ii)(D)"],
+    },
+    "downtime_procedures": {
+        "nist-csf": ["RC.RP-01"],
+        "nist-800-53": ["CP-2", "CP-4"],
+        "hipaa-security": ["164.308(a)(7)(ii)(C)", "164.310(a)(2)(i)"],
+    },
+    "agreements_recorded": {"nist-csf": ["GV.OC-03"]},
+    "standards_tracked": {"nist-csf": ["GV.OC-03"]},
+    "training_tracked": {
+        "nist-csf": ["PR.AT-01"],
+        "nist-800-53": ["AT-4"],
+        "hipaa-security": ["164.308(a)(5)(i)"],
+    },
+    "supplier_assessed": {
+        "nist-csf": ["GV.SC-06", "GV.SC-07"],
+        "nist-800-53": ["SR-6", "SA-9"],
+        "nist-800-171": ["03.16.03", "03.17.03"],
+        "hipaa-security": ["164.308(b)(1)"],
+    },
+    "agreements_in_place": {
+        "nist-csf": ["GV.SC-05"],
+        "nist-800-53": ["SA-9", "CA-3"],
+        "nist-800-171": ["03.16.03", "03.12.05"],
+        "hipaa-security": ["164.308(b)(1)", "164.308(b)(3)", "164.314(a)(1)"],
+    },
+    "alternate_supplier": {"nist-800-53": ["SR-3(1)"]},
+    "exit_plan": {"nist-csf": ["GV.SC-10"]},
+}
+
 CONTROL_LIBRARY: dict[str, Any] = {
     "pack": {
         "key": "starter-controls",
         "kind": "control_library",
         "title": "Starter controls",
         "version": "1",
-        "pack_version": "0.1.0",
+        "pack_version": "0.2.0",
         "publisher": "The RiskWren Authors",
         "license": "Apache-2.0",
         "text_policy": "verbatim",
@@ -1011,6 +1143,7 @@ CONTROL_LIBRARY: dict[str, Any] = {
             "nature": row[4],
             "frequency": row[5],
             "reduces": row[6],
+            **({"requirements": CROSSWALK[row[0]]} if row[0] in CROSSWALK else {}),
         }
         for row in CONTROL_ROWS
     ],

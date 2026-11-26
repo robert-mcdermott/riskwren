@@ -115,7 +115,7 @@ One function per record type decides what a principal may see. Single records, l
 | Read risks and controls | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read frameworks and their requirements (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Add a record in a unit | | | ✓ | | | ✓ | | |
-| Edit a record; link and unlink | | ✓ | ✓ | | | ✓ | | |
+| Edit a record; link and unlink; map a control to requirements (wave 2) | | ✓ | ✓ | | | ✓ | | |
 | Assess a risk; rate a control | | ✓ | ✓ | | ✓ | ✓ | | |
 | Record a response; create and manage a treatment plan | | ✓ | ✓ | | | ✓ | | |
 | Accept a risk | | | | ✓ (not their own; up to their limit) | | | | |

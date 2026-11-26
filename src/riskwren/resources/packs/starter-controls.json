@@ -4,7 +4,7 @@
     "kind": "control_library",
     "title": "Starter controls",
     "version": "1",
-    "pack_version": "0.1.0",
+    "pack_version": "0.2.0",
     "publisher": "The RiskWren Authors",
     "license": "Apache-2.0",
     "text_policy": "verbatim"
@@ -17,7 +17,26 @@
       "kind": "preventive",
       "nature": "both",
       "frequency": "as_needed",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.AA-01",
+          "PR.AA-05",
+          "GV.RR-04"
+        ],
+        "nist-800-53": [
+          "PS-4",
+          "PS-5",
+          "AC-2"
+        ],
+        "nist-800-171": [
+          "03.09.02",
+          "03.01.01"
+        ],
+        "hipaa-security": [
+          "164.308(a)(3)(ii)(C)"
+        ]
+      }
     },
     {
       "key": "access_reviewed",
@@ -26,7 +45,23 @@
       "kind": "detective",
       "nature": "manual",
       "frequency": "twice_a_year",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.AA-05"
+        ],
+        "nist-800-53": [
+          "AC-2",
+          "AC-6(7)"
+        ],
+        "nist-800-171": [
+          "03.01.01",
+          "03.01.05"
+        ],
+        "hipaa-security": [
+          "164.308(a)(4)(ii)(C)"
+        ]
+      }
     },
     {
       "key": "second_factor",
@@ -35,7 +70,23 @@
       "kind": "preventive",
       "nature": "automated",
       "frequency": "continuous",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.AA-03"
+        ],
+        "nist-800-53": [
+          "IA-2",
+          "IA-2(1)",
+          "IA-2(2)"
+        ],
+        "nist-800-171": [
+          "03.05.03"
+        ],
+        "hipaa-security": [
+          "164.312(d)"
+        ]
+      }
     },
     {
       "key": "privileged_access",
@@ -44,7 +95,27 @@
       "kind": "preventive",
       "nature": "both",
       "frequency": "continuous",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.AA-05"
+        ],
+        "nist-800-53": [
+          "AC-6",
+          "AC-6(2)",
+          "AC-6(5)",
+          "AC-6(9)"
+        ],
+        "nist-800-171": [
+          "03.01.05",
+          "03.01.06",
+          "03.01.07"
+        ],
+        "hipaa-security": [
+          "164.308(a)(4)(ii)(B)",
+          "164.312(a)(2)(i)"
+        ]
+      }
     },
     {
       "key": "encryption_at_rest",
@@ -53,7 +124,22 @@
       "kind": "preventive",
       "nature": "automated",
       "frequency": "continuous",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "PR.DS-01"
+        ],
+        "nist-800-53": [
+          "SC-28",
+          "SC-28(1)"
+        ],
+        "nist-800-171": [
+          "03.13.08"
+        ],
+        "hipaa-security": [
+          "164.312(a)(2)(iv)"
+        ]
+      }
     },
     {
       "key": "backups_tested",
@@ -62,7 +148,23 @@
       "kind": "corrective",
       "nature": "both",
       "frequency": "quarterly",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "PR.DS-11",
+          "RC.RP-03"
+        ],
+        "nist-800-53": [
+          "CP-9",
+          "CP-9(1)",
+          "CP-10"
+        ],
+        "hipaa-security": [
+          "164.308(a)(7)(ii)(A)",
+          "164.308(a)(7)(ii)(D)",
+          "164.310(d)(2)(iv)"
+        ]
+      }
     },
     {
       "key": "data_classified",
@@ -71,7 +173,20 @@
       "kind": "directive",
       "nature": "manual",
       "frequency": "as_needed",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "ID.AM-07",
+          "ID.AM-05"
+        ],
+        "nist-800-53": [
+          "RA-2",
+          "MP-3"
+        ],
+        "nist-800-171": [
+          "03.08.04"
+        ]
+      }
     },
     {
       "key": "data_sharing_approved",
@@ -80,7 +195,23 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "as_needed",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "GV.OC-03"
+        ],
+        "nist-800-53": [
+          "AC-21",
+          "CA-3"
+        ],
+        "nist-800-171": [
+          "03.12.05"
+        ],
+        "hipaa-security": [
+          "164.308(b)(1)",
+          "164.314(a)(1)"
+        ]
+      }
     },
     {
       "key": "patching",
@@ -89,7 +220,24 @@
       "kind": "preventive",
       "nature": "both",
       "frequency": "monthly",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.PS-02",
+          "ID.RA-01"
+        ],
+        "nist-800-53": [
+          "SI-2",
+          "RA-5"
+        ],
+        "nist-800-171": [
+          "03.14.01",
+          "03.11.02"
+        ],
+        "hipaa-security": [
+          "164.308(a)(1)(ii)(B)"
+        ]
+      }
     },
     {
       "key": "malware_protection",
@@ -98,7 +246,22 @@
       "kind": "preventive",
       "nature": "automated",
       "frequency": "continuous",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "DE.CM-09",
+          "PR.PS-05"
+        ],
+        "nist-800-53": [
+          "SI-3"
+        ],
+        "nist-800-171": [
+          "03.14.02"
+        ],
+        "hipaa-security": [
+          "164.308(a)(5)(ii)(B)"
+        ]
+      }
     },
     {
       "key": "network_segmentation",
@@ -107,7 +270,20 @@
       "kind": "preventive",
       "nature": "automated",
       "frequency": "continuous",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "PR.IR-01"
+        ],
+        "nist-800-53": [
+          "SC-7",
+          "AC-4"
+        ],
+        "nist-800-171": [
+          "03.13.01",
+          "03.01.03"
+        ]
+      }
     },
     {
       "key": "unsupported_contained",
@@ -116,7 +292,22 @@
       "kind": "directive",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.PS-02",
+          "ID.AM-08"
+        ],
+        "nist-800-53": [
+          "SA-22"
+        ],
+        "nist-800-171": [
+          "03.16.02"
+        ],
+        "hipaa-security": [
+          "164.308(a)(1)(ii)(B)"
+        ]
+      }
     },
     {
       "key": "change_review",
@@ -125,7 +316,21 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "as_needed",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.PS-01",
+          "ID.RA-07"
+        ],
+        "nist-800-53": [
+          "CM-3",
+          "CM-4"
+        ],
+        "nist-800-171": [
+          "03.04.03",
+          "03.04.04"
+        ]
+      }
     },
     {
       "key": "logging_monitoring",
@@ -134,7 +339,31 @@
       "kind": "detective",
       "nature": "both",
       "frequency": "continuous",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "PR.PS-04",
+          "DE.CM-01",
+          "DE.CM-03",
+          "DE.AE-02"
+        ],
+        "nist-800-53": [
+          "AU-2",
+          "AU-6",
+          "AU-12",
+          "SI-4"
+        ],
+        "nist-800-171": [
+          "03.03.01",
+          "03.03.05",
+          "03.14.06"
+        ],
+        "hipaa-security": [
+          "164.312(b)",
+          "164.308(a)(1)(ii)(D)",
+          "164.308(a)(5)(ii)(C)"
+        ]
+      }
     },
     {
       "key": "incident_response",
@@ -143,7 +372,28 @@
       "kind": "corrective",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "RS.MA-01",
+          "ID.IM-04",
+          "ID.IM-02"
+        ],
+        "nist-800-53": [
+          "IR-8",
+          "IR-3",
+          "IR-4"
+        ],
+        "nist-800-171": [
+          "03.06.01",
+          "03.06.03",
+          "03.06.05"
+        ],
+        "hipaa-security": [
+          "164.308(a)(6)(i)",
+          "164.308(a)(6)(ii)"
+        ]
+      }
     },
     {
       "key": "security_training",
@@ -152,7 +402,26 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.AT-01",
+          "PR.AT-02"
+        ],
+        "nist-800-53": [
+          "AT-2",
+          "AT-2(3)",
+          "AT-3"
+        ],
+        "nist-800-171": [
+          "03.02.01",
+          "03.02.02"
+        ],
+        "hipaa-security": [
+          "164.308(a)(5)(i)",
+          "164.308(a)(5)(ii)(A)"
+        ]
+      }
     },
     {
       "key": "ai_use_reviewed",
@@ -197,7 +466,15 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "monthly",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "PR.IR-02"
+        ],
+        "nist-800-53": [
+          "PE-11"
+        ]
+      }
     },
     {
       "key": "backup_capacity",
@@ -215,7 +492,15 @@
       "kind": "detective",
       "nature": "automated",
       "frequency": "continuous",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.IR-02"
+        ],
+        "nist-800-53": [
+          "PE-14"
+        ]
+      }
     },
     {
       "key": "safety_training",
@@ -233,7 +518,23 @@
       "kind": "corrective",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "ID.IM-04",
+          "PR.IR-03",
+          "RC.RP-01"
+        ],
+        "nist-800-53": [
+          "CP-2",
+          "CP-4"
+        ],
+        "hipaa-security": [
+          "164.308(a)(7)(i)",
+          "164.308(a)(7)(ii)(C)",
+          "164.308(a)(7)(ii)(D)"
+        ]
+      }
     },
     {
       "key": "animal_care_checks",
@@ -296,7 +597,12 @@
       "kind": "directive",
       "nature": "manual",
       "frequency": "as_needed",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "GV.OC-03"
+        ]
+      }
     },
     {
       "key": "standards_tracked",
@@ -305,7 +611,12 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "quarterly",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "GV.OC-03"
+        ]
+      }
     },
     {
       "key": "two_identifiers",
@@ -341,7 +652,20 @@
       "kind": "corrective",
       "nature": "manual",
       "frequency": "twice_a_year",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "RC.RP-01"
+        ],
+        "nist-800-53": [
+          "CP-2",
+          "CP-4"
+        ],
+        "hipaa-security": [
+          "164.308(a)(7)(ii)(C)",
+          "164.310(a)(2)(i)"
+        ]
+      }
     },
     {
       "key": "trial_monitoring",
@@ -440,7 +764,18 @@
       "kind": "detective",
       "nature": "both",
       "frequency": "monthly",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "PR.AT-01"
+        ],
+        "nist-800-53": [
+          "AT-4"
+        ],
+        "hipaa-security": [
+          "164.308(a)(5)(i)"
+        ]
+      }
     },
     {
       "key": "reporting_channel",
@@ -467,7 +802,24 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "GV.SC-06",
+          "GV.SC-07"
+        ],
+        "nist-800-53": [
+          "SR-6",
+          "SA-9"
+        ],
+        "nist-800-171": [
+          "03.16.03",
+          "03.17.03"
+        ],
+        "hipaa-security": [
+          "164.308(b)(1)"
+        ]
+      }
     },
     {
       "key": "agreements_in_place",
@@ -476,7 +828,25 @@
       "kind": "preventive",
       "nature": "manual",
       "frequency": "as_needed",
-      "reduces": "likelihood"
+      "reduces": "likelihood",
+      "requirements": {
+        "nist-csf": [
+          "GV.SC-05"
+        ],
+        "nist-800-53": [
+          "SA-9",
+          "CA-3"
+        ],
+        "nist-800-171": [
+          "03.16.03",
+          "03.12.05"
+        ],
+        "hipaa-security": [
+          "164.308(b)(1)",
+          "164.308(b)(3)",
+          "164.314(a)(1)"
+        ]
+      }
     },
     {
       "key": "alternate_supplier",
@@ -485,7 +855,12 @@
       "kind": "corrective",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-800-53": [
+          "SR-3(1)"
+        ]
+      }
     },
     {
       "key": "exit_plan",
@@ -494,7 +869,12 @@
       "kind": "corrective",
       "nature": "manual",
       "frequency": "annually",
-      "reduces": "impact"
+      "reduces": "impact",
+      "requirements": {
+        "nist-csf": [
+          "GV.SC-10"
+        ]
+      }
     },
     {
       "key": "funding_diversified",

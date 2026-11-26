@@ -212,6 +212,9 @@ def create(
                     kind=OWNER,
                 )
             )
+        created = record_type.extra.get("created")
+        if created is not None:
+            created(session, principal, record)
     return record
 
 

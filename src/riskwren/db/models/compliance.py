@@ -26,6 +26,8 @@ FRAMEWORK_KINDS = ("standard", "regulation", "agreement", "internal")
 TEXT_POLICIES = ("verbatim", "attributed", "identifiers", "summary", "own")
 ORIGINS = ("pack", "local")
 FRAMEWORK_STATUSES = ("active", "retired")
+COVERAGE = ("full", "partial")
+MAPPING_SOURCES = ("pack", "person")
 REQUIREMENT_STATUSES = ("active", "withdrawn")
 
 
@@ -128,3 +130,30 @@ class BaselineRequirement(Base):
     )
 
     __table_args__ = (Index("ix_baseline_requirement_requirement_id", "requirement_id"),)
+
+
+class ControlRequirement(Base):
+    """A crosswalk: this control helps to satisfy this requirement. One control answers
+    many requirements, in any number of frameworks, and is tested once."""
+
+    __tablename__ = "control_requirement"
+    __subject__ = "control_requirement"
+    __audit_parent__ = ("control", "control_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id", ondelete="CASCADE"))
+    requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement.id", ondelete="CASCADE"))
+    # Whether the control answers the requirement by itself, or only in part.
+    coverage: Mapped[str] = mapped_column(String(16), default="partial")
+    note: Mapped[str | None] = mapped_column(String(300))
+    # Suggested by a pack, or said by a person.
+    source: Mapped[str] = mapped_column(String(16), default="person")
+    created_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("control_id", "requirement_id", name="uq_control_requirement"),
+        CheckConstraint(one_of("coverage", COVERAGE), name="coverage"),
+        CheckConstraint(one_of("source", MAPPING_SOURCES), name="source"),
+        Index("ix_control_requirement_requirement_id", "requirement_id"),
+    )

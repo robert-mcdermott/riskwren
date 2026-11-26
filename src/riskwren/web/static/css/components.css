@@ -348,6 +348,12 @@ button.requirement-toggle:hover { background: var(--surface-2); color: var(--tex
 .requirement-row:hover { background: var(--surface-2); }
 .requirement-row .cell-sub { display: block; }
 .requirement-code { flex: none; min-width: 7ch; font-family: var(--font-mono); font-size: var(--text-s); color: var(--accent); white-space: nowrap; }
+.mapped-count { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0 0; color: var(--text-muted); font-size: var(--text-s); font-variant-numeric: tabular-nums; }
+.mapped-control { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-s); }
+.picked { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); border-radius: var(--radius-s); background: var(--accent-soft); }
+.coverage { display: grid; gap: var(--space-2); }
+.coverage-bar { height: 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.coverage-fill { display: block; height: 100%; width: 0; background: var(--accent); }
 .disclosure summary { cursor: pointer; color: var(--accent); font-weight: 550; width: fit-content; }
 .disclosure .prose { margin-top: var(--space-2); }
 .mono { font-family: var(--font-mono); font-size: var(--text-s); }

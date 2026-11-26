@@ -156,14 +156,17 @@ def listing(
     parent: str | None = None,
     query: str | None = None,
     baseline: str | None = None,
+    only: Any = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[dict[str, Any]], int]:
-    """One level of the tree, or, with words or a baseline, the requirements that match
-    wherever they sit."""
+    """One level of the tree, or, with words, a baseline, or another condition (``only``),
+    the requirements that match wherever they sit."""
     conditions = [Requirement.framework_id == framework.id]
     words = (query or "").strip()
-    flat = bool(words or baseline)
+    flat = bool(words or baseline) or only is not None
+    if only is not None:
+        conditions.append(only)
     if words:
         like = f"%{words.lower()}%"
         conditions.append(

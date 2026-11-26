@@ -640,3 +640,15 @@ DUA-4.2 Results are released only in a form in which no participant can be ident
 DUA-5.1 Any loss of, or unauthorized access to, the data is reported to the trust within seventy-two hours of discovery.
 DUA-6.1 The data and every copy are destroyed within ninety days of the agreement ending, and the destruction is certified in writing.
 """
+
+# control (library key), the unit that runs it, the term it answers, how far, and a note.
+AGREEMENT_CONTROLS = [
+    ("access_reviewed", "SEC", "DUA-2.2", "partial",
+     "The review happens twice a year. Telling the trust of changes is not yet anyone's job."),
+    ("encryption_at_rest", "IT", "DUA-3.2", "partial",
+     "Covers storage and managed laptops. Transfers are covered by the network standard."),
+    ("data_classified", "CMPL", "DUA-3.1", "partial", None),
+    ("incident_response", "SEC", "DUA-5.1", "partial",
+     "The plan names the privacy office; the seventy-two hours is in the checklist."),
+    ("data_sharing_approved", "CMPL", "DUA-4.1", "full", None),
+]  # fmt: skip

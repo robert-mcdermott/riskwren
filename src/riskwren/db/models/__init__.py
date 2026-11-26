@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from riskwren.db.models.compliance import Baseline, BaselineRequirement, Framework, Requirement
+from riskwren.db.models.compliance import (
+    Baseline,
+    BaselineRequirement,
+    ControlRequirement,
+    Framework,
+    Requirement,
+)
 from riskwren.db.models.controls import (
     Acceptance,
     Action,
@@ -43,6 +49,7 @@ __all__ = [
     "Control",
     "ControlLibraryEntry",
     "ControlRating",
+    "ControlRequirement",
     "Counter",
     "Credential",
     "Event",

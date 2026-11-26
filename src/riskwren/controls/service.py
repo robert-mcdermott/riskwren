@@ -55,6 +55,15 @@ def _apply(
         control.library_key = records.text(values["library_key"])
 
 
+def _created(session: Session, principal: Any, control: Control) -> None:
+    """A control started from the library arrives mapped to the requirements the library
+    suggests for it, in whichever frameworks are loaded."""
+    if control.library_key:
+        from riskwren.compliance import crosswalk  # it builds on this module
+
+        crosswalk.apply_library(session, control, account_id=principal.account_id)
+
+
 def is_stale(session: Session, control: Control, *, today: date | None = None) -> bool:
     """Whether what is known about the control is too old to rely on."""
     if control.rated_at is None:
@@ -184,6 +193,7 @@ CONTROL = register(
         extra={
             "new": _new,
             "apply": _apply,
+            "created": _created,
             "cards": _cards,
             "detail": _detail,
             "conditions": _conditions,
@@ -500,6 +510,7 @@ def load_library(session: Session, pack: dict[str, Any]) -> int:
             "nature": item.get("nature"),
             "frequency": item.get("frequency"),
             "reduces": item.get("reduces", "likelihood"),
+            "requirements": item.get("requirements", {}),
             "source_pack": source,
         }
         row = have.get(item["key"])

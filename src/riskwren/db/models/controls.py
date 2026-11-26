@@ -117,6 +117,8 @@ class ControlLibraryEntry(Base):
     nature: Mapped[str | None] = mapped_column(String(40))
     frequency: Mapped[str | None] = mapped_column(String(40))
     reduces: Mapped[str] = mapped_column(String(16), default="likelihood")
+    # Framework key → the codes of the requirements this control helps to satisfy.
+    requirements: Mapped[dict[str, list[str]]] = mapped_column(JsonType, default=dict)
     source_pack: Mapped[str] = mapped_column(String(80))
 
 

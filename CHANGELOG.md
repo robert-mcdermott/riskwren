@@ -17,6 +17,12 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Frameworks of your own.** An agreement's terms, a sponsor's requirements, or an internal
   standard is entered as a framework and behaves like any other. Requirements are added one
   at a time or pasted in after a dry run, and every change to them is in the history.
+- **Crosswalks.** A control is mapped to every requirement it helps to satisfy, in any
+  number of frameworks, from the control or from the requirement, in full or in part, with
+  a note. Twenty-seven starter controls carry suggested mappings to the built-in frameworks:
+  a control started from the library arrives mapped, and others are offered the suggestions.
+  Each framework shows how many of its requirements have a control and lists those with
+  none. Counts leave out controls their reader may not see (migration 0008).
 - **Framework packs.** A framework is one JSON document, checked whole before anything is
   loaded and refused whole if anything is wrong. Each pack declares what text it may carry,
   and a test holds every built-in pack to it. `riskwren frameworks list`, `show`, and `load`.

@@ -38,16 +38,18 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `scripts/build-framework-packs.py` builds the four packs from the publishers' own files, each pinned by digest: the Cybersecurity Framework 2.0 (106 outcomes), SP 800-53 Rev. 5 release 5.2.0 (1,014 active controls and enhancements, with four baselines), SP 800-171 Rev. 3 (97 requirements), and the Security Rule from the electronic Code of Federal Regulations (91 standards, specifications, and paragraphs). `init` and `db upgrade` load them in a tenth of a second. Anyone signed in browses a tree a level at a time, searches it whole, narrows it to a baseline, and opens any requirement in full. Those who run the program enter agreements and internal standards as frameworks of their own, a requirement at a time or pasted in after a dry run.
 
-### Slice 2: Crosswalks ☐
+### Slice 2: Crosswalks ☑
 
 **Goal:** one control, many requirements.
 
-- [ ] `control_requirement` with coverage (full, partial), a note, and its source (pack or person)
-- [ ] Mapping from either end: a control's requirements, a requirement's controls
-- [ ] The starter controls' crosswalk to the built-in frameworks, shipped with the control library and applied when a control is adopted
-- [ ] Coverage of a framework: requirements with and without controls
+- [x] `control_requirement` with coverage (full, partial), a note, and its source (pack or person)
+- [x] Mapping from either end: a control's requirements, a requirement's controls
+- [x] The starter controls' crosswalk to the built-in frameworks, shipped with the control library and applied when a control is adopted
+- [x] Coverage of a framework: requirements with and without controls
 
 **Acceptance:** a control adopted from the library arrives mapped; coverage figures open the requirements they count.
+
+**Done:** a control has a Requirements tab, framework by framework; a requirement shows its controls and how well each is known to work. Twenty-seven of the starter controls carry 156 suggested mappings to the four built-in frameworks, each code checked against the packs by a test. A control started from the library arrives mapped, and one adopted before its framework was loaded is offered the suggestions. Each framework shows how many of its requirements have a control, and the ones with none are a filter away.
 
 ### Slice 3: Scopes and inheritance ☐
 
@@ -131,4 +133,9 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **A heading is not a requirement.** Families, functions, sections, and paragraphs that only introduce others are kept in the tree and marked as headings, so that nothing is mapped to "Implementation specifications:".
 - **The regulation is read from its paragraphs.** The Security Rule arrives as flat paragraphs marked (a), (1), (i), (A). The builder rebuilds the tree from the marks, takes titles from the italic leads, and tells standards from implementation specifications by what the text itself says.
 - **A requirement is addressed by a query, not a path.** Codes such as `164.308(a)(1)(ii)(A)` and an agreement's `A/1` do not belong in a path, so one requirement is `…/requirement?code=`.
+- **A suggested mapping is partial until someone says otherwise.** A plain-words control rarely answers the whole of a requirement that has a dozen parts. The library's mappings arrive marked as suggested and as answering in part; a person who changes one has made it their own.
+- **Coverage is not readiness.** A requirement with a control mapped to it is covered, which says nothing about whether the control works. The coverage card says so; readiness, from tests and evidence, comes in slice 5.
+- **Coverage follows what its reader may see of controls.** A requirement's controls, and every count of them, leave out controls the reader could not open, and say how many were left out. A retired control answers nothing.
+- **Suggestions are offered, not applied behind anyone's back.** Upgrading does not map an organization's existing controls. A control that came from the library shows what the library suggests, and its keeper adds them or not.
+- **The demo is built once for the tests that only read it.** A build makes some fifty thousand small statements, which is seconds on SQLite and over a minute against a PostgreSQL container. The tests that only read the demo now share one build; those that are about building it still build their own.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

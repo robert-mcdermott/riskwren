@@ -107,6 +107,10 @@ POLICIES.update(record_policies("controls", links=False))
 POLICIES.update(
     {
         ("GET", "/api/v1/control-library"): Needs.MEMBER,
+        ("GET", "/api/v1/controls/{ref}/requirements"): Needs.MEMBER,
+        ("PUT", "/api/v1/controls/{ref}/requirements"): Needs.MEMBER,
+        ("POST", "/api/v1/controls/{ref}/requirements/suggested"): Needs.MEMBER,
+        ("DELETE", "/api/v1/controls/{ref}/requirements/{mapping_id}"): Needs.MEMBER,
         ("GET", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
         ("POST", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
         ("GET", "/api/v1/risks/{ref}/controls"): Needs.MEMBER,
@@ -136,6 +140,7 @@ POLICIES.update(
         ("GET", "/api/v1/frameworks/{key}"): Needs.MEMBER,
         ("PATCH", "/api/v1/frameworks/{key}"): Needs.CONFIGURE,
         ("GET", "/api/v1/frameworks/{key}/requirements"): Needs.MEMBER,
+        ("GET", "/api/v1/frameworks/{key}/coverage"): Needs.MEMBER,
         ("POST", "/api/v1/frameworks/{key}/requirements"): Needs.CONFIGURE,
         ("POST", "/api/v1/frameworks/{key}/requirements/paste"): Needs.CONFIGURE,
         ("GET", "/api/v1/frameworks/{key}/requirement"): Needs.MEMBER,

@@ -343,6 +343,7 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
             )
             path = path.replace("{kind}", "favicon").replace("{key}", "technology")
             path = path.replace("{control_ref}", "CTL-9999").replace("{acceptance_id}", "9999")
+            path = path.replace("{mapping_id}", "9999")
             if template.startswith("/api/v1/plans/"):
                 path = path.replace("{ref}", "PLN-9999")
             if template.startswith("/api/v1/actions/"):
@@ -372,6 +373,8 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"product_name": "RiskWren", "palette": "wren"}
             elif template.endswith("/branding/check"):
                 body = {"accent": "#1f6f5c"}
+            elif template.endswith("/controls/{ref}/requirements"):
+                body = {"framework": "nist-csf", "code": "GV.OC-01", "coverage": "full"}
             elif template.endswith("/ratings"):
                 body = {"design": "effective", "operation": "effective", "note": "x"}
             elif template.endswith("/risks/{ref}/controls"):

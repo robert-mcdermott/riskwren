@@ -25,7 +25,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
-from riskwren.compliance import frameworks
+from riskwren.compliance import crosswalk, frameworks
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
 from riskwren.core.clock import clock_set_to
@@ -1471,6 +1471,16 @@ class Builder:
                 {"guidance": "The trust's privacy office confirmed that discovery means the "
                  "moment anyone at the institute first suspects it, not when it is confirmed."},
             )  # fmt: skip
+        yield self.ago(381)
+        # The controls the institute already runs answer most of the agreement's terms.
+        for key, unit, code, coverage, note in c.AGREEMENT_CONTROLS:
+            control = self.control(key, self.units[unit])
+            with self.act(lead) as (session, who):
+                crosswalk.map_(
+                    session, who, session.get(Control, control), framework=made.key, code=code,
+                    coverage=coverage, note=note,
+                )  # fmt: skip
+            self.tally("requirements mapped by hand")
 
     def _story_escalated(self) -> Script:
         """A lab's privacy risk raised to its department, with the reason."""
