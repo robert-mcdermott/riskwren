@@ -16,7 +16,11 @@ from riskwren.people import accounts
 
 SAFE = {"GET", "HEAD", "OPTIONS"}
 # Changes that need no CSRF token because there is no session yet, or it is being ended.
-NO_TOKEN = {("POST", "/api/v1/session"), ("DELETE", "/api/v1/session")}
+NO_TOKEN = {
+    ("POST", "/api/v1/session"),
+    ("POST", "/api/v1/session/demo"),
+    ("DELETE", "/api/v1/session"),
+}
 MAX_BODY = 32 * 1024 * 1024  # a little over the largest file anyone may send
 
 

@@ -132,7 +132,7 @@
 .input[aria-invalid="true"], .select[aria-invalid="true"] { border-color: var(--danger); }
 .input::placeholder, .textarea::placeholder { color: var(--text-subtle); }
 .input-color { width: 46px; min-height: 38px; padding: 3px; }
-.check { display: flex; align-items: flex-start; gap: var(--space-2); }
+.check { display: flex; align-items: flex-start; gap: var(--space-2); min-height: 24px; }
 .check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); }
 .form-actions { display: flex; gap: var(--space-3); align-items: center; padding-top: var(--space-2); }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
@@ -317,7 +317,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .swatch { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); flex: none; }
 
 /* ---- Odds and ends ---- */
-.link-button { border: 0; background: none; padding: 0; text-align: left; color: var(--text); }
+.link-button { border: 0; background: none; padding: 0; min-height: 24px; text-align: left; color: var(--text); }
 .link-button:hover { color: var(--accent); text-decoration: underline; background: none; }
 .search-slot { width: min(280px, 100%); }
 
@@ -337,7 +337,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
 .filters .select { width: auto; min-width: 130px; flex: 0 1 auto; }
 .filter-search { flex: 1 1 200px; max-width: 300px; }
-.sort-button { border: 0; background: none; padding: 0; font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; }
+.sort-button { border: 0; background: none; padding: 0; min-height: 24px; min-width: 24px; font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; text-align: inherit; cursor: pointer; }
 .sort-button:hover { color: var(--text); }
 th[aria-sort] .sort-button { color: var(--text); }
 

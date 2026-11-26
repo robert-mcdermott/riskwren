@@ -23,7 +23,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 
 ---
 
-## Wave 1: The register (v0.1.0) ◐
+## Wave 1: The register (v0.1.0) ☑
 
 **Goal:** prove the core loop. Something the organization depends on has a risk; the risk is rated with reasons; controls of known effectiveness bring it down; what remains is treated or accepted by someone with the authority; and all of it is on a record that cannot be quietly changed.
 
@@ -37,7 +37,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 | 6 | Controls and treatment | The control library and starter controls, effectiveness ratings, the suggested residual with its working, responses, treatment plans, actions, and acceptance under the authority table | ☑ |
 | 7 | Home, heat map, and dashboard | What each person owes; the heat map with the appetite boundary; the risk dashboard with every figure linked to its records | ☑ |
 | 8 | Demo organization | The fictional institute, built through the services under a simulated clock, with storylines for every wave 1 screen | ☑ |
-| 9 | Release prep | Guides, quickstart, changelog, accessibility check, version, release | ☐ |
+| 9 | Release prep | Guides, quickstart, changelog, accessibility check, version, release | ☑ |
 
 Detail: [waves/wave-1.md](waves/wave-1.md)
 

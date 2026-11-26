@@ -1,7 +1,7 @@
 // Admin → Program: how risks are rated here. The categories and their appetite, and the
 // scoring method with every definition, so that anyone can see what a rating means.
 
-import { patch } from "../core/api.js";
+import { get, patch, put } from "../core/api.js";
 import { h } from "../core/dom.js";
 import { program as loadProgram } from "../core/lookups.js";
 import { matrixGrid } from "../components/matrix.js";
@@ -26,6 +26,28 @@ function appetiteSelect(program, category, top, reload) {
     }
   });
   return node;
+}
+
+// Who sees the register of risks and controls. The inventory is open to everyone signed in.
+function visibility(seen) {
+  const node = h("select", { class: "select", id: "register-visibility" },
+    Object.entries(seen.choices).map(([key, text]) => h("option", { value: key, selected: key === seen.visibility }, text)));
+  let current = seen.visibility;
+  node.addEventListener("change", async () => {
+    try {
+      await put("/api/v1/admin/visibility", { visibility: node.value });
+      current = node.value;
+      toast("Saved.");
+    } catch (error) {
+      toast(Object.values(error.fields ?? {}).join(" ") || error.detail || "That could not be saved.");
+      node.value = current;
+    }
+  });
+  return card({ title: "Who sees the register" },
+    h("div", { class: "stack-sm" },
+      h("label", { class: "label", for: "register-visibility" }, "What a person with no role sees"),
+      node,
+      h("p", { class: "subtle" }, "Leaders and stewards always see their unit and everything beneath it; managers, auditors, and assessors see what their role covers. A record marked restricted is seen only by its owners, its unit's steward and leaders, managers, and auditors. Processes, systems, and third parties are open to everyone signed in, so that anything can be linked to them.")));
 }
 
 function taxonomy(program, reload) {
@@ -71,7 +93,10 @@ function rules(program) {
 export function adminProgram(main) {
   return show(main, {
     title: "Program",
-    load: () => loadProgram({ fresh: true }),
+    load: async () => {
+      const [program, seen] = await Promise.all([loadProgram({ fresh: true }), get("/api/v1/admin/visibility", undefined, { fresh: true })]);
+      return { ...program, seen: seen.data };
+    },
     view: (program, reload) => h("div", { class: "stack-lg" },
       pageHeader({ eyebrow: "Admin", title: "Program",
         lede: "How risks are rated here: what each level means, how likelihood and impact combine, and how much each kind of risk may be lived with." }),
@@ -80,6 +105,7 @@ export function adminProgram(main) {
         matrixGrid(program),
         h("p", { class: "subtle" }, "Impact up the side, likelihood along the bottom. The overall impact of a risk is the highest level rated on any dimension.")),
       rules(program),
+      visibility(program.seen),
       definitions(program),
       alert("info", h("div", {}, "The scoring method, cadences, and vocabularies are changed by importing a program pack: ",
         h("code", {}, "riskwren program export"), " writes the one in force, and ", h("code", {}, "riskwren program import"),

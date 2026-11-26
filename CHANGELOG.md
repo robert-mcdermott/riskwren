@@ -6,6 +6,14 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.1.0 (2026-11-25)
+
+Wave 1, *The register*: install, sign in, and hold a risk register over an inventory of
+processes, systems, and third parties, with risks rated, linked to controls of known
+effectiveness, and treated or formally accepted.
+
 ### Added
 
 - **Foundation.** `riskwren init`, `serve`, `db upgrade`, `db current`, `verify`, and `doctor`.
@@ -130,6 +138,14 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   plan gone late, and a departed owner's orphaned records. A demo marks itself on every
   page, signs in any of nine sample people with one click from the machine it runs on, and
   will not listen on the network unless started with `--demo-on-network`.
+- **Who sees the register.** Admin → Program has the setting for what a person with no role
+  sees of risks and controls: everything not restricted, their own units, or only what they
+  are named on.
+- **Guides.** Getting started, the register, running the program, configuration, and the API,
+  with a command reference and an OpenAPI document written from the code.
+- **An accessibility audit.** `node scripts/a11y-audit.mjs` builds a fresh demo and checks
+  every screen, in three palettes by day and after dark, for names on controls, labels,
+  headings, landmarks, click-target sizes, and the contrast of every piece of text.
 
 ### Fixed
 

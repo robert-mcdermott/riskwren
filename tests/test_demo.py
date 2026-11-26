@@ -223,6 +223,10 @@ def test_sample_people_sign_in_with_one_click_only_on_a_demo(
     assert client.get("/api/v1/dashboard").status_code == 200
     assert client.get("/api/v1/risks").json()["data"]
 
+    # Choosing another sample person while signed in needs no token, as signing in does not.
+    again = client.post("/api/v1/session/demo", json={"email": shown["accounts"][1]["email"]})
+    assert again.status_code == 200 and "steward" in again.json()["data"]["roles"]
+
     with TestClient(create_app(instance.config), client=("203.0.113.9", 4000)) as elsewhere:
         away = elsewhere.post(
             "/api/v1/session/demo", json={"email": email}, headers={"origin": "http://testserver"}

@@ -304,6 +304,7 @@ class Builder:
             account = accounts.get(session, self.cast[key])
             self.sample.append(
                 {
+                    "key": key,
                     "email": account.email,
                     "name": account.display_name,
                     "title": account.title or "",

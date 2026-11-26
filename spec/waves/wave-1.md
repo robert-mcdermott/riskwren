@@ -2,7 +2,7 @@
 
 **Goal:** prove the core loop. Something the organization depends on has a risk; RiskWren rates it and shows why; controls of known effectiveness bring it down, and the arithmetic is on the screen; what remains above appetite is treated through a plan or accepted by a named person with the authority; and every step is on a record that cannot be quietly changed. Everything else in the roadmap builds on this loop being quick, clear, and trustworthy.
 
-**Branch:** `wave-1` · **Target version:** `0.1.0` · **Status:** ◐ in progress
+**Branch:** `wave-1` · **Target version:** `0.1.0` · **Status:** ☑ released
 
 ## Exit criteria
 
@@ -166,13 +166,15 @@ None block the start. These defaults have been taken and can be changed before t
 
 **Done:** `riskwren demo` builds Northmere in about five seconds: 60 units, about 210 people, 220 inventory records, 180 risks, 110 controls, and some 6,000 events over two years, all through the services and under a simulated clock. Twelve storylines are written by hand and asserted by the tests. A demo marks itself on every page, signs in any of nine sample people with one click from the machine it runs on, and refuses to listen on the network unless told to.
 
-## Slice 9: Release prep ☐
+## Slice 9: Release prep ☑
 
-- [ ] Guides in `docs/`: getting started, configuration, the register (inventory, risks, controls, treatment), running the program, the command-line reference, the API guide
-- [ ] `README.md` with the quickstart; `CHANGELOG.md` for 0.1.0
-- [ ] The automated accessibility audit over every wave 1 screen in every palette and mode
-- [ ] Fresh-clone install and quickstart checked on both databases
-- [ ] Version `0.1.0`; pull request from `wave-1`; tag and release
+- [x] Guides in `docs/`: getting started, configuration, the register (inventory, risks, controls, treatment), running the program, the command-line reference, the API guide
+- [x] `README.md` with the quickstart; `CHANGELOG.md` for 0.1.0
+- [x] The automated accessibility audit over every wave 1 screen in every palette and mode
+- [x] Fresh-clone install and quickstart checked on both databases
+- [x] Version `0.1.0`; pull request from `wave-1`; tag and release
+
+**Done:** five guides and two references; a README a stranger can install from; the audit, which is RiskWren's own script driving headless Chrome with no packages, over 32 scenes in three palettes and two modes; and a fresh clone installed, set up, and served on SQLite and on PostgreSQL.
 
 ## Notes
 
@@ -195,4 +197,6 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Parts and wholes are links, not record types.** A system built on a platform, or a service within a broader line of work, is said with an *is part of* link between two systems or two processes. The dependency graph that makes these links visible moves forward from wave 3 to wave 2, where scopes, controls, and requirements give it more to show.
 - **A control another unit runs is linked by the second line.** Under the default visibility a steward cannot see, and so cannot link, a control owned by a unit outside their own. Building the demo through the services made this plain: central controls (backups, patching, training) are tied to a unit's risks by the risk team, who see everything. Wave 2's scopes and inherited controls give units a way to lean on a provider's controls themselves.
 - **The demo is the widest test the product has.** It found nothing to fix in the services, which is the result hoped for; it does take most of a minute of the test run, because several tests each build it afresh.
+- **Writing the guides found a setting with no screen.** How much of the register a person with no role sees could be set through the API and nowhere else. Admin → Program now has it.
+- **The audit found five things.** Sort buttons in table headers, name buttons in the People list, and radio rows on Appearance were under the 24 pixels a click target needs; the placeholder in the dark-logo slot was too faint by day; and choosing a second sample person while signed in as the first was refused for want of a token, which sign-in itself does not need. All are fixed, and the last has a test.
 - **The rating ramp has five steps.** A method with fewer ratings spreads them across the ramp, so the lowest and the highest always sit at its ends.
