@@ -305,6 +305,12 @@ for _key, _needs in POLICIES.items():
     mine = _key[1].startswith(("/api/v1/assessments", "/api/v1/tests", "/api/v1/results"))
     if mine and _key not in REACH:
         REACH[_key] = {"assessor", "manager"} if _needs is Needs.ASSESS else EVERYONE
+for _key, _needs in POLICIES.items():
+    # Issues, exceptions, and notices are reached by anyone and decided by the record.
+    # Confirming a closure, withdrawing an issue, and reopening one are the second line's.
+    mine = _key[1].startswith(("/api/v1/issues", "/api/v1/exceptions", "/api/v1/notices"))
+    if mine and _key not in REACH:
+        REACH[_key] = {"assessor", "manager"} if _needs is Needs.ASSESS else EVERYONE
 for _key in POLICIES:
     # Evidence is reached by anyone and decided by the item.
     if _key[1].startswith("/api/v1/evidence") and _key not in REACH:
@@ -370,6 +376,10 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 path = path.replace("{ref}", "ASM-9999")
             if template.startswith("/api/v1/evidence"):
                 path = path.replace("{ref}", "EV-9999")
+            if template.startswith("/api/v1/issues"):
+                path = path.replace("{ref}", "ISS-9999")
+            if template.startswith("/api/v1/exceptions"):
+                path = path.replace("{ref}", "EXC-9999")
             for record_path, prefix in RECORD_PATHS.items():
                 if template.startswith(f"/api/v1/{record_path}"):
                     # A record that is not there: reached, and answered with "not found".
@@ -405,6 +415,16 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"control": "CTL-9999", "status": "planned"}
             elif template.endswith("/controls/inherited"):
                 body = {"implementation": 9999, "inheritance": "inherited"}
+            elif template.endswith("/issues/{ref}/actions"):
+                body = {"title": "x", "owner_id": 1, "due_on": "2030-01-01"}
+            elif template.endswith("/due-date"):
+                body = {"due_on": "2030-01-01", "reason": "x"}
+            elif template.endswith("/closure"):
+                body = {"note": "x", "root_cause": "other"}
+            elif template.endswith("/validation"):
+                body = {"confirm": True}
+            elif template.endswith("/decision"):
+                body = {"approve": True}
             elif template.endswith("/results"):
                 body = {"design": "effective", "operation": "effective", "note": "x"}
             elif template.endswith("/review"):

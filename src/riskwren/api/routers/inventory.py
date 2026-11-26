@@ -84,8 +84,17 @@ class VisibilityBody(BaseModel):
 
 @router.get("/vocabularies", summary="The lists of values records choose from")
 def vocabularies(request: Request) -> dict[str, Any]:
+    from riskwren.compliance import issues  # the clock each severity sets, beside its meaning
+
     with reading(request) as session:
-        return envelope(vocab.all_(session))
+        found = vocab.all_(session)
+        found["issue_severities"] = [
+            {**item, "due_days": issues.due_days(session, item["key"])}
+            if item["key"] in issues.DUE_DAYS
+            else item
+            for item in found["issue_severities"]
+        ]
+        return envelope(found)
 
 
 @router.get("/admin/visibility", summary="How much of the register everyone can see")

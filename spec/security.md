@@ -127,7 +127,11 @@ One function per record type decides what a principal may see. Single records, l
 | Start an assessment; plan its tests (wave 2) | | | | | ✓ | ✓ | | |
 | Record a test result (wave 2) | | | | | ✓ (not their own control) | ✓ (not their own control) | | |
 | Confirm or return a test result (wave 2) | | | | | ✓ (not their own control or result) | ✓ (not their own control or result) | | |
-| Validate closure of an issue (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
+| Raise an issue for a unit they work in or have a role over (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| Work on an issue: actions, its date, proposing closure (wave 2) | | ✓ | ✓ | | | ✓ | | |
+| Validate closure of an issue; withdraw or reopen one (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
+| Ask for an exception (wave 2) | | ✓ (of the scope or control) | ✓ | | | ✓ | | |
+| Decide an exception (wave 2) | | | | ✓ (not their own request) | | ✓ (not their own request) | | |
 | Read the full history; export | | | | | | ✓ | ✓ | ✓ |
 | Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | ✓ |
 | Enter and keep the organization's own frameworks; retire a framework (wave 2) | | | | | | ✓ | | ✓ |

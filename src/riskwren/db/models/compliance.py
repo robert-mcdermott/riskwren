@@ -19,7 +19,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from riskwren.db.base import Base
 from riskwren.db.models.inventory import RECORD_STATUSES, RecordMixin, one_of
-from riskwren.db.types import UtcDateTime
+from riskwren.db.types import JsonType, UtcDateTime
 
 FRAMEWORK_KINDS = ("standard", "regulation", "agreement", "internal")
 # What text a framework may carry (see spec/content-packs.md). ``own`` is the organization's
@@ -37,6 +37,10 @@ TEST_METHODS = ("examine", "interview", "test")
 TEST_RESULTS = ("effective", "partly", "ineffective")
 REVIEWS = ("confirmed", "returned")
 REQUIREMENT_STATUSES = ("active", "withdrawn")
+SEVERITIES = ("critical", "high", "moderate", "low")
+ISSUE_STATUSES = ("open", "proposed", "closed", "cancelled")
+EXCEPTION_STATUSES = ("requested", "approved", "refused", "withdrawn")
+EXCEPTION_SUBJECTS = ("control", "requirement")
 
 
 class Framework(Base):
@@ -410,3 +414,114 @@ class TestResult(Base):
         CheckConstraint("review IS NULL OR " + one_of("review", REVIEWS), name="review"),
         Index("ix_test_result_test_id", "test_id"),
     )
+
+
+class Issue(RecordMixin, Base):
+    """Something found to be wrong that must be put right, whatever found it. Its date follows
+    from its severity, and it closes only when someone other than its owner has confirmed
+    that it is fixed."""
+
+    __tablename__ = "issue"
+    __subject__ = "issue"
+
+    severity: Mapped[str] = mapped_column(String(16))
+    # What found it (a test, a gap, an audit, an incident, a review, someone's own
+    # observation), and, where there is one, the row it came from.
+    source_kind: Mapped[str] = mapped_column(String(24), default="observation")
+    source_type: Mapped[str | None] = mapped_column(String(24))
+    source_id: Mapped[int | None] = mapped_column(Integer)
+    due_on: Mapped[date] = mapped_column(Date)
+    # Moving the date needs a reason; where it started and how often it moved stay here.
+    original_due_on: Mapped[date] = mapped_column(Date)
+    extensions: Mapped[list[dict[str, str]]] = mapped_column(JsonType, default=list)
+    status: Mapped[str] = mapped_column(String(16), default="open")
+    root_cause: Mapped[str | None] = mapped_column(String(40))
+    closure_note: Mapped[str | None] = mapped_column(Text)
+    proposed_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    proposed_by_name: Mapped[str | None] = mapped_column(String(200))
+    proposed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    # What the person asked to confirm closure said when they sent it back.
+    return_note: Mapped[str | None] = mapped_column(Text)
+    validated_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    validated_by_name: Mapped[str | None] = mapped_column(String(200))
+    validated_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    closed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        CheckConstraint(one_of("severity", SEVERITIES), name="severity"),
+        CheckConstraint(one_of("status", ISSUE_STATUSES), name="status"),
+        Index("ix_issue_org_unit_id", "org_unit_id"),
+        Index("ix_issue_status_due_on", "status", "due_on"),
+        Index("ix_issue_source", "source_type", "source_id"),
+    )
+
+
+class IssueSubject(Base):
+    """What an issue is about: a control, a requirement, a scope, or a risk."""
+
+    __tablename__ = "issue_subject"
+    __audit_parent__ = ("issue", "issue_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    issue_id: Mapped[int] = mapped_column(ForeignKey("issue.id", ondelete="CASCADE"))
+    subject_type: Mapped[str] = mapped_column(String(24))
+    subject_id: Mapped[int] = mapped_column(Integer)
+
+    __table_args__ = (
+        UniqueConstraint("issue_id", "subject_type", "subject_id", name="uq_issue_subject"),
+        Index("ix_issue_subject_subject", "subject_type", "subject_id"),
+    )
+
+
+class ExceptionRequest(RecordMixin, Base):
+    """A request to depart from a control or a requirement for a time, with what makes up
+    for it, and the decision of someone with authority who did not ask."""
+
+    __tablename__ = "exception_request"
+    __subject__ = "exception"
+
+    subject_type: Mapped[str] = mapped_column(String(24))
+    subject_id: Mapped[int] = mapped_column(Integer)
+    # Where it applies. An exception to a requirement is always within a scope; one to a
+    # control may be within a scope, or wherever the control is relied on.
+    scope_id: Mapped[int | None] = mapped_column(ForeignKey("scope.id"))
+    justification: Mapped[str] = mapped_column(Text)
+    compensating: Mapped[str | None] = mapped_column(Text)
+    requested_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    requested_by_name: Mapped[str] = mapped_column(String(200))
+    requested_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    starts_on: Mapped[date] = mapped_column(Date)
+    expires_on: Mapped[date] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(16), default="requested")
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    decided_by_name: Mapped[str | None] = mapped_column(String(200))
+    decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    # The exception this one would carry on from, when it is a renewal.
+    renews_id: Mapped[int | None] = mapped_column(ForeignKey("exception_request.id"))
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", EXCEPTION_STATUSES), name="status"),
+        CheckConstraint(one_of("subject_type", EXCEPTION_SUBJECTS), name="subject_type"),
+        Index("ix_exception_request_org_unit_id", "org_unit_id"),
+        Index("ix_exception_request_subject", "subject_type", "subject_id"),
+        Index("ix_exception_request_scope_id", "scope_id"),
+    )
+
+
+class Notice(Base):
+    """Something a person should know was assigned to them or changed for them. A pointer,
+    not a record: the history holds what happened."""
+
+    __tablename__ = "notice"
+    __audit__ = False
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id", ondelete="CASCADE"))
+    kind: Mapped[str] = mapped_column(String(40))
+    text: Mapped[str] = mapped_column(String(400))
+    href: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    read_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+
+    __table_args__ = (Index("ix_notice_account_id_read_at", "account_id", "read_at"),)

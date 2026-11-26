@@ -40,7 +40,7 @@ export function bars(items, { empty = "Nothing to show yet." } = {}) {
 
 /**
  * One bar cut into parts, with the figures spelled out beneath it, so nothing is said by
- * color alone. parts: [{ label, value, tone }]; tone is ok, info, warn, danger, gap, or none.
+ * color alone. parts: [{ label, value, tone }]; tone is ok, info, warn, danger, gap, excepted, or none.
  */
 export function segments(parts, { label }) {
   const total = parts.reduce((sum, part) => sum + part.value, 0);

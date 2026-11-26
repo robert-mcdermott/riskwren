@@ -56,10 +56,15 @@ STATES = {
     "failing": "Failing",
     "gap": "Gap",
     "planned": "Planned",
+    "excepted": "Excepted",
     "in_place": "In place",
     "verified": "Verified",
     "excluded": "Not applicable",
 }
+
+# The states an exception in force stands in for. One that is in place or verified is not
+# made to look worse by an exception nobody needs.
+COVERED = ("failing", "gap", "planned")
 
 
 # --- The record type ----------------------------------------------------------------------
@@ -721,7 +726,7 @@ def statement(
     that still holds found a control partly effective or ineffective. A requirement takes
     the weakest state among its controls.
     """
-    from riskwren.compliance import readiness  # it builds on scopes, evidence, and tests
+    from riskwren.compliance import exceptions, readiness  # they build on scopes and tests
 
     framework = frameworks.by_key(session, framework_key)
     held = _held(session, scope, framework)
@@ -759,8 +764,18 @@ def statement(
         control_id: implementation_view(session, principal, row) for control_id, row in used.items()
     }
     assured = readiness.assurance(session, list(used))
+    waived = exceptions.in_force_for(session, scope)
     for control_id, view in views.items():
-        view["readiness"], view["why"] = readiness.of_control(view["standing"], assured[control_id])
+        found, why = readiness.of_control(view["standing"], assured[control_id])
+        excepted = waived["control"].get(control_id)
+        view["exception"], view["underlying"] = None, found
+        if excepted is not None and found in COVERED:
+            view["exception"] = exceptions.chip(excepted)
+            # An exception covers a weakness for a time. It does not improve on a control
+            # that is in place, and what is underneath is said beside it.
+            why = f"Excepted until {excepted.expires_on.isoformat()} by {excepted.ref}. {why}"
+            found = "excepted"
+        view["readiness"], view["why"] = found, why
     rows = []
     counts = dict.fromkeys(STATES, 0)
     for requirement in requirements:
@@ -779,6 +794,14 @@ def statement(
             found = "gap"
         else:
             found = min((view["readiness"] for view in answering), key=list(STATES).index)
+        underneath = found
+        if applies and answering:
+            underneath = min((view["underlying"] for view in answering), key=list(STATES).index)
+        excepted = waived["requirement"].get(requirement.id) if applies else None
+        if excepted is not None and found in COVERED:
+            found = "excepted"
+        else:
+            excepted = None  # one that covers nothing here is not shown as if it did
         counts[found] += 1
         if state and found != state:
             continue
@@ -789,6 +812,9 @@ def statement(
                 "excerpt": frameworks.card(requirement)["excerpt"],
                 "applicable": applies,
                 "state": found,
+                # What it would be without the exception, and will be again when that ends.
+                "underlying": underneath,
+                "exception": exceptions.chip(excepted) if excepted is not None else None,
                 "reason": decision.reason if decision else None,
                 "decided_by": decision.decided_by_name if decision else None,
                 "decided_at": decision.decided_at if decision else None,
@@ -796,6 +822,7 @@ def statement(
                 "controls": [
                     {"ref": v["control"]["ref"], "name": v["control"]["name"],
                      "standing": v["standing"], "readiness": v["readiness"], "why": v["why"],
+                     "exception": v["exception"],
                      "inheritance": v["inheritance"],
                      "provider": v["provider"]["scope"] if v["provider"] else None,
                      "open": v["control"]["open"]}

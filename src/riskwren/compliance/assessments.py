@@ -578,6 +578,10 @@ def review(
                 note=f"Tested in {assessment.ref}: {result.note}", basis="test",
                 by_id=result.tested_by, by_name=result.tested_by_name,
             )  # fmt: skip
+            if result.design != "effective" or result.operation != "effective":
+                from riskwren.compliance import issues  # issues know of tests, not the reverse
+
+                issues.from_test(session, principal, result, test, assessment, control)
         assessment.updated_at = utc_now()
     return result
 
@@ -642,6 +646,17 @@ def _result_view(session: Session, principal: Principal, result: TestResult) -> 
     }
 
 
+def _issue_for(session: Session, principal: Principal, control: Control) -> dict[str, Any] | None:
+    """The issue that is open because a test found this control wanting, if the person may
+    see it."""
+    from riskwren.compliance import issues
+
+    found = issues.open_for_test(session, control)
+    if found is None or not issues.can_see(session, principal, found):
+        return None
+    return {"ref": found.ref, "name": found.name, "status": found.status}
+
+
 def view_of_test(session: Session, principal: Principal, test: ControlTest) -> dict[str, Any]:
     assessment = session.get(Assessment, test.assessment_id)
     control = session.get(Control, test.control_id)
@@ -668,6 +683,7 @@ def view_of_test(session: Session, principal: Principal, test: ControlTest) -> d
         "state": state,
         "result": _result_view(session, principal, latest) if latest else None,
         "results": int(earlier),
+        "issue": _issue_for(session, principal, control) if state == "counted" else None,
         "can": {
             "plan": is_open and can_run(session, principal, assessment),
             "record": is_open and assesses and not owns and state != "counted",

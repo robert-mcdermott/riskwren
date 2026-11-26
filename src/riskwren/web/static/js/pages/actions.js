@@ -43,12 +43,12 @@ export function actionList(main) {
           h("th", { scope: "col" }, "Due"), h("th", { scope: "col" }, "Status"), h("th", { scope: "col" }, h("span", { class: "sr-only" }, "What you can do")))),
         h("tbody", {}, rows.map((action) => h("tr", {},
           h("td", {}, h("div", { class: "cell-main" }, action.title), h("div", { class: "cell-sub" }, [action.ref, action.plan].filter(Boolean).join(" · "))),
-          h("td", {}, action.risk ? recordChip(action.risk) : h("span", { class: "subtle" }, "A risk you cannot see")),
+          h("td", {}, action.risk ? recordChip(action.risk) : action.source ? recordChip(action.source) : h("span", { class: "subtle" }, "Something you cannot see")),
           h("td", {}, action.owner.name),
           h("td", { class: "nowrap" }, dueCell(action)),
           h("td", {}, actionStatus(action)),
           h("td", { class: "actions" }, actionButtons(action, reload)))))))
-        : nothing("Nothing is owed", "Actions from treatment plans appear here, soonest first, each with an owner and a date.");
+        : nothing("Nothing is owed", "Actions from treatment plans and issues appear here, soonest first, each with an owner and a date.");
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Risks", title: "Actions", lede: "Everything someone has to do by a date, whatever it came from." }),
         bar, card({ title: plural(data.page.meta.total, "action"), flush: true, footer: pager(data.page.meta, rows.length) }, body));

@@ -797,6 +797,108 @@ SCOPE_ENCLAVE = {
     "excluded": [],
 }  # fmt: skip
 
+# Issues at every stage. Each: where it is, what found it, how serious, what is wrong, the
+# detail, and its actions as (what, days from the build that it is due, whether it is done).
+ISSUES = {
+    "alarm": {
+        "unit": "BIO", "source": "observation", "severity": "high",
+        "name": "The freezer alarm call list names people who have left",
+        "summary": "When the minus-eighty in bay 3 alarmed on a Sunday, the first two numbers on "
+        "the call list belonged to people who left in the spring. The third answered after forty minutes.",
+        "actions": [("Rebuild the call list from this quarter's rota", -40, True),
+                    ("Test the call-out at night, unannounced", -12, False)],
+    },
+    "cabinets": {
+        "unit": "PHARM", "source": "audit", "severity": "high",
+        "name": "Override reports from the dispensing cabinets are not reviewed",
+        "summary": "Internal audit found that the weekly report of overrides was produced and filed, "
+        "and that nobody had signed one off since the pharmacy manager changed.",
+        "actions": [("Name a reviewer and a deputy for the weekly report", -70, True),
+                    ("Review the backlog of unsigned reports and follow up the outliers", -30, True)],
+        "done": "A pharmacist and a deputy now sign the report each Monday. The backlog was reviewed: "
+        "three overrides were followed up with the nurses concerned, and none was a diversion.",
+        "cause": "ownership",
+        "proof": ("Signed override reports, eight weeks", "The eight most recent weekly reports, each signed and dated."),
+    },
+    "visitors": {
+        "unit": "FAC", "source": "observation", "severity": "low",
+        "name": "Contractors are let into plant rooms without signing the log",
+        "summary": "Three visits by the chiller contractor in one month have no entry in the plant room log.",
+        "actions": [("Move the log to the security desk, where keys are issued", -190, True)],
+        "done": "Keys to plant rooms are now issued at the security desk against a signature. "
+        "A month of entries was checked against the contractor's invoices.",
+        "cause": "procedure",
+        "proof": ("Plant room log against invoices", "Every invoiced visit in the month has an entry."),
+    },
+    "letters": {
+        "unit": "SP", "source": "review", "severity": "moderate",
+        "name": "Monitoring letters are missing for two sub-recipients",
+        "summary": "The annual review of sub-awards found no monitoring letter on file for two of "
+        "the fourteen sub-recipients.",
+        "actions": [("Obtain and file the two letters", -25, True)],
+        "done": "Both letters have been requested and filed.",
+        "cause": "people",
+        "returned": "Only one of the two letters is on file. The other is a request for it.",
+        "moved": (45, "The second sub-recipient's finance office is closed until the new year."),
+    },
+    "duplicate": {
+        "unit": "IT", "source": "observation", "severity": "moderate",
+        "name": "Two legacy hosts cannot be patched",
+        "summary": "The hosts behind the old instrument booking system have had no patches this year.",
+        "actions": [],
+        "withdrawn": "Recorded twice: the assessment has opened an issue for the same control.",
+    },
+    "gap": {
+        "unit": "CLIN", "source": "gap", "severity": "moderate",
+        "summary": "Nothing the clinic does, and nothing it inherits, answers this. It was noted "
+        "when the clinic's requirements were first gone through, and nobody has taken it up.",
+        "actions": [],
+    },
+}  # fmt: skip
+# What is done about the control the assessment found wanting.
+FINDING_ACTIONS = [
+    (
+        "Send contract end dates from the personnel system to the identity team each night",
+        20,
+        False,
+    ),
+    ("Disable the three accounts found, and check the last year's leavers for others", -15, True),
+]
+# Exceptions at every stage.
+EXCEPTIONS = {
+    "leavers": {
+        "why": "Agency nurses are engaged through the agency, and their end dates are not in the "
+        "personnel system that the identity team works from. That feed is being built.",
+        "instead": "Each Friday the nurse managers send the identity team the names of agency staff "
+        "who have finished, and the accounts are disabled that day.",
+        "note": "Until the feed is in. Not to be renewed without a date for it.",
+    },
+    "rooms": {
+        "why": "The enclave shares a machine room with other tenants until it moves to the new data "
+        "hall, and this cannot be met there before then.",
+        "instead": "Racks 4 to 6 are locked, the two administrators hold the only keys, and the "
+        "room's door log is reviewed against their visits every month.",
+        "note": None,
+    },
+    "training": {
+        "why": "Agency staff cannot be enrolled in the learning system, so a third of them have "
+        "not taken the privacy module.",
+        "instead": "A printed briefing is signed on the first shift, and kept by the nurse manager.",
+    },
+    "logs": {
+        "why": "The enclave's hosts cannot send their logs to security monitoring until the storage "
+        "refresh gives them a route out that the data-use terms allow.",
+        "instead": "The administrators review the hosts' own logs each week and record that they did.",
+        "note": "For the length of the refresh project.",
+    },
+    "patching": {
+        "why": "Two hosts behind the old instrument booking system run a release the maker no "
+        "longer patches, and the system cannot move until the cores agree a replacement.",
+        "instead": "The hosts are on their own network segment, reachable only from the booking desk.",
+        "refused": "This has been the answer for two years. Retire them or move them, and bring a date.",
+    },
+}
+
 # Evidence collected when a control is rated. kind: (name, what the item says)
 EVIDENCE = {
     "file": [

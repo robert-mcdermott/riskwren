@@ -93,18 +93,20 @@ The wave is done when, on a fresh checkout:
 
 **Done:** an assessment is a record (`ASM`) of a scope, started by an assessor or a manager, which plans a test for each control the scope does itself: all of them, those that answer an applicable requirement of one framework, or a chosen few. Each test has a method, a procedure, and a person it is assigned to, and appears on that person's Home. A result gives design and operation, what was looked at, what was found, and the evidence it cites. It is recorded by someone who does not own the control and counts once a second such person confirms it; a returned result is recorded again, and the earlier one is kept. A confirmed result becomes the control's rating on the basis of a test, which a judgment cannot overrule while it holds. Readiness is now worked out in five states, each control's with its reason in words, and a failing test shows in the scope that does the control and in every scope that inherits it. `tests/test_assessments.py::test_one_result_moves_the_control_every_scope_that_relies_on_it_and_every_risk` is the acceptance test. A failed test opening an issue waits for slice 6, where issues arrive.
 
-### Slice 6: Issues and exceptions ☐
+### Slice 6: Issues and exceptions ☑
 
 **Goal:** what is wrong, who is fixing it, and by when.
 
-- [ ] The issue register with sources; severity clocks from the program; ISS references
-- [ ] Actions on issues, reusing the action model from treatment
-- [ ] Proposed closure with evidence, confirmed by someone else; root cause on closing
-- [ ] Exceptions: requested, decided by someone with authority who did not ask, time-limited, renewable; the covered item shown as excepted
-- [ ] The plan of action view for a scope
-- [ ] In-app notices
+- [x] The issue register with sources; severity clocks from the program; ISS references
+- [x] Actions on issues, reusing the action model from treatment
+- [x] Proposed closure with evidence, confirmed by someone else; root cause on closing
+- [x] Exceptions: requested, decided by someone with authority who did not ask, time-limited, renewable; the covered item shown as excepted
+- [x] The plan of action view for a scope
+- [x] In-app notices
 
 **Acceptance:** a failed test opens a prefilled issue; an owner cannot confirm their own closure; an expired exception returns its item to its underlying state.
+
+**Done:** an issue is a record (`ISS`) with a severity, what found it, and what it is about: controls, scopes, risks, and requirements. Its date follows from its severity by a table in the program (30, 90, 180, and 365 days), counted from the day it was raised; moving it needs a reason, and every move is kept. A confirmed test result of partly effective or ineffective opens one, filled in from the result, owned by the control's owners, and naming every scope that relies on the control. Anyone may raise one for a unit they work in. It is worked through the same actions treatment plans use, which now belong to a plan or an issue. Its owner proposes closure with what was done, a root cause, and evidence; an assessor or manager who neither owns it nor proposed it confirms or sends it back. An exception (`EXC`) is asked for by whoever keeps the scope or control, to a control or to a requirement within a scope, runs between two dates at most a year apart, and is decided by a leader or manager over the unit who did not ask. While it is in force a weak state is shown as excepted with what lies underneath; the day after, the state underneath is back. A scope has a plan of action tab that prints. Each person has notices with a count in the top bar. The acceptance tests are in `tests/test_issues.py`: `test_a_failed_test_opens_an_issue_filled_in_from_the_result`, `test_an_issue_is_closed_only_by_someone_who_does_not_own_it`, and `test_an_exception_is_decided_by_someone_else_and_ends_by_itself`.
 
 ### Slice 7: Import and export ☐
 
@@ -160,4 +162,14 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Verified needs evidence that still counts.** Tested effective is not enough: evidence attached to the control, or cited by the result, must be current. When it goes stale the requirement drops back to in place without anyone touching it, and says why.
 - **A reason travels with every state.** Each control in a statement of applicability carries its state and a sentence saying how it got there, so a reader never has to work out why a requirement is not verified.
 - **An assessment's history tells its tests.** Planning a test, recording a result, confirming it, and returning it are each told in the assessment's history with the control's name, since they are what an assessment consists of.
+- **One issue for one failing control.** A control that fails a second test while its issue is still open does not get a second issue: the first stands, and the test shows it. Once that issue is closed, a later failure opens a new one.
+- **A test-raised issue belongs to the control's owners.** Whoever found the weakness is not the one to fix it. If the control has no owner the issue has none either, and shows to the unit's stewards as needing one.
+- **Changing the severity sets the date again.** The date is the rule applied to the day the issue was raised, so a change of severity re-applies it and puts aside any date set by hand. The history keeps both.
+- **Only the second line withdraws an issue.** An owner who could cancel their own issue would never need its closure confirmed. Withdrawing one raised in error, and reopening one that turned out not to be fixed, are for an assessor or a manager.
+- **An issue is known to those with a part in it.** Whoever raised it, those named on it, anyone with an action on it, and those with a role over its unit. Working in the unit is not enough.
+- **Actions have a source.** The action table always said where an action came from; the service now does too. A treatment plan and an issue each say who manages their actions and what follows when one changes, and the one list of everything owed shows both.
+- **An exception changes how a state is shown, not what it is.** It is worked out on the day from its dates, never by a job that flips a status, so nothing has to run for it to end. It stands in only for failing, gap, or planned, and what lies underneath is always shown beside it.
+- **An exception to an inherited control can be asked for where it is felt.** A scope that inherits a failing control cannot fix it, and may need to say so. Its keepers ask within their own scope, by the control's name, without being able to open the provider's record. An exception approved in the provider's scope reaches those that inherit from it.
+- **The table is not called what the word means in the language it is written in.** The record type is `exception` everywhere a person or the API sees it; the table and the model are `exception_request`.
+- **Notices are pointers, not records.** A notice is a sentence and a place to go, for one person, about something assigned to them or decided for them. It is not in the history, which already holds what happened, and nobody is told about what they did themselves.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

@@ -537,6 +537,102 @@
           ]
         ]
       }
+    ],
+    "issue_severities": [
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Leaves people, patients, or regulated data exposed now, or breaks a legal obligation"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "A control the organization relies on does not work, with nothing making up for it"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "A control works in part, or something else partly makes up for it"
+      },
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "A weakness in how something is done or recorded that does not yet leave anything exposed"
+      }
+    ],
+    "issue_sources": [
+      {
+        "key": "test",
+        "label": "Test",
+        "description": "A test in an assessment found a control wanting"
+      },
+      {
+        "key": "gap",
+        "label": "Gap",
+        "description": "A requirement that nothing answers, or a control with no evidence"
+      },
+      {
+        "key": "audit",
+        "label": "Audit",
+        "description": "A finding from an internal or external audit"
+      },
+      {
+        "key": "incident",
+        "label": "Incident",
+        "description": "Something that went wrong showed it"
+      },
+      {
+        "key": "review",
+        "label": "Review",
+        "description": "A review of a supplier, a system, or a process"
+      },
+      {
+        "key": "observation",
+        "label": "Observation",
+        "description": "Somebody noticed it and said so"
+      }
+    ],
+    "root_causes": [
+      {
+        "key": "procedure",
+        "label": "Procedure",
+        "description": "There was no procedure, or it was unclear or out of date"
+      },
+      {
+        "key": "people",
+        "label": "People and time",
+        "description": "Not enough people, time, or training to do it"
+      },
+      {
+        "key": "ownership",
+        "label": "Ownership",
+        "description": "Nobody was clearly responsible, or it changed hands and was dropped"
+      },
+      {
+        "key": "technology",
+        "label": "Technology",
+        "description": "A system could not do what was needed, or failed"
+      },
+      {
+        "key": "design",
+        "label": "Design",
+        "description": "The control was done as described and still did not meet the need"
+      },
+      {
+        "key": "change",
+        "label": "Change",
+        "description": "A change elsewhere was not followed through here"
+      },
+      {
+        "key": "third_party",
+        "label": "Third party",
+        "description": "A supplier or partner did not do its part"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these, or not known"
+      }
     ]
   },
   "categories": [
@@ -957,7 +1053,14 @@
       "low": 24
     },
     "unrated_risk_review_months": 3,
-    "control_rating_months": 12
+    "control_rating_months": 12,
+    "issue_due_days": {
+      "critical": 30,
+      "high": 90,
+      "moderate": 180,
+      "low": 365
+    },
+    "exception_max_months": 12
   },
   "authority": {
     "acceptance": {

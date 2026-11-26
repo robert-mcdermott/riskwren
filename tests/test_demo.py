@@ -253,6 +253,48 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert all(
             t["result"]["tested_by"] != t["result"]["reviewed_by"] for t in tests if t["result"]
         )
+        # Issues at every stage, and each failed test with its own.
+        from riskwren.compliance import exceptions, issues
+        from riskwren.db.models import ExceptionRequest, Issue
+
+        raised = session.scalars(select(Issue)).all()
+        assert {issue.status for issue in raised} == {"open", "proposed", "closed", "cancelled"}
+        assert {issue.source_kind for issue in raised} == {
+            "test",
+            "gap",
+            "audit",
+            "review",
+            "observation",
+        }
+        failed = sum(
+            1
+            for test in tests
+            if test["result"]
+            and test["result"]["outcome"] != "effective"
+            and test["state"] == "counted"
+        )
+        assert sum(1 for issue in raised if issue.source_kind == "test") == failed >= 1
+        assert next(t for t in tests if t["control"]["name"] == "Access removed when people leave")[
+            "issue"
+        ]
+        assert any(
+            issue.status == "open" and issue.due_on < TODAY for issue in raised
+        )  # one is overdue
+        assert any(issue.extensions for issue in raised) and any(
+            issue.return_note for issue in raised
+        )
+        closed = next(issue for issue in raised if issue.status == "closed")
+        assert closed.root_cause == "procedure" and closed.validated_by is not None
+        assert closed.validated_by != closed.proposed_by
+        plan = issues.plan_of_action(session, reader, by_name["Clinical systems"])
+        assert len(plan["issues"]) >= 3  # its own gap, and what it inherits with its controls
+        # Exceptions at every stage, each decided by someone other than whoever asked.
+        asked = session.scalars(select(ExceptionRequest)).all()
+        assert {exceptions.state_of(item, TODAY) for item in asked} == {
+            "requested", "in_force", "expiring", "expired", "refused",
+        }  # fmt: skip
+        assert all(item.decided_by != item.requested_by for item in asked)
+        assert clinic["counts"]["excepted"] >= 1
         from riskwren.compliance import evidence
         from riskwren.db.models import Evidence, StoredFile
 

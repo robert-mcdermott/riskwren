@@ -26,7 +26,7 @@ export function fileSize(bytes) {
 }
 
 /** The units a person may add evidence for: where they work, and where they have a role. */
-function evidenceUnits() {
+export function evidenceUnits() {
   const me = session();
   const kept = ownUnits();
   if (kept === null) return null;

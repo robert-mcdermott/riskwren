@@ -98,42 +98,6 @@
         "title": "AccountChanges",
         "type": "object"
       },
-      "ActionBody": {
-        "properties": {
-          "detail": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Detail"
-          },
-          "due_on": {
-            "format": "date",
-            "title": "Due On",
-            "type": "string"
-          },
-          "owner_id": {
-            "title": "Owner Id",
-            "type": "integer"
-          },
-          "title": {
-            "maxLength": 400,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "title",
-          "owner_id",
-          "due_on"
-        ],
-        "title": "ActionBody",
-        "type": "object"
-      },
       "ActionChange": {
         "description": "Send only what changes. Moving ``due_on`` needs a ``reason``.",
         "properties": {
@@ -341,6 +305,59 @@
         "title": "CategoryBody",
         "type": "object"
       },
+      "ClosureBody": {
+        "properties": {
+          "evidence": {
+            "description": "References of evidence items",
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "note": {
+            "description": "What was done to put it right",
+            "title": "Note",
+            "type": "string"
+          },
+          "root_cause": {
+            "description": "From the root_causes vocabulary",
+            "title": "Root Cause",
+            "type": "string"
+          }
+        },
+        "required": [
+          "note",
+          "root_cause"
+        ],
+        "title": "ClosureBody",
+        "type": "object"
+      },
+      "ConfirmBody": {
+        "properties": {
+          "confirm": {
+            "description": "True to confirm it is put right; false to send it back",
+            "title": "Confirm",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "confirm"
+        ],
+        "title": "ConfirmBody",
+        "type": "object"
+      },
       "ControlBody": {
         "description": "A control. On a change, send only what changes, with the ``version`` you were editing.",
         "properties": {
@@ -508,41 +525,6 @@
         "title": "ControlBody",
         "type": "object"
       },
-      "DecisionBody": {
-        "properties": {
-          "applicable": {
-            "title": "Applicable",
-            "type": "boolean"
-          },
-          "code": {
-            "title": "Code",
-            "type": "string"
-          },
-          "framework": {
-            "title": "Framework",
-            "type": "string"
-          },
-          "reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Needed to leave a requirement out",
-            "title": "Reason"
-          }
-        },
-        "required": [
-          "framework",
-          "code",
-          "applicable"
-        ],
-        "title": "DecisionBody",
-        "type": "object"
-      },
       "DemoSignIn": {
         "properties": {
           "email": {
@@ -555,6 +537,25 @@
           "email"
         ],
         "title": "DemoSignIn",
+        "type": "object"
+      },
+      "DueBody": {
+        "properties": {
+          "due_on": {
+            "title": "Due On",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why the date is moving",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "due_on",
+          "reason"
+        ],
+        "title": "DueBody",
         "type": "object"
       },
       "EscalationBody": {
@@ -768,6 +769,127 @@
           }
         },
         "title": "EvidenceBody",
+        "type": "object"
+      },
+      "ExceptionBody": {
+        "description": "A request for an exception. Name a control, or a requirement and the scope.",
+        "properties": {
+          "compensating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What makes up for it meanwhile",
+            "title": "Compensating"
+          },
+          "control": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The control's reference",
+            "title": "Control"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
+          },
+          "justification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Justification"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "renews": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The exception this carries on from",
+            "title": "Renews"
+          },
+          "requirement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RequirementRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The scope it applies in",
+            "title": "Scope"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "ExceptionBody",
         "type": "object"
       },
       "FrameworkBody": {
@@ -1205,6 +1327,149 @@
         "title": "InheritBody",
         "type": "object"
       },
+      "IssueBody": {
+        "description": "An issue. On a change, send only what changes, with the ``version`` you had.",
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Unit Id"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who is to put it right",
+            "title": "Owner Id"
+          },
+          "requirements": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RequirementRef"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requirements"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "critical, high, moderate, or low",
+            "title": "Severity"
+          },
+          "source_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the issue_sources vocabulary",
+            "title": "Source Kind"
+          },
+          "subjects": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "References of the controls, scopes, and risks it is about",
+            "title": "Subjects"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What is wrong, and how it was found",
+            "title": "Summary"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "IssueBody",
+        "type": "object"
+      },
       "MappingBody": {
         "properties": {
           "code": {
@@ -1624,6 +1889,44 @@
         "title": "RatingBody",
         "type": "object"
       },
+      "ReadBody": {
+        "properties": {
+          "ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omit to mark every notice read",
+            "title": "Ids"
+          }
+        },
+        "title": "ReadBody",
+        "type": "object"
+      },
+      "ReasonBody": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "ReasonBody",
+        "type": "object"
+      },
       "RequirementBody": {
         "properties": {
           "code": {
@@ -1698,6 +2001,24 @@
           }
         },
         "title": "RequirementBody",
+        "type": "object"
+      },
+      "RequirementRef": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "framework": {
+            "title": "Framework",
+            "type": "string"
+          }
+        },
+        "required": [
+          "framework",
+          "code"
+        ],
+        "title": "RequirementRef",
         "type": "object"
       },
       "ResponseBody": {
@@ -2796,6 +3117,96 @@
         "title": "LinkBody",
         "type": "object"
       },
+      "riskwren__api__routers__issues__ActionBody": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "due_on": {
+            "title": "Due On",
+            "type": "string"
+          },
+          "owner_id": {
+            "title": "Owner Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "owner_id",
+          "due_on"
+        ],
+        "title": "ActionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__issues__DecisionBody": {
+        "properties": {
+          "approve": {
+            "title": "Approve",
+            "type": "boolean"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "An earlier end, when approving",
+            "title": "Expires On"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "approve"
+        ],
+        "title": "DecisionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__issues__SubjectsBody": {
+        "properties": {
+          "requirements": {
+            "items": {
+              "$ref": "#/components/schemas/RequirementRef"
+            },
+            "title": "Requirements",
+            "type": "array"
+          },
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          }
+        },
+        "title": "SubjectsBody",
+        "type": "object"
+      },
       "riskwren__api__routers__risks__AssessmentBody": {
         "properties": {
           "impact_levels": {
@@ -2851,6 +3262,77 @@
           "subjects"
         ],
         "title": "SubjectsBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__scopes__DecisionBody": {
+        "properties": {
+          "applicable": {
+            "title": "Applicable",
+            "type": "boolean"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "framework": {
+            "title": "Framework",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Needed to leave a requirement out",
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "framework",
+          "code",
+          "applicable"
+        ],
+        "title": "DecisionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__treatment__ActionBody": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "owner_id": {
+            "title": "Owner Id",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 400,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "owner_id",
+          "due_on"
+        ],
+        "title": "ActionBody",
         "type": "object"
       }
     }
@@ -5988,6 +6470,476 @@
         ]
       }
     },
+    "/api/v1/exceptions": {
+      "get": {
+        "operationId": "list_exceptions_api_v1_exceptions_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "requested, in_force, expired, refused, or withdrawn",
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "requested, in_force, expired, refused, or withdrawn",
+              "title": "State"
+            }
+          },
+          {
+            "description": "A scope's reference",
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A scope's reference",
+              "title": "Scope"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; prefix with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "expires_on",
+              "description": "A field name; prefix with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Exceptions Api V1 Exceptions Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find exceptions",
+        "tags": [
+          "issues"
+        ]
+      },
+      "post": {
+        "operationId": "request_exception_api_v1_exceptions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExceptionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Request Exception Api V1 Exceptions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask for an exception",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{ref}": {
+      "get": {
+        "operationId": "show_exception_api_v1_exceptions__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Exception Api V1 Exceptions  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One exception",
+        "tags": [
+          "issues"
+        ]
+      },
+      "patch": {
+        "operationId": "update_exception_api_v1_exceptions__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExceptionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Exception Api V1 Exceptions  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reword a request that has not been decided",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{ref}/decision": {
+      "post": {
+        "operationId": "decide_exception_api_v1_exceptions__ref__decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__issues__DecisionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Decide Exception Api V1 Exceptions  Ref  Decision Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve or refuse an exception",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{ref}/history": {
+      "get": {
+        "operationId": "exception_history_api_v1_exceptions__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Exception History Api V1 Exceptions  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that has happened to an exception",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{ref}/withdrawal": {
+      "post": {
+        "operationId": "withdraw_exception_api_v1_exceptions__ref__withdrawal_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Withdraw Exception Api V1 Exceptions  Ref  Withdrawal Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Take back a request, or end one early",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
     "/api/v1/frameworks": {
       "get": {
         "operationId": "list_frameworks_api_v1_frameworks_get",
@@ -7443,6 +8395,842 @@
         ]
       }
     },
+    "/api/v1/issues": {
+      "get": {
+        "operationId": "list_issues_api_v1_issues_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "open, proposed, closed, cancelled, or live",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "open, proposed, closed, cancelled, or live",
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "severity",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Kind"
+            }
+          },
+          {
+            "description": "A control, scope, or risk reference",
+            "in": "query",
+            "name": "about",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A control, scope, or risk reference",
+              "title": "About"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overdue",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Overdue",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; prefix with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "due_on",
+              "description": "A field name; prefix with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Issues Api V1 Issues Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find issues",
+        "tags": [
+          "issues"
+        ]
+      },
+      "post": {
+        "operationId": "create_issue_api_v1_issues_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Issue Api V1 Issues Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise an issue",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}": {
+      "get": {
+        "operationId": "show_issue_api_v1_issues__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Issue Api V1 Issues  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One issue, with its actions",
+        "tags": [
+          "issues"
+        ]
+      },
+      "patch": {
+        "operationId": "update_issue_api_v1_issues__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Issue Api V1 Issues  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change an issue",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/actions": {
+      "post": {
+        "operationId": "add_issue_action_api_v1_issues__ref__actions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__issues__ActionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Issue Action Api V1 Issues  Ref  Actions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add an action to an issue",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/cancellation": {
+      "post": {
+        "operationId": "cancel_issue_api_v1_issues__ref__cancellation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cancel Issue Api V1 Issues  Ref  Cancellation Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Withdraw an issue raised in error",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/closure": {
+      "post": {
+        "operationId": "propose_closure_api_v1_issues__ref__closure_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClosureBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Propose Closure Api V1 Issues  Ref  Closure Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Propose that an issue is put right",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/due-date": {
+      "post": {
+        "operationId": "move_issue_date_api_v1_issues__ref__due_date_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DueBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Move Issue Date Api V1 Issues  Ref  Due Date Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Move an issue's date, with the reason",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/history": {
+      "get": {
+        "operationId": "issue_history_api_v1_issues__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Issue History Api V1 Issues  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that has happened to an issue",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/owners": {
+      "put": {
+        "operationId": "set_issue_owners_api_v1_issues__ref__owners_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Issue Owners Api V1 Issues  Ref  Owners Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say who is to put an issue right",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/reopening": {
+      "post": {
+        "operationId": "reopen_issue_api_v1_issues__ref__reopening_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reopen Issue Api V1 Issues  Ref  Reopening Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open a closed issue again",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/subjects": {
+      "put": {
+        "operationId": "set_issue_subjects_api_v1_issues__ref__subjects_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__issues__SubjectsBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Issue Subjects Api V1 Issues  Ref  Subjects Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say what an issue is about",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/issues/{ref}/validation": {
+      "post": {
+        "operationId": "validate_closure_api_v1_issues__ref__validation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Validate Closure Api V1 Issues  Ref  Validation Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm an issue's closure, or send it back",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
     "/api/v1/meta": {
       "get": {
         "description": "What the web app needs before anyone signs in.",
@@ -7464,6 +9252,117 @@
         "summary": "The product's name, version, and branding",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/v1/notices": {
+      "get": {
+        "operationId": "list_notices_api_v1_notices_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "unread",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Unread",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Notices Api V1 Notices Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What has been assigned to you or changed for you",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/notices/count": {
+      "get": {
+        "operationId": "count_notices_api_v1_notices_count_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Count Notices Api V1 Notices Count Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "How many of your notices are unread",
+        "tags": [
+          "issues"
+        ]
+      }
+    },
+    "/api/v1/notices/read": {
+      "post": {
+        "operationId": "read_notices_api_v1_notices_read_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Read Notices Api V1 Notices Read Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mark notices as read",
+        "tags": [
+          "issues"
         ]
       }
     },
@@ -7620,7 +9519,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ActionBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__treatment__ActionBody"
               }
             }
           },
@@ -10581,6 +12480,50 @@
         ]
       }
     },
+    "/api/v1/scopes/{ref}/plan-of-action": {
+      "get": {
+        "operationId": "scope_plan_of_action_api_v1_scopes__ref__plan_of_action_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Scope Plan Of Action Api V1 Scopes  Ref  Plan Of Action Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The open issues that bear on a scope, each with its milestones",
+        "tags": [
+          "scopes"
+        ]
+      }
+    },
     "/api/v1/scopes/{ref}/requirements": {
       "get": {
         "operationId": "scope_requirements_api_v1_scopes__ref__requirements_get",
@@ -10686,7 +12629,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DecisionBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__scopes__DecisionBody"
               }
             }
           },

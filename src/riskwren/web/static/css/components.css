@@ -524,3 +524,17 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
 .steps { margin: 0; padding-left: 1.2em; display: grid; gap: var(--space-2); }
 .record-icon[data-record="assessment"] { color: var(--accent); }
 .owed-icon[data-kind="confirm"] { color: var(--info); background: var(--info-soft); }
+
+/* Notices: the bell and its count, and an unread row. */
+.notice-bell { position: relative; text-decoration: none; }
+.bell-count { position: absolute; top: 1px; right: 0; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full); background: var(--accent); color: var(--on-accent); font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; }
+.owed-item[data-unread="true"] { background: var(--accent-soft); }
+.owed-icon[data-kind="issue"], .owed-icon[data-kind="closure"] { color: var(--danger); background: var(--danger-soft); }
+.record-icon[data-record="issue"] { color: var(--danger); }
+.record-icon[data-record="exception"] { color: var(--accent); }
+/* Excepted: upright stripes, so it is told from "in place" beside it by more than its hue. */
+.segments i[data-tone="excepted"] { background: repeating-linear-gradient(90deg, var(--accent) 0 2px, var(--accent-soft) 2px 5px); }
+.row-actions { display: grid; justify-items: start; gap: 2px; }
+/* The plan of action: one issue to a row, its milestones beneath one another. */
+.milestones { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.milestones li { display: grid; gap: 1px; }

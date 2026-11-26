@@ -58,6 +58,27 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   control says in words why it is where it is. Verified takes a test found effective and
   evidence that still counts; when the evidence goes stale the requirement drops back by
   itself.
+- **Issues.** One register of what is wrong, whatever found it: a test, a gap, an audit, an
+  incident, a review, or somebody noticing. Each has a severity with a stated meaning and
+  is due on a date that follows from it (30, 90, 180, or 365 days, a table the program can
+  change). Moving the date needs a reason and is counted. A test that finds a control
+  partly effective or ineffective opens an issue for the control's owners, filled in from
+  the result and naming every scope that relies on the control (migration 0012).
+- **Closure confirmed by someone else.** An issue is put right through actions, the same
+  ones treatment plans use, on the one list of everything owed. Its owner proposes closure
+  with what was done, a root cause, and evidence. An assessor or a manager who neither owns
+  it nor proposed it confirms, or sends it back saying what is missing.
+- **Exceptions.** A departure from a control, or from a requirement within a scope, is asked
+  for with the reason and what makes up for it, and decided by a leader or manager who did
+  not ask. It runs between two dates, at most twelve months apart by default. While it is
+  in force a failing, missing, or planned state is shown as excepted with what lies
+  underneath; the day after it ends, that state is back by itself. Carrying on is a new
+  request.
+- **Plan of action.** A scope lists the open issues that bear on it, its own and those of
+  the controls it uses or inherits, most severe first, each with its milestones. It prints.
+- **Notices.** Each person has a list of what has been assigned to them or decided for
+  them, with a count in the top bar. Home gained issues to put right, closures to confirm,
+  and exceptions to decide or renew.
 - **Safe file storage.** Files are stored by the SHA-256 of their content, outside anything
   the server serves. Their kind is judged by content, not name: PDF, common images, Word,
   Excel, and PowerPoint documents, and plain text, up to 25 MB; programs are refused. A file

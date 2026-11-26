@@ -32,6 +32,7 @@ from riskwren.db.models import (
 from riskwren.db.models.risk import ASSESSMENT_KINDS, STANDINGS
 from riskwren.inventory import access, records
 from riskwren.inventory.registry import TYPES, RecordType
+from riskwren.program import vocab
 from riskwren.risk import categories
 from riskwren.risk import method as methods
 from riskwren.risk.register import RISK
@@ -303,13 +304,22 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             .where(Action.owner_id == me, Action.status.in_(treatment.OPEN))
             .order_by(Action.due_on)
         ):
-            plan = session.get(TreatmentPlan, action.source_id)
+            plan = (
+                session.get(TreatmentPlan, action.source_id)
+                if action.source_type == treatment.PLAN
+                else None
+            )
             risk = session.get(Risk, plan.risk_id) if plan is not None else None
-            add(
-                "action", action.title, f"{action.ref}" + (f" · for {risk.name}" if risk else ""),
-                f"/risks/{risk.ref}?tab=treatment" if risk else "/actions?mine=true",
-                action.due_on, ref=action.ref,
-            )  # fmt: skip
+            source = treatment.SOURCES.get(action.source_type)
+            about = source.describe(session, principal, action.source_id) if source else None
+            if risk is not None:
+                detail, href = f"{action.ref} · for {risk.name}", f"/risks/{risk.ref}?tab=treatment"
+            elif about is not None:
+                detail = f"{action.ref} · for {about['ref']} {about['name']}"
+                href = f"/issues/{about['ref']}"
+            else:
+                detail, href = action.ref, "/actions?mine=true"
+            add("action", action.title, detail, href, action.due_on, ref=action.ref)
         for control in session.scalars(
             select(Control).where(
                 Control.id.in_(_owned(session, CONTROL, me)), Control.status == "active"
@@ -373,6 +383,39 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 "confirm", f"Review the result for {control.name}",
                 f"{assessment.ref} · it counts once a second person has confirmed it",
                 f"/assessments/{assessment.ref}", None, ref=assessment.ref,
+            )  # fmt: skip
+
+    # Issues a person owns, closures that wait for them, and exceptions to decide or renew.
+    from riskwren.compliance import exceptions, issues
+
+    severities = vocab.labels(session, "issue_severities")
+    for owed in issues.waiting_on(session, principal):
+        issue = owed["issue"]
+        if owed["kind"] == "issue":
+            add(
+                "issue", f"Put right: {issue.name}",
+                f"{issue.ref} · {severities.get(issue.severity, issue.severity)}",
+                f"/issues/{issue.ref}", issue.due_on, ref=issue.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "closure", f"Confirm that {issue.ref} is put right",
+                f"{issue.name} · {issue.proposed_by_name} says it is",
+                f"/issues/{issue.ref}", None, ref=issue.ref,
+            )  # fmt: skip
+    for owed in exceptions.waiting_on(session, principal):
+        item = owed["exception"]
+        if owed["kind"] == "decide":
+            add(
+                "exception", f"Decide an exception: {item.name}",
+                f"{item.ref} · asked for by {item.requested_by_name}",
+                f"/exceptions/{item.ref}", None, ref=item.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "exception", f"An exception of yours is about to end: {item.name}",
+                f"{item.ref} · ask again if it is still needed",
+                f"/exceptions/{item.ref}", item.expires_on, ref=item.ref,
             )  # fmt: skip
 
     # A leader is shown what waits on someone with their authority.

@@ -27,7 +27,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
-from riskwren.compliance import assessments, crosswalk, evidence, frameworks, scopes
+from riskwren.compliance import (
+    assessments,
+    crosswalk,
+    evidence,
+    exceptions,
+    frameworks,
+    issues,
+    scopes,
+)
 from riskwren.compliance.evidence import EVIDENCE
 from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
@@ -42,6 +50,8 @@ from riskwren.db.models import (
     ControlTest,
     Evidence,
     EvidenceLink,
+    ExceptionRequest,
+    Issue,
     Risk,
     Scope,
     TreatmentPlan,
@@ -1766,6 +1776,241 @@ class Builder:
         sample, note = c.TESTS["effective"][0]
         self._result(test_id, testers[test_id], ("effective", "effective", sample, note))
 
+    # --- Issues and exceptions ------------------------------------------------------------
+
+    def _story_issues_later(self) -> Script:
+        """Issues begin once the scopes are there for them to be about."""
+        yield self.ago(232)
+        self.schedule(self._story_issues())
+
+    def _story_exceptions_later(self) -> Script:
+        yield self.ago(205)
+        self.schedule(self._story_exceptions())
+
+    def _raise(self, by: int, key: str, owner: int, **more: Any) -> int:
+        spec = c.ISSUES[key]
+        values = {
+            "name": spec.get("name"), "summary": spec["summary"], "severity": spec["severity"],
+            "org_unit_id": self.units[spec["unit"]], "source_kind": spec["source"],
+            "owner_id": owner, **more,
+        }  # fmt: skip
+        with self.act(by) as (session, who):
+            issue = issues.create(session, who, values)
+            self.tally("issues")
+            return issue.id
+
+    def _issue_actions(self, by: int, issue_id: int, wanted: list[tuple[str, int, bool]], owners: list[int]) -> list[tuple[str, int, bool]]:  # fmt: skip
+        made = []
+        for index, (title, due, done) in enumerate(wanted):
+            with self.act(by) as (session, who):
+                action = issues.add_action(
+                    session, who, session.get(Issue, issue_id), title=title,
+                    owner_id=owners[index % len(owners)], due_on=self.day(due),
+                )  # fmt: skip
+                made.append((action.ref, action.owner_id, done))
+                self.tally("actions")
+        return made
+
+    def _finish(self, actions: list[tuple[str, int, bool]]) -> None:
+        for ref, owner, done in actions:
+            if done:
+                with self.act(owner) as (session, who):
+                    treatment.update_action(
+                        session, who, treatment.find_action(session, ref), {"status": "done"}
+                    )
+
+    def _propose(self, by: int, issue_id: int, key: str) -> None:
+        spec = c.ISSUES[key]
+        cited = []
+        if spec.get("proof"):
+            name, note = spec["proof"]
+            with self.act(by) as (session, who):
+                item = records.create(
+                    session, who, EVIDENCE,
+                    {"name": name, "kind": "note", "note": note,
+                     "org_unit_id": self.units[spec["unit"]], "collected_on": self.today},
+                )  # fmt: skip
+                cited.append(item.ref)
+                self.tally("evidence")
+        with self.act(by) as (session, who):
+            issues.propose(
+                session, who, session.get(Issue, issue_id), note=spec["done"],
+                root_cause=spec["cause"], evidence_refs=cited,
+            )  # fmt: skip
+
+    def _issue_story(self, key: str, raised: float, by: int, owner: int, **more: Any) -> Script:
+        """One issue from the day it is raised to wherever it has got to."""
+        spec = c.ISSUES[key]
+        yield self.ago(raised)
+        issue = self._raise(by, key, owner, **more)
+        if spec["actions"]:
+            yield self.later(2, 6)
+            staff = self.staff[self.units[spec["unit"]]]
+            # Whoever noticed it helps to put it right, if they work there.
+            helper = (
+                by
+                if by != owner and by in staff
+                else next((person for person in staff if person != owner), owner)
+            )
+            actions = self._issue_actions(owner, issue, spec["actions"], [helper, owner])
+            yield self.later(12, 25)
+            self._finish(actions)
+        if spec.get("withdrawn"):
+            yield self.later(1, 3)
+            with self.act(self.cast["assess1"]) as (session, who):
+                issues.cancel(session, who, session.get(Issue, issue), reason=spec["withdrawn"])
+            return
+        if not spec.get("done"):
+            return
+        yield (
+            self.later(8, 20) if key == "visitors" else self.ago(20 if spec.get("returned") else 3)
+        )
+        self._propose(owner, issue, key)
+        if spec.get("returned"):
+            yield self.later(3, 4)
+            with self.act(self.cast["assess2"]) as (session, who):
+                issues.validate(
+                    session, who, session.get(Issue, issue), confirm=False, note=spec["returned"]
+                )
+            yield self.later(2, 3)
+            days, why = spec["moved"]
+            with self.act(owner) as (session, who):
+                issues.reschedule(
+                    session, who, session.get(Issue, issue), due_on=self.day(days), reason=why
+                )
+        elif key == "visitors":
+            yield self.later(4, 9)
+            with self.act(self.cast["assess2"]) as (session, who):
+                issues.validate(session, who, session.get(Issue, issue), confirm=True, note=None)
+
+    def _scope_named(self, session: Session, name: str) -> Scope:
+        return session.scalars(select(Scope).where(Scope.name == name)).one()
+
+    def _first_gap(self, name: str, framework: str, prefix: str = "") -> str:
+        """A requirement that nothing in a scope answers: the first under a prefix, or at all."""
+        with self.db.read() as session:
+            found = scopes.statement(
+                session, Principal.for_command(), self._scope_named(session, name), framework,
+                state="gap",
+            )  # fmt: skip
+        codes = [row["code"] for row in found["requirements"]]
+        return next((code for code in codes if code.startswith(prefix)), codes[0])
+
+    def _story_issues(self) -> Script:
+        """Issues at every stage: raised by someone who noticed, found by audit, sent back,
+        closed, withdrawn, and a gap nobody has taken up; and what is being done about the
+        control the assessment found wanting."""
+        member, chidi = self.cast["member"], self.cast["bio_mgr"]
+        bio = self.units["BIO"]
+        cold = next((cid for (_, unit), cid in sorted(self.controls.items()) if unit == bio), None)
+        about = []
+        if cold is not None:
+            with self.db.read() as session:
+                about = [session.get(Control, cold).ref]
+        self.schedule(self._issue_story("alarm", 75, member, chidi, subjects=about))
+        self.schedule(
+            self._issue_story("cabinets", 100, self.cast["risk2"], self.cast["pharm_mgr"])
+        )
+        fac, sp, it = (self.units[code] for code in ("FAC", "SP", "IT"))
+        self.schedule(self._issue_story("visitors", 230, self.pick(fac), self.steward(fac)))
+        self.schedule(self._issue_story("letters", 170, self.cast["risk1"], self.steward(sp)))
+        self.schedule(self._issue_story("duplicate", 6, self.pick(it), self.steward(it)))
+        yield self.ago(200)
+        clinic = c.SCOPE_CLINIC
+        code = self._first_gap(clinic["name"], clinic["framework"][0], "164.310")
+        with self.db.read() as session:
+            scope_ref = self._scope_named(session, clinic["name"]).ref
+        self._raise(
+            self.cast["risk2"], "gap", self.steward(self.units["CLIN"]),
+            name=f"{code}: nothing answers it in {clinic['name']}", subjects=[scope_ref],
+            requirements=[{"framework": clinic["framework"][0], "code": code}],
+        )  # fmt: skip
+        # The assessment's own finding: its owners have a plan, and have done half of it.
+        yield self.ago(4)
+        finding = self.controls.get((c.ASSESSMENT["finding"][0], it))
+        with self.db.read() as session:
+            control = session.get(Control, finding) if finding else None
+            found = issues.open_for_test(session, control) if control is not None else None
+            issue = found.id if found is not None else None
+        if issue is not None:
+            steward = self.steward(it)
+            actions = self._issue_actions(steward, issue, c.FINDING_ACTIONS, [steward])
+            yield self.later(1, 2)
+            self._finish(actions)
+
+    def _ask(self, by: int, key: str, values: dict[str, Any]) -> int:
+        spec = c.EXCEPTIONS[key]
+        with self.act(by) as (session, who):
+            item = exceptions.request(
+                session, who,
+                {"justification": spec["why"], "compensating": spec["instead"], **values},
+            )  # fmt: skip
+            self.tally("exceptions")
+            return item.id
+
+    def _decide(self, by: int, exception_id: int, key: str) -> None:
+        spec = c.EXCEPTIONS[key]
+        with self.act(by) as (session, who):
+            exceptions.decide(
+                session, who, session.get(ExceptionRequest, exception_id),
+                approve="refused" not in spec, note=spec.get("refused") or spec.get("note"),
+            )  # fmt: skip
+
+    def _story_exceptions(self) -> Script:
+        """Exceptions at every stage: one that has ended, one refused, one in force, one about
+        to end, and one waiting to be decided."""
+        clinic, enclave = c.SCOPE_CLINIC, c.SCOPE_ENCLAVE
+        clin, rc, it = (self.units[code] for code in ("CLIN", "RC", "IT"))
+        with self.db.read() as session:
+            refs = {
+                name: self._scope_named(session, name).ref
+                for name in (clinic["name"], enclave["name"])
+            }
+
+        def control(key: str, unit: int) -> str:
+            with self.db.read() as session:
+                return session.get(Control, self.controls[(key, unit)]).ref
+
+        yield self.ago(200)
+        logs = self._ask(
+            self.steward(rc), "logs",
+            {"scope": refs[enclave["name"]], "control": control("logging_monitoring", self.units["SEC"]),
+             "expires_on": self.day(-35)},
+        )  # fmt: skip
+        yield self.later(3, 5)
+        self._decide(self.cast["rc_dir"], logs, "logs")
+        yield self.ago(90)
+        patching = self._ask(
+            self.steward(it),
+            "patching",
+            {"control": control("patching", it), "expires_on": self.day(120)},
+        )
+        yield self.later(3, 5)
+        self._decide(self.cast["cio"], patching, "patching")
+        yield self.ago(60)
+        code = self._first_gap(enclave["name"], enclave["framework"][0], "03.10")
+        rooms = self._ask(
+            self.steward(rc), "rooms",
+            {"scope": refs[enclave["name"]], "expires_on": self.day(150),
+             "requirement": {"framework": enclave["framework"][0], "code": code}},
+        )  # fmt: skip
+        yield self.later(2, 4)
+        self._decide(self.cast["rc_dir"], rooms, "rooms")
+        yield self.ago(6)
+        leavers = self._ask(
+            self.steward(clin), "leavers",
+            {"scope": refs[clinic["name"]], "expires_on": self.day(21),
+             "control": control("access_removed_on_leaving", it)},
+        )  # fmt: skip
+        yield self.later(1, 2)
+        self._decide(self.cast["clinic_lead"], leavers, "leavers")
+        yield self.ago(2)
+        self._ask(
+            self.steward(clin), "training",
+            {"scope": refs[clinic["name"]], "expires_on": self.day(170),
+             "control": control("security_training", self.units["SEC"])},
+        )  # fmt: skip
+
     def _story_escalated(self) -> Script:
         """A lab's privacy risk raised to its department, with the reason."""
         lab = self.labs["PS"][0]
@@ -1880,6 +2125,7 @@ class Builder:
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
             self._story_agreement, self._story_scopes, self._story_assessment,
+            self._story_issues_later, self._story_exceptions_later,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

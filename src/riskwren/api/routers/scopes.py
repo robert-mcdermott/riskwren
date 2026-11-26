@@ -188,6 +188,19 @@ def decide(request: Request, ref: str, body: DecisionBody) -> dict[str, Any]:
         return envelope({"code": body.code, "applicable": body.applicable})
 
 
+@router.get(
+    "/scopes/{ref}/plan-of-action",
+    summary="The open issues that bear on a scope, each with its milestones",
+)
+def scope_plan_of_action(request: Request, ref: str) -> dict[str, Any]:
+    from riskwren.compliance import issues
+
+    principal = current(request)
+    with reading(request) as session:
+        scope = records.load(session, principal, SCOPE, ref)
+        return envelope(issues.plan_of_action(session, principal, scope))
+
+
 @router.get("/scopes/{ref}/controls", summary="How each control is done within a scope")
 def scope_controls(request: Request, ref: str) -> dict[str, Any]:
     principal = current(request)

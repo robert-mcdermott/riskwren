@@ -205,6 +205,38 @@ POLICIES.update(
     }
 )
 
+# Issues and exceptions. Any member may ask, and may say that something is wrong; the
+# services decide the rest. Confirming a closure, withdrawing an issue, and reopening one are
+# the second line's. Nobody confirms their own closure or decides their own request.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/issues"): Needs.MEMBER,
+        ("POST", "/api/v1/issues"): Needs.MEMBER,
+        ("GET", "/api/v1/issues/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/issues/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/issues/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/issues/{ref}/history"): Needs.MEMBER,
+        ("PUT", "/api/v1/issues/{ref}/subjects"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/actions"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/due-date"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/closure"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/validation"): Needs.ASSESS,
+        ("POST", "/api/v1/issues/{ref}/cancellation"): Needs.ASSESS,
+        ("POST", "/api/v1/issues/{ref}/reopening"): Needs.ASSESS,
+        ("GET", "/api/v1/scopes/{ref}/plan-of-action"): Needs.MEMBER,
+        ("GET", "/api/v1/exceptions"): Needs.MEMBER,
+        ("POST", "/api/v1/exceptions"): Needs.MEMBER,
+        ("GET", "/api/v1/exceptions/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/exceptions/{ref}"): Needs.MEMBER,
+        ("GET", "/api/v1/exceptions/{ref}/history"): Needs.MEMBER,
+        ("POST", "/api/v1/exceptions/{ref}/decision"): Needs.MEMBER,
+        ("POST", "/api/v1/exceptions/{ref}/withdrawal"): Needs.MEMBER,
+        ("GET", "/api/v1/notices"): Needs.MEMBER,
+        ("GET", "/api/v1/notices/count"): Needs.MEMBER,
+        ("POST", "/api/v1/notices/read"): Needs.MEMBER,
+    }
+)
+
 # Reporting: every figure counts only what the asker may see.
 POLICIES.update(
     {
