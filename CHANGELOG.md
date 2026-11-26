@@ -156,6 +156,8 @@ library offers its mappings on its Requirements tab.
 - The accessibility audit now fails when a screen it means to open has no such button,
   where before it passed over it.
 - The default program is written by a script, and a test now holds the shipped file to it.
+- On a narrow screen, a list's name column keeps enough room to be read while the table
+  scrolls, and a bar with two figures keeps its track.
 
 ## 0.1.0 (2026-11-25)
 

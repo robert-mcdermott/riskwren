@@ -583,4 +583,7 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
   .bar-row { grid-template-columns: minmax(96px, 40%) minmax(40px, 1fr) minmax(40px, 34%); }
   .bar-value { white-space: normal; }
   .bar-value .cell-sub { display: block; }
+  /* A list's first column is the record's name: it keeps enough room to be read, and the
+     table scrolls. The picker tables in forms are left as they are. */
+  .table:not(.table-compact) th:first-child, .table:not(.table-compact) td:first-child { min-width: 190px; }
 }
