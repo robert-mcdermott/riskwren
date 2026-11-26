@@ -40,7 +40,7 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and 120 controls, with three scopes held to frameworks, an assessment in progress, evidence going stale, and issues and exceptions at every stage. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 115 controls, with three scopes held to frameworks, an assessment in progress, evidence going stale, and issues and exceptions at every stage. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
