@@ -140,7 +140,7 @@ Close a risk when it no longer applies, with the reason. It leaves the open regi
 
 A control is something the organization does to make a risk less likely or less harmful. It has a statement of what is done, an owner, a unit, a kind (preventive, detective, corrective, or directive), and how often it happens.
 
-**Controls → Library** is your organization's own controls. **Add a control** can start from a set of 56 common controls in plain words: search it, choose one, and then make it specific. The starting text says "backups are tested"; yours says which systems, how often, and by whom.
+**Controls → Library** is your organization's own controls. **Add a control** can start from a set of 75 common controls in plain words: search it, choose one, and then make it specific. The starting text says "backups are tested"; yours says which systems, how often, and by whom.
 
 ### Rate a control
 

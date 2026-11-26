@@ -4,7 +4,7 @@
     "kind": "risk_library",
     "title": "Starter risk library",
     "version": "1",
-    "pack_version": "0.1.0",
+    "pack_version": "0.3.0",
     "publisher": "The RiskWren Authors",
     "license": "Apache-2.0",
     "text_policy": "verbatim"
@@ -265,7 +265,10 @@
         "access_reviewed",
         "encryption_at_rest",
         "logging_monitoring",
-        "security_training"
+        "security_training",
+        "encryption_in_transit",
+        "access_approved",
+        "media_disposal"
       ]
     },
     {
@@ -277,7 +280,8 @@
       "consequence": "unauthorized use or disclosure that the organization must answer for",
       "controls": [
         "access_removed_on_leaving",
-        "access_reviewed"
+        "access_reviewed",
+        "access_approved"
       ]
     },
     {
@@ -339,7 +343,9 @@
         "second_factor",
         "security_training",
         "network_segmentation",
-        "incident_response"
+        "incident_response",
+        "vulnerability_scanning",
+        "disaster_recovery"
       ]
     },
     {
@@ -353,7 +359,10 @@
         "second_factor",
         "security_training",
         "logging_monitoring",
-        "privileged_access"
+        "privileged_access",
+        "unique_accounts",
+        "session_lock",
+        "remote_access"
       ]
     },
     {
@@ -366,7 +375,8 @@
       "controls": [
         "unsupported_contained",
         "network_segmentation",
-        "patching"
+        "patching",
+        "asset_inventory"
       ]
     },
     {
@@ -389,7 +399,8 @@
       "event": "data must be restored and the backup is incomplete or unusable",
       "consequence": "permanent loss of data the organization believed was safe",
       "controls": [
-        "backups_tested"
+        "backups_tested",
+        "disaster_recovery"
       ]
     },
     {
@@ -402,7 +413,8 @@
       "controls": [
         "data_classified",
         "logging_monitoring",
-        "access_reviewed"
+        "access_reviewed",
+        "secure_configuration"
       ]
     },
     {
@@ -428,7 +440,8 @@
       "controls": [
         "continuity_plan",
         "privileged_access",
-        "incident_response"
+        "incident_response",
+        "disaster_recovery"
       ]
     },
     {

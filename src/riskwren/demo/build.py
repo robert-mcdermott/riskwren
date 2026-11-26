@@ -1621,12 +1621,18 @@ class Builder:
         yield self.ago(296)
         provider = self._scope(lead, c.SCOPE_PROVIDER)
         offered: dict[str, int] = {}
-        for key, unit, team in c.SCOPE_PROVIDER["controls"]:
-            control = self.control(key, self.units[unit])
+        for key, unit, team, known, standing in c.SCOPE_PROVIDER["controls"]:
+            # What is known of each is fixed, so that the scopes tell the story as written. A
+            # storyline that has already said how well a control works is left to stand.
+            there = self.controls.get((key, self.units[unit]))
+            rating = None
+            if there is None or there not in self.fixed_rating:
+                rating = "never" if known == "never" else self._rating(known)
+            control = self.control(key, self.units[unit], rating=rating)
             with self.act(lead) as (session, who):
                 row = scopes.implement(
                     session, who, session.get(Scope, provider), session.get(Control, control),
-                    status=self._standing(control), responsibility=team,
+                    status=standing or self._standing(control), responsibility=team,
                 )  # fmt: skip
                 offered[key] = row.id
         yield self.ago(288)
@@ -1675,9 +1681,11 @@ class Builder:
                     return person
         raise AssertionError("nobody is left to test this control")
 
-    def _result(self, test_id: int, by: int, found: tuple[str, str, str, str]) -> int:
-        """Record what a test found, citing what is already held for the control or, more
-        often than not, something collected for the test."""
+    def _result(
+        self, test_id: int, by: int, found: tuple[str, str, str, str], *, collect: bool = True
+    ) -> int:
+        """Record what a test found, citing what is already held for the control or, unless
+        told not to, something collected for the test."""
         design, operation, sample, note = found
         with self.db.read() as session:
             control_id = session.get(ControlTest, test_id).control_id
@@ -1694,7 +1702,7 @@ class Builder:
                 )
                 if evidence.state_of(item, self.today) != "stale"
             ][:1]
-        if not held and self.rng.random() < 0.75:
+        if not held and collect:
             self._evidence(by, control_id, note)
             return self._result(test_id, by, found)
         with self.act(by) as (session, who):
@@ -1714,10 +1722,11 @@ class Builder:
 
     def _story_assessment(self) -> Script:
         """The security team tests what central IT provides. Most results are counted, one is
-        sent back and recorded again, one waits for a second person, and two are still to do.
-        One control is found wanting, and shows as failing wherever it is inherited."""
+        sent back and recorded again, one waits for a second person, and the two controls
+        that are not yet in place are still to do. One control is found wanting that was
+        believed to work, and shows as failing wherever it is inherited."""
         lead = self.cast["assess1"]
-        yield self.ago(44)
+        yield self.ago(76)
         with self.act(lead) as (session, who):
             scope = session.scalars(
                 select(Scope).where(Scope.name == c.SCOPE_PROVIDER["name"])
@@ -1735,11 +1744,17 @@ class Builder:
             self.tally("assessments")
         finding_key, *finding = c.ASSESSMENT["finding"]
         wanting = self.controls.get((finding_key, self.units["IT"]))
-        # The result that waits at the end is on a control the lead may review.
         open_ = [each for each in planned if each[1] != wanting]
-        mine = [each for each in open_ if self._independent(each[1]) == lead]
+        # A control that is not yet in place waits to be tested until it is.
+        unready = {
+            self.controls[(key, self.units[unit])]
+            for key, unit, _, _, standing in c.SCOPE_PROVIDER["controls"]
+            if standing
+        }
+        todo = [each for each in open_ if each[1] in unready][-2:] or open_[-2:]
+        # The result that waits at the end is on a control the lead may review.
+        mine = [e for e in open_ if e not in todo and self._independent(e[1]) == lead]
         waiting = mine[len(mine) // 2]
-        todo = [each for each in open_ if each != waiting][-2:]
         done = [each for each in planned if each != waiting and each not in todo]
         testers = {}
         for index, (test_id, control_id) in enumerate(planned):
@@ -1756,7 +1771,7 @@ class Builder:
                     {"assigned_to": tester, "method": self.rng.choice(["examine", "examine", "interview", "test"])},
                 )  # fmt: skip
         for index, (test_id, control_id) in enumerate(done):
-            yield self.ago(40 - index * 3)
+            yield self.ago(74 - index * 2)
             tester = testers[test_id]
             if control_id == wanting:
                 found = tuple(finding)
@@ -1770,17 +1785,19 @@ class Builder:
                     "ineffective": ("partly", "ineffective"),
                 }[outcome]  # fmt: skip
                 found = (design, operation, sample, note)
-            result = self._result(test_id, tester, found)
+            # Now and then a tester cites nothing, and the result counts for less: the control
+            # is known to work, and nothing on record shows it.
+            result = self._result(test_id, tester, found, collect=index % 9 != 4)
             reviewer = self._independent(control_id, besides=tester)
-            yield self.later(1, 2)
+            yield self.later(0.2, 0.8)
             if index == 1:
                 # Sent back once, recorded again with what was asked for, then confirmed.
                 self._confirm(result, reviewer, confirm=False, note=c.ASSESSMENT["returned"])
-                yield self.later(1, 2)
+                yield self.later(0.2, 0.8)
                 design, operation, sample, note = found
                 again = (design, operation, f"{sample} Quarter three; ten instances.", note)
                 result = self._result(test_id, tester, again)
-                yield self.later(1, 2)
+                yield self.later(0.2, 0.8)
             self._confirm(result, reviewer)
         yield self.ago(2)
         test_id, control_id = waiting

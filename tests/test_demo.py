@@ -207,9 +207,10 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert crosswalk.coverage(session, reader, agreement) == {
             "citable": 9, "mapped": 5, "unmapped": 4,
         }  # fmt: skip
-        # Starter controls arrive mapped, so the public frameworks are partly covered at once.
-        assert crosswalk.coverage(session, reader, held["nist-csf"])["mapped"] >= 20
-        assert crosswalk.coverage(session, reader, held["hipaa-security"])["mapped"] >= 15
+        # Starter controls arrive mapped, so most of each public framework is covered at once.
+        assert crosswalk.coverage(session, reader, held["nist-csf"])["mapped"] >= 75
+        assert crosswalk.coverage(session, reader, held["nist-800-171"])["mapped"] >= 68
+        assert crosswalk.coverage(session, reader, held["hipaa-security"])["mapped"] >= 60
         from riskwren.compliance import scopes
         from riskwren.db.models import Information, Scope
 
@@ -220,12 +221,26 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         }  # fmt: skip
         assert by_name["Central information technology"].offers_controls
         clinic = scopes.statement(session, reader, by_name["Clinical systems"], "hipaa-security")
-        assert clinic["counts"]["excluded"] == 7
-        # What the clinic inherits has been tested where it is provided: some of it is verified
+        # Left out: what is for health plans, clearinghouses, business associates, and
+        # government bodies, and the provisions that only say how the rule is to be read.
+        assert clinic["counts"]["excluded"] == 18
+        # What the clinic inherits has been tested where it is provided: much of it is verified
         # there, and the control found wanting shows as failing here too.
-        assert clinic["counts"]["verified"] >= 1 and clinic["counts"]["failing"] >= 1
-        assert clinic["counts"]["in_place"] + clinic["counts"]["verified"] >= 5
-        assert clinic["counts"]["planned"] >= 1 and clinic["counts"]["gap"] >= 20
+        assert clinic["counts"]["verified"] >= 20 and clinic["counts"]["failing"] >= 1
+        assert clinic["counts"]["planned"] >= 1 and 5 <= clinic["counts"]["gap"] <= 12
+        # A program in working order, with work left: each scope is about half ready or better,
+        # none is finished, and what nothing answers is the smaller part of every one.
+        for name, key in (
+            ("Central information technology", "nist-csf"),
+            ("Clinical systems", "hipaa-security"),
+            ("Controlled-access data enclave", "nist-800-171"),
+        ):
+            counts = scopes.statement(session, reader, by_name[name], key)["counts"]
+            applies = sum(counts[state] for state in scopes.STATES if state != "excluded")
+            ready = counts["verified"] + counts["in_place"]
+            assert 0.45 <= ready / applies <= 0.85, (name, counts)
+            assert counts["gap"] / applies <= 0.35, (name, counts)
+            assert counts["verified"] > counts["in_place"] and counts["failing"] >= 5
         enclave = scopes.implementations(session, reader, by_name["Controlled-access data enclave"])
         ways = {
             c["control"]["name"]: (c["inheritance"], c["standing"]) for c in enclave["controls"]
@@ -242,13 +257,17 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert assessment.scope_id == by_name["Central information technology"].id
         tests = assessments.tests_of(session, reader, assessment)
         states = [test["state"] for test in tests]
-        assert len(tests) == 14 and states.count("counted") == 11
+        assert len(tests) == 35 and states.count("counted") == 32
         assert states.count("awaiting") == 1 and states.count("todo") == 2
+        # The two still to do are the two controls that are not yet in place.
+        assert {test["control"]["name"] for test in tests if test["state"] == "todo"} == {
+            "Recovery of systems planned and tested", "Systems built to a secure standard",
+        }  # fmt: skip
         wanting = next(
             t for t in tests if t["control"]["name"] == "Access removed when people leave"
         )
         assert wanting["result"]["outcome"] == "partly"
-        assert sum(test["results"] for test in tests) == 13  # one was sent back and done again
+        assert sum(test["results"] for test in tests) == 34  # one was sent back and done again
         # Nobody tested or confirmed a control they own, and nobody confirmed their own result.
         assert all(
             t["result"]["tested_by"] != t["result"]["reviewed_by"] for t in tests if t["result"]
