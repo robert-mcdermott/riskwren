@@ -25,6 +25,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
+from riskwren.compliance import frameworks
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
 from riskwren.core.clock import clock_set_to
@@ -1228,7 +1229,11 @@ class Builder:
             "A second chemistry was tried once in a pilot. It is not validated for any of "
             "the core's assays."))  # fmt: skip
         self.link(maren, risk, second, "likelihood", "primary")
-        self.link(maren, risk, self.control("agreements_in_place", self.units["LEGAL"]), "impact", "supporting")  # fmt: skip
+        # The contract helps the odds a little and the consequence not at all, so however it
+        # is rated the picture stays the same.
+        self.link(
+            maren, risk, self.control("agreements_in_place", self.units["LEGAL"]), "likelihood", "supporting"
+        )  # fmt: skip
         yield self.ago(418)
         self.residual(maren, risk, "I agree with the suggestion: stock buys weeks, not months, and there is no second source.")  # fmt: skip
         yield self.ago(404)
@@ -1450,6 +1455,23 @@ class Builder:
         yield self.ago(15)
         self.residual(bryn, risk, "Reviewed. The new generator is due in the spring. The acceptance expires this month and will need to be given again.")  # fmt: skip
 
+    def _story_agreement(self) -> Script:
+        """An agreement's terms, entered as a framework of the institute's own."""
+        lead = self.cast["risk2"]
+        yield self.ago(402)
+        with self.act(lead) as (session, who):
+            made = frameworks.create(session, who, c.AGREEMENT)
+            frameworks.paste(session, who, made, c.AGREEMENT_TERMS, dry_run=False)
+        self.tally("frameworks of its own")
+        yield self.ago(396)
+        with self.act(lead) as (session, who):
+            made = frameworks.by_key(session, frameworks.slug(c.AGREEMENT["title"]))
+            frameworks.update_requirement(
+                session, who, made, frameworks.find(session, made, "DUA-5.1"),
+                {"guidance": "The trust's privacy office confirmed that discovery means the "
+                 "moment anyone at the institute first suspects it, not when it is confirmed."},
+            )  # fmt: skip
+
     def _story_escalated(self) -> Script:
         """A lab's privacy risk raised to its department, with the reason."""
         lab = self.labs["PS"][0]
@@ -1562,6 +1584,7 @@ class Builder:
             self._story_authority, self._story_costs, self._story_supplier,
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
+            self._story_agreement,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

@@ -145,6 +145,13 @@ def test_the_storylines_came_out_as_written(db: Database, built: demo.Summary) -
             .order_by(RiskAssessment.id)
         ).all()
         assert history == ["moderate", "high"]
+        from riskwren.compliance import frameworks
+
+        held = {row.key: row for row in frameworks.all_(session)}
+        assert len(held) == 5 and held["nist-800-53"].citable_count == 1014
+        agreement = held["data-use-agreement-open-cohort-trust"]
+        assert (agreement.origin, agreement.citable_count) == ("local", 9)
+        assert frameworks.find(session, agreement, "DUA-5.1").guidance
         closed = named("Loss of refrigerated medication from a failed pharmacy refrigerator")
         assert closed.status == "closed" and closed.closed_reason
         power = named("Emergency power cannot carry the freezer farm and animal facility")

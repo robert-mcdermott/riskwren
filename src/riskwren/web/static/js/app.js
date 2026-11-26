@@ -57,6 +57,8 @@ async function boot() {
   route("/heat-map", page("heat-map", "heatMap"));
   route("/controls", page("controls", "controlLibrary"));
   route("/controls/:ref", page("control", "controlPage"));
+  route("/frameworks", page("frameworks", "frameworkList"));
+  route("/frameworks/:key", page("frameworks", "frameworkPage"));
   route("/plans", page("actions", "planList"));
   route("/acceptances", page("actions", "acceptanceList"));
   route("/actions", page("actions", "actionList"));

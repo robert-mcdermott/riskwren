@@ -332,6 +332,26 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .record-icon[data-record="third_party"] { color: var(--rec-party); }
 .record-badges { margin-top: var(--space-2); }
 .prose { white-space: pre-wrap; max-width: 72ch; }
+
+/* ---- Requirements of a framework ---- */
+.requirement-list { list-style: none; margin: 0; padding: 0; }
+.requirement-tree { padding: var(--space-2); }
+.requirement-list .requirement-list { margin-left: 14px; padding-left: var(--space-2); border-left: 1px solid var(--border); }
+.requirement-line { display: flex; align-items: flex-start; gap: var(--space-1); }
+.requirement-line > .numeric { flex: none; padding: 8px var(--space-3) 0; }
+.requirement-toggle { flex: none; width: 28px; height: 28px; margin-top: 2px; display: grid; place-items: center; border: 0; background: none; color: var(--text-muted); border-radius: var(--radius-s); }
+button.requirement-toggle { cursor: pointer; }
+button.requirement-toggle:hover { background: var(--surface-2); color: var(--text); }
+.requirement-toggle .icon { transition: transform 120ms ease; }
+.requirement-toggle[aria-expanded="true"] .icon { transform: rotate(90deg); }
+.requirement-row { flex: 1 1 auto; min-width: 0; min-height: 32px; display: flex; align-items: baseline; gap: var(--space-3); padding: 6px var(--space-3); border: 0; background: none; font: inherit; color: inherit; text-align: left; border-radius: var(--radius-s); cursor: pointer; }
+.requirement-row:hover { background: var(--surface-2); }
+.requirement-row .cell-sub { display: block; }
+.requirement-code { flex: none; min-width: 7ch; font-family: var(--font-mono); font-size: var(--text-s); color: var(--accent); white-space: nowrap; }
+.disclosure summary { cursor: pointer; color: var(--accent); font-weight: 550; width: fit-content; }
+.disclosure .prose { margin-top: var(--space-2); }
+.mono { font-family: var(--font-mono); font-size: var(--text-s); }
+@media (prefers-reduced-motion: reduce) { .requirement-toggle .icon { transition: none; } }
 .warn-text { color: var(--warn); }
 
 .filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }

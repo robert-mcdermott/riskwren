@@ -65,11 +65,12 @@ def _add_categories(session: Session, items: list[dict[str, Any]]) -> int:
     return added
 
 
-def install(session: Session) -> dict[str, int]:
+def install(session: Session, *, frameworks: bool = True) -> dict[str, int]:
     """Give an installation what it needs to work on its first day. Safe to run again: it
-    adds what is missing and leaves what is there."""
+    adds what is missing and leaves what is there. ``frameworks`` loads the built-in
+    public frameworks too."""
     pack = vocab.default_pack()
-    done = {"scoring_method": 0, "categories": 0, "library": 0, "controls": 0}
+    done = {"scoring_method": 0, "categories": 0, "library": 0, "controls": 0, "frameworks": 0}
     with audit.operation(session, "program.install"):
         if session.scalars(select(ScoringMethod.id)).first() is None:
             methods.publish(session, None, pack["scoring_method"])
@@ -79,6 +80,10 @@ def install(session: Session) -> dict[str, int]:
             done["library"] += library.load(session, builtin(name))
         for name in CONTROL_PACKS:
             done["controls"] += controls.load_library(session, builtin(name))
+    if frameworks:
+        from riskwren.compliance import packs as framework_packs
+
+        done["frameworks"] = framework_packs.install(session)
     return done
 
 

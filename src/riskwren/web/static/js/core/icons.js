@@ -43,6 +43,7 @@ const PATHS = {
   "chevron-left": ["m14.5 6.5-5.5 5.5 5.5 5.5"],
   external: ["M13.5 5H19v5.5", "M19 5l-8 8", "M17 13.5V19H5V7h5.5"],
   dot: ["M12 12h.01"],
+  framework: ["M5.5 4.5h10a3 3 0 0 1 3 3v12h-10a3 3 0 0 1-3-3z", "M5.5 16.5a3 3 0 0 1 3-3h10", "M9.5 8.5h5"],
 };
 
 /** An icon by name. It is decorative: put the words beside it, or label the button. */

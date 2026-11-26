@@ -619,3 +619,24 @@ WITHDRAW_REASONS = [
     "Circumstances changed: the exposure is larger than when it was accepted.",
 ]
 RETIRE_NOTE = "Replaced, and its data moved to managed storage."
+
+# A framework of the institute's own: the terms of one of its agreements.
+AGREEMENT = {
+    "title": "Data use agreement: Open Cohort Trust",
+    "kind": "agreement",
+    "publisher": "Open Cohort Trust",
+    "version": "Signed March 2025; renews every three years",
+    "summary": "The terms under which the trust shares its cohort data with Population "
+    "Sciences: who may use it, where it may be held, and what the trust must be told.",
+}
+AGREEMENT_TERMS = """\
+DUA-2.1 The data are used only for the approved study, by people named in the access list.
+DUA-2.2 The access list is reviewed by the principal investigator every six months, and the trust is told of each change within thirty days.
+DUA-3.1 The data are held only on systems the institute manages, in the country where they were provided.
+DUA-3.2 The data are encrypted wherever they are stored and whenever they are moved.
+DUA-3.3 No copy is made onto a personally owned device or removable media.
+DUA-4.1 No attempt is made to identify a participant, or to link the data to another source, without the trust's written agreement.
+DUA-4.2 Results are released only in a form in which no participant can be identified, with no cell smaller than ten.
+DUA-5.1 Any loss of, or unauthorized access to, the data is reported to the trust within seventy-two hours of discovery.
+DUA-6.1 The data and every copy are destroyed within ninety days of the agreement ending, and the destruction is certified in writing.
+"""

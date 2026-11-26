@@ -23,18 +23,20 @@ The wave is done when, on a fresh checkout:
 
 ## Slices
 
-### Slice 1: Frameworks ☐
+### Slice 1: Frameworks ☑
 
 **Goal:** what the organization is held to, on record, in the publisher's own words where the law allows.
 
-- [ ] The pack loader for frameworks: validation of the whole pack before anything is written, every problem reported together
-- [ ] Text policies, and the test that holds every built-in pack to its own
-- [ ] Build scripts that generate the four built-in packs from the publishers' files, recording the source and its version
-- [ ] `framework`, `requirement`, `baseline`; `riskwren frameworks list / load / show`
-- [ ] The organization's own frameworks: created in the app, requirements typed in or pasted
-- [ ] Browsing: the frameworks list, a framework's tree with search, a requirement's page
+- [x] The pack loader for frameworks: validation of the whole pack before anything is written, every problem reported together
+- [x] Text policies, and the test that holds every built-in pack to its own
+- [x] Build scripts that generate the four built-in packs from the publishers' files, recording the source and its version
+- [x] `framework`, `requirement`, `baseline`; `riskwren frameworks list / load / show`
+- [x] The organization's own frameworks: created in the app, requirements typed in or pasted
+- [x] Browsing: the frameworks list, a framework's tree with search, a requirement's page
 
 **Acceptance:** a new installation has the four frameworks with their baselines; a pack with one bad requirement is refused whole; the tree of the largest framework opens and searches without delay.
+
+**Done:** `scripts/build-framework-packs.py` builds the four packs from the publishers' own files, each pinned by digest: the Cybersecurity Framework 2.0 (106 outcomes), SP 800-53 Rev. 5 release 5.2.0 (1,014 active controls and enhancements, with four baselines), SP 800-171 Rev. 3 (97 requirements), and the Security Rule from the electronic Code of Federal Regulations (91 standards, specifications, and paragraphs). `init` and `db upgrade` load them in a tenth of a second. Anyone signed in browses a tree a level at a time, searches it whole, narrows it to a baseline, and opens any requirement in full. Those who run the program enter agreements and internal standards as frameworks of their own, a requirement at a time or pasted in after a dry run.
 
 ### Slice 2: Crosswalks ☐
 
@@ -123,3 +125,10 @@ The wave is done when, on a fresh checkout:
 ## Notes
 
 Decisions and discoveries made during the wave are logged here, newest last.
+
+- **Published requirements are recorded by their framework, not row by row.** Loading SP 800-53 writes a thousand rows of content that is the same in every installation. The history holds one event for the framework, with a digest of what was loaded, and not a thousand. A change to a requirement of one of the organization's own frameworks is its own record, and each is an event that says what the text was and what it became.
+- **A statement is carried as the publication prints it.** The machine-readable catalogs hold a statement as nested parts with placeholders for parameters. A pack renders them as the document does: lettered and numbered items a line each, and `[Assignment: organization-defined frequency]` where the organization is to choose. Withdrawn entries are left out.
+- **A heading is not a requirement.** Families, functions, sections, and paragraphs that only introduce others are kept in the tree and marked as headings, so that nothing is mapped to "Implementation specifications:".
+- **The regulation is read from its paragraphs.** The Security Rule arrives as flat paragraphs marked (a), (1), (i), (A). The builder rebuilds the tree from the marks, takes titles from the italic leads, and tells standards from implementation specifications by what the text itself says.
+- **A requirement is addressed by a query, not a path.** Codes such as `164.308(a)(1)(ii)(A)` and an agreement's `A/1` do not belong in a path, so one requirement is `…/requirement?code=`.
+- **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

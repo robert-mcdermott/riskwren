@@ -127,6 +127,23 @@ POLICIES.update(
     }
 )
 
+# Frameworks: anyone signed in may read what the organization is held to; those who run the
+# program enter and keep its own.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/frameworks"): Needs.MEMBER,
+        ("POST", "/api/v1/frameworks"): Needs.CONFIGURE,
+        ("GET", "/api/v1/frameworks/{key}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/frameworks/{key}"): Needs.CONFIGURE,
+        ("GET", "/api/v1/frameworks/{key}/requirements"): Needs.MEMBER,
+        ("POST", "/api/v1/frameworks/{key}/requirements"): Needs.CONFIGURE,
+        ("POST", "/api/v1/frameworks/{key}/requirements/paste"): Needs.CONFIGURE,
+        ("GET", "/api/v1/frameworks/{key}/requirement"): Needs.MEMBER,
+        ("PATCH", "/api/v1/frameworks/{key}/requirement"): Needs.CONFIGURE,
+        ("DELETE", "/api/v1/frameworks/{key}/requirement"): Needs.CONFIGURE,
+    }
+)
+
 # Reporting: every figure counts only what the asker may see.
 POLICIES.update(
     {

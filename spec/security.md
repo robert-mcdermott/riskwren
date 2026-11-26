@@ -113,6 +113,7 @@ One function per record type decides what a principal may see. Single records, l
 | See what is assigned to them; complete an action | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read the inventory (unless restricted) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read risks and controls | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Read frameworks and their requirements (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Add a record in a unit | | | ✓ | | | ✓ | | |
 | Edit a record; link and unlink | | ✓ | ✓ | | | ✓ | | |
 | Assess a risk; rate a control | | ✓ | ✓ | | ✓ | ✓ | | |
@@ -122,7 +123,8 @@ One function per record type decides what a principal may see. Single records, l
 | Record a test result (wave 2) | | | | | ✓ (not their own control) | ✓ (not their own control) | | |
 | Validate closure of an issue (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
 | Read the full history; export | | | | | | ✓ | ✓ | ✓ |
-| Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | |
+| Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | ✓ |
+| Enter and keep the organization's own frameworks; retire a framework (wave 2) | | | | | | ✓ | | ✓ |
 | Manage accounts, roles, units, branding, and system settings | | | | | | | | ✓ |
 
 A manager's authority to edit any record does not include accepting risk: acceptance belongs to the first line, to a named leader with the authority for that rating.

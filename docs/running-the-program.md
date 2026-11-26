@@ -6,7 +6,7 @@ This guide is for the risk and compliance team and for administrators. It covers
 
 RiskWren keeps administration and judgment apart.
 
-- An **administrator** manages accounts, units, appearance, and system settings. That role reads the register and configures the installation. It does not assess, rate, or accept.
+- An **administrator** manages accounts, units, appearance, and system settings. That role reads the register and can set the program's rules, since it sets everything else up. It does not assess, rate, or accept.
 - A **manager** runs the program: shapes the categories, appetite, and scoring method, edits any record, and reads everything. A manager does not accept risk either. Acceptance belongs to leaders.
 
 Someone who does both jobs holds both roles, and the history shows which they acted under.
@@ -27,7 +27,7 @@ Four roles can be limited to a unit, and then cover that unit and everything ben
 | Accept a risk | | | | ✓ not their own, up to their limit | | | | |
 | Escalate a risk | | ✓ | ✓ | ✓ | | ✓ | | |
 | Read the full history | | | | | | ✓ | ✓ | ✓ |
-| Shape the program | | | | | | ✓ | | |
+| Shape the program; keep the organization's own frameworks | | | | | | ✓ | | ✓ |
 | Manage accounts, units, and appearance | | | | | | | | ✓ |
 
 Roles are given under **Admin → People**, or with [`riskwren users roles`](cli.md#riskwren-users-roles). The last active administrator can never be removed or disabled.

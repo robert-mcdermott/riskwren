@@ -15,6 +15,7 @@ from riskwren.api.problems import install_problem_handlers
 from riskwren.api.routers import (
     branding,
     controls,
+    frameworks,
     inventory,
     people,
     reporting,
@@ -30,7 +31,10 @@ from riskwren.config import ENV_CONFIG, Config, load_config
 from riskwren.db.engine import Database
 from riskwren.home import DataHome
 
-ROUTERS = (system, session, people, branding, inventory, risks, controls, treatment, reporting)
+ROUTERS = (
+    system, session, people, branding, inventory, risks, controls, treatment, frameworks,
+    reporting,
+)  # fmt: skip
 
 
 def create_app(config: Config) -> FastAPI:

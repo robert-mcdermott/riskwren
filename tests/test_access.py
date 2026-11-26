@@ -278,6 +278,11 @@ REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
+for (_method, _template), _needs in POLICIES.items():
+    if _template.startswith("/api/v1/frameworks"):
+        REACH[(_method, _template)] = (
+            {"admin", "manager"} if _needs is Needs.CONFIGURE else EVERYONE
+        )
 REACH[("PATCH", "/api/v1/risk-categories/{key}")] = {"admin", "manager"}
 for _action in ("assessments", "subjects", "escalation"):
     for _method in ("GET", "POST", "PUT"):

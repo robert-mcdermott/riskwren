@@ -6,7 +6,20 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
-Nothing yet.
+### Added
+
+- **Frameworks.** Four public frameworks load at installation, each built from its
+  publisher's own machine-readable file and carried as published: the NIST Cybersecurity
+  Framework 2.0, NIST SP 800-53 Rev. 5 (release 5.2.0) with the Low, Moderate, High, and
+  Privacy baselines, NIST SP 800-171 Rev. 3, and the HIPAA Security Rule. Each shows its
+  publisher, version, license, and source. Anyone signed in can browse a framework's tree,
+  search it, narrow it to a baseline, and read any requirement in full (migration 0007).
+- **Frameworks of your own.** An agreement's terms, a sponsor's requirements, or an internal
+  standard is entered as a framework and behaves like any other. Requirements are added one
+  at a time or pasted in after a dry run, and every change to them is in the history.
+- **Framework packs.** A framework is one JSON document, checked whole before anything is
+  loaded and refused whole if anything is wrong. Each pack declares what text it may carry,
+  and a test holds every built-in pack to it. `riskwren frameworks list`, `show`, and `load`.
 
 ## 0.1.0 (2026-11-25)
 

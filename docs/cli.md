@@ -19,6 +19,7 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 | [`riskwren db`](#riskwren-db) | Look after the database schema |
 | [`riskwren users`](#riskwren-users) | Manage accounts from the command line |
 | [`riskwren verify`](#riskwren-verify) | Check that the history has not been altered |
+| [`riskwren frameworks`](#riskwren-frameworks) | See and load what the organization is held to |
 | [`riskwren program`](#riskwren-program) | Move the program between installations |
 | [`riskwren doctor`](#riskwren-doctor) | Check that this installation is healthy |
 
@@ -127,6 +128,32 @@ Show an account's roles, or with --set replace the roles granted in RiskWren. Ro
 ## `riskwren verify`
 
 Recompute the hash chain over every event in the history and report the first one that does not hold. Exits with 1 if the history is broken.
+
+## `riskwren frameworks`
+
+A framework is a source of requirements: a public standard, a regulation, an agreement's terms. Four public ones ship with RiskWren and are loaded at installation. Others are loaded from a pack file, or entered in the app.
+
+### `riskwren frameworks list`
+
+List every framework.
+
+### `riskwren frameworks load`
+
+Load a framework from a pack file, or the built-in ones that are missing. A pack is checked whole first and refused whole if anything is wrong.
+
+| Option | Meaning |
+|---|---|
+| `FILE` | the pack to load |
+| `--builtin` | load the built-in frameworks not yet here |
+| `--dry-run` | check the pack, and load nothing |
+
+### `riskwren frameworks show`
+
+Show a framework's publisher, version, license, and source.
+
+| Option | Meaning |
+|---|---|
+| `KEY` | the framework's key, such as nist-csf |
 
 ## `riskwren program`
 

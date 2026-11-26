@@ -172,9 +172,9 @@ Free labels, for whatever the vocabularies do not cover, kept as a list on the r
 
 ## Compliance (wave 2)
 
-- **Framework:** `framework(id, key, title, version, publisher, license, text_policy, attribution, source_url, pack_version, kind, status)`. `kind`: standard, regulation, agreement, internal.
-- **Requirement:** `requirement(id, framework_id, parent_id, code, title, text, summary, position, is_citable, status)`. A tree; codes are stable across pack versions.
-- **Baseline:** `baseline(id, framework_id, key, title)` with `baseline_requirement`: a published selection from a framework.
+- **Framework:** `framework(id, key, title, version, kind, summary, publisher, license, text_policy, attribution, source_url, built_from, pack_version, origin, status, requirement_count, citable_count, digest, …)`. `kind`: standard, regulation, agreement, internal. `origin`: pack, or local for one the organization entered. `digest` is a fingerprint of a pack's requirements.
+- **Requirement:** `requirement(id, framework_id, parent_id, code, title, text, guidance, kind, position, depth, is_citable, status)`. A tree; codes are stable across pack versions. `is_citable` is false for a heading. Rows are not audited one by one: a pack's requirements are recorded by the framework's event, and a change to one of the organization's own is recorded explicitly.
+- **Baseline:** `baseline(id, framework_id, key, title, requirement_count)` with `baseline_requirement`: a published selection from a framework.
 - **Crosswalk:** `control_requirement(control_id, requirement_id, coverage, note, source)`. `coverage`: full, partial. `source`: pack, person.
 - **Scope:** `scope(ref, name, summary, org_unit_id, status, offers_controls, …)`, with `scope_member(scope_id, subject_type, subject_id)` for what is inside the boundary and `scope_framework(scope_id, framework_id, baseline_id?)` for what it must meet.
 - **Applicability:** `scope_requirement(scope_id, requirement_id, applicable, reason, decided_by, decided_at)`.
