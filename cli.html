@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" data-palette="wren">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command reference · RiskWren</title>
+<meta name="description" content="Every riskwren command. This page is written from the program itself, so it always matches the version it ships with. Run commands with uv run riskwren … from the project directory.">
+<meta property="og:title" content="Command reference">
+<meta property="og:description" content="Every riskwren command. This page is written from the program itself, so it always matches the version it ships with. Run commands with uv run riskwren … from the project directory.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/img/compliance-light.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body class="page-cli">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.0</span></a>
+  <div class="search" role="search">
+    <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light">☀</button><button type="button" data-theme-choice="system" aria-label="Follow the system theme" title="System">◐</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark">☾</button>
+  </div>
+  <a class="github" href="https://github.com/robert-mcdermott/riskwren" rel="noopener">GitHub</a>
+</header>
+<div class="layout">
+  <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html">Getting started</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html">Evidence and testing</a></li><li><a href="issues-and-exceptions.html">Issues and exceptions</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html">API reference</a></li><li><a href="cli.html" aria-current="page">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
+  <main id="content" class="content">
+<h1 id="command-reference">Command reference</h1>
+<p>Every <code>riskwren</code> command. This page is written from the program itself, so it always matches
+the version it ships with. Run commands with <code>uv run riskwren …</code> from the project directory.</p>
+<p>Options that come before the command apply to all of them:</p>
+<div class="code"><pre><code class="language-text">riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...</code></pre></div>
+<h2 id="commands">Commands<a class="anchor" href="#commands" aria-label="Link to this section">#</a></h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead><tbody><tr><td><a href="#riskwren-init"><code>riskwren init</code></a></td><td>Set up a new installation</td></tr><tr><td><a href="#riskwren-serve"><code>riskwren serve</code></a></td><td>Run the web server</td></tr><tr><td><a href="#riskwren-demo"><code>riskwren demo</code></a></td><td>Build a fictional organization to explore</td></tr><tr><td><a href="#riskwren-db"><code>riskwren db</code></a></td><td>Look after the database schema</td></tr><tr><td><a href="#riskwren-users"><code>riskwren users</code></a></td><td>Manage accounts from the command line</td></tr><tr><td><a href="#riskwren-verify"><code>riskwren verify</code></a></td><td>Check that the history has not been altered</td></tr><tr><td><a href="#riskwren-frameworks"><code>riskwren frameworks</code></a></td><td>See and load what the organization is held to</td></tr><tr><td><a href="#riskwren-program"><code>riskwren program</code></a></td><td>Move the program between installations</td></tr><tr><td><a href="#riskwren-doctor"><code>riskwren doctor</code></a></td><td>Check that this installation is healthy</td></tr></tbody></table></div>
+<h2 id="riskwren-init"><code>riskwren init</code><a class="anchor" href="#riskwren-init" aria-label="Link to this section">#</a></h2>
+<p>Write a configuration file if there is none, create the data home, create or upgrade the database, and create the first administrator if there is none. Safe to run again.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>--force</code></td><td>overwrite an existing configuration file</td></tr><tr><td><code>--admin-email</code> <code>EMAIL</code></td><td>create the first administrator with this address</td></tr><tr><td><code>--admin-name</code> <code>NAME</code></td><td>the first administrator's name</td></tr><tr><td><code>--password-stdin</code></td><td>read the password from standard input instead of asking</td></tr></tbody></table></div>
+<h2 id="riskwren-serve"><code>riskwren serve</code><a class="anchor" href="#riskwren-serve" aria-label="Link to this section">#</a></h2>
+<p>Run RiskWren's web server. It refuses to start on a database whose schema is behind; run <code>riskwren db upgrade</code> first.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>--host</code></td><td>address to listen on (default: from the configuration)</td></tr><tr><td><code>--port</code> <code>PORT</code></td><td>port to listen on (default: from the configuration)</td></tr><tr><td><code>--workers</code> <code>WORKERS</code></td><td>server processes (default: from the configuration)</td></tr><tr><td><code>--reload</code></td><td>restart when the code changes (development)</td></tr><tr><td><code>--demo-on-network</code></td><td>let a demo organization listen beyond this machine (anyone who reaches it can sign in as its sample people)</td></tr></tbody></table></div>
+<h2 id="riskwren-demo"><code>riskwren demo</code><a class="anchor" href="#riskwren-demo" aria-label="Link to this section">#</a></h2>
+<p>Build the Northmere Institute for Health Research, a fictional organization with two years of history, in its own directory. Everything in it is made by the same code the app uses. Start it with the command it prints.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>PATH</code></td><td>where to build it (default: ./demo)</td></tr><tr><td><code>--seed</code> <code>SEED</code></td><td>a different number gives a different Northmere</td></tr><tr><td><code>--port</code> <code>PORT</code></td><td>the port its server will use (default: 8020)</td></tr><tr><td><code>--force</code></td><td>rebuild a demo that is already there</td></tr></tbody></table></div>
+<h2 id="riskwren-db"><code>riskwren db</code><a class="anchor" href="#riskwren-db" aria-label="Link to this section">#</a></h2>
+<p>Look after the database schema.</p>
+<h3 id="riskwren-db-upgrade"><code>riskwren db upgrade</code><a class="anchor" href="#riskwren-db-upgrade" aria-label="Link to this section">#</a></h3>
+<p>Apply any migrations the database has not had. Export first: an upgrade cannot be undone except by restoring.</p>
+<h3 id="riskwren-db-current"><code>riskwren db current</code><a class="anchor" href="#riskwren-db-current" aria-label="Link to this section">#</a></h3>
+<p>Show which migration the database is at, and which this version expects. Exits with 1 when they differ.</p>
+<h2 id="riskwren-users"><code>riskwren users</code><a class="anchor" href="#riskwren-users" aria-label="Link to this section">#</a></h2>
+<p>Manage accounts from the command line: for setting up, and for getting back in when nobody can sign in. Everyday account management is in the app, under Admin. Changes made here are recorded in the history as made at the command line.</p>
+<h3 id="riskwren-users-add"><code>riskwren users add</code><a class="anchor" href="#riskwren-users-add" aria-label="Link to this section">#</a></h3>
+<p>Add an account. It asks for a password unless --password-stdin or --invite is given.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>EMAIL</code></td><td>the email address the person signs in with</td></tr><tr><td><code>--name</code></td><td>the person's name</td></tr><tr><td><code>--title</code></td><td>their job title</td></tr><tr><td><code>--role</code> <code>ROLE</code></td><td>a role: admin, manager, assessor, auditor, steward=unit:CODE, or leader=unit:CODE,limit:RATING; manager and assessor may also take unit:CODE (may be repeated)</td></tr><tr><td><code>--unit</code> <code>CODE</code></td><td>a unit they work in, by code (may be repeated)</td></tr><tr><td><code>--password-stdin</code></td><td>read the password from standard input instead of asking</td></tr><tr><td><code>--invite</code></td><td>add them without a password: they can be named on records now, and sign in once they are given a password or use single sign-on</td></tr></tbody></table></div>
+<h3 id="riskwren-users-list"><code>riskwren users list</code><a class="anchor" href="#riskwren-users-list" aria-label="Link to this section">#</a></h3>
+<p>List every account with its status and roles.</p>
+<h3 id="riskwren-users-disable"><code>riskwren users disable</code><a class="anchor" href="#riskwren-users-disable" aria-label="Link to this section">#</a></h3>
+<p>Stop an account signing in and end its sessions. Its records and history are kept. The last active administrator cannot be disabled.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>EMAIL</code></td><td>the account's email address</td></tr></tbody></table></div>
+<h3 id="riskwren-users-enable"><code>riskwren users enable</code><a class="anchor" href="#riskwren-users-enable" aria-label="Link to this section">#</a></h3>
+<p>Let a disabled account sign in again.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>EMAIL</code></td><td>the account's email address</td></tr></tbody></table></div>
+<h3 id="riskwren-users-reset-password"><code>riskwren users reset-password</code><a class="anchor" href="#riskwren-users-reset-password" aria-label="Link to this section">#</a></h3>
+<p>Give an account a new password and end its sessions.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>EMAIL</code></td><td>the account's email address</td></tr><tr><td><code>--password-stdin</code></td><td>read the password from standard input instead of asking</td></tr></tbody></table></div>
+<h3 id="riskwren-users-roles"><code>riskwren users roles</code><a class="anchor" href="#riskwren-users-roles" aria-label="Link to this section">#</a></h3>
+<p>Show an account's roles, or with --set replace the roles granted in RiskWren. Roles mapped from an identity provider are left alone. The last active administrator cannot lose that role.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>EMAIL</code></td><td>the account's email address</td></tr><tr><td><code>--set</code> <code>ROLE</code></td><td>a role: admin, manager, assessor, auditor, steward=unit:CODE, or leader=unit:CODE,limit:RATING; manager and assessor may also take unit:CODE (may be repeated); with none, removes every role</td></tr></tbody></table></div>
+<h2 id="riskwren-verify"><code>riskwren verify</code><a class="anchor" href="#riskwren-verify" aria-label="Link to this section">#</a></h2>
+<p>Recompute the hash chain over every event in the history and report the first one that does not hold. Exits with 1 if the history is broken.</p>
+<h2 id="riskwren-frameworks"><code>riskwren frameworks</code><a class="anchor" href="#riskwren-frameworks" aria-label="Link to this section">#</a></h2>
+<p>A framework is a source of requirements: a public standard, a regulation, an agreement's terms. Four public ones ship with RiskWren and are loaded at installation. Others are loaded from a pack file, or entered in the app.</p>
+<h3 id="riskwren-frameworks-list"><code>riskwren frameworks list</code><a class="anchor" href="#riskwren-frameworks-list" aria-label="Link to this section">#</a></h3>
+<p>List every framework.</p>
+<h3 id="riskwren-frameworks-load"><code>riskwren frameworks load</code><a class="anchor" href="#riskwren-frameworks-load" aria-label="Link to this section">#</a></h3>
+<p>Load a framework from a pack file, or the built-in ones that are missing. A pack is checked whole first and refused whole if anything is wrong.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>FILE</code></td><td>the pack to load</td></tr><tr><td><code>--builtin</code></td><td>load the built-in frameworks not yet here</td></tr><tr><td><code>--dry-run</code></td><td>check the pack, and load nothing</td></tr></tbody></table></div>
+<h3 id="riskwren-frameworks-show"><code>riskwren frameworks show</code><a class="anchor" href="#riskwren-frameworks-show" aria-label="Link to this section">#</a></h3>
+<p>Show a framework's publisher, version, license, and source.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>KEY</code></td><td>the framework's key, such as nist-csf</td></tr></tbody></table></div>
+<h2 id="riskwren-program"><code>riskwren program</code><a class="anchor" href="#riskwren-program" aria-label="Link to this section">#</a></h2>
+<p>The program is everything a risk and compliance team configures: vocabularies, the risk categories and their appetite, the scoring method, cadences, and who may accept what. It lives in the database and moves as one file.</p>
+<h3 id="riskwren-program-export"><code>riskwren program export</code><a class="anchor" href="#riskwren-program-export" aria-label="Link to this section">#</a></h3>
+<p>Write the whole program as one JSON document, to a file or to standard output.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>--output</code>, <code>-o</code> <code>FILE</code></td><td>write to this file</td></tr></tbody></table></div>
+<h3 id="riskwren-program-import"><code>riskwren program import</code><a class="anchor" href="#riskwren-program-import" aria-label="Link to this section">#</a></h3>
+<p>Load a program pack. The whole pack is checked first, and nothing is loaded unless all of it can be. A new scoring method is published as a new version; assessments already made keep the version they were made under.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Option</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>FILE</code></td><td>the pack to load</td></tr><tr><td><code>--dry-run</code></td><td>say what would change, and change nothing</td></tr></tbody></table></div>
+<h2 id="riskwren-doctor"><code>riskwren doctor</code><a class="anchor" href="#riskwren-doctor" aria-label="Link to this section">#</a></h2>
+<p>Check the configuration, the data home, the database and its schema, and the history. Exits with 1 if anything must be fixed.</p>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="api-reference.html"><span>Previous</span>API reference</a><a class="next" href="changelog.html"><span>Next</span>Changelog</a></nav>
+    <footer class="foot">Describes RiskWren 0.2.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+  </main>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#commands">Commands</a></li><li class="l2"><a href="#riskwren-init">riskwren init</a></li><li class="l2"><a href="#riskwren-serve">riskwren serve</a></li><li class="l2"><a href="#riskwren-demo">riskwren demo</a></li><li class="l2"><a href="#riskwren-db">riskwren db</a></li><li class="l3"><a href="#riskwren-db-upgrade">riskwren db upgrade</a></li><li class="l3"><a href="#riskwren-db-current">riskwren db current</a></li><li class="l2"><a href="#riskwren-users">riskwren users</a></li><li class="l3"><a href="#riskwren-users-add">riskwren users add</a></li><li class="l3"><a href="#riskwren-users-list">riskwren users list</a></li><li class="l3"><a href="#riskwren-users-disable">riskwren users disable</a></li><li class="l3"><a href="#riskwren-users-enable">riskwren users enable</a></li><li class="l3"><a href="#riskwren-users-reset-password">riskwren users reset-password</a></li><li class="l3"><a href="#riskwren-users-roles">riskwren users roles</a></li><li class="l2"><a href="#riskwren-verify">riskwren verify</a></li><li class="l2"><a href="#riskwren-frameworks">riskwren frameworks</a></li><li class="l3"><a href="#riskwren-frameworks-list">riskwren frameworks list</a></li><li class="l3"><a href="#riskwren-frameworks-load">riskwren frameworks load</a></li><li class="l3"><a href="#riskwren-frameworks-show">riskwren frameworks show</a></li><li class="l2"><a href="#riskwren-program">riskwren program</a></li><li class="l3"><a href="#riskwren-program-export">riskwren program export</a></li><li class="l3"><a href="#riskwren-program-import">riskwren program import</a></li><li class="l2"><a href="#riskwren-doctor">riskwren doctor</a></li></ul></aside>
+</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" data-palette="wren">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Issues and exceptions · RiskWren</title>
+<meta name="description" content="This guide is for whoever has to put something right, whoever checks that it was, and whoever decides when a departure is allowed for a while. It covers the issue register, severity and dates, actions">
+<meta property="og:title" content="Issues and exceptions">
+<meta property="og:description" content="This guide is for whoever has to put something right, whoever checks that it was, and whoever decides when a departure is allowed for a while. It covers the issue register, severity and dates, actions">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/img/compliance-light.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body class="page-issues-and-exceptions">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.0</span></a>
+  <div class="search" role="search">
+    <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light">☀</button><button type="button" data-theme-choice="system" aria-label="Follow the system theme" title="System">◐</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark">☾</button>
+  </div>
+  <a class="github" href="https://github.com/robert-mcdermott/riskwren" rel="noopener">GitHub</a>
+</header>
+<div class="layout">
+  <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html">Getting started</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html">Evidence and testing</a></li><li><a href="issues-and-exceptions.html" aria-current="page">Issues and exceptions</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html">API reference</a></li><li><a href="cli.html">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
+  <main id="content" class="content">
+<h1 id="issues-and-exceptions">Issues and exceptions</h1>
+<p>This guide is for whoever has to put something right, whoever checks that it was, and whoever decides when a departure is allowed for a while. It covers the issue register, severity and dates, actions, closure, exceptions, the plan of action, and notices.</p>
+<h2 id="issues">Issues<a class="anchor" href="#issues" aria-label="Link to this section">#</a></h2>
+<p>An issue is something found to be wrong that must be put right. <strong>Compliance → Issues</strong> is one register for all of them, whatever found them:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Found by</th><th scope="col">For example</th></tr></thead><tbody><tr><td><strong>A test</strong></td><td>An assessment found a control partly effective or ineffective</td></tr><tr><td><strong>A gap</strong></td><td>A requirement that nothing answers in a scope</td></tr><tr><td><strong>Security testing</strong></td><td>A penetration test, a scan, or an exercise</td></tr><tr><td><strong>An audit</strong></td><td>A finding from an internal or external audit</td></tr><tr><td><strong>An incident</strong></td><td>Something that went wrong showed it</td></tr><tr><td><strong>A review</strong></td><td>A review of a supplier, a system, or a process</td></tr><tr><td><strong>An observation</strong></td><td>Somebody noticed it and said so</td></tr></tbody></table></div>
+<figure><a href="img/issues-light.webp" class="only-light"><img src="img/issues-light.webp" alt="The issue register: each issue with its severity, what found it, its owner, and its date" width="1360" height="860" loading="lazy"></a><a href="img/issues-dark.webp" class="only-dark"><img src="img/issues-dark.webp" alt="The issue register: each issue with its severity, what found it, its owner, and its date" width="1360" height="860" loading="lazy"></a></figure>
+<h3 id="raise-an-issue">Raise an issue<a class="anchor" href="#raise-an-issue" aria-label="Link to this section">#</a></h3>
+<p><strong>Issues → Raise an issue.</strong> Anyone may raise one for a unit they work in or have a role over. Say what is wrong, in which unit, how serious it is, what found it, and what it is about: the controls, scopes, and risks concerned. Name who is to put it right; they are told.</p>
+<p>On a scope's <strong>Requirements</strong> tab, <strong>Raise an issue</strong> beside a requirement that is a gap, planned, or failing starts one already about that requirement and that scope.</p>
+<h3 id="from-a-failed-test">From a failed test<a class="anchor" href="#from-a-failed-test" aria-label="Link to this section">#</a></h3>
+<p>When a test result of partly effective or ineffective is confirmed, an issue is opened without anyone asking:</p>
+<ul><li>it is named for the control and the assessment, and carries what the test found and what was looked at;</li><li>it is <strong>high</strong> if the control was found ineffective and <strong>moderate</strong> if partly effective;</li><li>it belongs to the control's owners, who are told, and not to whoever found it;</li><li>it names every scope that relies on the control.</li></ul>
+<p>If an issue is already open for that control from an earlier test, that one stands and no second one is opened. If the control has no owner the issue has none either, and shows on Home for those who can name one.</p>
+<h3 id="severity-sets-the-date">Severity sets the date<a class="anchor" href="#severity-sets-the-date" aria-label="Link to this section">#</a></h3>
+<p>Each severity has a written meaning, shown as you choose, and the issue is due a fixed time after it was raised:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Severity</th><th scope="col">Due within</th></tr></thead><tbody><tr><td>Critical</td><td>30 days</td></tr><tr><td>High</td><td>90 days</td></tr><tr><td>Moderate</td><td>180 days</td></tr><tr><td>Low</td><td>365 days</td></tr></tbody></table></div>
+<p>The table is part of the program and can be changed (see <a href="running-the-program.html#clocks-for-issues-and-exceptions">Running the program</a>). Changing an issue's severity applies the rule again, counted from the day it was raised.</p>
+<p><strong>Move the date</strong> changes it by hand. That needs a reason, and where the date started and every move stay on the record, with a count beside the date wherever the issue is listed.</p>
+<h3 id="put-it-right">Put it right<a class="anchor" href="#put-it-right" aria-label="Link to this section">#</a></h3>
+<p>An issue is worked through <strong>actions</strong>, each with an owner and a date: the same actions treatment plans use, on the same list of everything owed. <strong>Add an action</strong> on the issue. Whoever owns an action sees the issue, does their part, and marks it done.</p>
+<h3 id="close-it">Close it<a class="anchor" href="#close-it" aria-label="Link to this section">#</a></h3>
+<ol><li>Its owner chooses <strong>Propose closure</strong>, and says what was done, <strong>why it happened</strong> (a root cause from a short list: procedure, people and time, ownership, technology, design, change, third party, or other), and cites the evidence that shows it. Open actions must be finished or cancelled first.</li><li>The issue then waits. An assessor or a manager for the unit sees it on Home and chooses <strong>Confirm closure</strong>: either confirming, which closes it, or sending it back with a note saying what is still missing.</li></ol>
+<p><strong>Nobody confirms the closure of an issue they own, or one they proposed closing.</strong> The server refuses it.</p>
+<figure><a href="img/issue-proposed-light.webp" class="only-light"><img src="img/issue-proposed-light.webp" alt="An issue whose owner says it is put right, waiting for someone who does not own it to confirm closure" width="1360" height="860" loading="lazy"></a><a href="img/issue-proposed-dark.webp" class="only-dark"><img src="img/issue-proposed-dark.webp" alt="An issue whose owner says it is put right, waiting for someone who does not own it to confirm closure" width="1360" height="860" loading="lazy"></a></figure>
+<p>Two more things belong to the second line alone: <strong>Withdraw</strong>, for an issue raised in error, and <strong>Reopen</strong>, for one that turned out not to be put right. An owner who could withdraw their own issue would never need its closure confirmed.</p>
+<h3 id="who-sees-an-issue">Who sees an issue<a class="anchor" href="#who-sees-an-issue" aria-label="Link to this section">#</a></h3>
+<p>An issue is known to those with a part in it: whoever raised it, those named on it, anyone with an action on it, and those with a role over its unit. Working in the unit is not enough. An issue can also be marked restricted.</p>
+<h2 id="exceptions">Exceptions<a class="anchor" href="#exceptions" aria-label="Link to this section">#</a></h2>
+<p>An exception is an approved departure from a control or a requirement, for a time, with what makes up for it. It is the honest answer when something cannot be met yet and everyone knows it.</p>
+<h3 id="ask">Ask<a class="anchor" href="#ask" aria-label="Link to this section">#</a></h3>
+<p>An exception is asked for from a scope, by those who keep it:</p>
+<ul><li>on the <strong>Requirements</strong> tab, <strong>Ask for an exception</strong> beside a requirement that is a gap, planned, or failing;</li><li>on the <strong>Controls</strong> tab, <strong>Exception</strong> beside a control, including one the scope inherits and cannot fix itself.</li></ul>
+<p>Say why it is needed, what is done in its place meanwhile, and the dates it runs between. It is never open-ended: by default it runs for at most twelve months.</p>
+<h3 id="decide">Decide<a class="anchor" href="#decide" aria-label="Link to this section">#</a></h3>
+<p>A leader or a manager with authority over the unit decides, and <strong>whoever asked does not decide</strong>. They see the request on Home. Approving may shorten it; refusing needs a reason. Asking changes nothing: an exception covers nothing until it is approved.</p>
+<h3 id="while-it-is-in-force-and-after">While it is in force, and after<a class="anchor" href="#while-it-is-in-force-and-after" aria-label="Link to this section">#</a></h3>
+<p>While an exception is in force, what it covers is shown as <strong>excepted</strong> in place of failing, a gap, or planned, with the state underneath said beside it. It does not improve on a control that is in place.</p>
+<p>The day after it ends, the state underneath is back, without anyone doing anything. Nothing has to run for that to happen: whether an exception is in force is worked out from its dates on the day.</p>
+<p>Whoever asked sees it on Home a month before it ends. <strong>Ask again</strong> starts a new request that carries on from it, which is decided again. <strong>End it early</strong> withdraws one that is no longer needed.</p>
+<figure><a href="img/exception-light.webp" class="only-light"><img src="img/exception-light.webp" alt="An approved exception that ends soon: what it is an exception to, why it is needed, what makes up for it meanwhile, and its dates" width="1360" height="860" loading="lazy"></a><a href="img/exception-dark.webp" class="only-dark"><img src="img/exception-dark.webp" alt="An approved exception that ends soon: what it is an exception to, why it is needed, what makes up for it meanwhile, and its dates" width="1360" height="860" loading="lazy"></a></figure>
+<p><strong>Compliance → Exceptions</strong> lists them, and can show those waiting to be decided, in force, ended, refused, or withdrawn.</p>
+<h2 id="the-plan-of-action">The plan of action<a class="anchor" href="#the-plan-of-action" aria-label="Link to this section">#</a></h2>
+<p>A scope's <strong>Plan of action</strong> tab lists the open issues that bear on it: those about the scope itself, and those about any control it uses or inherits. They are listed most severe first, each with its owner, its milestones (the actions, with who and when), and its date.</p>
+<p>It prints, and it is the document a reviewer asks for: what is wrong, who is fixing it, and by when.</p>
+<figure><a href="img/scope-plan-light.webp" class="only-light"><img src="img/scope-plan-light.webp" alt="A scope's Plan of action tab: its open issues, most severe first, each with its owner, milestones, and date" width="1360" height="860" loading="lazy"></a><a href="img/scope-plan-dark.webp" class="only-dark"><img src="img/scope-plan-dark.webp" alt="A scope's Plan of action tab: its open issues, most severe first, each with its owner, milestones, and date" width="1360" height="860" loading="lazy"></a></figure>
+<h2 id="notices">Notices<a class="anchor" href="#notices" aria-label="Link to this section">#</a></h2>
+<p>The bell at the top right counts what has been assigned to you or decided for you since you last looked: an issue handed to you, an action that is yours, a closure sent back, an exception approved or refused, a request waiting for your decision.</p>
+<figure><a href="img/notices-light.webp" class="only-light"><img src="img/notices-light.webp" alt="Notices: what has been assigned to you or decided for you, each a sentence and a place to go" width="1360" height="860" loading="lazy"></a><a href="img/notices-dark.webp" class="only-dark"><img src="img/notices-dark.webp" alt="Notices: what has been assigned to you or decided for you, each a sentence and a place to go" width="1360" height="860" loading="lazy"></a></figure>
+<p>A notice is a sentence and a place to go. It is not the record of what happened, which is in the history, and nobody is told about what they did themselves. <strong>Home</strong> remains the list of what you still owe.</p>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="evidence-and-testing.html"><span>Previous</span>Evidence and testing</a><a class="next" href="running-the-program.html"><span>Next</span>Running the program</a></nav>
+    <footer class="foot">Describes RiskWren 0.2.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+  </main>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#issues">Issues</a></li><li class="l3"><a href="#raise-an-issue">Raise an issue</a></li><li class="l3"><a href="#from-a-failed-test">From a failed test</a></li><li class="l3"><a href="#severity-sets-the-date">Severity sets the date</a></li><li class="l3"><a href="#put-it-right">Put it right</a></li><li class="l3"><a href="#close-it">Close it</a></li><li class="l3"><a href="#who-sees-an-issue">Who sees an issue</a></li><li class="l2"><a href="#exceptions">Exceptions</a></li><li class="l3"><a href="#ask">Ask</a></li><li class="l3"><a href="#decide">Decide</a></li><li class="l3"><a href="#while-it-is-in-force-and-after">While it is in force, and after</a></li><li class="l2"><a href="#the-plan-of-action">The plan of action</a></li><li class="l2"><a href="#notices">Notices</a></li></ul></aside>
+</div>
+</body>
+</html>

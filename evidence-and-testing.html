@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" data-palette="wren">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence and testing · RiskWren</title>
+<meta name="description" content="This guide is for the people who collect proof that a control is done, and for those who test whether it works: control owners, assessors, and whoever leads an assessment. It covers evidence, its date">
+<meta property="og:title" content="Evidence and testing">
+<meta property="og:description" content="This guide is for the people who collect proof that a control is done, and for those who test whether it works: control owners, assessors, and whoever leads an assessment. It covers evidence, its date">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/img/compliance-light.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body class="page-evidence-and-testing">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.0</span></a>
+  <div class="search" role="search">
+    <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light">☀</button><button type="button" data-theme-choice="system" aria-label="Follow the system theme" title="System">◐</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark">☾</button>
+  </div>
+  <a class="github" href="https://github.com/robert-mcdermott/riskwren" rel="noopener">GitHub</a>
+</header>
+<div class="layout">
+  <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html">Getting started</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html" aria-current="page">Evidence and testing</a></li><li><a href="issues-and-exceptions.html">Issues and exceptions</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html">API reference</a></li><li><a href="cli.html">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
+  <main id="content" class="content">
+<h1 id="evidence-and-testing">Evidence and testing</h1>
+<p>This guide is for the people who collect proof that a control is done, and for those who test whether it works: control owners, assessors, and whoever leads an assessment. It covers evidence, its dates, files, assessments, tests, independence, and what a result changes.</p>
+<h2 id="evidence">Evidence<a class="anchor" href="#evidence" aria-label="Link to this section">#</a></h2>
+<p>An evidence item is something that shows a control is done. It is collected once and attached to everything it supports.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Kind</th><th scope="col">What it is</th></tr></thead><tbody><tr><td><strong>A file</strong></td><td>A report, an export, a screenshot, a signed form</td></tr><tr><td><strong>A link</strong></td><td>Where the proof lives in another system</td></tr><tr><td><strong>A note of what was seen</strong></td><td>What somebody looked at, and what they saw</td></tr><tr><td><strong>An attestation</strong></td><td>A named person's statement that something is so</td></tr></tbody></table></div>
+<p><strong>Compliance → Evidence → Add evidence</strong>, or <strong>Add evidence</strong> on a control or a scope, which attaches it there as it is made. Anyone may add evidence for a unit they work in, because the people who do the work hold the proof.</p>
+<p>Every item has an owner, the date it was collected, the period it covers, a data class, and the date it <strong>holds until</strong>.</p>
+<figure><a href="img/evidence-light.webp" class="only-light"><img src="img/evidence-light.webp" alt="The evidence list: each item with its kind, its owner, what it supports, and whether it still counts" width="1360" height="860" loading="lazy"></a><a href="img/evidence-dark.webp" class="only-dark"><img src="img/evidence-dark.webp" alt="The evidence list: each item with its kind, its owner, what it supports, and whether it still counts" width="1360" height="860" loading="lazy"></a></figure>
+<h3 id="evidence-stops-counting">Evidence stops counting<a class="anchor" href="#evidence-stops-counting" aria-label="Link to this section">#</a></h3>
+<p>Evidence is true of a moment. An item holds for twelve months from the day it was collected unless you give another date, and it is in one of three states:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">State</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><strong>Current</strong></td><td>It counts</td></tr><tr><td><strong>Expires soon</strong></td><td>It counts, and its date is within 30 days. Its owner sees it on Home</td></tr><tr><td><strong>No longer counts</strong></td><td>Its date has passed. It stays on the record, and counts toward nothing</td></tr></tbody></table></div>
+<p>Stale evidence is never deleted and never quietly renewed. Collect it again and add a new item; the old one remains as what was true then.</p>
+<h3 id="attach-it">Attach it<a class="anchor" href="#attach-it" aria-label="Link to this section">#</a></h3>
+<p>An item counts once it is attached to the control it shows. On the item, <strong>Supports → Edit</strong> lists the controls and scopes it is attached to. One item can support many: the same restore log may be evidence for a backup control and for the scope that relies on it.</p>
+<p>Putting evidence on a control or a scope is for those who keep or assess that control or scope. Collecting is open; attaching is not.</p>
+<h3 id="files">Files<a class="anchor" href="#files" aria-label="Link to this section">#</a></h3>
+<p>A file is checked by what it contains, not by its name. PDF, common images, Word, Excel, and PowerPoint documents, and plain text (including CSV and JSON) are taken, up to 25 MB. Programs are refused.</p>
+<ul><li>Files are stored under the SHA-256 of their content, in the data home, in a directory the server does not serve from. The same file sent twice is kept once.</li><li>A file only ever leaves as a download. A page or a drawing kept as evidence of a configuration is stored and returned as the plain text it is, so it cannot run in the browser.</li><li>Every download is recorded in the item's history.</li></ul>
+<h3 id="who-sees-evidence">Who sees evidence<a class="anchor" href="#who-sees-evidence" aria-label="Link to this section">#</a></h3>
+<p>Evidence is more closely held than the register. An item is seen by whoever collected it, those named on it, and those with a role over its unit. Others see it only through something it is attached to that they may see, and not at all if it is restricted or of the most sensitive data class. A person who cannot see a control cannot download its evidence.</p>
+<h2 id="assessments">Assessments<a class="anchor" href="#assessments" aria-label="Link to this section">#</a></h2>
+<p>An assessment is a planned look at whether a scope's controls work. <strong>Compliance → Assessments → Start an assessment</strong> (an assessor or a manager), or <strong>Start an assessment</strong> on a scope.</p>
+<p>Give it a name, the scope, a period, and a lead. It plans a test for each control the scope does itself:</p>
+<ul><li>every one of them; or</li><li>with <strong>Against</strong> set to a framework, only those that answer a requirement of it that applies in the scope.</li></ul>
+<p>A control the scope inherits is not tested here. It is tested where it is provided, once, and the result reaches every scope that relies on it.</p>
+<figure><a href="img/assessment-light.webp" class="only-light"><img src="img/assessment-light.webp" alt="An assessment in progress: how many results count, await review, and are still to do, then each test and what it found" width="1360" height="860" loading="lazy"></a><a href="img/assessment-dark.webp" class="only-dark"><img src="img/assessment-dark.webp" alt="An assessment in progress: how many results count, await review, and are still to do, then each test and what it found" width="1360" height="860" loading="lazy"></a></figure>
+<h3 id="plan-the-tests">Plan the tests<a class="anchor" href="#plan-the-tests" aria-label="Link to this section">#</a></h3>
+<p>Each test has a <strong>method</strong> (examine records and settings, interview the people who do it, or test it and see), a <strong>procedure</strong>, and a person it is <strong>assigned to</strong>. <strong>Plan</strong> on a test changes them. A test that is assigned appears on that person's Home, due on the last day of the assessment's period.</p>
+<h3 id="record-a-result">Record a result<a class="anchor" href="#record-a-result" aria-label="Link to this section">#</a></h3>
+<p><strong>Record result</strong> on a test:</p>
+<ul><li><strong>Design</strong>: would it reduce the risk, if it operated as described?</li><li><strong>Operation</strong>: does it operate as described?</li><li><strong>What was looked at</strong>: the sample, the period, the people asked.</li><li><strong>What was found.</strong> This is required.</li><li><strong>Evidence</strong>: cite the items that show it.</li></ul>
+<p>Each of design and operation is effective, partly effective, or ineffective. The control is as strong as the weaker of the two.</p>
+<figure><a href="img/assessment-record-light.webp" class="only-light"><img src="img/assessment-record-light.webp" alt="Recording a test result: design, operation, what was looked at, what was found, and the evidence cited" width="1360" height="860" loading="lazy"></a><a href="img/assessment-record-dark.webp" class="only-dark"><img src="img/assessment-record-dark.webp" alt="Recording a test result: design, operation, what was looked at, what was found, and the evidence cited" width="1360" height="860" loading="lazy"></a></figure>
+<h3 id="independence-and-a-second-pair-of-eyes">Independence, and a second pair of eyes<a class="anchor" href="#independence-and-a-second-pair-of-eyes" aria-label="Link to this section">#</a></h3>
+<p>Two rules always hold, and the server enforces both.</p>
+<ol><li><strong>Nobody records or reviews a result for a control they own.</strong> The test is shown to them as theirs, with someone else to do it.</li><li><strong>A result counts only when a second person has confirmed it.</strong> Whoever recorded it cannot confirm it.</li></ol>
+<p>Recording a result changes nothing. It waits, and the assessment's lead sees it on Home. <strong>Review</strong> then either confirms it or returns it with a note saying what needs another look. A returned result is recorded again; the earlier one stays in the assessment's history.</p>
+<figure><a href="img/assessment-review-light.webp" class="only-light"><img src="img/assessment-review-light.webp" alt="Reviewing a result someone else recorded: confirm it, or return it with a note" width="1360" height="860" loading="lazy"></a><a href="img/assessment-review-dark.webp" class="only-dark"><img src="img/assessment-review-dark.webp" alt="Reviewing a result someone else recorded: confirm it, or return it with a note" width="1360" height="860" loading="lazy"></a></figure>
+<h3 id="what-a-confirmed-result-changes">What a confirmed result changes<a class="anchor" href="#what-a-confirmed-result-changes" aria-label="Link to this section">#</a></h3>
+<p>Confirming a result does three things at once.</p>
+<ol><li><strong>It becomes the control's rating</strong>, on the basis of a test, in the tester's name.</li><li><strong>It moves every requirement the control answers, in every scope that relies on it.</strong> Effective, with evidence that still counts, makes them verified. Partly effective or ineffective makes them failing, in the scope that does the control and in every scope that inherits it.</li><li><strong>It moves the residual rating that the controls suggest for every risk the control reduces.</strong> If the suggestion is now worse than the rating on record, the risk is flagged as in doubt and its owner is asked to assess again.</li></ol>
+<p>A result of partly effective or ineffective also opens an issue for the control's owners, filled in from the result. See <a href="issues-and-exceptions.html#from-a-failed-test">Issues and exceptions</a>.</p>
+<p>While a test result holds, the control cannot be re-rated by judgment. Otherwise the quickest way to clear a failing test would be to have an opinion. A later test replaces it, and so does the passing of time: a result holds for as long as any rating does, twelve months by default.</p>
+<h3 id="finish">Finish<a class="anchor" href="#finish" aria-label="Link to this section">#</a></h3>
+<p><strong>Complete</strong> closes an assessment once every test in it has a result that counts. A test that will not be done is taken out first. <strong>Cancel it</strong> abandons an assessment; results already confirmed still count.</p>
+<p>The assessment's <strong>History</strong> tab tells every test planned, every result recorded, and every confirmation and return, with who did each.</p>
+<h2 id="verified-in-practice">Verified, in practice<a class="anchor" href="#verified-in-practice" aria-label="Link to this section">#</a></h2>
+<p>A requirement is verified when each control that answers it in the scope is in place, has a confirmed test result of effective that still holds, and has current evidence, either attached to the control or cited by that result.</p>
+<p>So the working rhythm for a control owner and an assessor is:</p>
+<ol><li>The owner keeps the control's evidence current, renewing it before its date.</li><li>The assessor tests the control once a year and cites that evidence.</li><li>A second assessor confirms the result.</li></ol>
+<p>Miss the first and the requirement drops to in place when the evidence goes stale. Miss the second and it drops when the test is a year old. Neither needs anyone to notice: the scope's Requirements tab and the compliance dashboard say so the same day.</p>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="compliance.html"><span>Previous</span>Compliance</a><a class="next" href="issues-and-exceptions.html"><span>Next</span>Issues and exceptions</a></nav>
+    <footer class="foot">Describes RiskWren 0.2.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+  </main>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#evidence">Evidence</a></li><li class="l3"><a href="#evidence-stops-counting">Evidence stops counting</a></li><li class="l3"><a href="#attach-it">Attach it</a></li><li class="l3"><a href="#files">Files</a></li><li class="l3"><a href="#who-sees-evidence">Who sees evidence</a></li><li class="l2"><a href="#assessments">Assessments</a></li><li class="l3"><a href="#plan-the-tests">Plan the tests</a></li><li class="l3"><a href="#record-a-result">Record a result</a></li><li class="l3"><a href="#independence-and-a-second-pair-of-eyes">Independence, and a second pair of eyes</a></li><li class="l3"><a href="#what-a-confirmed-result-changes">What a confirmed result changes</a></li><li class="l3"><a href="#finish">Finish</a></li><li class="l2"><a href="#verified-in-practice">Verified, in practice</a></li></ul></aside>
+</div>
+</body>
+</html>

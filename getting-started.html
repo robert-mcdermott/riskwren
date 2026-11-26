@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" data-palette="wren">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting started · RiskWren</title>
+<meta name="description" content="This guide takes you from nothing to a running RiskWren that your organization can sign in to. It is for whoever installs it and sets it up. Allow about fifteen minutes.">
+<meta property="og:title" content="Getting started">
+<meta property="og:description" content="This guide takes you from nothing to a running RiskWren that your organization can sign in to. It is for whoever installs it and sets it up. Allow about fifteen minutes.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/img/compliance-light.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body class="page-getting-started">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.0</span></a>
+  <div class="search" role="search">
+    <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light">☀</button><button type="button" data-theme-choice="system" aria-label="Follow the system theme" title="System">◐</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark">☾</button>
+  </div>
+  <a class="github" href="https://github.com/robert-mcdermott/riskwren" rel="noopener">GitHub</a>
+</header>
+<div class="layout">
+  <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html" aria-current="page">Getting started</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html">Evidence and testing</a></li><li><a href="issues-and-exceptions.html">Issues and exceptions</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html">API reference</a></li><li><a href="cli.html">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
+  <main id="content" class="content">
+<h1 id="getting-started">Getting started</h1>
+<p>This guide takes you from nothing to a running RiskWren that your organization can sign in to. It is for whoever installs it and sets it up. Allow about fifteen minutes.</p>
+<p>If you only want to look around first, skip to <a href="#explore-the-demo-organization">Explore the demo organization</a>.</p>
+<h2 id="what-you-need">What you need<a class="anchor" href="#what-you-need" aria-label="Link to this section">#</a></h2>
+<ul><li><a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, which provides the right Python (3.12 or later).</li><li>A copy of this repository.</li></ul>
+<p>Every command in these guides is run through <code>uv run riskwren …</code> from the repository directory. The full list is in the <a href="cli.html">command reference</a>.</p>
+<h2 id="install">Install<a class="anchor" href="#install" aria-label="Link to this section">#</a></h2>
+<div class="code"><pre><code class="language-bash">uv sync</code></pre></div>
+<h2 id="set-up-the-installation">Set up the installation<a class="anchor" href="#set-up-the-installation" aria-label="Link to this section">#</a></h2>
+<div class="code"><pre><code class="language-bash">uv run riskwren init</code></pre></div>
+<p><code>init</code> does five things:</p>
+<ol><li>Writes <code>riskwren.toml</code>, the deployment settings, in the current directory.</li><li>Creates the data home, <code>./var</code>, which holds everything that is not in the database.</li><li>Creates the database. With no other setting, this is a SQLite file inside the data home.</li><li>Loads the default program: nine families of risk with an appetite for each, a scoring method with defined scales, review cadences, the table of who may accept what, a library of 57 common risks, a library of 56 common controls, and four public frameworks (the NIST Cybersecurity Framework 2.0, NIST SP 800-53 Rev. 5, NIST SP 800-171 Rev. 3, and the HIPAA Security Rule) with the common controls already mapped to them.</li><li>Asks for your email address, your name, and a password, and creates the first administrator.</li></ol>
+<p>The password needs at least 12 characters. Length matters more than symbols: a few unrelated words make a good one.</p>
+<p><code>init</code> is safe to run again. It leaves an existing configuration file alone, adds only what is missing from the program, and creates an administrator only if there is none.</p>
+<p>To set up without being asked anything, name the administrator and pipe the password in:</p>
+<div class="code"><pre><code class="language-bash">printf '%s' &quot;$ADMIN_PASSWORD&quot; | uv run riskwren init \
+  --admin-email you@example.org --admin-name &quot;Your Name&quot; --password-stdin</code></pre></div>
+<h2 id="check-it">Check it<a class="anchor" href="#check-it" aria-label="Link to this section">#</a></h2>
+<div class="code"><pre><code class="language-bash">uv run riskwren doctor</code></pre></div>
+<p><code>doctor</code> checks the configuration, the data home, that the database answers, that its schema is the one this version expects, that the database still refuses changes to the history, and that the history verifies. It exits with 1 if anything must be fixed.</p>
+<h2 id="run-it">Run it<a class="anchor" href="#run-it" aria-label="Link to this section">#</a></h2>
+<div class="code"><pre><code class="language-bash">uv run riskwren serve</code></pre></div>
+<p>The server prints its address, by default <code>http://127.0.0.1:8000</code>. Use <code>--port</code> to pick another port.</p>
+<p><code>serve</code> refuses to start in three cases, and says what to do in each:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">It says</th><th scope="col">Do this</th></tr></thead><tbody><tr><td>The database schema is behind</td><td><code>uv run riskwren db upgrade</code></td></tr><tr><td>There is no administrator yet</td><td><code>uv run riskwren users add you@example.org --name &quot;Your Name&quot; --role admin</code></td></tr><tr><td>The port is already in use</td><td>Stop what is using it, or pass <code>--port</code></td></tr></tbody></table></div>
+<p>As installed, RiskWren listens only on the machine it runs on. To put it in front of other people, read <a href="configuration.html">Configuration</a> first.</p>
+<h2 id="sign-in-for-the-first-time">Sign in for the first time<a class="anchor" href="#sign-in-for-the-first-time" aria-label="Link to this section">#</a></h2>
+<p>Open the address in a browser and sign in with the email address and password you gave <code>init</code>.</p>
+<p>This release signs in with local accounts: an email address and a password held by RiskWren. Single sign-on comes later; see the <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a>.</p>
+<ul><li>Five failed attempts within fifteen minutes stop sign-in for that account from that address for a few minutes.</li><li>A sign-in ends after 12 hours without activity, and after 7 days in any case. Both are <a href="configuration.html#server">settings</a>.</li><li>To change your password, open the account menu at the top right and choose <strong>Your account</strong>. Changing it signs out your other sessions.</li><li>If you cannot sign in at all, reset the password from the command line: <code>uv run riskwren users reset-password you@example.org</code>.</li></ul>
+<h2 id="set-up-the-organization">Set up the organization<a class="anchor" href="#set-up-the-organization" aria-label="Link to this section">#</a></h2>
+<p>The administrator account sets the installation up. It does not assess or accept risk: that belongs to the roles below, and an administrator who also does that work is given a second role.</p>
+<h3 id="units">Units<a class="anchor" href="#units" aria-label="Link to this section">#</a></h3>
+<p><strong>Admin → Units</strong> holds the organization as a hierarchy of any depth: divisions, departments, labs, cores, clinics, offices. Every record belongs to a unit, roles can be limited to a unit and everything beneath it, and figures roll up the tree. Give each unit a short code; imports and the command line refer to units by it.</p>
+<h3 id="people-and-roles">People and roles<a class="anchor" href="#people-and-roles" aria-label="Link to this section">#</a></h3>
+<p><strong>Admin → People</strong> adds accounts and gives them roles. A person with no role is a member: they see what they are named on, and their own unit's register if the program allows it.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Role</th><th scope="col">What it is for</th></tr></thead><tbody><tr><td><strong>Manager</strong></td><td>The risk and compliance team. Edits any record, shapes the program, reads everything. Can be limited to a unit</td></tr><tr><td><strong>Assessor</strong></td><td>Assesses risks and rates controls they do not own. Can be limited to a unit</td></tr><tr><td><strong>Auditor</strong></td><td>Reads everything, including the full history, and changes nothing</td></tr><tr><td><strong>Leader</strong></td><td>Leads a unit. Sees it and everything beneath it, and may accept risk in it up to a limit set on the role</td></tr><tr><td><strong>Steward</strong></td><td>Keeps a unit's records: adds and edits its processes, systems, third parties, risks, and controls</td></tr><tr><td><strong>Admin</strong></td><td>Accounts, units, appearance, and system settings</td></tr></tbody></table></div>
+<p>A leader's limit is the highest rating they may accept: moderate, high, or critical. <a href="running-the-program.html#who-may-accept-what">Running the program</a> explains how it is used.</p>
+<h3 id="import-units-and-people">Import units and people<a class="anchor" href="#import-units-and-people" aria-label="Link to this section">#</a></h3>
+<p>Both screens take a CSV file, which is the quick way to load an organization. Each import can be run dry first and reports every problem by row, so nothing is half-loaded. The import dialog shows the columns it expects.</p>
+<h3 id="appearance">Appearance<a class="anchor" href="#appearance" aria-label="Link to this section">#</a></h3>
+<p><strong>Admin → Appearance</strong> sets the product's name, your organization's name, a logo, an accent color, the default palette, and how ratings are colored. See <a href="running-the-program.html#appearance">Running the program</a>.</p>
+<h2 id="explore-the-demo-organization">Explore the demo organization<a class="anchor" href="#explore-the-demo-organization" aria-label="Link to this section">#</a></h2>
+<p>To see RiskWren with data in it before you set anything up, build the demo:</p>
+<div class="code"><pre><code class="language-bash">uv run riskwren demo                                 # builds ./demo
+uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020</code></pre></div>
+<p>The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 230 processes, systems, third parties, and information assets, 180 risks, and about 115 controls, with their assessments, ratings, plans, and acceptances. Three scopes are held to frameworks: central information technology, which provides controls; the clinical systems, under the HIPAA Security Rule; and a controlled-access data enclave, under NIST SP 800-171. Both inherit from the first. There is an assessment in progress, evidence at every stage of freshness, a dozen issues from raised to closed, and exceptions waiting, in force, and ended. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.</p>
+<figure><a href="img/home-ciso-light.webp" class="only-light"><img src="img/home-ciso-light.webp" alt="Home for the demo's security leader: figures for what needs attention, then the list of what is waiting on them" width="1360" height="860" loading="lazy"></a><a href="img/home-ciso-dark.webp" class="only-dark"><img src="img/home-ciso-dark.webp" alt="Home for the demo's security leader: figures for what needs attention, then the list of what is waiting on them" width="1360" height="860" loading="lazy"></a></figure>
+<p>Its sign-in page offers ten sample people and asks for no password:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Sign in as</th><th scope="col">To see</th></tr></thead><tbody><tr><td>The risk manager</td><td>The whole register, the dashboard, the heat map, and records that have lost their owner</td></tr><tr><td>The steward of the Biospecimen Repository</td><td>A unit's inventory and risks, and a critical risk brought to high by controls, with its plan</td></tr><tr><td>The unit leader</td><td>A leader whose limit is moderate, and a high risk they were not allowed to accept</td></tr><tr><td>The division leader</td><td>Acceptances given, one of them expiring next month</td></tr><tr><td>The executive</td><td>The one person who may accept a critical risk</td></tr><tr><td>The security leader</td><td>The compliance dashboard, a critical finding from a penetration test, a closure to confirm, and exceptions to decide</td></tr><tr><td>The assessor</td><td>An assessment in progress: tests to do, a result to review, and the issues the failed tests opened</td></tr><tr><td>The auditor</td><td>Everything, read-only, with the full history</td></tr><tr><td>The administrator</td><td>People, units, and appearance, and no part in the register's judgments</td></tr><tr><td>A staff member</td><td>Home for someone with one action to finish, and only their own unit's part of the register</td></tr></tbody></table></div>
+<p><code>riskwren demo --seed 2</code> builds a different Northmere with the same shape, and <code>--force</code> rebuilds one that is already there.</p>
+<p>A demo listens only on the machine it runs on. See <a href="configuration.html#the-demo-and-the-network">Configuration</a> before changing that.</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-label="Link to this section">#</a></h2>
+<ul><li>To start recording what you have and what could go wrong, read <a href="the-register.html">The register</a>.</li><li>To set appetite, cadences, and who sees what, read <a href="running-the-program.html">Running the program</a>.</li></ul>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="index.html"><span>Previous</span>Overview</a><a class="next" href="the-register.html"><span>Next</span>The register</a></nav>
+    <footer class="foot">Describes RiskWren 0.2.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+  </main>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#what-you-need">What you need</a></li><li class="l2"><a href="#install">Install</a></li><li class="l2"><a href="#set-up-the-installation">Set up the installation</a></li><li class="l2"><a href="#check-it">Check it</a></li><li class="l2"><a href="#run-it">Run it</a></li><li class="l2"><a href="#sign-in-for-the-first-time">Sign in for the first time</a></li><li class="l2"><a href="#set-up-the-organization">Set up the organization</a></li><li class="l3"><a href="#units">Units</a></li><li class="l3"><a href="#people-and-roles">People and roles</a></li><li class="l3"><a href="#import-units-and-people">Import units and people</a></li><li class="l3"><a href="#appearance">Appearance</a></li><li class="l2"><a href="#explore-the-demo-organization">Explore the demo organization</a></li><li class="l2"><a href="#next">Next</a></li></ul></aside>
+</div>
+</body>
+</html>
