@@ -229,7 +229,10 @@ def _cards(session: Session, rows: list[Evidence]) -> list[dict[str, Any]]:
     counts = dict(
         session.execute(
             select(EvidenceLink.evidence_id, func.count())
-            .where(EvidenceLink.evidence_id.in_([row.id for row in rows] or [0]))
+            .where(
+                EvidenceLink.evidence_id.in_([row.id for row in rows] or [0]),
+                EvidenceLink.subject_type.in_(list(SUBJECTS)),  # not the results that cite it
+            )
             .group_by(EvidenceLink.evidence_id)
         ).all()
     )

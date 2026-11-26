@@ -220,7 +220,11 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         }  # fmt: skip
         assert by_name["Central information technology"].offers_controls
         clinic = scopes.statement(session, reader, by_name["Clinical systems"], "hipaa-security")
-        assert clinic["counts"]["excluded"] == 7 and clinic["counts"]["in_place"] >= 5
+        assert clinic["counts"]["excluded"] == 7
+        # What the clinic inherits has been tested where it is provided: some of it is verified
+        # there, and the control found wanting shows as failing here too.
+        assert clinic["counts"]["verified"] >= 1 and clinic["counts"]["failing"] >= 1
+        assert clinic["counts"]["in_place"] + clinic["counts"]["verified"] >= 5
         assert clinic["counts"]["planned"] >= 1 and clinic["counts"]["gap"] >= 20
         enclave = scopes.implementations(session, reader, by_name["Controlled-access data enclave"])
         ways = {
@@ -230,6 +234,25 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert ways["Security events monitored"] == ("shared", "planned")
         assert all(c["provider"]["scope"]["name"] == "Central information technology"
                    for c in enclave["controls"] if c["provider"])  # fmt: skip
+        from riskwren.compliance import assessments
+        from riskwren.db.models import Assessment
+
+        assessment = session.scalars(select(Assessment)).one()
+        assert (assessment.ref, assessment.status) == ("ASM-0001", "in_progress")
+        assert assessment.scope_id == by_name["Central information technology"].id
+        tests = assessments.tests_of(session, reader, assessment)
+        states = [test["state"] for test in tests]
+        assert len(tests) == 14 and states.count("counted") == 11
+        assert states.count("awaiting") == 1 and states.count("todo") == 2
+        wanting = next(
+            t for t in tests if t["control"]["name"] == "Access removed when people leave"
+        )
+        assert wanting["result"]["outcome"] == "partly"
+        assert sum(test["results"] for test in tests) == 13  # one was sent back and done again
+        # Nobody tested or confirmed a control they own, and nobody confirmed their own result.
+        assert all(
+            t["result"]["tested_by"] != t["result"]["reviewed_by"] for t in tests if t["result"]
+        )
         from riskwren.compliance import evidence
         from riskwren.db.models import Evidence, StoredFile
 

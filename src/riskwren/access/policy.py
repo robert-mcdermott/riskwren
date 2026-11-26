@@ -185,6 +185,26 @@ POLICIES.update(
     }
 )
 
+# Assessments and tests. Any member may ask; the services decide who may plan, record, and
+# review, and nobody does so for a control they own.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/assessments"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments"): Needs.ASSESS,
+        ("GET", "/api/v1/assessments/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/assessments/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/assessments/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/assessments/{ref}/history"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments/{ref}/tests"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments/{ref}/completion"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments/{ref}/cancellation"): Needs.MEMBER,
+        ("PATCH", "/api/v1/tests/{test_id}"): Needs.MEMBER,
+        ("DELETE", "/api/v1/tests/{test_id}"): Needs.MEMBER,
+        ("POST", "/api/v1/tests/{test_id}/results"): Needs.ASSESS,
+        ("POST", "/api/v1/results/{result_id}/review"): Needs.ASSESS,
+    }
+)
+
 # Reporting: every figure counts only what the asker may see.
 POLICIES.update(
     {

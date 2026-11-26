@@ -23,18 +23,29 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
-from riskwren.compliance import crosswalk, evidence, frameworks, scopes
+from riskwren.compliance import assessments, crosswalk, evidence, frameworks, scopes
 from riskwren.compliance.evidence import EVIDENCE
 from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
 from riskwren.core.clock import clock_set_to
-from riskwren.core.errors import PermissionDenied, RiskWrenError
+from riskwren.core.errors import Conflict, PermissionDenied, RiskWrenError
 from riskwren.db.engine import Database
-from riskwren.db.models import Acceptance, Action, Control, Risk, Scope, TreatmentPlan
+from riskwren.db.models import (
+    Acceptance,
+    Action,
+    Control,
+    ControlTest,
+    Evidence,
+    EvidenceLink,
+    Risk,
+    Scope,
+    TreatmentPlan,
+)
 from riskwren.demo import content as c
 from riskwren.inventory import access, links, records
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
@@ -541,9 +552,12 @@ class Builder:
         return known
 
     def rate(self, by: int, control_id: int, design: str, operation: str, note: str) -> None:
-        with self.act(by) as (session, who):
-            control = session.get(Control, control_id)
-            controls.rate(session, who, control, design=design, operation=operation, note=note)
+        try:
+            with self.act(by) as (session, who):
+                control = session.get(Control, control_id)
+                controls.rate(session, who, control, design=design, operation=operation, note=note)
+        except Conflict:
+            return  # a test result still holds, and a judgment does not replace it
         self.last_rated[control_id] = self.now
         self.tally("control ratings")
         if self.rng.random() < 0.6:
@@ -1629,6 +1643,129 @@ class Builder:
                             applicable=False, reason=reason,
                         )  # fmt: skip
 
+    def _independent(self, control_id: int, *, besides: int | None = None) -> int:
+        """Someone who may test or review this control: an assessor who does not own it."""
+        with self.db.read() as session:
+            for key in ("assess1", "assess2", "risk1", "risk2", "risk3"):
+                person = self.cast[key]
+                if person != besides and not access.owner_kinds(
+                    session, CONTROL, control_id, person
+                ):
+                    return person
+        raise AssertionError("nobody is left to test this control")
+
+    def _result(self, test_id: int, by: int, found: tuple[str, str, str, str]) -> int:
+        """Record what a test found, citing what is already held for the control or, more
+        often than not, something collected for the test."""
+        design, operation, sample, note = found
+        with self.db.read() as session:
+            control_id = session.get(ControlTest, test_id).control_id
+            held = [
+                item.ref
+                for item in session.scalars(
+                    select(Evidence)
+                    .join(EvidenceLink, EvidenceLink.evidence_id == Evidence.id)
+                    .where(
+                        EvidenceLink.subject_type == "control",
+                        EvidenceLink.subject_id == control_id,
+                    )
+                    .order_by(Evidence.id.desc())
+                )
+                if evidence.state_of(item, self.today) != "stale"
+            ][:1]
+        if not held and self.rng.random() < 0.75:
+            self._evidence(by, control_id, note)
+            return self._result(test_id, by, found)
+        with self.act(by) as (session, who):
+            result = assessments.record(
+                session, who, session.get(ControlTest, test_id), design=design,
+                operation=operation, sample=sample, note=note, evidence_refs=held,
+            )  # fmt: skip
+            self.tally("test results")
+            return result.id
+
+    def _confirm(self, result_id: int, by: int, *, confirm: bool = True, note: str | None = None) -> None:  # fmt: skip
+        with self.act(by) as (session, who):
+            result, test, _ = assessments.find_result(session, who, result_id)
+            assessments.review(session, who, result, confirm=confirm, note=note)
+            if confirm:
+                self.last_rated[test.control_id] = self.now
+
+    def _story_assessment(self) -> Script:
+        """The security team tests what central IT provides. Most results are counted, one is
+        sent back and recorded again, one waits for a second person, and two are still to do.
+        One control is found wanting, and shows as failing wherever it is inherited."""
+        lead = self.cast["assess1"]
+        yield self.ago(44)
+        with self.act(lead) as (session, who):
+            scope = session.scalars(
+                select(Scope).where(Scope.name == c.SCOPE_PROVIDER["name"])
+            ).one()
+            made = assessments.create(
+                session, who,
+                {"name": f"{c.ASSESSMENT['name']} {self.end.year}", "scope": scope.ref,
+                 "framework": c.SCOPE_PROVIDER["framework"][0], "period_start": self.today,
+                 "period_end": self.day(24), "approach": c.ASSESSMENT["approach"]},
+            )  # fmt: skip
+            planned = [
+                (test["id"], session.get(ControlTest, test["id"]).control_id)
+                for test in assessments.tests_of(session, who, made)
+            ]
+            self.tally("assessments")
+        finding_key, *finding = c.ASSESSMENT["finding"]
+        wanting = self.controls.get((finding_key, self.units["IT"]))
+        # The result that waits at the end is on a control the lead may review.
+        open_ = [each for each in planned if each[1] != wanting]
+        mine = [each for each in open_ if self._independent(each[1]) == lead]
+        waiting = mine[len(mine) // 2]
+        todo = [each for each in open_ if each != waiting][-2:]
+        done = [each for each in planned if each != waiting and each not in todo]
+        testers = {}
+        for index, (test_id, control_id) in enumerate(planned):
+            # The two assessors take turns, and each confirms what the other found. The lead
+            # keeps the last of the tests still to do.
+            each = (test_id, control_id)
+            turn = each == todo[-1] or (index % 2 == 1 and each not in (waiting, todo[0]))
+            tester = lead if turn and self._independent(control_id) == lead else None
+            tester = tester or self._independent(control_id, besides=lead)
+            testers[test_id] = tester
+            with self.act(lead) as (session, who):
+                assessments.update_test(
+                    session, who, session.get(ControlTest, test_id),
+                    {"assigned_to": tester, "method": self.rng.choice(["examine", "examine", "interview", "test"])},
+                )  # fmt: skip
+        for index, (test_id, control_id) in enumerate(done):
+            yield self.ago(40 - index * 3)
+            tester = testers[test_id]
+            if control_id == wanting:
+                found = tuple(finding)
+            else:
+                with self.db.read() as session:
+                    state = controls.state_of(session, session.get(Control, control_id))
+                outcome = state if state in ("partly", "ineffective") else "effective"
+                sample, note = self.rng.choice(c.TESTS[outcome])
+                design, operation = {
+                    "effective": ("effective", "effective"), "partly": ("effective", "partly"),
+                    "ineffective": ("partly", "ineffective"),
+                }[outcome]  # fmt: skip
+                found = (design, operation, sample, note)
+            result = self._result(test_id, tester, found)
+            reviewer = self._independent(control_id, besides=tester)
+            yield self.later(1, 2)
+            if index == 1:
+                # Sent back once, recorded again with what was asked for, then confirmed.
+                self._confirm(result, reviewer, confirm=False, note=c.ASSESSMENT["returned"])
+                yield self.later(1, 2)
+                design, operation, sample, note = found
+                again = (design, operation, f"{sample} Quarter three; ten instances.", note)
+                result = self._result(test_id, tester, again)
+                yield self.later(1, 2)
+            self._confirm(result, reviewer)
+        yield self.ago(2)
+        test_id, control_id = waiting
+        sample, note = c.TESTS["effective"][0]
+        self._result(test_id, testers[test_id], ("effective", "effective", sample, note))
+
     def _story_escalated(self) -> Script:
         """A lab's privacy risk raised to its department, with the reason."""
         lab = self.labs["PS"][0]
@@ -1742,7 +1879,7 @@ class Builder:
             self._story_authority, self._story_costs, self._story_supplier,
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
-            self._story_agreement, self._story_scopes,
+            self._story_agreement, self._story_scopes, self._story_assessment,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

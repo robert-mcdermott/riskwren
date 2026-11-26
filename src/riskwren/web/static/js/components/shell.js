@@ -35,6 +35,7 @@ export const NAV = [
       { href: "/frameworks", label: "Frameworks", iconName: "framework" },
       { href: "/scopes", label: "Scopes", iconName: "scope" },
       { href: "/evidence", label: "Evidence", iconName: "evidence" },
+      { href: "/assessments", label: "Assessments", iconName: "assessment" },
     ],
   },
   {

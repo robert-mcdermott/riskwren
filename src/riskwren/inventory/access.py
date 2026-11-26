@@ -136,6 +136,9 @@ def can_add(principal: Principal, org_unit_id: int | None) -> bool:
 
 
 def can_edit(session: Session, principal: Principal, record_type: RecordType, record: Any) -> bool:
+    own_rule = record_type.extra.get("can_edit")
+    if own_rule is not None:
+        return bool(own_rule(session, principal, record))
     if principal.manages_unit(record.org_unit_id) or principal.stewards_unit(record.org_unit_id):
         return True
     kinds = owner_kinds(session, record_type, record.id, principal.account_id)

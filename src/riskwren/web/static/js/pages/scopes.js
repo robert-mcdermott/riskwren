@@ -7,6 +7,8 @@ import { date, plural, relative } from "../core/format.js";
 import { units, vocabularies } from "../core/lookups.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { can } from "../core/session.js";
+import { statusPill as assessmentStatus } from "../components/assessment.js";
+import { segments } from "../components/charts.js";
 import { statePill } from "../components/control.js";
 import { evidenceCard } from "../components/evidence.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
@@ -23,7 +25,10 @@ import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, o
 const TABS = [["overview", "Overview"], ["requirements", "Requirements"], ["controls", "Controls"], ["history", "History"]];
 const STANDING = { planned: ["Planned", ""], partly: ["Partly in place", "warn"], in_place: ["In place", "ok"], not_applicable: ["Not applicable here", ""] };
 const STATUS_CHOICES = Object.entries(STANDING).map(([key, [text]]) => [key, text]);
-const STATES = { gap: ["Gap", "danger"], planned: ["Planned", "warn"], in_place: ["In place", "ok"], excluded: ["Not applicable", ""] };
+// Readiness, weakest first: a word, a tone for the pill, and a tone for the bar.
+const STATES = { failing: ["Failing", "danger", "danger"], gap: ["Gap", "danger", "gap"], planned: ["Planned", "warn", "warn"], in_place: ["In place", "info", "info"],
+  verified: ["Verified", "ok", "ok"], excluded: ["Not applicable", "", "none"] };
+const READY = ["verified", "in_place", "planned", "gap", "failing"];
 const INHERITED = { inherited: "Inherited", shared: "Shared" };
 
 const standingPill = (key) => pill(STANDING[key]?.[0] ?? key, STANDING[key]?.[1] ?? "");
@@ -356,6 +361,13 @@ function overview(scope, ctx) {
           m.records.length ? h("div", { class: "chips" }, m.records.map((record) => recordChip(record))) : null)
           : h("p", { class: "muted" }, "Nothing listed yet: the units, processes, systems, and information this scope covers."),
         m.hidden ? h("p", { class: "subtle" }, `And ${m.hidden} more that you do not have access to.`) : null),
+      card({ title: "Assessments", flush: ctx.assessments.length > 0,
+        actions: can("assess") && scope.status === "active" ? button("Start an assessment", { kind: "btn-sm", iconName: "plus", onclick: async () => (await import("./assessments.js")).editAssessment({ scope }) }) : null },
+      ctx.assessments.length ? h("div", {}, ctx.assessments.map((item) => h("div", { class: "list-row" },
+        h("div", { class: "grow" }, h("a", { class: "cell-main", href: `/assessments/${item.ref}` }, item.name),
+          h("div", { class: "cell-sub" }, [item.ref, item.tests ? `${item.counted} of ${plural(item.tests, "test")} counted` : "No tests planned", item.failing ? `${item.failing} failing` : null].filter(Boolean).join(" · "))),
+        assessmentStatus(item.status))))
+        : h("p", { class: "muted" }, "Not assessed yet. An assessment tests the controls this scope does itself; a requirement is verified once its controls have been tested and found effective.")),
       evidenceCard(scope, ctx)),
     h("div", { class: "stack-lg" },
       card({ title: "At a glance" }, facts([
@@ -385,7 +397,8 @@ function requirementsTab(scope, found, reload) {
       h("td", {}, statePillOf(row.state), row.reason ? h("div", { class: "cell-sub" }, row.reason, row.decided_by ? ` (${row.decided_by}, ${date(row.decided_at)})` : "") : null),
       h("td", {}, row.controls.length ? row.controls.map((control) => h("div", { class: "answered-by" },
         control.open ? h("a", { href: `/controls/${control.ref}` }, control.name) : h("span", {}, control.name),
-        h("span", { class: "subtle" }, ` ${STANDING[control.standing][0]}${control.provider ? `, from ${control.provider.name}` : ""}`)))
+        control.provider ? h("span", { class: "subtle" }, ` from ${control.provider.name}`) : null,
+        h("div", { class: "cell-sub" }, `${control.why}.`)))
         : row.applicable ? h("span", { class: "subtle" }, "No control used here answers it") : null),
       h("td", { class: "nowrap no-print" }, found.can_edit ? button(row.applicable ? "Leave out" : "Bring back", { kind: "btn-sm btn-ghost", "aria-label": `${row.applicable ? "Leave out" : "Bring back"} ${row.code}`,
         onclick: () => decide(scope, chosen, row, reload) }) : null))))))
@@ -395,8 +408,11 @@ function requirementsTab(scope, found, reload) {
     h("div", { class: "statement-head" },
       h("h2", {}, `Statement of applicability: ${found.framework.title}`),
       h("p", { class: "muted" }, [found.framework.version, found.baseline ? `starting from the ${found.baseline.title.toLowerCase()}` : "every requirement"].filter(Boolean).join(", "), `. ${found.applicable} apply here: `,
-        `${counts.in_place} in place, ${counts.planned} planned, ${counts.gap} with no control. ${counts.excluded} left out, each with its reason.`),
-      h("p", { class: "subtle" }, "In place means the controls that answer a requirement are used here and said to be in place. Whether they work is shown by testing them.")),
+        `${counts.verified} verified, ${counts.in_place} in place, ${counts.planned} planned, ${counts.gap} with no control, ${counts.failing} failing. ${counts.excluded} left out, each with its reason.`),
+      found.applicable ? segments(READY.map((key) => ({ label: STATES[key][0].toLowerCase(), value: counts[key], tone: STATES[key][2] })),
+        { label: `Readiness: ${READY.map((key) => `${counts[key]} ${STATES[key][0].toLowerCase()}`).join(", ")}` }) : null,
+      h("p", { class: "subtle" }, "A requirement is as ready as the weakest control that answers it. In place: used here and said to be in place. ",
+        "Verified: also tested and found effective, with evidence that still counts. Failing: a test found a control not to work as described.")),
     bar,
     card({ title: plural(rows.length, "requirement"), flush: true }, table));
 }
@@ -448,6 +464,7 @@ export function scopePage(main, params) {
       const base = `/api/v1/scopes/${params.ref}`;
       const [scope, vocab, unitIndex] = await Promise.all([get(base, null, { fresh: true }), vocabularies(), units()]);
       let extra = null;
+      const assessed = tab === "overview" ? (await get("/api/v1/assessments", { scope: params.ref, limit: 10 }, { fresh: true })).data : [];
       if (tab === "history") extra = (await get(`${base}/history`, null, { fresh: true })).data;
       if (tab === "controls") extra = (await get(`${base}/controls`, null, { fresh: true })).data;
       if (tab === "requirements" && scope.data.held_to.length) {
@@ -455,12 +472,12 @@ export function scopePage(main, params) {
         const framework = scope.data.held_to.find((held) => held.key === asked.get("framework"))?.key ?? scope.data.held_to[0].key;
         extra = (await get(`${base}/requirements`, { framework, state: asked.get("state") ?? undefined, q: asked.get("q") ?? undefined }, { fresh: true })).data;
       }
-      return { scope: { ...scope.data, type: "scope" }, vocab, units: unitIndex, extra };
+      return { scope: { ...scope.data, type: "scope" }, vocab, units: unitIndex, extra, assessments: assessed };
     },
     view: (data, reload) => {
       const scope = data.scope;
       document.title = `${scope.name} · ${scope.ref}`;
-      const ctx = { vocab: data.vocab, units: data.units, reload };
+      const ctx = { vocab: data.vocab, units: data.units, reload, assessments: data.assessments };
       const edit = scope.can.edit ? button("Edit", { iconName: "edit", onclick: () => editScope({ scope, unitIndex: data.units, onDone: reload }) }) : null;
       return h("div", { class: "stack" },
         recordHeader(scope, { badges: [scope.status === "retired" ? pill("Retired") : null, scope.offers_controls ? pill("Offers its controls", "info") : null], actions: edit }),

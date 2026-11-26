@@ -300,6 +300,11 @@ for _key in POLICIES:
     # Everything about a scope is reached by anyone and decided by the scope.
     if _key[1].startswith("/api/v1/scopes/{ref}/") and _key not in REACH:
         REACH[_key] = EVERYONE
+for _key, _needs in POLICIES.items():
+    # Assessing is for assessors and managers; the rest is decided by the assessment.
+    mine = _key[1].startswith(("/api/v1/assessments", "/api/v1/tests", "/api/v1/results"))
+    if mine and _key not in REACH:
+        REACH[_key] = {"assessor", "manager"} if _needs is Needs.ASSESS else EVERYONE
 for _key in POLICIES:
     # Evidence is reached by anyone and decided by the item.
     if _key[1].startswith("/api/v1/evidence") and _key not in REACH:
@@ -360,6 +365,9 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 path = path.replace("{ref}", "PLN-9999")
             if template.startswith("/api/v1/actions/"):
                 path = path.replace("{ref}", "ACT-9999")
+            path = path.replace("{test_id}", "9999").replace("{result_id}", "9999")
+            if template.startswith("/api/v1/assessments"):
+                path = path.replace("{ref}", "ASM-9999")
             if template.startswith("/api/v1/evidence"):
                 path = path.replace("{ref}", "EV-9999")
             for record_path, prefix in RECORD_PATHS.items():
@@ -397,6 +405,12 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"control": "CTL-9999", "status": "planned"}
             elif template.endswith("/controls/inherited"):
                 body = {"implementation": 9999, "inheritance": "inherited"}
+            elif template.endswith("/results"):
+                body = {"design": "effective", "operation": "effective", "note": "x"}
+            elif template.endswith("/review"):
+                body = {"confirm": True}
+            elif template.endswith("/assessments/{ref}/tests"):
+                body = {"control": "CTL-9999"}
             elif template.endswith("/ratings"):
                 body = {"design": "effective", "operation": "effective", "note": "x"}
             elif template.endswith("/risks/{ref}/controls"):

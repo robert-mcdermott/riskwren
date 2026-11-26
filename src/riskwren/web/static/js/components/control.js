@@ -172,5 +172,6 @@ export function ratedLine(rating) {
   return h("div", { class: "stack-sm" },
     h("dl", { class: "dl" }, h("dt", {}, "Design"), h("dd", {}, statePill(rating.design)), h("dt", {}, "Operation"), h("dd", {}, statePill(rating.operation))),
     h("p", { class: "prose" }, rating.note),
-    h("p", { class: "subtle" }, `Rated by ${rating.rated_by} on ${date(rating.rated_at)}, on their ${rating.basis}.`));
+    h("p", { class: "subtle" }, rating.basis === "test" ? `Tested by ${rating.rated_by} on ${date(rating.rated_at)}, and confirmed by a second person.`
+      : `Rated by ${rating.rated_by} on ${date(rating.rated_at)}, on their ${rating.basis}.`));
 }

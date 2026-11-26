@@ -210,7 +210,9 @@ def test_a_requirement_is_a_gap_until_a_control_that_answers_it_is_used_and_in_p
                          responsibility="Clinic manager", statement="Reviewed each March.")  # fmt: skip
         found = scopes.statement(session, steward, scope, "nist-csf")
         assert state_of(found, "PR.AA-05") == "in_place"
-        assert found["counts"] == {"gap": 105, "planned": 0, "in_place": 1, "excluded": 0}
+        assert found["counts"] == {
+            "failing": 0, "gap": 105, "planned": 0, "in_place": 1, "verified": 0, "excluded": 0,
+        }  # fmt: skip
         # A second control answering the same requirement, not yet in place, holds it back.
         scopes.implement(session, steward, scope, leave, status="partly")
         found = scopes.statement(session, steward, scope, "nist-csf")

@@ -79,17 +79,19 @@ The wave is done when, on a fresh checkout:
 
 **Done:** files are stored under the SHA-256 of their bytes in the data home, in a directory nothing serves from; their kind is judged by content, and only a short list is taken. A file leaves only as an attachment, under a policy that allows nothing, and every download is an event. An evidence item is a file, a link, a note, or an attestation with a collection date, the period it covers, and a date it holds until, a year by default. It is attached to as many controls and scopes as it supports, and anyone may collect it for a unit they work in. Its owner is reminded on Home a month before it stops counting.
 
-### Slice 5: Assessments and tests ☐
+### Slice 5: Assessments and tests ☑
 
 **Goal:** test once.
 
-- [ ] Assessments over a scope, against a framework, a baseline, or a chosen set, with a lead and a period
-- [ ] The test queue; procedure, method, sample, evidence, and a result for design and for operation
-- [ ] Independence: not the control's owner; reviewed by a second person before it counts
-- [ ] A counted result becomes the control's rating with the basis *test*, and flows to requirements, scopes, and risks
-- [ ] Readiness in five states with reasons, per scope and framework; gaps
+- [x] Assessments over a scope, against a framework (and so its baseline in that scope) or a chosen set, with a lead and a period
+- [x] The test queue; procedure, method, sample, evidence, and a result for design and for operation
+- [x] Independence: not the control's owner; reviewed by a second person before it counts
+- [x] A counted result becomes the control's rating with the basis *test*, and flows to requirements, scopes, and risks
+- [x] Readiness in five states with reasons, per scope and framework; gaps
 
 **Acceptance:** recording one result changes the control, each mapped requirement in each relying scope, and each linked risk's suggestion, and a test proves all three.
+
+**Done:** an assessment is a record (`ASM`) of a scope, started by an assessor or a manager, which plans a test for each control the scope does itself: all of them, those that answer an applicable requirement of one framework, or a chosen few. Each test has a method, a procedure, and a person it is assigned to, and appears on that person's Home. A result gives design and operation, what was looked at, what was found, and the evidence it cites. It is recorded by someone who does not own the control and counts once a second such person confirms it; a returned result is recorded again, and the earlier one is kept. A confirmed result becomes the control's rating on the basis of a test, which a judgment cannot overrule while it holds. Readiness is now worked out in five states, each control's with its reason in words, and a failing test shows in the scope that does the control and in every scope that inherits it. `tests/test_assessments.py::test_one_result_moves_the_control_every_scope_that_relies_on_it_and_every_risk` is the acceptance test. A failed test opening an issue waits for slice 6, where issues arrive.
 
 ### Slice 6: Issues and exceptions ☐
 
@@ -152,4 +154,10 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Evidence is more closely held than the register.** Whoever collected it, those named on it, and those with a role over its unit see it. Others see it only through something it is attached to that they may see, and not at all if it is restricted or of the most sensitive data class. An organization-wide assessor sees what is not restricted.
 - **Collecting is open; attaching is not.** Anyone may add evidence for a unit they work in, because the people who do the work hold the proof. Putting it on a control or a scope is for those who keep or assess that control or scope.
 - **A record type may set its own visibility.** Evidence needed a rule the shared one could not express, so a record type can now supply its own, used by single records, lists, and counts alike.
+- **A scope tests what it does itself.** A control inherited whole or shared is tested where it is provided, once, and the result reaches every scope that relies on it. An assessment of an inheriting scope plans no test for it and cannot be given one.
+- **A result waits for a second person.** Recording a result changes nothing. Confirming it does, and the person who confirms is neither the tester nor an owner of the control. Until then the control, its requirements, and its risks stand where they stood.
+- **A test outranks a judgment while it holds.** Once a control has a confirmed test result, rating it by judgment is refused until the result is out of date, by the same cadence that makes any rating stale. Otherwise the cheapest way to clear a failing test would be to have an opinion.
+- **Verified needs evidence that still counts.** Tested effective is not enough: evidence attached to the control, or cited by the result, must be current. When it goes stale the requirement drops back to in place without anyone touching it, and says why.
+- **A reason travels with every state.** Each control in a statement of applicability carries its state and a sentence saying how it got there, so a reader never has to work out why a requirement is not verified.
+- **An assessment's history tells its tests.** Planning a test, recording a result, confirming it, and returning it are each told in the assessment's history with the control's name, since they are what an assessment consists of.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

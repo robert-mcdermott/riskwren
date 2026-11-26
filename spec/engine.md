@@ -233,9 +233,9 @@ For a scope and a framework, each applicable requirement is in exactly one state
 | **Verified** | Every implementation is in place and has a current test result of effective, with current evidence |
 | **Failing** | At least one control's current test result is partly effective or ineffective |
 
-A requirement takes the weakest state among its controls, with *failing* weakest of all. Requirements excluded as not applicable are left out of every figure and listed separately with their reasons. The readiness bar for a scope is the count in each state, and each segment opens the requirements in it.
+A requirement takes the weakest state among its controls, with *failing* weakest of all. Requirements excluded as not applicable are left out of every figure and listed separately with their reasons. The readiness bar for a scope is the count in each state, the list narrows to any one of them, and each control in it says in words why it is where it is.
 
-An owner's attestation alone can take a requirement to *in place*, never to *verified*; rules say which frameworks demand an independent test.
+An owner's attestation alone can take a requirement to *in place*, never to *verified*. That takes a test: recorded by someone who does not own the control, confirmed by a second person who does not own it either, and still within the cadence that keeps a rating current. A confirmed test result is the control's rating, and a judgment does not replace it while it holds. A control is tested in the scope that does it; scopes that inherit it take the result.
 
 ## Issues and their clocks (wave 2)
 

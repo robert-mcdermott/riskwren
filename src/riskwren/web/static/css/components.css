@@ -504,3 +504,23 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
   tr { break-inside: avoid; }
 }
 .group-row th { text-align: left; padding: var(--space-2) var(--space-4); background: var(--surface-2); font-weight: 600; border-bottom: 1px solid var(--border); text-transform: none; letter-spacing: 0; font-size: var(--text-s); color: var(--text); }
+
+/* One bar in parts, with a legend that says the same in words. */
+.segments { display: grid; gap: var(--space-2); }
+.segbar { display: flex; gap: 2px; height: 12px; border-radius: var(--radius-full); overflow: hidden; }
+.segbar i { min-width: 4px; flex-basis: 0; }
+.segbar i, .seg-legend i { background: var(--surface-3); }
+.segments i[data-tone="ok"] { background: var(--ok); }
+.segments i[data-tone="info"] { background: var(--info); }
+.segments i[data-tone="warn"] { background: var(--warn); }
+.segments i[data-tone="danger"] { background: var(--danger); }
+.segments i[data-tone="gap"] { background: repeating-linear-gradient(135deg, var(--danger) 0 3px, var(--danger-soft) 3px 6px); }
+.segments i[data-tone="none"] { background: var(--surface-3); box-shadow: inset 0 0 0 1px var(--control-border); }
+.seg-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: var(--text-s); color: var(--text-muted); }
+.seg-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.seg-legend li[data-empty="true"] { color: var(--text-subtle); }
+.seg-legend i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.seg-legend strong { color: var(--text); font-weight: 600; }
+.steps { margin: 0; padding-left: 1.2em; display: grid; gap: var(--space-2); }
+.record-icon[data-record="assessment"] { color: var(--accent); }
+.owed-icon[data-kind="confirm"] { color: var(--info); background: var(--info-soft); }

@@ -32,6 +32,10 @@ MAPPING_SOURCES = ("pack", "person")
 IMPLEMENTATION_STATUSES = ("planned", "partly", "in_place", "not_applicable")
 INHERITANCE = ("none", "inherited", "shared")
 EVIDENCE_KINDS = ("file", "link", "note", "attestation")
+ASSESSMENT_STATUSES = ("planned", "in_progress", "complete", "cancelled")
+TEST_METHODS = ("examine", "interview", "test")
+TEST_RESULTS = ("effective", "partly", "ineffective")
+REVIEWS = ("confirmed", "returned")
 REQUIREMENT_STATUSES = ("active", "withdrawn")
 
 
@@ -326,4 +330,83 @@ class EvidenceLink(Base):
     __table_args__ = (
         UniqueConstraint("evidence_id", "subject_type", "subject_id", name="uq_evidence_link"),
         Index("ix_evidence_link_subject", "subject_type", "subject_id"),
+    )
+
+
+class Assessment(RecordMixin, Base):
+    """A planned look at whether a scope's controls work: over a period, against a framework
+    or a chosen set of controls, with a lead."""
+
+    __tablename__ = "assessment"
+    __subject__ = "assessment"
+
+    scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id"))
+    framework_id: Mapped[int | None] = mapped_column(ForeignKey("framework.id"))
+    lead_id: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    period_start: Mapped[date | None] = mapped_column(Date)
+    period_end: Mapped[date | None] = mapped_column(Date)
+    approach: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(24), default="planned")
+    completed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", ASSESSMENT_STATUSES), name="status"),
+        Index("ix_assessment_org_unit_id", "org_unit_id"),
+        Index("ix_assessment_scope_id", "scope_id"),
+    )
+
+
+class ControlTest(Base):
+    """One control to be examined in one assessment: the procedure, the method, and who is
+    to do it. What was found is a result."""
+
+    __tablename__ = "control_test"
+    __audit_parent__ = ("assessment", "assessment_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    assessment_id: Mapped[int] = mapped_column(ForeignKey("assessment.id", ondelete="CASCADE"))
+    implementation_id: Mapped[int] = mapped_column(ForeignKey("implementation.id"))
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id"))
+    procedure: Mapped[str] = mapped_column(Text)
+    method: Mapped[str] = mapped_column(String(16), default="examine")
+    assigned_to: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+
+    __table_args__ = (
+        UniqueConstraint("assessment_id", "control_id", name="uq_control_test"),
+        CheckConstraint(one_of("method", TEST_METHODS), name="method"),
+        Index("ix_control_test_control_id", "control_id"),
+        Index("ix_control_test_assigned_to", "assigned_to"),
+    )
+
+
+class TestResult(Base):
+    """What a test found, by whom, and who reviewed it. Never edited: a correction is a new
+    result that supersedes it, and it counts only once a second person has confirmed it."""
+
+    __tablename__ = "test_result"
+    __test__ = False  # not a test case, whatever its name suggests to the test runner
+    __audit_parent__ = ("assessment", "assessment_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    test_id: Mapped[int] = mapped_column(ForeignKey("control_test.id", ondelete="CASCADE"))
+    assessment_id: Mapped[int] = mapped_column(ForeignKey("assessment.id", ondelete="CASCADE"))
+    sample: Mapped[str | None] = mapped_column(Text)
+    design: Mapped[str] = mapped_column(String(16))
+    operation: Mapped[str] = mapped_column(String(16))
+    note: Mapped[str] = mapped_column(Text)
+    tested_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    tested_by_name: Mapped[str] = mapped_column(String(200))
+    tested_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    review: Mapped[str | None] = mapped_column(String(16))
+    review_note: Mapped[str | None] = mapped_column(Text)
+    reviewed_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    reviewed_by_name: Mapped[str | None] = mapped_column(String(200))
+    reviewed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    superseded_by: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (
+        CheckConstraint(one_of("design", TEST_RESULTS), name="design"),
+        CheckConstraint(one_of("operation", TEST_RESULTS), name="operation"),
+        CheckConstraint("review IS NULL OR " + one_of("review", REVIEWS), name="review"),
+        Index("ix_test_result_test_id", "test_id"),
     )

@@ -51,10 +51,13 @@ STATUS_LABELS = {
 }
 # From weakest to strongest: what a requirement takes when its controls differ.
 ORDER = ("planned", "partly", "in_place")
+# From weakest to strongest. A requirement takes the weakest state among its controls.
 STATES = {
+    "failing": "Failing",
     "gap": "Gap",
     "planned": "Planned",
     "in_place": "In place",
+    "verified": "Verified",
     "excluded": "Not applicable",
 }
 
@@ -653,9 +656,13 @@ def remove_implementation(
         records.touch(session, scope)
 
 
-def _applicable_ids(session: Session, scope: Scope) -> set[int]:
+def applicable_ids(session: Session, scope: Scope, framework: Framework | None = None) -> set[int]:
+    """The requirements that apply within a scope, for one framework or for all it is held to."""
+    held_to = select(ScopeFramework).where(ScopeFramework.scope_id == scope.id)
+    if framework is not None:
+        held_to = held_to.where(ScopeFramework.framework_id == framework.id)
     chosen: set[int] = set()
-    for held in session.scalars(select(ScopeFramework).where(ScopeFramework.scope_id == scope.id)):
+    for held in session.scalars(held_to):
         chosen |= _starting_point(session, held)
     for row in session.scalars(
         select(ScopeRequirement).where(ScopeRequirement.scope_id == scope.id)
@@ -667,7 +674,7 @@ def _applicable_ids(session: Session, scope: Scope) -> set[int]:
 def candidates(session: Session, principal: Principal, scope: Scope) -> list[dict[str, Any]]:
     """Controls the person may see that answer this scope's requirements and are not used in
     it yet, each with how many of those requirements it answers."""
-    wanted = _applicable_ids(session, scope)
+    wanted = applicable_ids(session, scope)
     if not wanted:
         return []
     have = select(Implementation.control_id).where(Implementation.scope_id == scope.id)
@@ -707,10 +714,15 @@ def statement(
     """For a scope and a framework: every requirement that applies, with the controls that
     answer it here and where they stand; and every one left out, with the reason.
 
-    A requirement is a *gap* when no control mapped to it is used in this scope, *planned*
-    when one that is used is not yet in place, and *in place* when all of them are. Whether
-    they work is another question, answered by testing them.
+    Each requirement is in one state, worked out and never typed in. It is a *gap* when no
+    control mapped to it is used in this scope; *planned* when one that is used is not yet
+    in place; *in place* when all of them are; *verified* when each has a test result of
+    effective that still holds, with evidence that still counts; and *failing* when a test
+    that still holds found a control partly effective or ineffective. A requirement takes
+    the weakest state among its controls.
     """
+    from riskwren.compliance import readiness  # it builds on scopes, evidence, and tests
+
     framework = frameworks.by_key(session, framework_key)
     held = _held(session, scope, framework)
     start = _starting_point(session, held)
@@ -746,6 +758,9 @@ def statement(
     views = {
         control_id: implementation_view(session, principal, row) for control_id, row in used.items()
     }
+    assured = readiness.assurance(session, list(used))
+    for control_id, view in views.items():
+        view["readiness"], view["why"] = readiness.of_control(view["standing"], assured[control_id])
     rows = []
     counts = dict.fromkeys(STATES, 0)
     for requirement in requirements:
@@ -762,10 +777,8 @@ def statement(
             found = "excluded"
         elif not answering:
             found = "gap"
-        elif all(view["standing"] == "in_place" for view in answering):
-            found = "in_place"
         else:
-            found = "planned"
+            found = min((view["readiness"] for view in answering), key=list(STATES).index)
         counts[found] += 1
         if state and found != state:
             continue
@@ -782,7 +795,8 @@ def statement(
                 "in_baseline": requirement.id in start,
                 "controls": [
                     {"ref": v["control"]["ref"], "name": v["control"]["name"],
-                     "standing": v["standing"], "inheritance": v["inheritance"],
+                     "standing": v["standing"], "readiness": v["readiness"], "why": v["why"],
+                     "inheritance": v["inheritance"],
                      "provider": v["provider"]["scope"] if v["provider"] else None,
                      "open": v["control"]["open"]}
                     for v in answering
@@ -796,7 +810,7 @@ def statement(
                       "version": framework.version},
         "baseline": {"key": baseline.key, "title": baseline.title} if baseline else None,
         "counts": counts,
-        "applicable": counts["gap"] + counts["planned"] + counts["in_place"],
+        "applicable": sum(count for key, count in counts.items() if key != "excluded"),
         "requirements": rows,
         "can_edit": access.can_edit(session, principal, SCOPE, scope) and scope.status == "active",
     }  # fmt: skip

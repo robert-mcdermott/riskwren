@@ -158,6 +158,7 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
         "operation": operation,
         "title": title,
         "lines": lines,
+        "told": bool(describe and title and not lines and event.action == "updated"),
     }
 
 
@@ -179,5 +180,11 @@ def for_record(
     lookups = Lookups(session, record_type)
     story = [entry(event, record_type, lookups) for event in events]
     # A change that only copied what another entry already says (a rating onto its control,
-    # an assessment onto its risk) is not told twice.
-    return [item for item in story if item["action"] != "updated" or item["lines"]]
+    # an assessment onto its risk) is not told twice, unless the type says its own titled
+    # changes are each worth telling (a result confirmed, in an assessment).
+    keeps = bool(record_type.extra.get("history_keeps_titled"))
+    return [
+        {key: value for key, value in item.items() if key != "told"}
+        for item in story
+        if item["action"] != "updated" or item["lines"] or (keeps and item["told"])
+    ]

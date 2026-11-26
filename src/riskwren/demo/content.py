@@ -711,6 +711,41 @@ SCOPE_PROVIDER = {
         ("security_training", "SEC", "Security awareness lead"), ("supplier_assessed", "SEC", "Security assurance"),
     ],
 }  # fmt: skip
+# The assessment the security team is carrying out on what central IT provides.
+ASSESSMENT = {
+    "name": "Central information technology: security assessment",
+    "approach": "Each control is examined against its own records for the last four quarters, and "
+    "the team that runs it is interviewed. Results are recorded by one assessor and confirmed by "
+    "the other. Systems that units run for themselves are assessed with their own scopes.",
+    # The one control the assessment finds wanting, whatever was believed of it before.
+    "finding": ("access_removed_on_leaving", "effective", "partly",
+                "Leavers between July and September, from the personnel system: 25 people.",
+                "Twenty-two accounts were disabled on the last working day. Three stayed active for "
+                "between nine and twenty-three days, all of them people on fixed-term contracts whose "
+                "end dates were not sent to the identity team."),
+    "returned": "Say which quarter was sampled, and how many were looked at.",
+}  # fmt: skip
+# What a test looked at and what it found, by outcome.
+TESTS = {
+    "effective": [
+        ("The last four quarters of records, and ten instances chosen at random.",
+         "All ten were done as described, on time, with the record kept where the procedure says."),
+        ("Settings exported from the system on the day, and the change history for the year.",
+         "The settings match the standard. No change in the year weakened them."),
+        ("An interview with the team lead, and the team's own log for the past six months.",
+         "Done as described every time it fell due. Exceptions were recorded and followed up."),
+    ],
+    "partly": [
+        ("Twenty instances from the past year, chosen at random.",
+         "Sixteen were done as described. Four were late by more than a month, all in one team."),
+        ("Settings exported from every system in the boundary.",
+         "In force on all but two older systems, which cannot support it and have no plan yet."),
+    ],
+    "ineffective": [
+        ("The records for the past year, and an interview with the people named in the procedure.",
+         "No record that it has been done since the person responsible moved to another team."),
+    ],
+}  # fmt: skip
 SCOPE_CLINIC = {
     "name": "Clinical systems",
     "unit": "CLIN",

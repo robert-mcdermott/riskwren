@@ -124,7 +124,9 @@ One function per record type decides what a principal may see. Single records, l
 | Record a response; create and manage a treatment plan | | ✓ | ✓ | | | ✓ | | |
 | Accept a risk | | | | ✓ (not their own; up to their limit) | | | | |
 | Escalate a risk; reassign owners | | | ✓ | ✓ | | ✓ | | |
+| Start an assessment; plan its tests (wave 2) | | | | | ✓ | ✓ | | |
 | Record a test result (wave 2) | | | | | ✓ (not their own control) | ✓ (not their own control) | | |
+| Confirm or return a test result (wave 2) | | | | | ✓ (not their own control or result) | ✓ (not their own control or result) | | |
 | Validate closure of an issue (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
 | Read the full history; export | | | | | | ✓ | ✓ | ✓ |
 | Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | ✓ |

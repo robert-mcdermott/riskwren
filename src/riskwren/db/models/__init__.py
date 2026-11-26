@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from riskwren.db.models.compliance import (
+    Assessment,
     Baseline,
     BaselineRequirement,
     ControlRequirement,
+    ControlTest,
     Evidence,
     EvidenceLink,
     Framework,
@@ -16,6 +18,7 @@ from riskwren.db.models.compliance import (
     ScopeMember,
     ScopeRequirement,
     StoredFile,
+    TestResult,
 )
 from riskwren.db.models.controls import (
     Acceptance,
@@ -58,6 +61,7 @@ __all__ = [
     "Acceptance",
     "Account",
     "Action",
+    "Assessment",
     "Baseline",
     "BaselineRequirement",
     "ChainHead",
@@ -65,6 +69,7 @@ __all__ = [
     "ControlLibraryEntry",
     "ControlRating",
     "ControlRequirement",
+    "ControlTest",
     "Counter",
     "Credential",
     "Event",
@@ -96,6 +101,7 @@ __all__ = [
     "Setting",
     "StoredFile",
     "System",
+    "TestResult",
     "ThirdParty",
     "TreatmentPlan",
 ]

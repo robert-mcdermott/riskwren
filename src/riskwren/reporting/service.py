@@ -358,6 +358,23 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             f"/evidence/{held.ref}", held.valid_until, ref=held.ref,
         )  # fmt: skip
 
+    # Tests a person has been asked to do, and results that wait for their review.
+    from riskwren.compliance import assessments
+
+    for owed in assessments.waiting_on(session, principal):
+        assessment, control = owed["assessment"], owed["control"]
+        if owed["kind"] == "test":
+            add(
+                "test", f"Test {control.name}", f"{assessment.ref} · {assessment.name}",
+                f"/assessments/{assessment.ref}", assessment.period_end, ref=assessment.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "confirm", f"Review the result for {control.name}",
+                f"{assessment.ref} · it counts once a second person has confirmed it",
+                f"/assessments/{assessment.ref}", None, ref=assessment.ref,
+            )  # fmt: skip
+
     # A leader is shown what waits on someone with their authority.
     led = principal.units_for(roles.LEADER)
     if led:

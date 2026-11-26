@@ -42,6 +42,22 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   collection unless said otherwise). One item is attached to as many controls and scopes as
   it supports. Past its date it stays on the record, is shown as no longer counting, and
   its owner is reminded on Home a month beforehand (migration 0010).
+- **Assessments and tests.** An assessment of a scope plans a test for each control the
+  scope does itself: all of them, those that answer one framework, or a chosen few. Each
+  test has a method, a procedure, and a person it is assigned to, who sees it on Home. A
+  result records design and operation, what was looked at, what was found, and the evidence
+  it cites. It is recorded by someone who does not own the control and counts once a second
+  person confirms it; a result sent back is recorded again and the first is kept
+  (migration 0011).
+- **Test once.** A confirmed result becomes the control's rating. It shows in the scope that
+  does the control, in every scope that inherits it, and in the suggested residual rating
+  of every risk the control reduces. While a test result holds, a rating by judgment does
+  not replace it.
+- **Readiness in five states.** Each applicable requirement of a scope is failing, a gap,
+  planned, in place, or verified, as weak as the weakest control that answers it, and each
+  control says in words why it is where it is. Verified takes a test found effective and
+  evidence that still counts; when the evidence goes stale the requirement drops back by
+  itself.
 - **Safe file storage.** Files are stored by the SHA-256 of their content, outside anything
   the server serves. Their kind is judged by content, not name: PDF, common images, Word,
   Excel, and PowerPoint documents, and plain text, up to 25 MB; programs are refused. A file
