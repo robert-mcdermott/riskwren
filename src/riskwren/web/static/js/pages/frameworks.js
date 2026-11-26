@@ -13,6 +13,7 @@ import { confirmAction, openOverlay } from "../components/overlay.js";
 import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { facts } from "./record.js";
 import { clearFilters, filterSelect, keepSearchFocus, pager, searchBox } from "./records.js";
@@ -286,6 +287,9 @@ export function frameworkPage(main, params) {
       const actions = [
         framework.can.edit ? button("Add a requirement", { kind: "btn-primary", iconName: "plus", onclick: () => editRequirement(framework, reload) }) : null,
         framework.can.edit ? button("Paste", { iconName: "upload", onclick: () => pasteRequirements(framework, reload) }) : null,
+        framework.can.edit ? button("Import", { iconName: "upload", onclick: async () => (await import("../components/exchange.js")).openRecordImport({
+          path: `requirements/${framework.key}`, what: "requirements", onDone: reload }) }) : null,
+        exportButton("requirements", { framework: framework.key }),
         framework.can.edit ? button("Edit", { iconName: "edit", onclick: () => editFramework(framework) }) : null,
         framework.can.retire ? button(framework.status === "active" ? "Retire" : "Restore", { kind: "btn-ghost", onclick: () => confirmAction({
           title: framework.status === "active" ? `Retire ${framework.title}?` : `Restore ${framework.title}?`,

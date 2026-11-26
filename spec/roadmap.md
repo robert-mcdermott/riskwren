@@ -53,7 +53,7 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 | 4 | Evidence and files | Content-addressed file storage, evidence items with owners and validity, reuse across controls, freshness | ☑ |
 | 5 | Assessments and tests | Assessments, the test queue, procedures and results with review, results flowing to controls, requirements, and risks; readiness in five states | ☑ |
 | 6 | Issues and exceptions | The issue register, severity clocks, action plans, validated closure, root cause, exceptions with compensating controls and expiry, the plan-of-action view; in-app notices | ☑ |
-| 7 | Import and export | Spreadsheet import with mapping and a dry run for every record type; CSV and JSON export of every list; external references | ☐ |
+| 7 | Import and export | Spreadsheet import with mapping and a dry run for every record type; CSV and JSON export of every list; external references | ☑ |
 | 8 | Dashboard, graph, and demo | Readiness by scope and framework, stale evidence, issues by age; the dependency graph around any record; an organization-wide history view; the demo's scopes, assessment, and issues | ☐ |
 | 9 | Release prep | Guides, changelog, dependency review, release | ☐ |
 

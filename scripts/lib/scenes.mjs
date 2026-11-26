@@ -84,6 +84,19 @@ export const SCENES = [
     path: async (page) => `/scopes/${await first("/api/v1/scopes?q=clinical+systems")(page)}?tab=requirements&state=failing`, step: click("Ask for an exception") },
   { name: "notices", as: "bio_mgr", path: "/notices" },
   { name: "actions-mine", as: "bio_mgr", path: "/actions?mine=true" },
+  { name: "export", as: "auditor", path: "/systems?criticality=critical", step: click("Export") },
+  { name: "import", as: "bio_mgr", path: "/systems", step: click("Import") },
+  { name: "import-matched", as: "bio_mgr", path: "/systems",
+    step: `(async () => { ${click("Import")}; await new Promise((r) => setTimeout(r, 400));
+      const input = document.querySelector('input[type="file"]'); const data = new DataTransfer();
+      data.items.add(new File(["Asset name,Department,Type,How critical\\nBay 3 alarm,BIO,application,high\\nBay 3 alarm,BASEMENT,gizmo,high\\n"], "systems.csv", { type: "text/csv" }));
+      input.files = data.files; input.dispatchEvent(new Event("change"));
+      await new Promise((r) => setTimeout(r, 900));
+      const pick = document.querySelector("#map-name"); pick.value = "Asset name"; pick.dispatchEvent(new Event("change"));
+      ${click("Check the file")}; await new Promise((r) => setTimeout(r, 900)); })()` },
+  { name: "external-refs", as: "bio_mgr",
+    path: async (page) => `/systems/${await first("/api/v1/systems?q=NM-")(page)}`,
+    step: `[...document.querySelectorAll(".card")].find((el) => el.querySelector("h2")?.textContent === "Known elsewhere as")?.querySelector("button")?.click()` },
   { name: "evidence-item", as: "cro", path: async (page) => `/evidence/${await first("/api/v1/evidence?kind=file&state=current")(page)}` },
   { name: "evidence-add", as: "bio_mgr", path: "/evidence", step: click("Add evidence") },
   { name: "scopes", as: "cro", path: "/scopes" },

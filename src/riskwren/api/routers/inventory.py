@@ -31,6 +31,13 @@ from riskwren.program import settings, vocab
 router = APIRouter(prefix="/api/v1", tags=["inventory"])
 
 
+class ExternalRefBody(BaseModel):
+    """What a record is called in another system."""
+
+    system: str = Field(description="From the external_systems vocabulary")
+    value: str = Field(max_length=200)
+
+
 class ThingBody(BaseModel):
     """What every process, system, and third party has. On a change, send only what changes,
     with the ``version`` you were editing."""
@@ -45,6 +52,7 @@ class ThingBody(BaseModel):
     tags: list[str] | None = None
     restricted: bool | None = None
     kind: str | None = None
+    external_refs: list[ExternalRefBody] | None = None
 
 
 class ProcessBody(ThingBody):

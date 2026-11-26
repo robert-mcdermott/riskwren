@@ -1,6 +1,6 @@
 // One inventory record: what it is, who answers for it, what it is connected to, and its history.
 
-import { del, get, post, put } from "../core/api.js";
+import { del, get, patch, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { dateTime, relative } from "../core/format.js";
 import { label, program as loadProgram, units, vocabularies } from "../core/lookups.js";
@@ -83,7 +83,77 @@ function editOwners(record, ctx) {
   });
 }
 
+// The kinds of record whose forms take external references.
+const CARRIES = new Set(["process", "system", "third_party", "information", "risk", "control", "scope"]);
+
+/** Change what a record is called in other systems. */
+function editExternal(record, ctx) {
+  const systems = (ctx.vocab?.external_systems ?? []).filter((item) => !item.retired);
+  const rows = record.external_refs.map((item) => ({ system: item.system, value: item.value }));
+  openOverlay({
+    title: "Known elsewhere as",
+    subtitle: `${record.ref} · ${record.name}`,
+    render: (body, footer, close) => {
+      const list = h("div", { class: "stack-sm" });
+      const problem = h("div", { class: "alert alert-danger", role: "alert", hidden: true });
+      const draw = () => {
+        list.replaceChildren(...(rows.length ? rows.map((row, index) => h("div", { class: "owner-row" },
+          h("select", { class: "select", "aria-label": `System ${index + 1}`, onchange: (event) => {
+            row.system = event.target.value;
+          } }, systems.map((item) => h("option", { value: item.key, selected: item.key === row.system }, item.label))),
+          h("input", { class: "input", value: row.value, maxlength: 200, placeholder: "Identifier", "aria-label": `Identifier ${index + 1}`, oninput: (event) => {
+            row.value = event.target.value;
+          } }),
+          button("Remove", { kind: "btn-ghost btn-sm", "aria-label": `Remove identifier ${index + 1}`, onclick: () => {
+            rows.splice(index, 1);
+            draw();
+          } }))) : [h("p", { class: "muted" }, "Nothing yet: an asset tag, a contract number, a ticket.")]));
+      };
+      draw();
+      const save = button("Save", { kind: "btn-primary" });
+      save.addEventListener("click", async () => {
+        save.disabled = true;
+        problem.hidden = true;
+        try {
+          await patch(`/api/v1/${TYPES[record.type].path}/${record.ref}`, { version: record.version, external_refs: rows.filter((row) => row.value.trim()) });
+          close();
+          toast("Saved.");
+          ctx.reload();
+        } catch (error) {
+          problem.textContent = Object.values(error.fields ?? {}).join(" ") || error.detail || "That did not work.";
+          problem.hidden = false;
+        } finally {
+          save.disabled = false;
+        }
+      });
+      body.append(h("div", { class: "stack" }, problem, list,
+        button("Add another", { iconName: "plus", kind: "btn-sm", onclick: () => {
+          rows.push({ system: systems[0]?.key ?? "other", value: "" });
+          draw();
+        } }),
+        h("p", { class: "subtle" }, "A record is found by these when searching.")));
+      footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    },
+  });
+}
+
+/** What a record is called in other systems, as links where the system has a pattern. */
+export function externalCard(record, ctx) {
+  const refs = record.external_refs;
+  if (!refs || !CARRIES.has(record.type) || !(refs.length || record.can?.edit)) return null;
+  return card({ title: "Known elsewhere as", actions: record.can?.edit ? button("Edit", { kind: "btn-sm", onclick: () => editExternal(record, ctx) }) : null },
+    refs.length ? h("dl", { class: "dl" }, refs.map((item) => [h("dt", {}, item.label),
+      h("dd", {}, item.url ? h("a", { href: item.url, target: "_blank", rel: "noopener noreferrer" }, item.value) : item.value)]))
+      : h("p", { class: "muted" }, "No identifier in another system is recorded."));
+}
+
+/** Who answers for a record, and beneath that what it is called elsewhere. */
 export function ownersCard(record, ctx) {
+  return [ownersOnly(record, ctx), externalCard(record, ctx)];
+}
+
+function ownersOnly(record, ctx) {
   const canEdit = record.can?.edit;
   return card({ title: "Owners", actions: canEdit ? button("Edit", { kind: "btn-sm", onclick: () => editOwners(record, ctx) }) : null },
     record.orphaned ? alert("warn", icon("alert"), h("div", {}, record.owners.some((o) => o.kind === "owner")

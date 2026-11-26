@@ -79,6 +79,20 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Notices.** Each person has a list of what has been assigned to them or decided for
   them, with a count in the top bar. Home gained issues to put right, closures to confirm,
   and exceptions to decide or renew.
+- **Export.** Every list has an Export button: CSV or JSON, filtered as the page is, and
+  holding only what the person may see. Each export is recorded in the history with who
+  took it, how many rows, and under what filters. `GET /api/v1/exports/{list}`.
+- **Import from a spreadsheet.** Processes, systems, third parties, information, risks, and
+  controls are imported from CSV. The file's columns are matched to fields by their
+  headings and corrected by hand; a dry run reports every problem by row; nothing is added
+  unless every row can be. Each row is added by the same rules as one added by hand, in the
+  importer's name. A CSV exported from one installation imports into another with its
+  references kept. Ratings and other judgments are never imported.
+- **Requirements from a spreadsheet.** A framework of the organization's own takes its
+  requirements from a CSV of codes, titles, text, and parents.
+- **External references.** A record can carry what it is called in other systems: an asset
+  tag, a contract number, a ticket. It is found by them in search, and they are links
+  where the system has an address pattern (migration 0013).
 - **Safe file storage.** Files are stored by the SHA-256 of their content, outside anything
   the server serves. Their kind is judged by content, not name: PDF, common images, Word,
   Excel, and PowerPoint documents, and plain text, up to 25 MB; programs are refused. A file

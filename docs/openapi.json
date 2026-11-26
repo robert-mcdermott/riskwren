@@ -361,6 +361,20 @@
       "ControlBody": {
         "description": "A control. On a change, send only what changes, with the ``version`` you were editing.",
         "properties": {
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
+          },
           "frequency": {
             "anyOf": [
               {
@@ -892,6 +906,27 @@
         "title": "ExceptionBody",
         "type": "object"
       },
+      "ExternalRefBody": {
+        "description": "What a record is called in another system.",
+        "properties": {
+          "system": {
+            "description": "From the external_systems vocabulary",
+            "title": "System",
+            "type": "string"
+          },
+          "value": {
+            "maxLength": 200,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "value"
+        ],
+        "title": "ExternalRefBody",
+        "type": "object"
+      },
       "FrameworkBody": {
         "description": "A framework of the organization's own. On a change, send only what changes.",
         "properties": {
@@ -1152,6 +1187,20 @@
               }
             ],
             "title": "Data Class"
+          },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
           },
           "held_in": {
             "anyOf": [
@@ -1757,6 +1806,20 @@
             ],
             "title": "Data Class"
           },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
+          },
           "kind": {
             "anyOf": [
               {
@@ -2169,6 +2232,20 @@
             ],
             "title": "Event"
           },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
+          },
           "library_key": {
             "anyOf": [
               {
@@ -2297,6 +2374,20 @@
             ],
             "description": "Where the scope begins and ends",
             "title": "Boundary"
+          },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
           },
           "name": {
             "anyOf": [
@@ -2438,6 +2529,20 @@
               }
             ],
             "title": "Data Class"
+          },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
           },
           "hosting": {
             "anyOf": [
@@ -2631,6 +2736,20 @@
               }
             ],
             "title": "Data Class"
+          },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
           },
           "kind": {
             "anyOf": [
@@ -6940,6 +7059,58 @@
         ]
       }
     },
+    "/api/v1/exports/{kind}": {
+      "get": {
+        "description": "``kind`` is a list's own name: ``processes``, ``systems``, ``third-parties``,\n``information``, ``risks``, ``controls``, ``scopes``, ``evidence``, ``assessments``,\n``issues``, ``exceptions``, ``actions``, ``plans``, ``acceptances``, ``requirements``\n(with ``framework``), or ``statement`` (with ``scope`` and ``framework``). Every other\nparameter is a filter, the same ones that list takes. What comes back is what the asker\nmay see, and taking it is recorded in the history.",
+        "operationId": "export_list_api_v1_exports__kind__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "description": "csv or json",
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "csv",
+              "description": "csv or json",
+              "title": "Format",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {},
+              "text/csv": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A list, as filtered, as CSV or JSON",
+        "tags": [
+          "import and export"
+        ]
+      }
+    },
     "/api/v1/frameworks": {
       "get": {
         "operationId": "list_frameworks_api_v1_frameworks_get",
@@ -7795,6 +7966,241 @@
         "summary": "Import people from CSV",
         "tags": [
           "people"
+        ]
+      }
+    },
+    "/api/v1/imports/records/{path}": {
+      "post": {
+        "description": "``path`` is ``processes``, ``systems``, ``third-parties``, ``information``, ``risks``,\nor ``controls``. Send the CSV as the request body. With ``dry_run`` (the default) every\nrow is checked and nothing is changed. Nothing is added unless every row can be.",
+        "operationId": "import_records_api_v1_imports_records__path__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "title": "Path",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Dry Run",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A JSON object saying which column holds each field; the rest are guessed",
+            "in": "query",
+            "name": "mapping",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A JSON object saying which column holds each field; the rest are guessed",
+              "title": "Mapping"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Records Api V1 Imports Records  Path  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import records from CSV",
+        "tags": [
+          "import and export"
+        ]
+      }
+    },
+    "/api/v1/imports/records/{path}/columns": {
+      "post": {
+        "description": "Send the CSV as the request body. Nothing is checked or changed: the answer says what\ncolumns the file has, and which field each is taken for.",
+        "operationId": "import_columns_api_v1_imports_records__path__columns_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "title": "Path",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Columns Api V1 Imports Records  Path  Columns Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read a CSV's columns and match them to fields",
+        "tags": [
+          "import and export"
+        ]
+      }
+    },
+    "/api/v1/imports/requirements/{key}": {
+      "post": {
+        "description": "For one of the organization's own frameworks. Columns: a code, and optionally a title,\nthe text, and the code of the requirement each sits under.",
+        "operationId": "import_requirements_api_v1_imports_requirements__key__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Dry Run",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A JSON object saying which column holds each field; the rest are guessed",
+            "in": "query",
+            "name": "mapping",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A JSON object saying which column holds each field; the rest are guessed",
+              "title": "Mapping"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Import Requirements Api V1 Imports Requirements  Key  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import a framework's requirements from CSV",
+        "tags": [
+          "import and export"
+        ]
+      }
+    },
+    "/api/v1/imports/requirements/{key}/columns": {
+      "post": {
+        "operationId": "requirement_columns_api_v1_imports_requirements__key__columns_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Requirement Columns Api V1 Imports Requirements  Key  Columns Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read a CSV's columns and match them to a requirement's fields",
+        "tags": [
+          "import and export"
         ]
       }
     },

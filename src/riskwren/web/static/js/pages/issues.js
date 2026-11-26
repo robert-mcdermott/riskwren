@@ -16,6 +16,7 @@ import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
 import { actionButtons, actionStatus, dueCell } from "../components/treatment.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, ownerCell, pager, searchBox, sortHeader } from "./records.js";
@@ -332,9 +333,10 @@ export function issueList(main) {
   return show(main, {
     title: "Issues",
     load: async () => {
-      const asked = Object.fromEntries(query());
-      const [page, vocab, unitIndex] = await Promise.all([get("/api/v1/issues", { status: "live", ...asked, ...(asked.status === "any" ? { status: undefined } : {}) }, { fresh: true }), vocabularies(), units()]);
-      return { page, vocab, units: unitIndex };
+      const said = Object.fromEntries(query());
+      const asked = { status: "live", ...said, ...(said.status === "any" ? { status: undefined } : {}) };
+      const [page, vocab, unitIndex] = await Promise.all([get("/api/v1/issues", asked, { fresh: true }), vocabularies(), units()]);
+      return { page, vocab, units: unitIndex, asked };
     },
     view: (data, reload) => {
       const rows = data.page.data;
@@ -354,7 +356,7 @@ export function issueList(main) {
         : emptyState(isFiltering() ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.", action: button("Clear filters", { onclick: clearFilters }) }
           : { iconName: "issue", title: "No open issues", text: meta.lede, action: button("Raise an issue", { kind: "btn-primary", onclick: add }) });
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Compliance", title: "Issues", lede: meta.lede, actions: button("Raise an issue", { kind: "btn-primary", iconName: "plus", onclick: add }) }),
+        pageHeader({ eyebrow: "Compliance", title: "Issues", lede: meta.lede, actions: [button("Raise an issue", { kind: "btn-primary", iconName: "plus", onclick: add }), exportButton("issues", data.asked)] }),
         bar,
         card({ title: plural(data.page.meta.total, "issue"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

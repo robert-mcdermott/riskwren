@@ -237,6 +237,19 @@ POLICIES.update(
     }
 )
 
+# Import and export. An export is the list its asker could already see, and is recorded.
+# Records are imported by those who could add them by hand, a row at a time by the same
+# service; requirements by those who shape the program.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/exports/{kind}"): Needs.MEMBER,
+        ("POST", "/api/v1/imports/records/{path}/columns"): Needs.STEWARD,
+        ("POST", "/api/v1/imports/records/{path}"): Needs.STEWARD,
+        ("POST", "/api/v1/imports/requirements/{key}/columns"): Needs.CONFIGURE,
+        ("POST", "/api/v1/imports/requirements/{key}"): Needs.CONFIGURE,
+    }
+)
+
 # Reporting: every figure counts only what the asker may see.
 POLICIES.update(
     {

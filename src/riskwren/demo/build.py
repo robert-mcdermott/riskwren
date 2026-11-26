@@ -99,6 +99,8 @@ class Builder:
         self.files = files  # where evidence files are kept; without it, items have none
         self.seed = seed
         self.rng = random.Random(seed)
+        # A second stream for details added later, so that they do not shift the first.
+        self.side = random.Random(seed + 7919)
         self.end = datetime(today.year, today.month, today.day, 16, 30, tzinfo=UTC)
         self.start = self._workday(self.end - timedelta(days=MONTHS * 30.4))
         self.now = self.start
@@ -387,6 +389,15 @@ class Builder:
         self, by: int, record_type: RecordType, key: str, values: dict[str, Any], owner: int
     ) -> None:
         unit = values["org_unit_id"]
+        # Some things are known by a number elsewhere: an asset tag, or a contract.
+        if record_type.key == "system" and self.side.random() < 0.45:
+            tag = f"NM-{self.side.randrange(100000, 999999)}"
+            values = {**values, "external_refs": [{"system": "asset_tag", "value": tag}]}
+        elif record_type.key == "third_party" and self.side.random() < 0.6:
+            number = (
+                f"C-{self.side.choice((2022, 2023, 2024, 2025))}-{self.side.randrange(100, 999)}"
+            )
+            values = {**values, "external_refs": [{"system": "contract", "value": number}]}
         with self.act(by) as (session, who):
             record = records.create(session, who, record_type, values)
             if owner != by:

@@ -11,6 +11,7 @@ import { openOverlay } from "../components/overlay.js";
 import { recordChip, TYPES } from "../components/record.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { facts, outside, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, ownerCell, pager, searchBox, sortHeader } from "./records.js";
@@ -165,7 +166,7 @@ export function evidenceList(main) {
         : emptyState(isFiltering() ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.", action: button("Clear filters", { onclick: clearFilters }) }
           : { iconName: "evidence", title: "No evidence yet", text: meta.lede, action: button("Add evidence", { kind: "btn-primary", onclick: add }) });
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Compliance", title: "Evidence", lede: meta.lede, actions: button("Add evidence", { kind: "btn-primary", iconName: "plus", onclick: add }) }),
+        pageHeader({ eyebrow: "Compliance", title: "Evidence", lede: meta.lede, actions: [button("Add evidence", { kind: "btn-primary", iconName: "plus", onclick: add }), exportButton("evidence")] }),
         bar,
         card({ title: plural(data.page.meta.total, "item"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

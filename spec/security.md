@@ -132,7 +132,9 @@ One function per record type decides what a principal may see. Single records, l
 | Validate closure of an issue; withdraw or reopen one (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
 | Ask for an exception (wave 2) | | ✓ (of the scope or control) | ✓ | | | ✓ | | |
 | Decide an exception (wave 2) | | | | ✓ (not their own request) | | ✓ (not their own request) | | |
-| Read the full history; export | | | | | | ✓ | ✓ | ✓ |
+| Export a list they can see, as CSV or JSON; each export is recorded (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Import records from a spreadsheet, each row as if added by hand (wave 2) | | | ✓ | | | ✓ | | |
+| Read the full history | | | | | | ✓ | ✓ | ✓ |
 | Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | ✓ |
 | Enter and keep the organization's own frameworks; retire a framework (wave 2) | | | | | | ✓ | | ✓ |
 | Manage accounts, roles, units, branding, and system settings | | | | | | | | ✓ |

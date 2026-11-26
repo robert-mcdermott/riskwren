@@ -633,6 +633,38 @@
         "label": "Other",
         "description": "None of these, or not known"
       }
+    ],
+    "external_systems": [
+      {
+        "key": "asset_tag",
+        "label": "Asset tag",
+        "description": "The number on the label, or in the asset register"
+      },
+      {
+        "key": "contract",
+        "label": "Contract number",
+        "description": "As the contracts or purchasing system knows it"
+      },
+      {
+        "key": "ticket",
+        "label": "Ticket",
+        "description": "A request or change in the service desk"
+      },
+      {
+        "key": "configuration_item",
+        "label": "Configuration item",
+        "description": "Its entry in a configuration database"
+      },
+      {
+        "key": "award",
+        "label": "Award number",
+        "description": "A grant or sponsored agreement"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "An identifier in any other system"
+      }
     ]
   },
   "categories": [

@@ -34,6 +34,7 @@ from riskwren.db.models.controls import (
     TreatmentPlan,
 )
 from riskwren.db.models.inventory import (
+    ExternalRef,
     Information,
     Process,
     RecordLink,
@@ -80,6 +81,7 @@ __all__ = [
     "Evidence",
     "EvidenceLink",
     "ExceptionRequest",
+    "ExternalRef",
     "FailedSignIn",
     "Framework",
     "Implementation",

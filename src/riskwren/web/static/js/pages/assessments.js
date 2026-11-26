@@ -18,6 +18,7 @@ import { recordChip, TYPES } from "../components/record.js";
 import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, pager, searchBox, sortHeader } from "./records.js";
@@ -432,7 +433,7 @@ export function assessmentList(main) {
         : emptyState(isFiltering() ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.", action: button("Clear filters", { onclick: clearFilters }) }
           : { iconName: "assessment", title: "No assessments yet", text: meta.lede, action: mayAdd ? button("Start an assessment", { kind: "btn-primary", onclick: add }) : null });
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Compliance", title: "Assessments", lede: meta.lede, actions: mayAdd ? button("Start an assessment", { kind: "btn-primary", iconName: "plus", onclick: add }) : null }),
+        pageHeader({ eyebrow: "Compliance", title: "Assessments", lede: meta.lede, actions: [mayAdd ? button("Start an assessment", { kind: "btn-primary", iconName: "plus", onclick: add }) : null, exportButton("assessments")] }),
         bar,
         card({ title: plural(data.page.meta.total, "assessment"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

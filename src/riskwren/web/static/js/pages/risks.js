@@ -1,5 +1,6 @@
 // The risk register. Filters, sort, and page all live in the URL.
 
+import { exportButton } from "../components/exchange.js";
 import { get } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date, plural } from "../core/format.js";
@@ -76,7 +77,8 @@ export function riskRegister(main) {
             action: mayAdd ? button("Raise a risk", { kind: "btn-primary", onclick: add }) : null });
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Risks", title: "Register", lede: meta.lede,
-          actions: mayAdd ? button("Raise a risk", { kind: "btn-primary", iconName: "plus", onclick: add }) : null }),
+          actions: [mayAdd ? button("Raise a risk", { kind: "btn-primary", iconName: "plus", onclick: add }) : null,
+            can("steward") ? button("Import", { iconName: "upload", onclick: async () => (await import("../components/exchange.js")).openRecordImport({ path: `records/${meta.path}`, what: meta.nouns, onDone: reload }) }) : null, exportButton("risks")] }),
         bar,
         card({ title: plural(total, "risk"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

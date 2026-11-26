@@ -127,6 +127,10 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
         title = (
             f"Now {label} {other}" if event.action == "created" else f"No longer {label} {other}"
         )
+    elif event.subject_type == "external_ref":
+        system = lookups.vocab("external_systems", now("system")).lower()
+        verb = "Now also known as" if event.action == "created" else "No longer known as"
+        title = f"{verb} {now('value')} ({system})"
     elif event.action == "created":
         title = f"Added this {record_type.label}"
     elif event.action == "updated":

@@ -14,6 +14,7 @@ from riskwren.api.routers.inventory import (
     MINE,
     SORT,
     UNIT,
+    ExternalRefBody,
     OwnersBody,
     Q,
     create_record,
@@ -46,6 +47,7 @@ class ScopeBody(BaseModel):
     status: str | None = None
     tags: list[str] | None = None
     restricted: bool | None = None
+    external_refs: list[ExternalRefBody] | None = None
 
 
 class MembersBody(BaseModel):

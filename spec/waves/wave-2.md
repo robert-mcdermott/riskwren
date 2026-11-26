@@ -108,13 +108,15 @@ The wave is done when, on a fresh checkout:
 
 **Done:** an issue is a record (`ISS`) with a severity, what found it, and what it is about: controls, scopes, risks, and requirements. Its date follows from its severity by a table in the program (30, 90, 180, and 365 days), counted from the day it was raised; moving it needs a reason, and every move is kept. A confirmed test result of partly effective or ineffective opens one, filled in from the result, owned by the control's owners, and naming every scope that relies on the control. Anyone may raise one for a unit they work in. It is worked through the same actions treatment plans use, which now belong to a plan or an issue. Its owner proposes closure with what was done, a root cause, and evidence; an assessor or manager who neither owns it nor proposed it confirms or sends it back. An exception (`EXC`) is asked for by whoever keeps the scope or control, to a control or to a requirement within a scope, runs between two dates at most a year apart, and is decided by a leader or manager over the unit who did not ask. While it is in force a weak state is shown as excepted with what lies underneath; the day after, the state underneath is back. A scope has a plan of action tab that prints. Each person has notices with a count in the top bar. The acceptance tests are in `tests/test_issues.py`: `test_a_failed_test_opens_an_issue_filled_in_from_the_result`, `test_an_issue_is_closed_only_by_someone_who_does_not_own_it`, and `test_an_exception_is_decided_by_someone_else_and_ends_by_itself`.
 
-### Slice 7: Import and export ☐
+### Slice 7: Import and export ☑
 
-- [ ] CSV and JSON export of every list, with the filters in force, recorded in the history
-- [ ] Spreadsheet import for each record type: column mapping, dry run, every problem by row
-- [ ] External references on records
+- [x] CSV and JSON export of every list, with the filters in force, recorded in the history
+- [x] Spreadsheet import for each record type: column mapping, dry run, every problem by row
+- [x] External references on records
 
 **Acceptance:** an exported list re-imports unchanged into an empty installation.
+
+**Done:** every list has an Export button that gives it as CSV or JSON, filtered as the page is and cut to what its reader may see; each export is an event saying who took which list, how many rows, and under what filters. Processes, systems, third parties, information, risks, and controls import from a CSV: the file's columns are matched to fields by their headings, the person corrects the matching, a dry run reports every problem by row, and nothing is added unless every row can be. Each row goes through the service that adds a record by hand. A framework of the organization's own takes its requirements from a CSV the same way. A record can carry what it is called in other systems, is found by those names, and shows them as links where the system has an address pattern. `tests/test_exchange.py::test_an_exported_list_reimports_unchanged_into_an_empty_installation` is the acceptance test: systems, processes, controls, and risks leave one installation and arrive in a second with their references, owners, tags, and external references, and the second's export is the first's, byte for byte.
 
 ### Slice 8: Dashboard, graph, and demo ☐
 
@@ -172,4 +174,11 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **An exception to an inherited control can be asked for where it is felt.** A scope that inherits a failing control cannot fix it, and may need to say so. Its keepers ask within their own scope, by the control's name, without being able to open the provider's record. An exception approved in the provider's scope reaches those that inherit from it.
 - **The table is not called what the word means in the language it is written in.** The record type is `exception` everywhere a person or the API sees it; the table and the model are `exception_request`.
 - **Notices are pointers, not records.** A notice is a sentence and a place to go, for one person, about something assigned to them or decided for them. It is not in the history, which already holds what happened, and nobody is told about what they did themselves.
+- **An import is many additions, not a load.** Each row is given to the same function a person's own addition goes through, in the importer's name, so permissions, validation, defaults, and history are the same and cannot drift. A dry run does all of it and rolls it back.
+- **Judgments are not imported.** A file can say what a risk or a control is. What it says of a rating, a standing, or a test is not read: those are made here, by a named person on a date. An export carries them as columns after the ones an import reads.
+- **A file's own references are kept when they are free.** An import that brings a `ref` column keeps each reference and moves the counter past it, so a copy of a register refers to the same things by the same names. A reference already in use is a problem on its row.
+- **The same file twice adds nothing.** A row whose name is already on record in its unit is a problem, so that an import run a second time is refused whole and not doubled.
+- **An export is what its reader could already see.** Anyone may export a list they can open; it applies the same rule as the list and is recorded. Text a spreadsheet would run as a formula is written with an apostrophe before it, which an import takes off again.
+- **External references are one small table.** One table for every kind of record, a child of the record in the history, with the system chosen from a vocabulary that may give an address pattern. They are set with the record's other facts and not through routes of their own.
+- **The plan of action is loaded when it is opened.** The scope page had reached its size budget; the tab and the issue form now arrive when asked for.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

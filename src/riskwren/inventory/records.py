@@ -8,16 +8,17 @@ from __future__ import annotations
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from typing import Any
+from urllib.parse import quote
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
 from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
-from riskwren.db.models import Account, OrgUnit, RecordOwner
+from riskwren.db.models import Account, ExternalRef, OrgUnit, RecordOwner
 from riskwren.db.models.inventory import RECORD_STATUSES
-from riskwren.db.refs import next_ref
+from riskwren.db.refs import claim_ref, next_ref, parse_ref
 from riskwren.events import audit
 from riskwren.inventory import access
 from riskwren.inventory.registry import RecordType
@@ -108,6 +109,81 @@ def apply_header(
         unit_id = unit(session, values.get("org_unit_id"), errors)
         if unit_id is not None:
             record.org_unit_id = unit_id
+    record.__dict__.pop("_external_refs", None)  # nothing left over from an earlier attempt
+    if values.get("external_refs") is not None:
+        # Checked here with everything else, and written once the record is.
+        record._external_refs = external_refs(session, values["external_refs"], errors)
+
+
+# --- What a record is called elsewhere ------------------------------------------------------
+
+
+def external_refs(session: Session, given: Any, errors: Errors) -> list[tuple[str, str]]:
+    """Check a list of ``{"system", "value"}`` and return it as pairs, without repeats."""
+    systems = vocab.keys(session, "external_systems")
+    found: list[tuple[str, str]] = []
+    for item in given or []:
+        system, value = text(item.get("system")), text(item.get("value"))
+        if system not in systems:
+            errors.add("external_refs", f"{system!r} is not one of the systems on record.")
+        elif not value or len(value) > 200:
+            errors.add("external_refs", "Give the identifier, in up to 200 characters.")
+        elif (system, value) not in found:
+            found.append((system, value))
+    return found
+
+
+def _save_external_refs(session: Session, record_type: RecordType, record: Any) -> None:
+    wanted = record.__dict__.pop("_external_refs", None)
+    if wanted is None:
+        return
+    have = {
+        (row.system, row.value): row
+        for row in session.scalars(
+            select(ExternalRef).where(
+                ExternalRef.record_type == record_type.key, ExternalRef.record_id == record.id
+            )
+        )
+    }
+    for key, row in have.items():
+        if key not in wanted:
+            session.delete(row)
+    for system, value in wanted:
+        if (system, value) not in have:
+            session.add(
+                ExternalRef(
+                    record_type=record_type.key, record_id=record.id, system=system, value=value
+                )
+            )
+    session.flush()
+
+
+def external_refs_of(
+    session: Session, record_type: RecordType, record_ids: Iterable[int]
+) -> dict[int, list[dict[str, Any]]]:
+    """Each record's identifiers elsewhere, with a link where the system has a pattern."""
+    ids = list(record_ids)
+    systems = {item["key"]: item for item in vocab.get(session, "external_systems")}
+    found: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    if not ids:
+        return found
+    for row in session.scalars(
+        select(ExternalRef)
+        .where(ExternalRef.record_type == record_type.key, ExternalRef.record_id.in_(ids))
+        .order_by(ExternalRef.id)
+    ):
+        system = systems.get(row.system, {})
+        pattern = str(system.get("url") or "")
+        link = (
+            pattern.replace("{id}", quote(row.value, safe=""))
+            if pattern.startswith(("https://", "http://")) and "{id}" in pattern
+            else None
+        )
+        found[row.record_id].append(
+            {"system": row.system, "label": system.get("label", row.system), "value": row.value,
+             "url": link}
+        )  # fmt: skip
+    return found
 
 
 def apply_fields(
@@ -206,10 +282,30 @@ def create(
             record_type.extra.get("add_refusal")
             or f"Only a steward of the unit, or a manager, can add a {record_type.label} to it."
         )
+    # An import may bring the reference a record had where it came from.
+    wanted = text(values.get("_ref"))
+    if wanted is not None:
+        model: Any = record_type.model
+        parsed = parse_ref(wanted)
+        if parsed is None or parsed[0] != record_type.prefix:
+            raise Invalid(
+                f"The {record_type.label} was not saved.",
+                {"ref": f"{wanted} is not a reference for {record_type.plural}."},
+            )
+        if session.scalars(select(model.id).where(model.ref == wanted.upper())).first():
+            raise Invalid(
+                f"The {record_type.label} was not saved.",
+                {"ref": f"{wanted.upper()} is already on record."},
+            )
     with audit.operation(session, f"{record_type.key}.create"):
-        record.ref = next_ref(session, record_type.prefix)
+        record.ref = (
+            claim_ref(session, record_type.prefix, wanted)
+            if wanted is not None
+            else next_ref(session, record_type.prefix)
+        )
         session.add(record)
         session.flush()
+        _save_external_refs(session, record_type, record)
         if principal.account_id is not None:
             session.add(
                 RecordOwner(
@@ -256,6 +352,9 @@ def update(
         if "org_unit_id" in values and not access.can_add(principal, record.org_unit_id):
             session.expire(record)
             raise PermissionDenied("You can move a record only to a unit you look after.")
+        if getattr(record, "_external_refs", None) is not None:
+            _save_external_refs(session, record_type, record)
+            record.updated_at = utc_now()
         touch(session, record)
     return record
 
@@ -375,11 +474,19 @@ def conditions_for(
     query = text(filters.get("q"))
     if query:
         like = f"%{query.lower()}%"
+        elsewhere = exists(
+            select(ExternalRef.id).where(
+                ExternalRef.record_type == record_type.key,
+                ExternalRef.record_id == model.id,
+                func.lower(ExternalRef.value).like(like),
+            )
+        )
         conditions.append(
             or_(
                 func.lower(model.name).like(like),
                 func.lower(model.ref).like(like),
                 func.lower(func.coalesce(model.summary, "")).like(like),
+                elsewhere,  # what it is called in another system
             )
         )
     if filters.get("unit"):
@@ -513,6 +620,7 @@ def detail(
         tags=record.tags,
         version=record.version,
         created_at=record.created_at,
+        external_refs=external_refs_of(session, record_type, [record.id]).get(record.id, []),
         can={
             "edit": editable,
             "assess": access.can_assess(session, principal, record_type, record),

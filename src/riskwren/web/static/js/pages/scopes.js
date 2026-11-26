@@ -8,7 +8,6 @@ import { units, vocabularies } from "../core/lookups.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { can } from "../core/session.js";
 import { statusPill as assessmentStatus } from "../components/assessment.js";
-import { issueDue, issueStatus, severityPill } from "../components/issue.js";
 import { segments } from "../components/charts.js";
 import { statePill } from "../components/control.js";
 import { evidenceCard } from "../components/evidence.js";
@@ -19,6 +18,7 @@ import { ownUnits, section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill, statusPill } from "../components/ui.js";
 import { unitOptions } from "../core/lookups.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, ownerCell, pager, searchBox, sortHeader } from "./records.js";
@@ -389,7 +389,8 @@ function requirementsTab(scope, found, reload) {
   const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
     scope.held_to.length > 1 ? filterSelect("framework", scope.held_to.map((held) => [held.key === scope.held_to[0].key ? "" : held.key, held.title]), "Framework") : null,
     filterSelect("state", [["", `Every requirement (${found.applicable + counts.excluded})`], ...Object.entries(STATES).map(([key, [text]]) => [key, `${text} (${counts[key]})`])], "State"),
-    button("Print", { class: "btn no-print", onclick: () => window.print() }));
+    button("Print", { class: "btn no-print", onclick: () => window.print() }),
+    h("span", { class: "no-print" }, exportButton("statement", { scope: scope.ref, framework: chosen, state: query().get("state"), q: query().get("q") })));
   const rows = found.requirements;
   const table = rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
     h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Requirement"), h("th", { scope: "col" }, "Here"), h("th", { scope: "col" }, "Answered by"), h("th", { scope: "col", class: "no-print" }, h("span", { class: "sr-only" }, "Actions")))),
@@ -405,7 +406,7 @@ function requirementsTab(scope, found, reload) {
         h("div", { class: "cell-sub" }, `${control.why}.`)))
         : row.applicable ? h("span", { class: "subtle" }, "No control used here answers it") : null),
       h("td", { class: "nowrap no-print" }, h("div", { class: "row-actions" },
-        WEAK.includes(row.state) ? button("Raise an issue", { kind: "btn-sm btn-ghost", "aria-label": `Raise an issue about ${row.code}`, onclick: () => raiseIssue(scope, { requirement: { framework: chosen, code: row.code, title: row.title },
+        WEAK.includes(row.state) ? button("Raise an issue", { kind: "btn-sm btn-ghost", "aria-label": `Raise an issue about ${row.code}`, onclick: async () => (await import("./scope-plan.js")).raiseIssue(scope, { requirement: { framework: chosen, code: row.code, title: row.title },
           name: row.state === "gap" ? `${row.code}: nothing answers it in ${scope.name}` : "", from: row.state === "gap" ? "gap" : "observation" }) }) : null,
         found.can_edit && WEAK.includes(row.state) ? button("Ask for an exception", { kind: "btn-sm btn-ghost", "aria-label": `Ask for an exception to ${row.code}`,
           onclick: async () => (await import("./exceptions.js")).requestException({ scope, requirement: { framework: chosen, code: row.code, title: row.title } }) }) : null,
@@ -426,41 +427,6 @@ function requirementsTab(scope, found, reload) {
         "Excepted: an approved exception covers it until a date, after which it is whatever lies underneath.")),
     bar,
     card({ title: plural(rows.length, "requirement"), flush: true }, table));
-}
-
-/** Raise an issue about this scope. The form is loaded when it is first asked for. */
-async function raiseIssue(scope, more = {}) {
-  const [{ editIssue }, vocab, unitIndex] = await Promise.all([import("./issues.js"), vocabularies(), units()]);
-  editIssue({ about: [{ type: "scope", ref: scope.ref, name: scope.name }], unitId: scope.org_unit_id, vocab, units: unitIndex, ...more });
-}
-
-function planTab(scope, plan) {
-  const rows = plan.issues;
-  const raise = button("Raise an issue", { kind: "btn-primary no-print", iconName: "plus", onclick: () => raiseIssue(scope) });
-  if (!rows.length) {
-    return card({}, emptyState({ iconName: "issue", title: "Nothing is open",
-      text: "No open issue bears on this scope: none about the scope itself, and none about a control it uses or inherits.", action: raise }));
-  }
-  const said = Object.entries(plan.counts).filter(([, count]) => count).map(([key, count]) => `${count} ${(plan.severities[key] ?? key).toLowerCase()}`).join(", ");
-  return h("div", { class: "stack-lg" },
-    h("div", { class: "statement-head" },
-      h("h2", {}, `Plan of action and milestones: ${scope.name}`),
-      h("p", { class: "muted" }, `${plural(rows.length, "open issue")} that ${rows.length === 1 ? "bears" : "bear"} on this scope: ${said}. `, plan.overdue ? `${plan.overdue} overdue.` : "None overdue."),
-      h("p", { class: "subtle" }, "Issues about the scope itself, and about any control it uses or inherits, most severe first. Each is put right through its actions.")),
-    h("div", { class: "row no-print" }, raise, button("Print", { onclick: () => window.print() })),
-    card({ flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
-      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Weakness"), h("th", { scope: "col" }, "Severity"), h("th", { scope: "col" }, "About"), h("th", { scope: "col" }, "Who"),
-        h("th", { scope: "col" }, "Milestones"), h("th", { scope: "col" }, "Due"))),
-      h("tbody", {}, rows.map((issue) => h("tr", {},
-        h("td", {}, h("a", { class: "cell-main", href: `/issues/${issue.ref}` }, issue.name), h("div", { class: "cell-sub" }, issue.ref, " · raised ", date(issue.created_at))),
-        h("td", {}, severityPill(issue.severity, plan.severities)),
-        h("td", {}, issue.subjects.records.filter((record) => record.type !== "scope").map((record) => h("div", {}, record.name)),
-          issue.subjects.requirements.map((item) => h("div", { class: "requirement-code" }, item.code))),
-        h("td", {}, issue.owners.length ? issue.owners.map((owner) => h("div", {}, owner.name)) : h("span", { class: "subtle" }, "Nobody")),
-        h("td", {}, issue.actions.length ? h("ul", { class: "milestones" }, issue.actions.filter((action) => action.status !== "cancelled").map((action) => h("li", {},
-          h("span", {}, action.title), h("span", { class: "cell-sub" }, `${action.owner.name} · ${action.status === "done" ? "done" : `due ${date(action.due_on)}`}${action.overdue ? " · overdue" : ""}`))))
-          : h("span", { class: "subtle" }, "No actions yet")),
-        h("td", { class: "nowrap" }, issueDue(issue), h("div", {}, issueStatus(issue))))))))));
 }
 
 function controlsTab(scope, held, reload) {
@@ -515,7 +481,8 @@ export function scopePage(main, params) {
       const assessed = tab === "overview" ? (await get("/api/v1/assessments", { scope: params.ref, limit: 10 }, { fresh: true })).data : [];
       if (tab === "history") extra = (await get(`${base}/history`, null, { fresh: true })).data;
       if (tab === "controls") extra = (await get(`${base}/controls`, null, { fresh: true })).data;
-      if (tab === "plan") extra = (await get(`${base}/plan-of-action`, null, { fresh: true })).data;
+      // The plan of action is drawn by its own module, loaded when the tab is opened.
+      if (tab === "plan") extra = { plan: (await get(`${base}/plan-of-action`, null, { fresh: true })).data, draw: (await import("./scope-plan.js")).planTab };
       if (tab === "requirements" && scope.data.held_to.length) {
         const asked = query();
         const framework = scope.data.held_to.find((held) => held.key === asked.get("framework"))?.key ?? scope.data.held_to[0].key;
@@ -532,7 +499,7 @@ export function scopePage(main, params) {
         recordHeader(scope, { badges: [scope.status === "retired" ? pill("Retired") : null, scope.offers_controls ? pill("Offers its controls", "info") : null], actions: edit }),
         tabBar(TABS, tab),
         tab === "history" ? card({ flush: true }, timeline(data.extra)) : tab === "controls" ? controlsTab(scope, data.extra, reload)
-          : tab === "plan" ? planTab(scope, data.extra)
+          : tab === "plan" ? data.extra.draw(scope, data.extra.plan)
           : tab === "requirements" ? requirementsTab(scope, data.extra, reload) : overview(scope, ctx));
     },
   });
@@ -573,7 +540,7 @@ export function scopeList(main) {
           : { iconName: "scope", title: "No scopes yet", text: meta.lede, action: mayAdd ? button("Add a scope", { kind: "btn-primary", onclick: add }) : null });
       void reload;
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Compliance", title: "Scopes", lede: meta.lede, actions: mayAdd ? button("Add a scope", { kind: "btn-primary", iconName: "plus", onclick: add }) : null }),
+        pageHeader({ eyebrow: "Compliance", title: "Scopes", lede: meta.lede, actions: [mayAdd ? button("Add a scope", { kind: "btn-primary", iconName: "plus", onclick: add }) : null, exportButton("scopes")] }),
         bar,
         card({ title: plural(data.page.meta.total, "scope"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

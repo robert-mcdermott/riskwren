@@ -12,6 +12,7 @@ import { recordChip, TYPES } from "../components/record.js";
 import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader } from "../components/ui.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, pager, searchBox, sortHeader } from "./records.js";
@@ -216,7 +217,7 @@ export function exceptionList(main) {
         : emptyState(isFiltering() ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.", action: button("Clear filters", { onclick: clearFilters }) }
           : { iconName: "exception", title: "No exceptions", text: `${meta.lede} One is asked for from a scope: from a requirement on its Requirements tab, or a control on its Controls tab.` });
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Compliance", title: "Exceptions", lede: meta.lede }),
+        pageHeader({ eyebrow: "Compliance", title: "Exceptions", lede: meta.lede, actions: exportButton("exceptions") }),
         bar,
         card({ title: plural(data.page.meta.total, "exception"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

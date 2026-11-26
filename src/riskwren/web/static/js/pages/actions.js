@@ -9,6 +9,7 @@ import { hrefOf, recordChip } from "../components/record.js";
 import { rating, standingPill } from "../components/risk.js";
 import { acceptanceState, actionButtons, actionStatus, dueCell } from "../components/treatment.js";
 import { card, emptyState, pageHeader, pill } from "../components/ui.js";
+import { exportButton } from "../components/exchange.js";
 import { show } from "./page.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, pager, searchBox } from "./records.js";
 
@@ -50,7 +51,7 @@ export function actionList(main) {
           h("td", { class: "actions" }, actionButtons(action, reload)))))))
         : nothing("Nothing is owed", "Actions from treatment plans and issues appear here, soonest first, each with an owner and a date.");
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Risks", title: "Actions", lede: "Everything someone has to do by a date, whatever it came from." }),
+        pageHeader({ eyebrow: "Risks", title: "Actions", lede: "Everything someone has to do by a date, whatever it came from.", actions: exportButton("actions", { status: "open", ...Object.fromEntries(query()) }) }),
         bar, card({ title: plural(data.page.meta.total, "action"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },
   });
@@ -82,7 +83,7 @@ export function planList(main) {
           h("td", { class: "nowrap" }, plan.overdue ? pill("Overdue", "danger") : null, " ", h("span", { class: plan.overdue ? "overdue" : "" }, date(plan.due_on))))))))
         : nothing("No treatment plans", "A plan is opened from a risk that is above appetite, on its Treatment tab.");
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Risks", title: "Treatment plans", lede: "What is being done to bring risks down, by whom, and by when." }),
+        pageHeader({ eyebrow: "Risks", title: "Treatment plans", lede: "What is being done to bring risks down, by whom, and by when.", actions: exportButton("plans", { status: "active", ...Object.fromEntries(query()) }) }),
         bar, card({ title: plural(rows.length, "plan"), flush: true }, body));
     },
   });
@@ -116,7 +117,7 @@ export function acceptanceList(main) {
           h("td", {}, acceptanceState(item)))))))
         : nothing("No acceptances", "A risk above appetite is accepted on its Treatment tab, by a leader with the authority for its rating.");
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Risks", title: "Acceptances", lede: "Risks above appetite that a named person has decided to live with, and until when." }),
+        pageHeader({ eyebrow: "Risks", title: "Acceptances", lede: "Risks above appetite that a named person has decided to live with, and until when.", actions: exportButton("acceptances", { state: "in_force", ...Object.fromEntries(query()) }) }),
         bar, card({ title: plural(rows.length, "acceptance"), flush: true }, body));
     },
   });

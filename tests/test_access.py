@@ -311,6 +311,10 @@ for _key, _needs in POLICIES.items():
     mine = _key[1].startswith(("/api/v1/issues", "/api/v1/exceptions", "/api/v1/notices"))
     if mine and _key not in REACH:
         REACH[_key] = {"assessor", "manager"} if _needs is Needs.ASSESS else EVERYONE
+REACH[("GET", "/api/v1/exports/{kind}")] = EVERYONE
+for _step in ("", "/columns"):
+    REACH[("POST", f"/api/v1/imports/records/{{path}}{_step}")] = {"manager", "steward"}
+    REACH[("POST", f"/api/v1/imports/requirements/{{key}}{_step}")] = {"admin", "manager"}
 for _key in POLICIES:
     # Evidence is reached by anyone and decided by the item.
     if _key[1].startswith("/api/v1/evidence") and _key not in REACH:
@@ -364,6 +368,10 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
             path = template.replace("{account_id}", str(own)).replace(
                 "{unit_id}", str(people.units["HALE"])
             )
+            if template.startswith("/api/v1/exports"):
+                path = path.replace("{kind}", "processes")
+            if template.startswith("/api/v1/imports/records"):
+                path = path.replace("{path}", "processes")
             path = path.replace("{kind}", "favicon").replace("{key}", "technology")
             path = path.replace("{control_ref}", "CTL-9999").replace("{acceptance_id}", "9999")
             path = path.replace("{mapping_id}", "9999").replace("{implementation_id}", "9999")

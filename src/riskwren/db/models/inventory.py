@@ -144,6 +144,25 @@ class RecordOwner(Base):
     )
 
 
+class ExternalRef(Base):
+    """What a record is called in another system: an asset tag, a contract number, a ticket."""
+
+    __tablename__ = "external_ref"
+    __audit_parent__ = ("@record_type", "record_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    record_type: Mapped[str] = mapped_column(String(24))
+    record_id: Mapped[int] = mapped_column(Integer)
+    system: Mapped[str] = mapped_column(String(40))
+    value: Mapped[str] = mapped_column(String(200))
+
+    __table_args__ = (
+        UniqueConstraint("record_type", "record_id", "system", "value"),
+        Index("ix_external_ref_record", "record_type", "record_id"),
+        Index("ix_external_ref_value", "value"),
+    )
+
+
 class RecordLink(Base):
     """A named relationship between two records: what relies on what."""
 
