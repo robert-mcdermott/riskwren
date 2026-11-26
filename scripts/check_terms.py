@@ -39,9 +39,12 @@ ENV_TERMS = "RISKWREN_TERMS_FILE"
 SKIP_FILES = {".gitignore"}  # must name private paths in order to ignore them
 MAX_BYTES = 5_000_000
 HOOK_MARKER = "riskwren: private-terms check"
+# The hooks find this script through the repository's own directory, so they also run in a
+# worktree of a branch that does not carry it (the published site on gh-pages).
+_SCRIPT = '"$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/check_terms.py"'
 HOOKS = {
-    "pre-commit": "exec python3 scripts/check_terms.py --staged\n",
-    "commit-msg": 'exec python3 scripts/check_terms.py --message "$1"\n',
+    "pre-commit": f"exec python3 {_SCRIPT} --staged\n",
+    "commit-msg": f'exec python3 {_SCRIPT} --message "$1"\n',
 }
 
 
