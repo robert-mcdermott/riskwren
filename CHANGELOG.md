@@ -6,7 +6,17 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
-Nothing yet.
+### Added
+
+- **A documentation site,** built from the guides in `docs/` by `scripts/site/build.mjs`
+  (Node 22, no packages): a home page, a page for each guide, the changelog, an API
+  reference written from the OpenAPI document, search, and light and dark themes from
+  RiskWren's own design tokens. The build fails on a broken link, anchor, or picture, and
+  the test suite runs it.
+- **Pictures in the guides:** 29 screens of the demo organization, each by day and after
+  dark, taken by `scripts/capture.mjs` and kept in `docs/img`.
+- `scripts/site/audit.mjs` checks every page of the built site in both themes at desk and
+  phone widths.
 
 ## 0.2.0 (2026-11-26)
 

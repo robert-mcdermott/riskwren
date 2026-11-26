@@ -48,7 +48,9 @@ main ──●──────────────────────
 - [ ] The automated accessibility audit passes in every palette and mode
 - [ ] Private-terms check run over the whole repository
 - [ ] Roadmap and wave status updated
-- [ ] Once the documentation site exists: screenshots of changed screens retaken, guides checked against the changelog, the site built and reviewed in both themes and at phone width, and published after the release
+- [ ] Screenshots of changed screens retaken (`node scripts/capture.mjs`), and the guides checked against the changelog
+- [ ] The site's own audit passes (`node scripts/site/audit.mjs`): both themes, desk and phone widths
+- [ ] After the release: the site built from the tag and published to `gh-pages`
 
 ## What the automated checks run on
 
@@ -74,7 +76,14 @@ uv run ruff check && uv run ruff format --check
 uv add <package>                     # only with a decision record
 ```
 
-The documentation site and screenshot capture use Node 22 with no packages (see the [roadmap](roadmap.md#documentation-site-between-v020-and-v030-)).
+The documentation site and screenshot capture use Node 22 with no packages (see the [roadmap](roadmap.md#documentation-site-between-v020-and-v030-)):
+
+```bash
+node scripts/site/build.mjs          # build the site into ./site, checking every link
+node scripts/site/audit.mjs          # check the built site in both themes and at phone width
+node scripts/capture.mjs             # retake the pictures the guides use
+node scripts/a11y-audit.mjs          # the application's accessibility audit
+```
 
 ## Versioning
 

@@ -121,6 +121,8 @@ uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0
 
 The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 230 processes, systems, third parties, and information assets, 180 risks, and about 115 controls, with their assessments, ratings, plans, and acceptances. Three scopes are held to frameworks: central information technology, which provides controls; the clinical systems, under the HIPAA Security Rule; and a controlled-access data enclave, under NIST SP 800-171. Both inherit from the first. There is an assessment in progress, evidence at every stage of freshness, a dozen issues from raised to closed, and exceptions waiting, in force, and ended. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.
 
+![Home for the demo's security leader: figures for what needs attention, then the list of what is waiting on them](img/home-ciso-light.webp)
+
 Its sign-in page offers ten sample people and asks for no password:
 
 | Sign in as | To see |

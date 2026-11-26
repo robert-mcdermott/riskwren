@@ -75,6 +75,8 @@ One consequence is worth knowing. Under the default setting a steward cannot lin
 
 **Admin → Program** shows how risks are rated here, in full: the categories and their appetite, the matrix, what follows from each rating, and the written definition of every level. Anyone assessing a risk sees the same definitions as they choose.
 
+![Admin, Program: the categories with their appetite, the matrix, and the written definition of every level](img/program-light.webp)
+
 ### Appetite
 
 Appetite is the highest residual rating the organization will live with for a kind of risk without a plan or an acceptance. It is set for each of the nine top categories and can be set differently for any category beneath; one that sets none takes its parent's.
@@ -135,6 +137,8 @@ There are two, each for the whole organization or for one unit and everything be
 
 Below them are the residual matrix, the highest risks, the register by standing, by rating, by category, and by unit, and what is known about the controls: how many are effective, partly effective, not assessed, or rated too long ago to rely on.
 
+![The risk dashboard: six figures, the residual matrix, and the highest risks](img/dashboard-light.webp)
+
 On both, every figure is the count of a list, and opens that list with the same filters. A dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
 
 Until scheduled jobs arrive in a later release, the calendar is caught up when the register is read: the first person to open it after an acceptance expires or a plan runs late causes the standing to be updated, and the history records that as done by the system.
@@ -149,6 +153,8 @@ Every change to every record is written to an append-only history in the same tr
 - `uv run riskwren verify` recomputes the chain and reports the first event that has been altered, removed, or cut from the end.
 - `uv run riskwren doctor` checks that the database still refuses changes to the history.
 
+![Reports, History: every change in one place, with who made it and when, narrowed by person, record, or date](img/history-light.webp)
+
 Assessments, control ratings, test results, and acceptances are never edited. A new one supersedes the last, and all of them are kept.
 
 ## Appearance
@@ -161,6 +167,8 @@ Assessments, control ratings, test results, and acceptances are never edited. A 
 - how ratings are colored: an **ordinal** ramp from light to dark in one hue, which keeps rating apart from the colors of standing, or a **signal** ramp from green to red.
 
 Each person chooses light, dark, or system mode and a palette for themselves, from the appearance button at the top right.
+
+![Admin, Appearance: names, logos, the palette, and how ratings are colored, beside a live preview](img/appearance-light.webp)
 
 ## Back up and recover
 

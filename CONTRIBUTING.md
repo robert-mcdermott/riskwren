@@ -56,6 +56,31 @@ Tests fail when either is out of date. Regenerate them with:
 UPDATE_DOCS=1 uv run pytest tests/test_docs.py
 ```
 
+### The documentation site and its screenshots
+
+The guides in `docs/` are the source of the documentation site. It is built by a script that
+needs Node 22 and no packages, and the pictures in it are taken from the demo organization
+by headless Chrome (set `CHROME` if yours is not found).
+
+```bash
+node scripts/site/build.mjs          # build into ./site; fails on a broken link, anchor, or picture
+node scripts/site/audit.mjs          # open every page in both themes, at desk and phone widths
+node scripts/capture.mjs             # retake the pictures the guides and the home page use
+node scripts/capture.mjs risk home   # retake only scenes whose name contains a word given
+node scripts/a11y-audit.mjs          # the application's accessibility audit, over every scene
+```
+
+- To put a picture in a guide, name it: `![What it shows](img/NAME-light.webp)`, where `NAME`
+  is a scene in `scripts/lib/scenes.mjs`, then run `node scripts/capture.mjs NAME`. The dark
+  version is taken with it, and the site shows whichever suits the reader's theme.
+- Only pictures something uses are kept in `docs/img`; a test fails on one that nothing
+  names, or that lacks either theme.
+- The home page is `scripts/site/pages/index.html`, and the menu is `MENU` at the top of
+  `scripts/site/build.mjs`. A new guide has to be added to the menu; a test says so.
+- The tests build the site, so a broken link in a guide fails like any other test.
+- Publishing is deliberate: `node scripts/site/build.mjs --publish DIR` copies the built
+  site into `DIR`, a worktree of the `gh-pages` branch, and commits and pushes nothing.
+
 ### The private-terms check
 
 Some words must never appear in this public repository. The list is kept outside version

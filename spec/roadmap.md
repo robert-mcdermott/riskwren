@@ -61,16 +61,16 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 
 Detail: [waves/wave-2.md](waves/wave-2.md) · Detail of the content: [content-packs.md](content-packs.md)
 
-## Documentation site (between v0.2.0 and v0.3.0) ☐
+## Documentation site (between v0.2.0 and v0.3.0) ☑
 
 **Goal:** a product site that lets someone outside the project find RiskWren, see it, and try it.
 
-It waits until the main screens have settled; screenshots taken during wave 1 would be stale within weeks. Until then the Markdown in the repository is the documentation, written so that the site can be built from it unchanged.
+It waited until the main screens had settled; screenshots taken during wave 1 would have been stale within weeks. The Markdown in the repository is still the documentation, and the site is built from it unchanged.
 
 - **The guides stay the source.** `README.md` and `docs/*.md` are what the repository shows and what the site is built from, so the two never disagree.
-- **Site generator:** a script needing Node 22 and no packages. It builds a home page and one page per guide, with a menu in reading order, client-side search, light and dark themes from RiskWren's own design tokens, the changelog, and an API reference generated from the OpenAPI document. The build checks every link, anchor, and image and fails on a broken one.
-- **Screenshots of the real app.** A capture script drives headless Chrome over its debugging protocol. It builds a fresh demo organization in a temporary directory, starts RiskWren on it, signs in as the right sample person for each scene, and saves each scene in both themes. Each scene is one line: a URL, who is signed in, a size, and an optional step. Named scenes can be retaken alone.
-- **An accessibility audit** runs over the same scenes and fails on any finding.
+- **Site generator:** `scripts/site/build.mjs`, a script needing Node 22 and no packages. It builds a home page and one page per guide, with a menu in reading order, client-side search, light and dark themes from RiskWren's own design tokens, the changelog, and an API reference generated from the OpenAPI document. The build checks every link, anchor, and image and fails on a broken one, and the test suite runs the build.
+- **Screenshots of the real app.** A capture script drives headless Chrome over its debugging protocol. It builds a fresh demo organization in a temporary directory, starts RiskWren on it, signs in as the right sample person for each scene, and saves each scene in both themes. Each scene is one line: a URL, who is signed in, a size, and an optional step. Named scenes can be retaken alone. The pictures a guide or the home page names are kept in `docs/img`, in both themes, and no others.
+- **An accessibility audit** runs over the same scenes and fails on any finding. The site has its own (`scripts/site/audit.mjs`): the same checks on every page, by day and after dark, at desk and phone widths, and that nothing is wider than the screen.
 - **Publishing:** the site is whatever is committed on the `gh-pages` branch. The build writes into a worktree of that branch only when asked to publish, so nothing is published by accident. The site states the version it describes.
 - **Each release from then on:** retake screenshots for screens that changed, check the guides against the changelog, review in both themes and at phone width, then publish.
 

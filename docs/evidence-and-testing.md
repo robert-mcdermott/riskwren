@@ -17,6 +17,8 @@ An evidence item is something that shows a control is done. It is collected once
 
 Every item has an owner, the date it was collected, the period it covers, a data class, and the date it **holds until**.
 
+![The evidence list: each item with its kind, its owner, what it supports, and whether it still counts](img/evidence-light.webp)
+
 ### Evidence stops counting
 
 Evidence is true of a moment. An item holds for twelve months from the day it was collected unless you give another date, and it is in one of three states:
@@ -58,6 +60,8 @@ Give it a name, the scope, a period, and a lead. It plans a test for each contro
 
 A control the scope inherits is not tested here. It is tested where it is provided, once, and the result reaches every scope that relies on it.
 
+![An assessment in progress: how many results count, await review, and are still to do, then each test and what it found](img/assessment-light.webp)
+
 ### Plan the tests
 
 Each test has a **method** (examine records and settings, interview the people who do it, or test it and see), a **procedure**, and a person it is **assigned to**. **Plan** on a test changes them. A test that is assigned appears on that person's Home, due on the last day of the assessment's period.
@@ -74,6 +78,8 @@ Each test has a **method** (examine records and settings, interview the people w
 
 Each of design and operation is effective, partly effective, or ineffective. The control is as strong as the weaker of the two.
 
+![Recording a test result: design, operation, what was looked at, what was found, and the evidence cited](img/assessment-record-light.webp)
+
 ### Independence, and a second pair of eyes
 
 Two rules always hold, and the server enforces both.
@@ -82,6 +88,8 @@ Two rules always hold, and the server enforces both.
 2. **A result counts only when a second person has confirmed it.** Whoever recorded it cannot confirm it.
 
 Recording a result changes nothing. It waits, and the assessment's lead sees it on Home. **Review** then either confirms it or returns it with a note saying what needs another look. A returned result is recorded again; the earlier one stays in the assessment's history.
+
+![Reviewing a result someone else recorded: confirm it, or return it with a note](img/assessment-review-light.webp)
 
 ### What a confirmed result changes
 

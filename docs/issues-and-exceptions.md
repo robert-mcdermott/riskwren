@@ -16,6 +16,8 @@ An issue is something found to be wrong that must be put right. **Compliance →
 | **A review** | A review of a supplier, a system, or a process |
 | **An observation** | Somebody noticed it and said so |
 
+![The issue register: each issue with its severity, what found it, its owner, and its date](img/issues-light.webp)
+
 ### Raise an issue
 
 **Issues → Raise an issue.** Anyone may raise one for a unit they work in or have a role over. Say what is wrong, in which unit, how serious it is, what found it, and what it is about: the controls, scopes, and risks concerned. Name who is to put it right; they are told.
@@ -59,6 +61,8 @@ An issue is worked through **actions**, each with an owner and a date: the same 
 
 **Nobody confirms the closure of an issue they own, or one they proposed closing.** The server refuses it.
 
+![An issue whose owner says it is put right, waiting for someone who does not own it to confirm closure](img/issue-proposed-light.webp)
+
 Two more things belong to the second line alone: **Withdraw**, for an issue raised in error, and **Reopen**, for one that turned out not to be put right. An owner who could withdraw their own issue would never need its closure confirmed.
 
 ### Who sees an issue
@@ -90,6 +94,8 @@ The day after it ends, the state underneath is back, without anyone doing anythi
 
 Whoever asked sees it on Home a month before it ends. **Ask again** starts a new request that carries on from it, which is decided again. **End it early** withdraws one that is no longer needed.
 
+![An approved exception that ends soon: what it is an exception to, why it is needed, what makes up for it meanwhile, and its dates](img/exception-light.webp)
+
 **Compliance → Exceptions** lists them, and can show those waiting to be decided, in force, ended, refused, or withdrawn.
 
 ## The plan of action
@@ -98,8 +104,12 @@ A scope's **Plan of action** tab lists the open issues that bear on it: those ab
 
 It prints, and it is the document a reviewer asks for: what is wrong, who is fixing it, and by when.
 
+![A scope's Plan of action tab: its open issues, most severe first, each with its owner, milestones, and date](img/scope-plan-light.webp)
+
 ## Notices
 
 The bell at the top right counts what has been assigned to you or decided for you since you last looked: an issue handed to you, an action that is yours, a closure sent back, an exception approved or refused, a request waiting for your decision.
+
+![Notices: what has been assigned to you or decided for you, each a sentence and a place to go](img/notices-light.webp)
 
 A notice is a sentence and a place to go. It is not the record of what happened, which is in the history, and nobody is told about what they did themselves. **Home** remains the list of what you still owe.
