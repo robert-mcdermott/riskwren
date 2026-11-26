@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>API reference · RiskWren</title>
-<meta name="description" content="Every route of the JSON API, written from RiskWren's OpenAPI document for version 0.2.0. For sign-in, the shape of answers and errors, and how lists page, see The API . A running server gives the docu">
+<meta name="description" content="Every route of the JSON API, written from RiskWren's OpenAPI document for version 0.2.1. For sign-in, the shape of answers and errors, and how lists page, see The API . A running server gives the docu">
 <meta property="og:title" content="API reference">
-<meta property="og:description" content="Every route of the JSON API, written from RiskWren's OpenAPI document for version 0.2.0. For sign-in, the shape of answers and errors, and how lists page, see The API . A running server gives the docu">
+<meta property="og:description" content="Every route of the JSON API, written from RiskWren's OpenAPI document for version 0.2.1. For sign-in, the shape of answers and errors, and how lists page, see The API . A running server gives the docu">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/img/compliance-light.webp">
 <meta name="twitter:card" content="summary_large_image">
@@ -20,7 +20,7 @@
 <a class="skip" href="#content">Skip to content</a>
 <header class="top">
   <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
-  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.0</span></a>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.1</span></a>
   <div class="search" role="search">
     <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
     <kbd>/</kbd>
@@ -35,7 +35,7 @@
   <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html">Getting started</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html">Evidence and testing</a></li><li><a href="issues-and-exceptions.html">Issues and exceptions</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html" aria-current="page">API reference</a></li><li><a href="cli.html">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
   <main id="content" class="content">
 <h1 id="api-reference">API reference</h1>
-<p>Every route of the JSON API, written from RiskWren's OpenAPI document for version 0.2.0. For sign-in, the shape of answers and errors, and how lists page, see <a href="api.html">The API</a>. A running server gives the document itself at <code>/api/openapi.json</code>.</p>
+<p>Every route of the JSON API, written from RiskWren's OpenAPI document for version 0.2.1. For sign-in, the shape of answers and errors, and how lists page, see <a href="api.html">The API</a>. A running server gives the document itself at <code>/api/openapi.json</code>.</p>
 <h2 id="system">System<a class="anchor" href="#system" aria-label="Link to this section">#</a></h2>
 <section class="endpoint" id="get-apiv1healthlive"><h3><span class="method method-get">GET</span> <code>/api/v1/health/live</code><a class="anchor" href="#get-apiv1healthlive" aria-label="Link to this route">#</a></h3><p>Is the server process running?</p></section>
 <section class="endpoint" id="get-apiv1healthready"><h3><span class="method method-get">GET</span> <code>/api/v1/health/ready</code><a class="anchor" href="#get-apiv1healthready" aria-label="Link to this route">#</a></h3><p>Can the server do its work?</p><p class="muted">The database answers and its schema is the one this version expects.</p></section>
@@ -241,7 +241,7 @@
 <section class="endpoint" id="get-apiv1history"><h3><span class="method method-get">GET</span> <code>/api/v1/history</code><a class="anchor" href="#get-apiv1history" aria-label="Link to this route">#</a></h3><p>Every change, newest first, for those who read everything</p><div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table class="fields fields-5"><thead><tr><th scope="col">Parameter</th><th scope="col">In</th><th scope="col">Type</th><th scope="col">Required</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>actor</code></td><td>query</td><td>integer</td><td></td><td>An account's id</td></tr><tr><td><code>about</code></td><td>query</td><td>string</td><td></td><td>A record's reference</td></tr><tr><td><code>kind</code></td><td>query</td><td>string</td><td></td><td>A kind of record, or other</td></tr><tr><td><code>since</code></td><td>query</td><td>string</td><td></td><td>From this date, year-month-day</td></tr><tr><td><code>until</code></td><td>query</td><td>string</td><td></td><td>Up to and including this date</td></tr><tr><td><code>before</code></td><td>query</td><td>integer</td><td></td><td>The <code>next</code> of the page before</td></tr></tbody></table></div></section>
 <section class="endpoint" id="get-apiv1home"><h3><span class="method method-get">GET</span> <code>/api/v1/home</code><a class="anchor" href="#get-apiv1home" aria-label="Link to this route">#</a></h3><p>What the asker owes, overdue first</p></section>
     <nav class="pager" aria-label="Pages"><a class="prev" href="api.html"><span>Previous</span>The API</a><a class="next" href="cli.html"><span>Next</span>Command reference</a></nav>
-    <footer class="foot">Describes RiskWren 0.2.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+    <footer class="foot">Describes RiskWren 0.2.1. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
   </main>
   <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#system">System</a></li><li class="l2"><a href="#signing-in">Signing in</a></li><li class="l2"><a href="#people-and-units">People and units</a></li><li class="l2"><a href="#appearance">Appearance</a></li><li class="l2"><a href="#the-inventory">The inventory</a></li><li class="l2"><a href="#risks">Risks</a></li><li class="l2"><a href="#controls">Controls</a></li><li class="l2"><a href="#treatment">Treatment</a></li><li class="l2"><a href="#frameworks">Frameworks</a></li><li class="l2"><a href="#scopes">Scopes</a></li><li class="l2"><a href="#evidence">Evidence</a></li><li class="l2"><a href="#assessments-and-tests">Assessments and tests</a></li><li class="l2"><a href="#issues-exceptions-and-notices">Issues, exceptions, and notices</a></li><li class="l2"><a href="#import-and-export">Import and export</a></li><li class="l2"><a href="#reports">Reports</a></li></ul></aside>
 </div>
