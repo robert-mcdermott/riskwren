@@ -1,1 +1,34 @@
 product_research/
+.claude
+.private/
+
+# Local instance configuration and data (never committed)
+/riskwren.toml
+/var/
+
+# The demo organization (riskwren demo) and the built documentation site
+/demo/
+/site/
+
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+/var-dev/
+
+# Deployment secrets
+/deploy/.env
