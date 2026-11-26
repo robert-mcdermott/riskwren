@@ -92,7 +92,7 @@ It is written for a research and health organization and is meant to be edited.
 ### With wave 1: starter libraries
 
 - **Risk library:** about sixty risk statements across the taxonomy, written for RiskWren, each with a cause, an event, a consequence, and suggested starter controls.
-- **Starter controls:** about fifty common controls in plain words, each a sentence a control owner would recognize as their own job: *"Access to systems is removed on the day a person leaves."* Written for RiskWren and Apache 2.0 licensed. From wave 2 each carries a crosswalk to the built-in frameworks.
+- **Starter controls:** 75 common controls in plain words, each a sentence a control owner would recognize as their own job: *"Access to systems is removed on the day a person leaves."* Written for RiskWren and Apache 2.0 licensed. From wave 2 those that a security framework asks for carry a crosswalk to the built-in frameworks: 46 of them, which between them answer about three quarters of the Cybersecurity Framework, SP 800-171, and the HIPAA Security Rule. The rest are about things no security framework asks for.
 
 ### With wave 2: built-in frameworks
 

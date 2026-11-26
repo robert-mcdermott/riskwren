@@ -46,7 +46,7 @@ Enough to look like an organization that has used RiskWren for a while, and smal
 | Third parties | 45 | Suppliers, collaborators, sponsors, and subrecipients |
 | Risks | 180 | Every category, rating, and standing; a dozen escalated; some not yet assessed |
 | Risk assessments | 480 | Inherent, residual, and target, with re-assessments over time |
-| Controls | 110 | Starter controls made specific, and local ones; varied effectiveness, some never assessed, some gone stale |
+| Controls | 135 | Starter controls made specific, and local ones; varied effectiveness, some never assessed, some gone stale |
 | Treatment plans | 30 | Active, complete, overdue |
 | Acceptances | 25 | In force, expiring soon, expired, withdrawn |
 | Actions | 100 | Open, done, overdue, extended |
@@ -76,6 +76,8 @@ Generated volume makes the lists and charts convincing. A set of hand-written st
 | **The clinic's medication-refrigeration risk, closed** | A risk closed when the activity moved, kept for the record |
 
 Wave 2 adds scopes (the clinical systems under the health security rule, a controlled-access data enclave under the federal standard for protecting controlled information, and central information technology as a provider of inherited controls), an assessment in progress, evidence going stale, and issues at every stage.
+
+The scopes show a security program in working order with work left, because that is what an adopter needs to see and what most have. Central information technology uses about 35 controls and offers them; the other two inherit most of what they need and add their own. Each scope comes out between a half and three quarters ready, with every state present: verified, in place, excepted, planned, failing, and gaps that nothing answers yet. What is known of each central control is written down, not left to chance, so the picture is the same whenever it is built.
 
 ## Using it
 

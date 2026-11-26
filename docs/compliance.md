@@ -42,7 +42,7 @@ A mapping says that a control helps to satisfy a requirement, **in full** or **i
 
 ![A control's Requirements tab: the requirements it answers in each framework, in full or in part](img/control-requirements-light.webp)
 
-A control started from the library of common controls arrives already mapped: 27 of the 56 carry suggested mappings to the built-in frameworks. A suggestion is marked as suggested and as answering in part, because a plain-words control rarely answers the whole of a requirement that has a dozen parts. Change one and it is yours.
+A control started from the library of common controls arrives already mapped: 46 of the 75 carry suggested mappings to the built-in frameworks. The other 29 are about things no security framework asks for, such as cold storage, research integrity, and finance. Between them the 46 answer 80 of the Cybersecurity Framework's 106 outcomes, 72 of the 97 requirements of SP 800-171, and 66 of the 91 entries of the HIPAA Security Rule, so an organization that adopts them starts with most of each framework answered and can see exactly what is left. A suggestion is marked as suggested and as answering in part, because a plain-words control rarely answers the whole of a requirement that has a dozen parts. Change one and it is yours.
 
 Each framework's page says how many of its requirements have a control and lists those with none. That figure is **coverage**. It says a control exists. It says nothing about whether the control works, which is what a scope and a test are for.
 
@@ -56,7 +56,7 @@ A scope says four things.
 
 **What it is held to.** **Held to → Add a framework.** Start from every requirement, or from a baseline where the framework has them.
 
-**Which requirements apply.** On the **Requirements** tab, every requirement applies until someone says otherwise. **Leave out** takes one out, and needs a reason; **Bring back** returns it. Only the departures from the starting point are kept, each with who decided and when. The tab is the scope's **statement of applicability**, and it prints.
+**Which requirements apply.** On the **Requirements** tab, every requirement applies until someone says otherwise. **Leave out** takes one out, and needs a reason; **Bring back** returns it. Only the departures from the starting point are kept, each with who decided and when. A published framework carries some entries that only say how it is to be read, or that bind another kind of organization: leave those out, with the reason. The demo's clinic leaves out 18 of the HIPAA Security Rule's 91 entries that way. The tab is the scope's **statement of applicability**, and it prints.
 
 **How each control is done here.** On the **Controls** tab, **Add controls** offers the controls that answer the scope's requirements. Each one used in the scope has an implementation: where it stands (planned, partly in place, in place, or not applicable here), who answers for it, and how it is done in this scope.
 

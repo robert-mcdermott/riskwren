@@ -6,8 +6,27 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.2.1 (2026-11-26)
+
+The common controls reach the frameworks, and the documentation has a site with pictures.
+
+### Upgrading from 0.2.0
+
+Run `uv sync`, then `uv run riskwren db upgrade`. There are no migrations. The upgrade adds
+the new controls to the library of common controls and refreshes its suggested mappings.
+Nothing already on record is changed.
+
 ### Added
 
+- **Nineteen security controls in the library of common controls,** which now has 75: access
+  approved before it is given, accounts of one's own, screens that lock, remote and wireless
+  access, screening and rules of use, encryption in transit, wiping devices and media, an
+  inventory of systems and software, secure configuration, vulnerability scanning, logs kept
+  and protected, incident reporting, recovery of systems, physical access, security policies,
+  assigned responsibilities, reporting to leadership, risk assessment, and independent
+  testing. Each is a sentence its owner would recognize, with suggested mappings.
 - **A documentation site,** built from the guides in `docs/` by `scripts/site/build.mjs`
   (Node 22, no packages): a home page, a page for each guide, the changelog, an API
   reference written from the OpenAPI document, search, and light and dark themes from
@@ -17,6 +36,30 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   dark, taken by `scripts/capture.mjs` and kept in `docs/img`.
 - `scripts/site/audit.mjs` checks every page of the built site in both themes at desk and
   phone widths.
+
+### Changed
+
+- **The common controls reach much further into the frameworks.** 46 of them carry suggested
+  mappings, up from 27. Between them they answer 80 of the NIST Cybersecurity Framework's 106
+  outcomes (it was 34), 72 of the 97 requirements of NIST SP 800-171 (27), and 66 of the 91
+  entries of the HIPAA Security Rule (24). An organization that adopts them starts with most
+  of each framework answered. Controls already adopted are not changed: on each, the new
+  mappings are offered as suggestions to take or leave.
+- **Library risks suggest the new controls** where they bear on them: ransomware, a
+  compromised account, a breach of health information, unsupported systems, exposed storage,
+  and others.
+- **The demo organization runs a believable security program.** Central information
+  technology uses 35 controls and offers them; the clinic and the data enclave inherit most
+  of what they need. The three scopes come out about half, three quarters, and half ready,
+  with failures, plans, exceptions, and real gaps in each. The assessment tests 35 controls:
+  32 results count, one waits for review, and the two controls not yet in place wait to be
+  tested. The clinic leaves out the entries of the HIPAA Security Rule that do not apply to
+  it, each with its reason.
+
+### Fixed
+
+- The private-terms hooks could not run in a worktree of a branch that does not carry the
+  script, such as the published site. They now find it through the repository itself.
 
 ## 0.2.0 (2026-11-26)
 

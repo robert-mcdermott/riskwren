@@ -2,6 +2,8 @@
 
 **Risk and compliance people actually keep current.**
 
+**Documentation, with pictures: <https://robert-mcdermott.github.io/riskwren/>**
+
 RiskWren is an open system of record for governance, risk, and compliance: one connected register of what an organization has, what could go wrong, what it must comply with, what it does about both, and the proof.
 
 It is built first for research and health organizations that are not large corporations: research institutes, academic medical centers, universities, and the nonprofits around them. Within them it is built first for the security team, whose work of frameworks, assessments, findings, and exceptions is the path it gets right before anything else. Nothing in it is specific to either, and any organization that wants a lightweight, self-hosted risk and compliance system can adopt it.
@@ -40,7 +42,7 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 115 controls, with three scopes held to frameworks, an assessment in progress, evidence going stale, and issues and exceptions at every stage. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with three scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, and issues and exceptions at every stage. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
@@ -58,7 +60,7 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.2.0 adds compliance to the register.
+Version 0.2.0 added compliance to the register. Version 0.2.1 adds nineteen security controls to the library of common controls, which now reach about three quarters of each built-in framework, and a documentation site.
 
 **Compliance, new in 0.2.0**
 
@@ -78,7 +80,7 @@ Version 0.2.0 adds compliance to the register.
 - **An inventory** of processes, systems, third parties, and information assets, each with a permanent reference, a unit, named owners, a criticality, and links that say what relies on what.
 - **A risk register** with a library of 57 common risks, nine families of risk each with an appetite, and inherent, residual, and target ratings that are judgments by named people with reasons.
 - **A scoring method you can read:** five levels of likelihood and of impact on five dimensions, each with a written definition, combined by a matrix.
-- **Controls of known effectiveness,** from a library of 56, and a residual rating **suggested from the controls with its working shown.**
+- **Controls of known effectiveness,** from a library of 75, and a residual rating **suggested from the controls with its working shown.**
 - **Standing, apart from rating:** within appetite, being treated, accepted, or needing a decision.
 - **Treatment:** plans with owned, dated actions, and acceptance by a leader with the authority for that rating, until a date, never of their own risk.
 - **Home, a heat map, and a risk dashboard.**

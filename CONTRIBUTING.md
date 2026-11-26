@@ -80,6 +80,15 @@ node scripts/a11y-audit.mjs          # the application's accessibility audit, ov
 - The tests build the site, so a broken link in a guide fails like any other test.
 - Publishing is deliberate: `node scripts/site/build.mjs --publish DIR` copies the built
   site into `DIR`, a worktree of the `gh-pages` branch, and commits and pushes nothing.
+  The site is whatever is on that branch:
+
+  ```bash
+  git worktree add .cache/gh-pages gh-pages          # once
+  node scripts/site/build.mjs --publish .cache/gh-pages
+  git -C .cache/gh-pages add -A
+  git -C .cache/gh-pages commit -m "Site for RiskWren X.Y.Z"
+  git -C .cache/gh-pages push
+  ```
 
 ### The private-terms check
 

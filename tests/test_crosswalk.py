@@ -62,7 +62,7 @@ def test_a_control_adopted_from_the_library_arrives_mapped(
             session, steward, people.units["HALE"], "Second factor", library_key="second_factor"
         )
         held = crosswalk.of_control(session, steward, adopted)
-        assert held["total"] == 6 and held["suggested"] == 0 and held["can_edit"]
+        assert held["total"] == 7 and held["suggested"] == 0 and held["can_edit"]
         assert [group["key"] for group in held["frameworks"]] == [
             "hipaa-security", "nist-csf", "nist-800-171", "nist-800-53",
         ]  # fmt: skip
@@ -74,7 +74,7 @@ def test_a_control_adopted_from_the_library_arrives_mapped(
         told = session.scalars(
             select(Event).where(Event.subject_type == "control_requirement")
         ).all()
-        assert len(told) == 6 and {e.parent_type for e in told} == {"control"}
+        assert len(told) == 7 and {e.parent_type for e in told} == {"control"}
         assert {e.parent_id for e in told} == {adopted.id}
 
 

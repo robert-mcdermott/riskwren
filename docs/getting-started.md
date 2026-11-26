@@ -28,7 +28,7 @@ uv run riskwren init
 1. Writes `riskwren.toml`, the deployment settings, in the current directory.
 2. Creates the data home, `./var`, which holds everything that is not in the database.
 3. Creates the database. With no other setting, this is a SQLite file inside the data home.
-4. Loads the default program: nine families of risk with an appetite for each, a scoring method with defined scales, review cadences, the table of who may accept what, a library of 57 common risks, a library of 56 common controls, and four public frameworks (the NIST Cybersecurity Framework 2.0, NIST SP 800-53 Rev. 5, NIST SP 800-171 Rev. 3, and the HIPAA Security Rule) with the common controls already mapped to them.
+4. Loads the default program: nine families of risk with an appetite for each, a scoring method with defined scales, review cadences, the table of who may accept what, a library of 57 common risks, a library of 75 common controls, and four public frameworks (the NIST Cybersecurity Framework 2.0, NIST SP 800-53 Rev. 5, NIST SP 800-171 Rev. 3, and the HIPAA Security Rule) with the common controls already mapped to them.
 5. Asks for your email address, your name, and a password, and creates the first administrator.
 
 The password needs at least 12 characters. Length matters more than symbols: a few unrelated words make a good one.
@@ -119,7 +119,7 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 230 processes, systems, third parties, and information assets, 180 risks, and about 115 controls, with their assessments, ratings, plans, and acceptances. Three scopes are held to frameworks: central information technology, which provides controls; the clinical systems, under the HIPAA Security Rule; and a controlled-access data enclave, under NIST SP 800-171. Both inherit from the first. There is an assessment in progress, evidence at every stage of freshness, a dozen issues from raised to closed, and exceptions waiting, in force, and ended. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.
+The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 230 processes, systems, third parties, and information assets, 180 risks, and about 135 controls, with their assessments, ratings, plans, and acceptances. Three scopes are held to frameworks: central information technology, which provides controls; the clinical systems, under the HIPAA Security Rule; and a controlled-access data enclave, under NIST SP 800-171. Both inherit from the first. There is an assessment in progress, evidence at every stage of freshness, a dozen issues from raised to closed, and exceptions waiting, in force, and ended. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.
 
 ![Home for the demo's security leader: figures for what needs attention, then the list of what is waiting on them](img/home-ciso-light.webp)
 
