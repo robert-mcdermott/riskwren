@@ -49,7 +49,7 @@ Its sign-in page offers nine sample people and asks for no password. Try a few:
 | The steward | One unit's inventory and risks, and a critical risk brought to high by controls, with its plan |
 | The unit leader | A high risk that is beyond their authority to accept |
 | The auditor | Everything, read-only, with the full history |
-| A staff member | Home for someone with an action to finish and a risk to review |
+| A staff member | Home for someone with one action to finish, and only their own unit's part of the register |
 
 A demo listens only on the machine it runs on. See [Configuration](docs/configuration.md#the-demo-and-the-network) before changing that.
 

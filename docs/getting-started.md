@@ -133,7 +133,7 @@ Its sign-in page offers nine sample people and asks for no password:
 | The assessor | Rating controls and assessing risks across the organization |
 | The auditor | Everything, read-only, with the full history |
 | The administrator | People, units, and appearance, and no part in the register's judgments |
-| A staff member | Home for someone with one action to finish and one risk to review |
+| A staff member | Home for someone with one action to finish, and only their own unit's part of the register |
 
 `riskwren demo --seed 2` builds a different Northmere with the same shape, and `--force` rebuilds one that is already there.
 
