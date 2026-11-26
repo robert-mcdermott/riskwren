@@ -20,12 +20,14 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
-from riskwren.compliance import crosswalk, frameworks, scopes
+from riskwren.compliance import crosswalk, evidence, frameworks, scopes
+from riskwren.compliance.evidence import EVIDENCE
 from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
@@ -71,8 +73,9 @@ def email_for(name: str) -> str:
 
 
 class Builder:
-    def __init__(self, db: Database, *, seed: int, today: date) -> None:
+    def __init__(self, db: Database, *, seed: int, today: date, files: Path | None = None) -> None:
         self.db = db
+        self.files = files  # where evidence files are kept; without it, items have none
         self.seed = seed
         self.rng = random.Random(seed)
         self.end = datetime(today.year, today.month, today.day, 16, 30, tzinfo=UTC)
@@ -543,6 +546,53 @@ class Builder:
             controls.rate(session, who, control, design=design, operation=operation, note=note)
         self.last_rated[control_id] = self.now
         self.tally("control ratings")
+        if self.rng.random() < 0.6:
+            self._evidence(by, control_id, note)
+
+    def _evidence(self, by: int, control_id: int, seen: str) -> None:
+        """Whoever rates a control often keeps what they looked at. It holds for a year, so
+        what was collected for an old rating has stopped counting by now."""
+        kind = self.rng.choices(["file", "link", "note", "attestation"], weights=[40, 20, 30, 10])[
+            0
+        ]
+        name, said = self.rng.choice(c.EVIDENCE[kind])
+        day = self.today
+        with self.act(by) as (session, who):
+            control = session.get(Control, control_id)
+            assert control is not None
+            values = {
+                "name": f"{name}: {control.name}"[:200],
+                "kind": kind,
+                "org_unit_id": control.org_unit_id,
+                "collected_on": day,
+                "covers_from": day - timedelta(days=90),
+                "covers_to": day,
+                "data_class": self.rng.choice(["internal", "internal", "confidential"]),
+                "note": seen if kind == "note" else said if kind == "attestation" else None,
+                "url": f"https://docs.{c.DOMAIN}/controls/{control.ref.lower()}"
+                if kind == "link"
+                else None,
+                "summary": said if kind == "link" else None,
+            }
+            item = records.create(session, who, EVIDENCE, values)
+            if kind == "file" and self.files is not None:
+                days = [
+                    (day - timedelta(days=offset)).isoformat() for offset in (80, 62, 41, 23, 5)
+                ]
+                rows = "\n".join(c.EVIDENCE_ROWS).format(
+                    **{f"d{n + 1}": d for n, d in enumerate(days)}
+                )
+                text = f"# {control.ref} {control.name}\n{rows}\n"
+                evidence.attach_file(
+                    session,
+                    who,
+                    item,
+                    self.files,
+                    text.encode(),
+                    f"{control.ref.lower()}-{said}.csv",
+                )
+            evidence.set_subjects(session, who, item, [control.ref])
+        self.tally("evidence")
 
     def _rating(self, fate: str) -> tuple[str, str, str]:
         note = self.rng.choice(c.RATING_NOTES[fate])
@@ -1705,14 +1755,16 @@ class Builder:
         return Summary(self.seed, self.end.date(), dict(sorted(self.counts.items())), self.sample)
 
 
-def build(db: Database, *, seed: int = 1, today: date | None = None) -> Summary:
+def build(
+    db: Database, *, seed: int = 1, today: date | None = None, files: Path | None = None
+) -> Summary:
     """Build the demo organization in an empty, migrated database."""
     with db.read() as session:
         if settings.get(session, SETTING) is not None or units.all_units(session):
             raise RiskWrenError("This installation already has an organization in it.")
     from riskwren.core.clock import today as real_today
 
-    return Builder(db, seed=seed, today=today or real_today()).build()
+    return Builder(db, seed=seed, today=today or real_today(), files=files).build()
 
 
 def marker(session: Session) -> dict[str, Any] | None:

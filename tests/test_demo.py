@@ -72,7 +72,10 @@ def shared(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Instance,
         db = Database(config.database_url)
         stack.callback(db.dispose)
         migrate.upgrade(db.engine)
-        yield Instance(path, config, home, db), demo.build(db, seed=7, today=TODAY)
+        yield (
+            Instance(path, config, home, db),
+            demo.build(db, seed=7, today=TODAY, files=home.files),
+        )
 
 
 @pytest.fixture
@@ -227,6 +230,14 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert ways["Security events monitored"] == ("shared", "planned")
         assert all(c["provider"]["scope"]["name"] == "Central information technology"
                    for c in enclave["controls"] if c["provider"])  # fmt: skip
+        from riskwren.compliance import evidence
+        from riskwren.db.models import Evidence, StoredFile
+
+        items = session.scalars(select(Evidence)).all()
+        states = {evidence.state_of(item, TODAY) for item in items}
+        assert len(items) >= 60 and states == {"current", "expiring", "stale"}
+        assert {item.kind for item in items} == {"file", "link", "note", "attestation"}
+        assert session.execute(select(func.count()).select_from(StoredFile)).scalar_one() >= 10
         closed = named("Loss of refrigerated medication from a failed pharmacy refrigerator")
         assert closed.status == "closed" and closed.closed_reason
         power = named("Emergency power cannot carry the freezer farm and animal facility")

@@ -355,7 +355,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
     db = Database(config.database_url)
     try:
         migrate.upgrade(db.engine)
-        summary = demo_build.build(db, seed=args.seed)
+        summary = demo_build.build(db, seed=args.seed, files=DataHome(config.data.home).files)
         with db.engine.connect() as conn:
             report = chain.verify(conn)
     finally:
@@ -369,7 +369,8 @@ def cmd_demo(args: argparse.Namespace) -> int:
     )
     print(
         f"  {counts.get('risks', 0)} risks, {counts.get('controls', 0)} controls, "
-        f"{counts.get('plans', 0)} treatment plans, {counts.get('acceptances', 0)} acceptances"
+        f"{counts.get('plans', 0)} treatment plans, {counts.get('acceptances', 0)} acceptances, "
+        f"{counts.get('scopes', 0)} scopes, {counts.get('evidence', 0)} items of evidence"
     )
     print(
         f"  {report.events} events of history, which "

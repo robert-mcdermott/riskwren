@@ -63,9 +63,9 @@ RiskWren is designed **not** to hold the regulated data it describes. Records de
 
 ### Files (wave 2)
 
-- Uploads have a size limit and an allowlist of types, checked by content, not by name.
+- Uploads have a size limit (25 MB) and an allowlist of types, checked by content, not by name. Text of any kind is kept as plain text; programs and unrecognized binary are refused.
 - Files are stored by hash outside any served directory and are only ever returned through a route that checks access to something the file is attached to.
-- Downloads are always sent as attachments with a restrictive content security policy, so an uploaded HTML or SVG file cannot run in the app's origin.
+- Downloads are always sent as attachments with a policy of `default-src 'none'; sandbox` and sniffing off, and anything that is not an inert type leaves as plain bytes, so an uploaded HTML or SVG file cannot run in the app's origin. Each download is an event.
 - Uploaded logos are sanitized and served from a route with its own locked-down policy.
 
 ### The history
@@ -116,6 +116,8 @@ One function per record type decides what a principal may see. Single records, l
 | Read frameworks and their requirements (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read scopes (wave 2) | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Keep a scope: its boundary, frameworks, applicability, and implementations (wave 2) | | ✓ | ✓ | | | ✓ | | |
+| Add evidence for a unit they work in or have a role over (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| Attach evidence to a control or a scope (wave 2) | | ✓ | ✓ | | ✓ | ✓ | | |
 | Add a record in a unit | | | ✓ | | | ✓ | | |
 | Edit a record; link and unlink; map a control to requirements (wave 2) | | ✓ | ✓ | | | ✓ | | |
 | Assess a risk; rate a control | | ✓ | ✓ | | ✓ | ✓ | | |

@@ -182,7 +182,7 @@ Free labels, for whatever the vocabularies do not cover, kept as a list on the r
 - **Information asset:** `information(ref, name, kind, criticality, data_class, held_in, shared_with, agreement, …)`, the fourth kind of inventory record.
 - **Assessment:** `assessment(ref, scope_id, title, framework_id?, baseline_id?, lead_id, period_start, period_end, status, …)`.
 - **Test:** `test(id, assessment_id, implementation_id, procedure, method, sample, design, operation, note, tested_by, tested_at, reviewed_by, reviewed_at, superseded_by)`.
-- **Evidence:** `evidence(ref, title, kind, file_id?, url?, note?, owner_id, collected_on, covers_from, covers_to, valid_until, data_class, …)` with `evidence_link(evidence_id, subject_type, subject_id)`; `file(sha256, size, media_type, original_name)`.
+- **Evidence:** `evidence(ref, name, summary, kind, file_id?, file_name?, url?, note?, collected_on, covers_from, covers_to, valid_until, data_class, org_unit_id, status, …)`, a record with owners and history, with `evidence_link(evidence_id, subject_type, subject_id)` for what it supports; `stored_file(sha256, size, media_type, extension)` for the bytes, kept once however often they are sent.
 - **Issue:** `issue(ref, title, description, severity, source_kind, source_type, source_id, org_unit_id, owner_id, due_on, original_due_on, extensions, status, root_cause, closure_note, validated_by, validated_at, …)` with `issue_subject` linking it to controls, requirements, scopes, and risks.
 - **Exception:** `exception(ref, subject_type, subject_id, scope_id?, justification, compensating, requested_by, decided_by, decision, starts_on, expires_on, status, …)`.
 - **Notice:** `notice(account_id, kind, subject_type, subject_id, text, created_at, read_at)`.

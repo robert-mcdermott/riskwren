@@ -168,6 +168,23 @@ POLICIES.update(
     }
 )
 
+# Evidence. Anyone may add it for a unit they work in; who sees an item, and its file, is
+# decided by the item.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/evidence"): Needs.MEMBER,
+        ("POST", "/api/v1/evidence"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/evidence/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/evidence/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence/{ref}/history"): Needs.MEMBER,
+        ("PUT", "/api/v1/evidence/{ref}/subjects"): Needs.MEMBER,
+        ("POST", "/api/v1/evidence/{ref}/file"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence/{ref}/file"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence-for/{ref}"): Needs.MEMBER,
+    }
+)
+
 # Reporting: every figure counts only what the asker may see.
 POLICIES.update(
     {

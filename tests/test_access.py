@@ -300,6 +300,10 @@ for _key in POLICIES:
     # Everything about a scope is reached by anyone and decided by the scope.
     if _key[1].startswith("/api/v1/scopes/{ref}/") and _key not in REACH:
         REACH[_key] = EVERYONE
+for _key in POLICIES:
+    # Evidence is reached by anyone and decided by the item.
+    if _key[1].startswith("/api/v1/evidence") and _key not in REACH:
+        REACH[_key] = EVERYONE
 for _path in RECORD_PATHS:
     for _method, _template in record_policies(
         _path, links=_path not in ("risks", "controls", "scopes")
@@ -356,6 +360,8 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 path = path.replace("{ref}", "PLN-9999")
             if template.startswith("/api/v1/actions/"):
                 path = path.replace("{ref}", "ACT-9999")
+            if template.startswith("/api/v1/evidence"):
+                path = path.replace("{ref}", "EV-9999")
             for record_path, prefix in RECORD_PATHS.items():
                 if template.startswith(f"/api/v1/{record_path}"):
                     # A record that is not there: reached, and answered with "not found".

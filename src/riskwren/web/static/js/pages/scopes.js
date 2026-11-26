@@ -8,6 +8,7 @@ import { units, vocabularies } from "../core/lookups.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { can } from "../core/session.js";
 import { statePill } from "../components/control.js";
+import { evidenceCard } from "../components/evidence.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { recordChip, TYPES } from "../components/record.js";
@@ -354,7 +355,8 @@ function overview(scope, ctx) {
           m.units.length ? h("div", {}, h("div", { class: "label" }, "Units"), h("p", {}, m.units.map((unit) => unit.name).join(", "))) : null,
           m.records.length ? h("div", { class: "chips" }, m.records.map((record) => recordChip(record))) : null)
           : h("p", { class: "muted" }, "Nothing listed yet: the units, processes, systems, and information this scope covers."),
-        m.hidden ? h("p", { class: "subtle" }, `And ${m.hidden} more that you do not have access to.`) : null)),
+        m.hidden ? h("p", { class: "subtle" }, `And ${m.hidden} more that you do not have access to.`) : null),
+      evidenceCard(scope, ctx)),
     h("div", { class: "stack-lg" },
       card({ title: "At a glance" }, facts([
         ["Unit", ctx.units.byId.get(scope.org_unit_id)?.name],

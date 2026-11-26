@@ -31,7 +31,7 @@ function setup(data, meta) {
 
 const KINDS = {
   assess: ["risk", "Assess"], review: ["risk", "Review"], decide: ["alert", "Decide"], action: ["check", "Do"],
-  rate: ["control", "Rate"], acceptance: ["accept", "Renew"], orphan: ["user", "Assign"],
+  rate: ["control", "Rate"], acceptance: ["accept", "Renew"], orphan: ["user", "Assign"], evidence: ["evidence", "Renew"],
 };
 
 function owed(listing) {

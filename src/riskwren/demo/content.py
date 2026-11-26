@@ -761,3 +761,37 @@ SCOPE_ENCLAVE = {
              "Two named administrators, separate accounts, and every session recorded.")],
     "excluded": [],
 }  # fmt: skip
+
+# Evidence collected when a control is rated. kind: (name, what the item says)
+EVIDENCE = {
+    "file": [
+        ("Sample of records", "sample"),
+        ("Quarterly report", "report"),
+        ("Export from the system", "export"),
+    ],
+    "link": [
+        (
+            "Procedure and its last run",
+            "The procedure, with the log of when it was last carried out.",
+        ),
+        ("Ticket queue for the period", "Every request and how long each took."),
+    ],
+    "note": [
+        ("Walkthrough notes", None),
+        ("Interview with the owner", None),
+    ],
+    "attestation": [
+        (
+            "Owner's attestation",
+            "I confirm that this control operated as described throughout the period.",
+        ),
+    ],
+}
+EVIDENCE_ROWS = [
+    "date,item,done,checked_by",
+    "{d1},1,yes,owner",
+    "{d2},2,yes,owner",
+    "{d3},3,yes,deputy",
+    "{d4},4,no,owner",
+    "{d5},5,yes,owner",
+]

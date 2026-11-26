@@ -58,6 +58,8 @@ async function boot() {
   route("/controls", page("controls", "controlLibrary"));
   route("/controls/:ref", page("control", "controlPage"));
   route("/frameworks", page("frameworks", "frameworkList"));
+  route("/evidence", page("evidence", "evidenceList"));
+  route("/evidence/:ref", page("evidence", "evidencePage"));
   route("/scopes", page("scopes", "scopeList"));
   route("/scopes/:ref", page("scopes", "scopePage"));
   route("/frameworks/:key", page("frameworks", "frameworkPage"));

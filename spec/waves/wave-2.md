@@ -66,16 +66,18 @@ The wave is done when, on a fresh checkout:
 
 **Done:** a scope is a record like any other, with owners, history, and the register's visibility. It lists what is inside it, is held to frameworks from a baseline or from every requirement, and decides applicability a requirement at a time; a reason is required to leave one out. Each control it uses has an implementation. A scope that offers its controls can be inherited from, whole or shared, and the inheriting scope sees whose control it is and how well it is known to work, even where it could not open the control itself. The Requirements tab is the statement of applicability and prints as one. Information assets are the fourth kind of inventory record, linked to the systems that hold them and the parties they are shared with. The demo has a provider, a clinic under the health security rule, and a data enclave.
 
-### Slice 4: Evidence and files ☐
+### Slice 4: Evidence and files ☑
 
 **Goal:** proof, collected once.
 
-- [ ] Content-addressed file storage in the data home; size and type limits checked by content; downloads as attachments under a locked-down policy, recorded in the history
-- [ ] Evidence items: file, link, note, or attestation, with owner, collected date, period covered, valid-until, and data class
-- [ ] Links from one item to any number of controls, tests, requirements, and issues
-- [ ] Freshness: stale evidence stays and stops counting; evidence near its date appears on its owner's Home
+- [x] Content-addressed file storage in the data home; size and type limits checked by content; downloads as attachments under a locked-down policy, recorded in the history
+- [x] Evidence items: file, link, note, or attestation, with owner, collected date, period covered, valid-until, and data class
+- [x] Links from one item to any number of controls and scopes; tests and issues join them in the slices that add them
+- [x] Freshness: stale evidence stays and stops counting; evidence near its date appears on its owner's Home
 
 **Acceptance:** an uploaded HTML or SVG file cannot run in the app's origin; a person who cannot see a control cannot download its evidence.
+
+**Done:** files are stored under the SHA-256 of their bytes in the data home, in a directory nothing serves from; their kind is judged by content, and only a short list is taken. A file leaves only as an attachment, under a policy that allows nothing, and every download is an event. An evidence item is a file, a link, a note, or an attestation with a collection date, the period it covers, and a date it holds until, a year by default. It is attached to as many controls and scopes as it supports, and anyone may collect it for a unit they work in. Its owner is reminded on Home a month before it stops counting.
 
 ### Slice 5: Assessments and tests ☐
 
@@ -146,4 +148,8 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **A provider cannot quietly withdraw.** A scope cannot stop offering its controls, or stop using one, while another scope inherits it.
 - **Offering a control shows its name and state, and no more.** People in an inheriting scope see whose control they rely on and how well it is known to work without being able to open the provider's record.
 - **Requirements carry their place in the document.** Rows are written a level at a time, so the order they were written in is not reading order. Each requirement keeps a sequence number, and every flat list (a search, a baseline, a statement of applicability) is in the order of the source.
+- **Markup is taken as text, and leaves as text.** A page or a drawing that carries script is a legitimate thing to keep as evidence of a configuration. It is stored as the plain text it is, returned with a plain-text type as an attachment, under a sandboxed policy with sniffing off, so it cannot run in the app's origin. Programs and unrecognized binary are refused.
+- **Evidence is more closely held than the register.** Whoever collected it, those named on it, and those with a role over its unit see it. Others see it only through something it is attached to that they may see, and not at all if it is restricted or of the most sensitive data class. An organization-wide assessor sees what is not restricted.
+- **Collecting is open; attaching is not.** Anyone may add evidence for a unit they work in, because the people who do the work hold the proof. Putting it on a control or a scope is for those who keep or assess that control or scope.
+- **A record type may set its own visibility.** Evidence needed a rule the shared one could not express, so a record type can now supply its own, used by single records, lists, and counts alike.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

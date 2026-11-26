@@ -195,9 +195,16 @@ def create(
     errors = _apply(session, record_type, record, values, creating=True)
     if errors:
         raise Invalid(f"The {record_type.label} was not saved.", errors)
-    if not access.can_add(principal, record.org_unit_id):
+    may_add = record_type.extra.get("can_add")
+    allowed = (
+        may_add(principal, record.org_unit_id)
+        if may_add is not None
+        else access.can_add(principal, record.org_unit_id)
+    )
+    if not allowed:
         raise PermissionDenied(
-            f"Only a steward of the unit, or a manager, can add a {record_type.label} to it."
+            record_type.extra.get("add_refusal")
+            or f"Only a steward of the unit, or a manager, can add a {record_type.label} to it."
         )
     with audit.operation(session, f"{record_type.key}.create"):
         record.ref = next_ref(session, record_type.prefix)

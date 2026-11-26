@@ -6,6 +6,8 @@ from riskwren.db.models.compliance import (
     Baseline,
     BaselineRequirement,
     ControlRequirement,
+    Evidence,
+    EvidenceLink,
     Framework,
     Implementation,
     Requirement,
@@ -13,6 +15,7 @@ from riskwren.db.models.compliance import (
     ScopeFramework,
     ScopeMember,
     ScopeRequirement,
+    StoredFile,
 )
 from riskwren.db.models.controls import (
     Acceptance,
@@ -65,6 +68,8 @@ __all__ = [
     "Counter",
     "Credential",
     "Event",
+    "Evidence",
+    "EvidenceLink",
     "FailedSignIn",
     "Framework",
     "Implementation",
@@ -89,6 +94,7 @@ __all__ = [
     "ScoringMethod",
     "SessionToken",
     "Setting",
+    "StoredFile",
     "System",
     "ThirdParty",
     "TreatmentPlan",

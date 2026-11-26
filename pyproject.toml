@@ -66,6 +66,7 @@ ignore = [
 "tests/test_frameworks.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]
 "tests/test_crosswalk.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]
 "tests/test_scopes.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]
+"tests/test_evidence.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]
 # The demo organization is invented with a seeded generator.
 "src/riskwren/demo/**" = ["S311"]
 # Its content is tables of words and sentences, kept one entry to a line; its stories

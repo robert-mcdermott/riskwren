@@ -7,6 +7,7 @@ import { label, program as loadProgram, units, vocabularies } from "../core/look
 import { query } from "../core/router.js";
 import { editControl, rateControl, ratedLine, reducesLabel, statePill } from "../components/control.js";
 import { coveragePill, mapCrosswalk } from "../components/crosswalk.js";
+import { evidenceCard } from "../components/evidence.js";
 import { confirmAction } from "../components/overlay.js";
 import { toast } from "../components/toast.js";
 import { hrefOf } from "../components/record.js";
@@ -28,6 +29,7 @@ function overview(control, ctx) {
         actions: control.can.assess && control.status === "active" ? button("Rate", { kind: "btn-sm btn-primary", onclick: () => rateControl({ control, onDone: ctx.reload }) }) : null },
       control.state === "stale" ? h("p", { class: "warn-text" }, "This rating is out of date. Until it is rated again, the control counts for nothing.") : null,
       ratedLine(control.rating)),
+      evidenceCard(control, ctx),
       card({ title: "Risks it bears on", flush: risks.length > 0 },
         risks.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
           h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Risk"), h("th", { scope: "col" }, "How"), h("th", { scope: "col" }, "Residual"), h("th", { scope: "col" }, "Standing"))),

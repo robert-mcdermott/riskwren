@@ -37,6 +37,16 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Information assets.** A fourth kind of inventory record for a body of information:
   what it is, its data class, where it is held, who it is shared with, and under what
   agreement. Systems hold it, processes use it, and it is shared with third parties.
+- **Evidence.** An item is a file, a link, a note of what was seen, or an attestation, with
+  who collected it, the period it covers, and the date it holds until (a year after
+  collection unless said otherwise). One item is attached to as many controls and scopes as
+  it supports. Past its date it stays on the record, is shown as no longer counting, and
+  its owner is reminded on Home a month beforehand (migration 0010).
+- **Safe file storage.** Files are stored by the SHA-256 of their content, outside anything
+  the server serves. Their kind is judged by content, not name: PDF, common images, Word,
+  Excel, and PowerPoint documents, and plain text, up to 25 MB; programs are refused. A file
+  is only ever returned as a download that cannot run in the browser, to someone who may see
+  the item, and each download is recorded in the history.
 - **Framework packs.** A framework is one JSON document, checked whole before anything is
   loaded and refused whole if anything is wrong. Each pack declares what text it may carry,
   and a test holds every built-in pack to it. `riskwren frameworks list`, `show`, and `load`.

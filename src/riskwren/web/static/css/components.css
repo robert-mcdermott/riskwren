@@ -360,6 +360,9 @@ button.requirement-toggle:hover { background: var(--surface-2); color: var(--tex
 .add-control { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border); }
 .add-control .select { width: auto; flex: none; }
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.card-pad { padding: var(--space-4) var(--space-5); }
+.record-icon[data-record="evidence"] { color: var(--accent); }
+.field[hidden] { display: none; }
 .answered-by + .answered-by { margin-top: 2px; }
 .statement-head { display: grid; gap: var(--space-1); }
 .statement-head h2 { font-size: var(--text-l); }

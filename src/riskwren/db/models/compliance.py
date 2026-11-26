@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Date,
     ForeignKey,
     Index,
     Integer,
@@ -30,6 +31,7 @@ COVERAGE = ("full", "partial")
 MAPPING_SOURCES = ("pack", "person")
 IMPLEMENTATION_STATUSES = ("planned", "partly", "in_place", "not_applicable")
 INHERITANCE = ("none", "inherited", "shared")
+EVIDENCE_KINDS = ("file", "link", "note", "attestation")
 REQUIREMENT_STATUSES = ("active", "withdrawn")
 
 
@@ -265,4 +267,63 @@ class Implementation(Base):
         CheckConstraint(one_of("inheritance", INHERITANCE), name="inheritance"),
         Index("ix_implementation_control_id", "control_id"),
         Index("ix_implementation_inherits_from_id", "inherits_from_id"),
+    )
+
+
+class StoredFile(Base):
+    """A file in the data home, known by the digest of its bytes. The same bytes are stored
+    once however many times they are sent."""
+
+    __tablename__ = "stored_file"
+    __audit__ = False
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    sha256: Mapped[str] = mapped_column(String(64), unique=True)
+    size: Mapped[int] = mapped_column(Integer)
+    media_type: Mapped[str] = mapped_column(String(120))
+    extension: Mapped[str] = mapped_column(String(12))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+
+class Evidence(RecordMixin, Base):
+    """Something that shows a control is done: a file, a link, a note, or an attestation,
+    with who collected it, the period it covers, and the date until which it holds."""
+
+    __tablename__ = "evidence"
+    __subject__ = "evidence"
+
+    kind: Mapped[str] = mapped_column(String(16))
+    file_id: Mapped[int | None] = mapped_column(ForeignKey("stored_file.id"))
+    file_name: Mapped[str | None] = mapped_column(String(200))
+    url: Mapped[str | None] = mapped_column(String(300))
+    note: Mapped[str | None] = mapped_column(Text)
+    data_class: Mapped[str | None] = mapped_column(String(40))
+    collected_on: Mapped[date] = mapped_column(Date)
+    covers_from: Mapped[date | None] = mapped_column(Date)
+    covers_to: Mapped[date | None] = mapped_column(Date)
+    valid_until: Mapped[date] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(24), default="active")
+
+    __table_args__ = (
+        CheckConstraint(one_of("kind", EVIDENCE_KINDS), name="kind"),
+        CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
+        Index("ix_evidence_org_unit_id", "org_unit_id"),
+        Index("ix_evidence_valid_until", "valid_until"),
+    )
+
+
+class EvidenceLink(Base):
+    """What a piece of evidence supports. One item supports any number of things."""
+
+    __tablename__ = "evidence_link"
+    __audit_parent__ = ("evidence", "evidence_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    evidence_id: Mapped[int] = mapped_column(ForeignKey("evidence.id", ondelete="CASCADE"))
+    subject_type: Mapped[str] = mapped_column(String(24))
+    subject_id: Mapped[int] = mapped_column(Integer)
+
+    __table_args__ = (
+        UniqueConstraint("evidence_id", "subject_type", "subject_id", name="uq_evidence_link"),
+        Index("ix_evidence_link_subject", "subject_type", "subject_id"),
     )

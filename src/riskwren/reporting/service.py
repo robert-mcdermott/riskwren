@@ -346,6 +346,18 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/risks/{risk.ref}?tab=treatment", acceptance.expires_on, ref=risk.ref,
             )  # fmt: skip
 
+    # Evidence of one's own that has stopped counting, or is about to.
+    from riskwren.compliance import evidence  # it builds on the controls this module reads
+
+    for held in evidence.due(session, principal):
+        stale = held.valid_until < today
+        add(
+            "evidence", f"Renew {held.name}",
+            "It no longer counts. Collect it again." if stale
+            else "It stops counting soon. Collect it again.",
+            f"/evidence/{held.ref}", held.valid_until, ref=held.ref,
+        )  # fmt: skip
+
     # A leader is shown what waits on someone with their authority.
     led = principal.units_for(roles.LEADER)
     if led:
