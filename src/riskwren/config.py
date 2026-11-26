@@ -50,11 +50,32 @@ class DataConfig:
 
 
 @dataclass(frozen=True)
+class SsoConfig:
+    """Single sign-on through an OpenID Connect provider, beside local accounts. Off until an
+    issuer and a client are named."""
+
+    issuer: str = ""
+    client_id: str = ""
+    client_secret_env: str = "RISKWREN_SSO_CLIENT_SECRET"  # noqa: S105 (a variable's name)
+    scopes: str = "openid profile email"
+    roles_claim: str = "roles"
+    label: str = "Sign in with your organization account"
+    trust_email: bool = False
+    create_accounts: bool = True
+    local_sign_in: bool = True
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.issuer and self.client_id)
+
+
+@dataclass(frozen=True)
 class Config:
     path: Path | None = None
     server: ServerConfig = field(default_factory=ServerConfig)
     database: DatabaseConfig = field(default_factory=DatabaseConfig)
     data: DataConfig = field(default_factory=DataConfig)
+    sso: SsoConfig = field(default_factory=SsoConfig)
 
     @property
     def database_url(self) -> str:
@@ -72,6 +93,7 @@ _SECTIONS: dict[str, type] = {
     "server": ServerConfig,
     "database": DatabaseConfig,
     "data": DataConfig,
+    "sso": SsoConfig,
 }
 
 
@@ -252,6 +274,33 @@ def _validate(config: Config, raw: Mapping[str, Any]) -> list[str]:
                     "[database] url: the password is never written in this file; put it in the "
                     "PGPASSWORD environment variable, or set RISKWREN_DATABASE_URL instead"
                 )
+    sso = config.sso
+    if bool(sso.issuer) != bool(sso.client_id):
+        problems.append("[sso] issuer and client_id go together: set both, or neither")
+    if sso.issuer:
+        local = re.fullmatch(r"http://(localhost|127\.0\.0\.1)(:\d+)?(/\S*)?", sso.issuer)
+        if not (re.fullmatch(r"https://[^\s?#]+", sso.issuer) or local):
+            problems.append(
+                "[sso] issuer must be an https address, such as "
+                '"https://login.microsoftonline.com/<tenant id>/v2.0"'
+            )
+        if re.search(r"/(common|organizations|consumers)(/|$)", sso.issuer):
+            problems.append(
+                "[sso] issuer must name one tenant. Use the directory (tenant) ID in place of "
+                '"common", "organizations", or "consumers", so that only your own directory '
+                "can sign people in"
+            )
+        if "openid" not in sso.scopes.split():
+            problems.append('[sso] scopes must include "openid"')
+        if not re.fullmatch(r"[A-Z][A-Z0-9_]*", sso.client_secret_env):
+            problems.append(
+                "[sso] client_secret_env names the environment variable that holds the client "
+                "secret, such as RISKWREN_SSO_CLIENT_SECRET"
+            )
+        if not sso.roles_claim:
+            problems.append("[sso] roles_claim must not be empty")
+        if not sso.label:
+            problems.append("[sso] label must not be empty")
     return problems
 
 

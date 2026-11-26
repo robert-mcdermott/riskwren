@@ -142,6 +142,7 @@ export const SCENES = [
   { name: "people", as: "admin", path: "/admin/people" },
   { name: "units", as: "admin", path: "/admin/units" },
   { name: "appearance", as: "admin", path: "/admin/appearance" },
+  { name: "admin-sso", as: "admin", path: "/admin/sso" },
   { name: "account", as: "member", path: "/account" },
   { name: "auditor-risks", as: "auditor", path: "/risks" },
 ];

@@ -6,7 +6,24 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
-Nothing yet.
+### Added
+
+- **Optional single sign-on with OpenID Connect,** beside local accounts. A new installation
+  still signs in with an email address and a password and needs nothing else. Naming an
+  issuer and a client under `[sso]` adds a button for the organization's own sign-in, with
+  the password form folded beneath it. It works with Microsoft Entra ID and any provider that
+  follows the standard: the authorization-code flow with PKCE, and an ID token whose
+  signature, issuer, audience, expiry, and nonce are all checked, with no new dependency.
+- **Roles from the provider.** Under Admin, Single sign-on, an application role or a group at
+  the provider gives a role here, for the whole organization or one unit, with a leader's
+  limit, or membership of a unit. Those roles are set again at every sign-in; roles given by
+  hand are left alone; the last administrator is never removed.
+- **A way in that does not depend on the provider.** An administrator can always sign in with
+  a password. Passwords can be kept for everyone, or for administrators only.
+- **Admin, Single sign-on** shows what is set up, the redirect address to give the provider,
+  and a check that the provider answers. `riskwren doctor` makes the same check.
+- `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
+  laptop. Its signing key is public; it is not for real use.
 
 ## 0.2.1 (2026-11-26)
 

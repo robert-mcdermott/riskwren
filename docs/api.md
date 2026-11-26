@@ -128,6 +128,8 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET /meta` | Product name, version, branding, and palettes (public) |
 | `GET` · `POST` · `DELETE /session` | Who is signed in; sign in; sign out |
 | `POST /session/password` | Change your own password |
+| `GET /sso/start` · `GET /sso/callback` | The single sign-on round trip, for a browser (public; 404 unless it is set up) |
+| `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 
 ### People and units
 

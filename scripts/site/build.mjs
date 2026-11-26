@@ -272,7 +272,7 @@ function sections(name, title, html) {
 
 // The document's tags, in reading order, with the headings they are given here.
 const TAGS = {
-  system: "System", session: "Signing in", people: "People and units", branding: "Appearance",
+  system: "System", session: "Signing in", "single sign-on": "Single sign-on", people: "People and units", branding: "Appearance",
   inventory: "The inventory", risks: "Risks", controls: "Controls", treatment: "Treatment",
   frameworks: "Frameworks", scopes: "Scopes", evidence: "Evidence", assessments: "Assessments and tests",
   issues: "Issues, exceptions, and notices", "import and export": "Import and export", reporting: "Reports",

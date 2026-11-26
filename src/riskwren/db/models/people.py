@@ -144,3 +144,55 @@ class FailedSignIn(Base):
     failed_at: Mapped[datetime] = mapped_column(UtcDateTime)
 
     __table_args__ = (Index("ix_failed_sign_in_key_hash", "key_hash", "failed_at"),)
+
+
+class Identity(Base):
+    """Who an account is at the identity provider: the provider's own, stable name for them.
+    People are matched by this, never by an email address the provider has not vouched for."""
+
+    __tablename__ = "identity"
+    __audit_parent__ = ("account", "account_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"))
+    issuer: Mapped[str] = mapped_column(String(300))
+    subject: Mapped[str] = mapped_column(String(300))
+    email: Mapped[str | None] = mapped_column(String(254))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("issuer", "subject"),
+        Index("ix_identity_account_id", "account_id"),
+    )
+
+
+class ProviderMapping(Base):
+    """A rule that turns an application role or a group from the identity provider into a
+    role here: for the whole organization or one unit, with a leader's limit, or into
+    membership of a unit."""
+
+    __tablename__ = "provider_mapping"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    claim_value: Mapped[str] = mapped_column(String(300))
+    role: Mapped[str] = mapped_column(String(24))
+    org_unit_id: Mapped[int | None] = mapped_column(ForeignKey("org_unit.id"))
+    accept_limit: Mapped[str | None] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (Index("ix_provider_mapping_claim_value", "claim_value"),)
+
+
+class SignInRequest(Base):
+    """A single sign-on round trip that has been started and not yet finished. Kept for a few
+    minutes and used once."""
+
+    __tablename__ = "sign_in_request"
+    __audit__ = False
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    state_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    nonce: Mapped[str] = mapped_column(String(64))
+    verifier: Mapped[str] = mapped_column(String(128))
+    next_path: Mapped[str] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)

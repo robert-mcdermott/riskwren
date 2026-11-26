@@ -12,7 +12,7 @@ These guides describe RiskWren 0.2.1. Read them in this order if you are new, or
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
 | 6 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, appetite, the scoring method, cadences, who may accept what, program packs, the dashboards, the history, appearance |
-| 7 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, PostgreSQL, upgrading, reverse proxies, the demo guard |
+| 7 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on, PostgreSQL, upgrading, reverse proxies, the demo guard |
 | 8 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
 
 ## Reference
@@ -51,6 +51,7 @@ These two are written from the code, so they always match the version they ship 
 | What does a dashboard figure count? | [Read the dashboards](running-the-program.md#read-the-dashboards) |
 | How do I move to PostgreSQL? | [Use PostgreSQL](configuration.md#use-postgresql) |
 | How do I put it behind a proxy? | [Run behind a reverse proxy](configuration.md#run-behind-a-reverse-proxy) |
+| How do I let people sign in with Entra ID or another identity provider? | [Single sign-on](configuration.md#single-sign-on) |
 | Nobody can sign in. How do I get back in? | [`riskwren users`](cli.md#riskwren-users) |
 
 ## What this release does not do yet

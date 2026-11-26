@@ -1556,6 +1556,66 @@
         "title": "MappingBody",
         "type": "object"
       },
+      "MappingIn": {
+        "properties": {
+          "accept_limit": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accept Limit"
+          },
+          "claim_value": {
+            "maxLength": 300,
+            "title": "Claim Value",
+            "type": "string"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Unit Id"
+          },
+          "role": {
+            "maxLength": 24,
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_value",
+          "role"
+        ],
+        "title": "MappingIn",
+        "type": "object"
+      },
+      "MappingsIn": {
+        "properties": {
+          "mappings": {
+            "items": {
+              "$ref": "#/components/schemas/MappingIn"
+            },
+            "maxItems": 500,
+            "title": "Mappings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mappings"
+        ],
+        "title": "MappingsIn",
+        "type": "object"
+      },
       "MembersBody": {
         "properties": {
           "records": {
@@ -13506,6 +13566,220 @@
         "summary": "Change your own password",
         "tags": [
           "session"
+        ]
+      }
+    },
+    "/api/v1/sso": {
+      "get": {
+        "operationId": "show_api_v1_sso_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Api V1 Sso Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "How single sign-on is set up",
+        "tags": [
+          "single sign-on"
+        ]
+      }
+    },
+    "/api/v1/sso/callback": {
+      "get": {
+        "operationId": "callback_api_v1_sso_callback_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "error",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Error"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finish single sign-on",
+        "tags": [
+          "single sign-on"
+        ]
+      }
+    },
+    "/api/v1/sso/check": {
+      "post": {
+        "description": "Reads the provider's discovery document and signing keys, and says whether the client\nsecret is set. Nothing is changed and nobody is signed in.",
+        "operationId": "check_api_v1_sso_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Api V1 Sso Check Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ask the identity provider whether it answers",
+        "tags": [
+          "single sign-on"
+        ]
+      }
+    },
+    "/api/v1/sso/mappings": {
+      "put": {
+        "operationId": "put_mappings_api_v1_sso_mappings_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Put Mappings Api V1 Sso Mappings Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say which groups give which roles",
+        "tags": [
+          "single sign-on"
+        ]
+      }
+    },
+    "/api/v1/sso/start": {
+      "get": {
+        "description": "Sends the browser to the identity provider. It comes back to ``/sso/callback``.",
+        "operationId": "start_api_v1_sso_start_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Begin single sign-on",
+        "tags": [
+          "single sign-on"
         ]
       }
     },

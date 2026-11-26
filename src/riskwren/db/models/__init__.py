@@ -46,10 +46,13 @@ from riskwren.db.models.people import (
     Account,
     Credential,
     FailedSignIn,
+    Identity,
     Membership,
     OrgUnit,
+    ProviderMapping,
     RoleGrant,
     SessionToken,
+    SignInRequest,
 )
 from riskwren.db.models.program import Setting
 from riskwren.db.models.risk import (
@@ -84,6 +87,7 @@ __all__ = [
     "ExternalRef",
     "FailedSignIn",
     "Framework",
+    "Identity",
     "Implementation",
     "Information",
     "Issue",
@@ -92,6 +96,7 @@ __all__ = [
     "Notice",
     "OrgUnit",
     "Process",
+    "ProviderMapping",
     "RecordLink",
     "RecordOwner",
     "Requirement",
@@ -109,6 +114,7 @@ __all__ = [
     "ScoringMethod",
     "SessionToken",
     "Setting",
+    "SignInRequest",
     "StoredFile",
     "System",
     "TestResult",

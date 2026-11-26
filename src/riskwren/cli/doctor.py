@@ -52,7 +52,37 @@ def run(config_path: str | None = None) -> list[Check]:
         ]
     checks.append(_disk(home))
     checks += _database(config)
+    # Single sign-on is optional. Without it, people sign in with local accounts.
+    checks.append(_sso(config) if config.sso.enabled else Check("Sign-in", OK, "local accounts"))
     return checks
+
+
+def _sso(config: Config) -> Check:
+    """Can the identity provider be read, and is the client secret where it should be?"""
+    import os
+
+    from riskwren.auth import oidc
+
+    client = oidc.Client(config.sso)
+    try:
+        client.metadata()
+        client.keys()
+    except RiskWrenError as exc:
+        return Check("Single sign-on", FAIL, str(exc))
+    if not os.environ.get(config.sso.client_secret_env):
+        return Check(
+            "Single sign-on",
+            FAIL,
+            f"the client secret is not set: put it in {config.sso.client_secret_env}",
+        )
+    if not config.server.base_url:
+        return Check(
+            "Single sign-on",
+            WARN,
+            "set [server] base_url, so that the redirect address does not depend on how "
+            "each request arrives",
+        )
+    return Check("Single sign-on", OK, f"{config.sso.issuer}, beside local accounts")
 
 
 def _python() -> Check:

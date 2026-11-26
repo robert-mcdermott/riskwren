@@ -64,6 +64,7 @@ export const NAV = [
       { href: "/admin/people", label: "People", iconName: "people", when: "admin" },
       { href: "/admin/units", label: "Units", iconName: "units", when: "admin" },
       { href: "/admin/appearance", label: "Appearance", iconName: "appearance", when: "admin" },
+      { href: "/admin/sso", label: "Single sign-on", iconName: "key", when: "admin" },
     ],
   },
 ];

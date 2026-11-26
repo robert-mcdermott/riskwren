@@ -242,6 +242,12 @@ REACH: dict[tuple[str, str], set[str]] = {
     ("DELETE", "/api/v1/session"): EVERYONE | {"nobody"},
     ("POST", "/api/v1/session/demo"): EVERYONE | {"nobody"},
     ("POST", "/api/v1/session/password"): EVERYONE,
+    # Single sign-on. The round trip is open to all, and answers 404 unless it is set up.
+    ("GET", "/api/v1/sso/start"): EVERYONE | {"nobody"},
+    ("GET", "/api/v1/sso/callback"): EVERYONE | {"nobody"},
+    ("GET", "/api/v1/sso"): {"admin"},
+    ("POST", "/api/v1/sso/check"): {"admin"},
+    ("PUT", "/api/v1/sso/mappings"): {"admin"},
     ("GET", "/api/v1/accounts"): EVERYONE,
     ("POST", "/api/v1/accounts"): {"admin"},
     ("GET", "/api/v1/accounts/{account_id}"): EVERYONE,

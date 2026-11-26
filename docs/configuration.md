@@ -29,7 +29,7 @@ Relative paths in the file are resolved against the file's own directory, not th
 
 ## Every section and key
 
-The file has three sections. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
+The file has four sections. Only the first three matter for a new installation; `[sso]` is optional. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
 
 ### `[server]`
 
@@ -38,7 +38,7 @@ The file has three sections. A section or key that RiskWren does not know is an 
 | `host` | `"127.0.0.1"` | The address the web server listens on. Keep `127.0.0.1` when a reverse proxy on the same machine terminates TLS. Use `0.0.0.0` only behind one |
 | `port` | `8000` | The port |
 | `workers` | `1` | How many server processes to run. One is enough for SQLite and small teams |
-| `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Meant for links in messages RiskWren sends. This release sends no email, so it can stay empty |
+| `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Used for the single sign-on redirect address, and for links in messages RiskWren sends. Set it when you use single sign-on |
 | `session_idle_hours` | `12` | A sign-in ends after this long without activity |
 | `session_max_days` | `7` | A sign-in ends after this long in any case |
 
@@ -55,6 +55,22 @@ The file has three sections. A section or key that RiskWren does not know is an 
 | Key | Default | Meaning |
 |---|---|---|
 | `home` | `"var"` | The data home: the one directory that holds everything not in the database |
+
+### `[sso]`
+
+Single sign-on is optional and off until both `issuer` and `client_id` are set. See [Single sign-on](#single-sign-on).
+
+| Key | Default | Meaning |
+|---|---|---|
+| `issuer` | `""` | The identity provider's issuer address. For Microsoft Entra ID, `"https://login.microsoftonline.com/<tenant id>/v2.0"` |
+| `client_id` | `""` | The client (application) ID the provider gave RiskWren |
+| `client_secret_env` | `"RISKWREN_SSO_CLIENT_SECRET"` | The name of the environment variable that holds the client secret. The secret itself is refused in the file |
+| `scopes` | `"openid profile email"` | What RiskWren asks the provider for. Must include `openid` |
+| `roles_claim` | `"roles"` | The claim in the ID token that lists a person's application roles or groups |
+| `label` | `"Sign in with your organization account"` | The words on the sign-in button |
+| `trust_email` | `false` | Accept the provider's address for a person without its saying the address is verified. Entra ID does not say, so set this to `true` for a single Entra ID tenant |
+| `create_accounts` | `true` | Make an account the first time someone signs in. With `false`, only people who already have an account can sign in |
+| `local_sign_in` | `true` | Keep the password form for everyone who has a password. With `false`, only administrators may sign in with a password |
 
 RiskWren also gives advice that does not stop it running. `serve` and `doctor` warn when several workers share one SQLite file, and when `base_url` is `http://` on a host other than localhost.
 
@@ -102,6 +118,98 @@ The data home is created by `init`. With the default settings it is `./var`.
 - Do not edit its contents by hand.
 - It must be writable by the account that runs the server.
 - Request bodies and tokens are never written to the log.
+
+## Single sign-on
+
+**You do not need this to use RiskWren.** A new installation signs in with an email address and a password that RiskWren keeps, and an evaluation or a small team needs nothing else. Single sign-on is something an administrator adds when the organization wants people to use the account they already have, under its own multi-factor authentication and offboarding.
+
+When it is on, it sits beside local accounts and does not replace them. The sign-in page shows the organization's button first, with the password form folded beneath it. An administrator can always sign in with a password, so a provider that is down or misconfigured never locks everyone out.
+
+RiskWren speaks OpenID Connect: the authorization-code flow with PKCE. It works with Microsoft Entra ID and with any provider that follows the standard and signs its ID tokens with RS256.
+
+### What you set, and where
+
+| What | Where |
+|---|---|
+| The provider's issuer and RiskWren's client ID | `[sso]` in `riskwren.toml` |
+| The client secret | An environment variable, `RISKWREN_SSO_CLIENT_SECRET` unless you name another |
+| RiskWren's public address | `[server] base_url`, so the redirect address is always the same |
+| Which of the provider's roles or groups give which role here | In the app: **Admin → Single sign-on** |
+
+The redirect address to give the provider is `<base_url>/api/v1/sso/callback`. **Admin → Single sign-on** shows it, before and after you set anything up.
+
+### With Microsoft Entra ID
+
+1. In the Entra admin center, open **App registrations → New registration**. Name it, choose **Accounts in this organizational directory only**, and add a **Web** redirect URI: your `base_url` followed by `/api/v1/sso/callback`.
+2. From the registration's **Overview**, copy the **Application (client) ID** and the **Directory (tenant) ID**.
+3. Under **Certificates & secrets**, add a client secret and copy its **Value**. It is shown once.
+4. Under **App roles**, create a role for each kind of access you want to give from Entra ID, for users and groups. The role's **Value** is what RiskWren sees: for example `RiskWren.Admin`, `RiskWren.Assessor`, `RiskWren.Security.Leader`.
+5. Under **Enterprise applications**, open the same application, then **Users and groups**, and assign people or groups to those roles. Under **Properties**, set **Assignment required** to **Yes** if only assigned people should be able to sign in.
+6. Under **Token configuration**, add the optional **ID** claim `email`.
+7. In `riskwren.toml`:
+
+   ```toml
+   [server]
+   base_url = "https://riskwren.example.org"
+
+   [sso]
+   issuer = "https://login.microsoftonline.com/<tenant id>/v2.0"
+   client_id = "<application id>"
+   trust_email = true
+   ```
+
+8. Put the secret's value in `RISKWREN_SSO_CLIENT_SECRET` in the environment RiskWren starts in, and restart it.
+9. Run `uv run riskwren doctor`. It reads the provider and says whether the secret is set.
+10. Sign in with a password as an administrator, open **Admin → Single sign-on**, choose **Check the connection**, and map each app role's value to a role here.
+
+Three things about Entra ID are worth knowing.
+
+- **Name one tenant.** RiskWren refuses the shared issuers (`common`, `organizations`, `consumers`), because they would accept a sign-in from any directory.
+- **Entra ID does not mark addresses as verified**, which is why `trust_email` is `true` above. That is safe for a single tenant, whose addresses are the organization's own. Without it nobody can be matched to an existing account or created.
+- **Prefer app roles to groups.** To use groups instead, add a groups claim under **Token configuration**, set `roles_claim = "groups"`, and map each group's object ID. Entra ID leaves the groups out of the token for a person in more than about two hundred of them; RiskWren then leaves that person's roles as they were and says so in its log.
+
+### With another provider
+
+Register RiskWren as a confidential web client with the redirect address above. Set `issuer` to the address whose `/.well-known/openid-configuration` the provider serves, and `client_id` to what it gave you. Have it put a person's groups or roles in a claim, and name that claim in `roles_claim` (many providers call it `groups`). If the provider says `email_verified` is true for its addresses, leave `trust_email` as it is.
+
+### Roles from the provider
+
+**Admin → Single sign-on** lists mappings. Each says: everyone the provider gives this value gets this role here.
+
+| Role here | For |
+|---|---|
+| Works in a unit | One unit. Membership grants nothing by itself; it decides what a member sees |
+| Steward, Leader | One unit, and everything beneath it. A leader's mapping also says what they may accept |
+| Assessor, Manager | The whole organization, or one unit |
+| Auditor, Administrator | The whole organization |
+
+- Roles given this way are **set again at every sign-in**. Take the role away at the provider and it is gone here the next time the person signs in. A shorter `session_max_days` shortens the wait.
+- Roles given by hand under **Admin → People** are left alone, and are shown apart from those the provider gave.
+- **The last administrator is never removed**, whatever the provider says.
+- A unit in a mapping is the unit itself, so renaming it changes nothing.
+
+### Who a person is
+
+A person is known by the provider's own identifier for them, never by an address alone. The first time someone signs in:
+
+- if an account here has the address the provider vouches for, the two are joined, and from then on the provider's identifier is what counts;
+- otherwise an account is made for them, with the roles their mappings give, unless `create_accounts` is `false`.
+
+A disabled account cannot come in through the provider. Signing out of RiskWren does not sign anyone out of the provider.
+
+### Passwords, once it is on
+
+With `local_sign_in = true`, anyone who has a password may still use it. With `false`, only administrators may. There is no setting that removes the administrator's password, on purpose: it is the way in when the provider cannot be reached.
+
+### Try it on a laptop
+
+`scripts/dev_identity_provider.py` is a stand-in provider for trying this out. It has a fixed list of people and no passwords, and its signing key is published in the file, so it proves nothing and listens only on the machine it runs on.
+
+```bash
+uv run python scripts/dev_identity_provider.py
+```
+
+Then set `issuer = "http://127.0.0.1:8099"`, `client_id = "riskwren-dev"`, and `trust_email = true` under `[sso]`, and start RiskWren with `RISKWREN_SSO_CLIENT_SECRET=dev-secret` in its environment.
 
 ## Use PostgreSQL
 
