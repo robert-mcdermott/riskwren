@@ -119,6 +119,17 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   and counts only what the viewer may see.
 - **Grouping and printing.** The register can be grouped by category or unit, and any page
   prints as the record without the application around it.
+- **The demo organization.** `riskwren demo` builds the Northmere Institute for Health
+  Research, a fictional research institute with a clinic, in its own directory in a few
+  seconds: 60 units, about 210 people, 220 processes, systems, and third parties, 180 risks,
+  110 controls, and two years of assessments, ratings, plans, and acceptances. Nothing is
+  inserted: every record is made by the services the app uses, as the person who would have
+  done it, under a simulated clock, so its history verifies. The same seed gives the same
+  organization. Twelve storylines are written by hand, among them a critical risk brought to
+  high by controls of known effectiveness, an acceptance refused above a leader's limit, a
+  plan gone late, and a departed owner's orphaned records. A demo marks itself on every
+  page, signs in any of nine sample people with one click from the machine it runs on, and
+  will not listen on the network unless started with `--demo-on-network`.
 
 ### Fixed
 

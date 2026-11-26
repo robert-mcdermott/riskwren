@@ -15,6 +15,7 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 |---|---|
 | [`riskwren init`](#riskwren-init) | Set up a new installation |
 | [`riskwren serve`](#riskwren-serve) | Run the web server |
+| [`riskwren demo`](#riskwren-demo) | Build a fictional organization to explore |
 | [`riskwren db`](#riskwren-db) | Look after the database schema |
 | [`riskwren users`](#riskwren-users) | Manage accounts from the command line |
 | [`riskwren verify`](#riskwren-verify) | Check that the history has not been altered |
@@ -42,6 +43,18 @@ Run RiskWren's web server. It refuses to start on a database whose schema is beh
 | `--port` `PORT` | port to listen on (default: from the configuration) |
 | `--workers` `WORKERS` | server processes (default: from the configuration) |
 | `--reload` | restart when the code changes (development) |
+| `--demo-on-network` | let a demo organization listen beyond this machine (anyone who reaches it can sign in as its sample people) |
+
+## `riskwren demo`
+
+Build the Northmere Institute for Health Research, a fictional organization with two years of history, in its own directory. Everything in it is made by the same code the app uses. Start it with the command it prints.
+
+| Option | Meaning |
+|---|---|
+| `PATH` | where to build it (default: ./demo) |
+| `--seed` `SEED` | a different number gives a different Northmere |
+| `--port` `PORT` | the port its server will use (default: 8020) |
+| `--force` | rebuild a demo that is already there |
 
 ## `riskwren db`
 

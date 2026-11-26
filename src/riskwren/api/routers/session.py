@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from fastapi import APIRouter, Request, Response
@@ -11,6 +12,7 @@ from riskwren.access.policy import current
 from riskwren.api.common import database, envelope, reading, writing
 from riskwren.api.problems import problem
 from riskwren.auth import sessions
+from riskwren.demo.build import marker as demo_marker
 from riskwren.events.actor import Actor
 from riskwren.people import accounts
 
@@ -20,6 +22,14 @@ router = APIRouter(prefix="/api/v1", tags=["session"])
 class SignIn(BaseModel):
     email: str = Field(max_length=254)
     password: str = Field(max_length=1024)
+
+
+class DemoSignIn(BaseModel):
+    email: str = Field(max_length=254)
+
+
+LOCAL = {"127.0.0.1", "::1", "testclient"}
+ENV_DEMO_ON_NETWORK = "RISKWREN_DEMO_ON_NETWORK"
 
 
 class PasswordChange(BaseModel):
@@ -46,7 +56,6 @@ def show(request: Request) -> Any:
 
 @router.post("/session", summary="Sign in with an email address and password")
 def sign_in(request: Request, body: SignIn, response: Response) -> Any:
-    config = request.app.state.config.server
     email = accounts.normalize_email(body.email)
     address = _client(request)
     # Five wrong passwords for one account from one address stop that pair. The account
@@ -81,8 +90,16 @@ def sign_in(request: Request, body: SignIn, response: Response) -> Any:
             401, "That email address and password do not match.", instance=request.url.path
         )
 
+    return _start(request, response, account, "password", cleared=keys)
+
+
+def _start(
+    request: Request, response: Response, account: Any, method: str, *, cleared: Any = ()
+) -> Any:
+    config = request.app.state.config.server
     with writing(request, Actor.account(account.id, account.display_name)) as session:
-        sessions.note_success(session, *keys)
+        if cleared:
+            sessions.note_success(session, *cleared)
         token, row = sessions.create(
             session,
             account.id,
@@ -90,13 +107,28 @@ def sign_in(request: Request, body: SignIn, response: Response) -> Any:
             max_days=config.session_max_days,
             user_agent=request.headers.get("user-agent"),
         )
-        accounts.note_sign_in(session, account, method="password")
+        accounts.note_sign_in(session, account, method=method)
         principal = accounts.principal_for(session, account, row)
     response.set_cookie(
         sessions.COOKIE, token, httponly=True, samesite="strict", secure=_secure(request), path="/",
         max_age=config.session_max_days * 86400,
     )  # fmt: skip
     return envelope(principal.to_json())
+
+
+@router.post("/session/demo", summary="Sign in as a sample person (demo installations only)")
+def demo_sign_in(request: Request, body: DemoSignIn, response: Response) -> Any:
+    """Only a demo organization has this, only for the sample people it names, and only from
+    the machine it runs on unless the server was started with ``--demo-on-network``."""
+    local = _client(request) in LOCAL or os.environ.get(ENV_DEMO_ON_NETWORK) == "1"
+    with reading(request) as session:
+        demo = demo_marker(session)
+        email = accounts.normalize_email(body.email)
+        offered = demo is not None and any(a["email"] == email for a in demo["accounts"])
+        account = accounts.by_email(session, email) if offered and local else None
+    if account is None or account.status != "active":
+        return problem(404, "There is no such sample account here.", instance=request.url.path)
+    return _start(request, response, account, "demo")
 
 
 @router.delete("/session", summary="Sign out")

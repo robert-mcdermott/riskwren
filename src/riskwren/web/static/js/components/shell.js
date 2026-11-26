@@ -187,6 +187,7 @@ export function mountShell(root, meta) {
         } }),
         search,
         h("div", { class: "spacer row-sm" },
+          meta.demo ? h("span", { class: "demo-flag", title: "A fictional organization. Nothing here is real." }, "Demo data") : null,
           iconButton("appearance", "Appearance", { onclick: () => openAppearance(meta) }),
           userMenu(meta))),
       main));

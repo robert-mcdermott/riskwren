@@ -34,6 +34,7 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/session"): Needs.PUBLIC,  # answers 401 itself, so the app can show sign-in
     ("POST", "/api/v1/session"): Needs.PUBLIC,
     ("DELETE", "/api/v1/session"): Needs.PUBLIC,
+    ("POST", "/api/v1/session/demo"): Needs.PUBLIC,  # answers 404 unless this is a demo
     ("POST", "/api/v1/session/password"): Needs.MEMBER,
     # People
     ("GET", "/api/v1/accounts"): Needs.MEMBER,  # the people picker; members see names only

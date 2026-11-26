@@ -64,6 +64,10 @@ ignore = [
 "scripts/build-default-program.py" = ["E501"]
 # The demo organization is invented with a seeded generator.
 "src/riskwren/demo/**" = ["S311"]
+# Its content is tables of words and sentences, kept one entry to a line; its stories
+# are told one step to a line.
+"src/riskwren/demo/content.py" = ["E501", "SIM905"]
+"src/riskwren/demo/build.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

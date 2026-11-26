@@ -240,6 +240,7 @@ REACH: dict[tuple[str, str], set[str]] = {
     ("GET", "/api/v1/session"): EVERYONE,
     ("POST", "/api/v1/session"): EVERYONE | {"nobody"},
     ("DELETE", "/api/v1/session"): EVERYONE | {"nobody"},
+    ("POST", "/api/v1/session/demo"): EVERYONE | {"nobody"},
     ("POST", "/api/v1/session/password"): EVERYONE,
     ("GET", "/api/v1/accounts"): EVERYONE,
     ("POST", "/api/v1/accounts"): {"admin"},

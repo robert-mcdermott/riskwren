@@ -153,16 +153,18 @@ None block the start. These defaults have been taken and can be changed before t
 
 **Acceptance (met):** every figure on the dashboard and every cell of the heat map opens a list whose length equals the figure, for each of the seven roles, for the whole organization and for one division, in all three ratings; the parts of each breakdown add up to the whole. 321 tests pass on SQLite. Checked in the browser: home with something overdue, the dashboard, the heat map with a category's appetite, and the grouped register.
 
-## Slice 8: Demo organization ☐
+## Slice 8: Demo organization ☑
 
 **Goal:** a believable institute that exercises everything in the wave.
 
-- [ ] The generator: units, people, processes, systems, third parties, risks, controls, plans, acceptances, and actions, built through the services under a simulated clock, deterministic by seed
-- [ ] The storylines in [demo-organization.md](../demo-organization.md), written by hand
-- [ ] The "Demo data" marker, one-click sign-in as each sample person, and the refusal to listen beyond the local machine unless told to
-- [ ] The demo build as an end-to-end test, with its history verified
+- [x] The generator: units, people, processes, systems, third parties, risks, controls, plans, acceptances, and actions, built through the services under a simulated clock, deterministic by seed
+- [x] The storylines in [demo-organization.md](../demo-organization.md), written by hand
+- [x] The "Demo data" marker, one-click sign-in as each sample person, and the refusal to listen beyond the local machine unless told to
+- [x] The demo build as an end-to-end test, with its history verified
 
 **Acceptance:** `riskwren demo` builds in under a minute; the same seed gives the same organization; every wave 1 screen has data worth reading; `riskwren verify` passes on the result.
+
+**Done:** `riskwren demo` builds Northmere in about five seconds: 60 units, about 210 people, 220 inventory records, 180 risks, 110 controls, and some 6,000 events over two years, all through the services and under a simulated clock. Twelve storylines are written by hand and asserted by the tests. A demo marks itself on every page, signs in any of nine sample people with one click from the machine it runs on, and refuses to listen on the network unless told to.
 
 ## Slice 9: Release prep ☐
 
@@ -191,4 +193,6 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **A matrix must never run backwards.** A scoring method in which a rating falls as likelihood or impact rises cannot be published, whether typed in or imported.
 - **The program is installed, not migrated.** Migrations build tables; `init` and `db upgrade` then add whatever of the default program and libraries is missing, as ordinary audited writes, and never overwrite what an organization has shaped.
 - **Parts and wholes are links, not record types.** A system built on a platform, or a service within a broader line of work, is said with an *is part of* link between two systems or two processes. The dependency graph that makes these links visible moves forward from wave 3 to wave 2, where scopes, controls, and requirements give it more to show.
+- **A control another unit runs is linked by the second line.** Under the default visibility a steward cannot see, and so cannot link, a control owned by a unit outside their own. Building the demo through the services made this plain: central controls (backups, patching, training) are tied to a unit's risks by the risk team, who see everything. Wave 2's scopes and inherited controls give units a way to lean on a provider's controls themselves.
+- **The demo is the widest test the product has.** It found nothing to fix in the services, which is the result hoped for; it does take most of a minute of the test run, because several tests each build it afresh.
 - **The rating ramp has five steps.** A method with fewer ratings spreads them across the ramp, so the lowest and the highest always sit at its ends.

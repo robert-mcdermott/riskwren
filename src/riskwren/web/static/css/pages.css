@@ -25,6 +25,15 @@
   .sign-in-art { display: none; }
 }
 
+.demo-people h2 { font-size: var(--text-l); margin-bottom: var(--space-1); }
+.demo-people ul { display: grid; gap: var(--space-2); margin-top: var(--space-4); }
+.demo-person { display: flex; align-items: center; gap: var(--space-3); width: 100%; padding: var(--space-3); text-align: left; font: inherit; color: inherit; background: var(--surface-1); border: 1px solid var(--border-strong); border-radius: var(--radius-m); cursor: pointer; }
+.demo-person:hover { border-color: var(--accent); background: var(--accent-soft); }
+.demo-person .cell-main, .demo-person .cell-sub { display: block; }
+.sign-in-form:has(.demo-people) > div { width: min(520px, 100%); }
+.sign-in-form:has(.demo-people) .sign-in-brand { margin-bottom: var(--space-5); }
+.demo-flag { display: inline-flex; align-items: center; gap: var(--space-1); padding: 2px var(--space-3); border-radius: 999px; border: 1px dashed var(--border-strong); color: var(--text-muted); font-size: var(--text-s); font-weight: 500; white-space: nowrap; }
+
 /* ---- Home ---- */
 .welcome { display: flex; align-items: center; gap: var(--space-5); padding: var(--space-6); }
 .welcome .wren { width: 72px; height: 72px; color: var(--accent); flex: none; }

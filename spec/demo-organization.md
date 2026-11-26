@@ -29,7 +29,7 @@ Units nest three and four deep, so scoped roles, roll-ups, and escalation all ha
 
 ### People
 
-About 220 accounts, including a chief risk and compliance officer and a team of four, assessors in security and compliance, an internal auditor, leaders for every division with different acceptance limits, stewards for most units, and principal investigators, lab managers, clinicians, engineers, and administrators who own risks, controls, and systems.
+About 210 accounts, including a chief risk and compliance officer and a team of four, assessors in security and compliance, an internal auditor, leaders for every division with different acceptance limits, stewards for most units, and principal investigators, lab managers, clinicians, engineers, and administrators who own risks, controls, and systems.
 
 Sample accounts for signing in as each role are listed on the demo's sign-in page.
 
@@ -39,20 +39,22 @@ Enough to look like an organization that has used RiskWren for a while, and smal
 
 | Records | About | Notes |
 |---|---|---|
-| Org units | 65 | Four levels |
-| Accounts | 220 | Every role represented |
-| Processes | 45 | Research, clinical, and administrative; every criticality |
-| Systems | 110 | Applications, platforms, instruments, and infrastructure; some retired |
-| Third parties | 55 | Suppliers, collaborators, sponsors, and subrecipients |
-| Risks | 170 | Every category, rating, and standing; a dozen escalated |
-| Risk assessments | 600 | Inherent, residual, and target, with re-assessments over time |
-| Controls | 95 | Starter controls made specific, and local ones; varied effectiveness, some never assessed |
-| Treatment plans | 40 | Active, complete, overdue |
-| Acceptances | 22 | In force, expiring soon, expired, withdrawn |
-| Actions | 260 | Open, done, overdue, extended |
-| Events | 12,000+ | Twenty-four months of history |
+| Org units | 60 | Four levels |
+| Accounts | 210 | Every role represented; one departed |
+| Processes | 75 | Research, clinical, and administrative; every criticality |
+| Systems | 105 | Applications, platforms, instruments, and infrastructure; some unsupported, some retired |
+| Third parties | 45 | Suppliers, collaborators, sponsors, and subrecipients |
+| Risks | 180 | Every category, rating, and standing; a dozen escalated; some not yet assessed |
+| Risk assessments | 480 | Inherent, residual, and target, with re-assessments over time |
+| Controls | 110 | Starter controls made specific, and local ones; varied effectiveness, some never assessed, some gone stale |
+| Treatment plans | 30 | Active, complete, overdue |
+| Acceptances | 25 | In force, expiring soon, expired, withdrawn |
+| Actions | 100 | Open, done, overdue, extended |
+| Events | 6,000 | Twenty-four months of history |
 
-The mix is realistic: most risks are low or moderate and within appetite; a few dozen are high; a handful are critical. Residual ratings improve over the two years as plans complete, so trends have a story, and a few risks have got worse.
+The figures move a little with the seed and with the day it is built.
+
+The mix is realistic: most risks are low or moderate and within appetite; a few dozen are high; a handful are critical. Residual ratings improve as plans complete, and a few risks have got worse.
 
 ## Storylines
 
@@ -63,9 +65,10 @@ Generated volume makes the lists and charts convincing. A set of hand-written st
 | **Loss of irreplaceable specimens from freezer failure** in the Biospecimen Repository | A critical inherent risk brought to high by controls of known effectiveness; the suggested residual with its working; a treatment plan to split collections across two buildings |
 | **Ransomware reaching research storage** | A risk that concerns a process, three systems, and a third party; controls owned by two different units; a residual assessment that departs from the suggestion, with the reason |
 | **An unsupported instrument workstation** that cannot be patched without invalidating the instrument | A named, time-limited acceptance by a division leader with conditions; the acceptance expiring next month |
-| **A high risk the lab's own leader tried to accept** | The authority table refusing an acceptance above the leader's limit, and the acceptance later given by the right person |
+| **A high risk the core's own director tried to accept** | The authority table refusing an acceptance above the leader's limit, and the acceptance later given by the right person |
+| **Emergency power that cannot carry the freezer farm** | A critical risk resting on a control that failed its test; escalated, planned, and accepted for six months by the one executive who may |
 | **Unallowable costs charged to a federal award** | A financial stewardship risk with a low appetite; a detective control rated partly effective; a plan with overdue actions and the risk's standing changed to *needs a decision* |
-| **Departure of a principal investigator** | Orphaned risks and controls, shown to the steward and reassigned |
+| **Departure of a principal investigator** | Orphaned risks and controls, shown to those who can name a new owner; one reassigned |
 | **A participant-privacy risk escalated from a lab to its division** | Escalation with a reason, and the roll-up a division leader sees |
 | **Sole-source dependence on a sequencing reagent supplier** | A third-party risk, a transfer and reduce response, and the link from process to system to supplier |
 | **A control nobody has assessed** | *Not assessed* counting for nothing in the suggestion, and the risk flagged because of it |

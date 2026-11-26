@@ -534,6 +534,20 @@
         "title": "ControlBody",
         "type": "object"
       },
+      "DemoSignIn": {
+        "properties": {
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "DemoSignIn",
+        "type": "object"
+      },
       "EscalationBody": {
         "properties": {
           "reason": {
@@ -5929,6 +5943,48 @@
           }
         },
         "summary": "Sign in with an email address and password",
+        "tags": [
+          "session"
+        ]
+      }
+    },
+    "/api/v1/session/demo": {
+      "post": {
+        "description": "Only a demo organization has this, only for the sample people it names, and only from\nthe machine it runs on unless the server was started with ``--demo-on-network``.",
+        "operationId": "demo_sign_in_api_v1_session_demo_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoSignIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Demo Sign In Api V1 Session Demo Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sign in as a sample person (demo installations only)",
         "tags": [
           "session"
         ]
