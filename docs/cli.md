@@ -18,6 +18,7 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 | [`riskwren db`](#riskwren-db) | Look after the database schema |
 | [`riskwren users`](#riskwren-users) | Manage accounts from the command line |
 | [`riskwren verify`](#riskwren-verify) | Check that the history has not been altered |
+| [`riskwren program`](#riskwren-program) | Move the program between installations |
 | [`riskwren doctor`](#riskwren-doctor) | Check that this installation is healthy |
 
 ## `riskwren init`
@@ -113,6 +114,27 @@ Show an account's roles, or with --set replace the roles granted in RiskWren. Ro
 ## `riskwren verify`
 
 Recompute the hash chain over every event in the history and report the first one that does not hold. Exits with 1 if the history is broken.
+
+## `riskwren program`
+
+The program is everything a risk and compliance team configures: vocabularies, the risk categories and their appetite, the scoring method, cadences, and who may accept what. It lives in the database and moves as one file.
+
+### `riskwren program export`
+
+Write the whole program as one JSON document, to a file or to standard output.
+
+| Option | Meaning |
+|---|---|
+| `--output`, `-o` `FILE` | write to this file |
+
+### `riskwren program import`
+
+Load a program pack. The whole pack is checked first, and nothing is loaded unless all of it can be. A new scoring method is published as a new version; assessments already made keep the version they were made under.
+
+| Option | Meaning |
+|---|---|
+| `FILE` | the pack to load |
+| `--dry-run` | say what would change, and change nothing |
 
 ## `riskwren doctor`
 

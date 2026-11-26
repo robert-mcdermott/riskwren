@@ -263,12 +263,19 @@ REACH: dict[tuple[str, str], set[str]] = {
 }
 
 EVERYONE = set(ROLES)
-RECORD_PATHS = {"processes": "PRC", "systems": "SYS", "third-parties": "TP"}
+RECORD_PATHS = {"processes": "PRC", "systems": "SYS", "third-parties": "TP", "risks": "RSK"}
 REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
+REACH[("GET", "/api/v1/program")] = EVERYONE
+REACH[("GET", "/api/v1/risk-library")] = EVERYONE
+REACH[("PATCH", "/api/v1/risk-categories/{key}")] = {"admin", "manager"}
+for _action in ("assessments", "subjects", "escalation"):
+    for _method in ("GET", "POST", "PUT"):
+        if (_method, f"/api/v1/risks/{{ref}}/{_action}") in POLICIES:
+            REACH[(_method, f"/api/v1/risks/{{ref}}/{_action}")] = EVERYONE
 for _path in RECORD_PATHS:
-    for _method, _template in record_policies(_path):
+    for _method, _template in record_policies(_path, links=_path != "risks"):
         # Anyone may ask about a record, and the service decides what they may see and do.
         # Adding one is for a unit's steward or a manager.
         adding = _method == "POST" and _template == f"/api/v1/{_path}"
@@ -314,7 +321,7 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
             path = template.replace("{account_id}", str(own)).replace(
                 "{unit_id}", str(people.units["HALE"])
             )
-            path = path.replace("{kind}", "favicon")
+            path = path.replace("{kind}", "favicon").replace("{key}", "technology")
             for record_path, prefix in RECORD_PATHS.items():
                 if template.startswith(f"/api/v1/{record_path}"):
                     # A record that is not there: reached, and answered with "not found".
@@ -340,6 +347,12 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"product_name": "RiskWren", "palette": "wren"}
             elif template.endswith("/branding/check"):
                 body = {"accent": "#1f6f5c"}
+            elif template.endswith("/assessments"):
+                body = {"kind": "inherent", "likelihood": 3, "impact_levels": {}, "rationale": ""}
+            elif template.endswith("/subjects"):
+                body = {"subjects": []}
+            elif template.endswith("/escalation"):
+                body = {"unit_id": None}
             elif template == "/api/v1/admin/visibility":
                 body = {"visibility": "unit"}
             elif template.endswith("/owners"):

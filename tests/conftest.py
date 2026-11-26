@@ -22,6 +22,7 @@ from riskwren.db.base import Base
 from riskwren.db.engine import Database
 from riskwren.events.actor import Actor
 from riskwren.home import DataHome
+from riskwren.program import packs
 from tests import models
 
 POSTGRES = os.environ.get("RISKWREN_TEST_DATABASE", "").lower() == "postgres"
@@ -131,9 +132,12 @@ def client(instance: Instance) -> Iterator[TestClient]:
 
 @pytest.fixture
 def people(instance: Instance):  # type: ignore[no-untyped-def]
-    """A small organization with one person in each role (see ``tests/people.py``)."""
+    """A small organization with one person in each role (see ``tests/people.py``), and the
+    default program."""
     from tests.people import seed
 
+    with instance.db.write(Actor.command("Setup")) as session:
+        packs.install(session)  # the default program, as `riskwren init` loads it
     return seed(instance.db)
 
 

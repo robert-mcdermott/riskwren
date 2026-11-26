@@ -3,13 +3,14 @@
 import { del, get, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { dateTime, relative } from "../core/format.js";
-import { label, units, vocabularies } from "../core/lookups.js";
+import { label, program as loadProgram, units, vocabularies } from "../core/lookups.js";
 import { query, setQuery } from "../core/router.js";
 import { banner, field, select, submit } from "../components/form.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { peoplePicker } from "../components/people-picker.js";
-import { criticality, recordChip, statusPill, TYPES } from "../components/record.js";
+import { criticality, hrefOf, recordChip, statusPill, TYPES } from "../components/record.js";
 import { editRecord } from "../components/record-forms.js";
+import { rating, standingPill } from "../components/risk.js";
 import { toast } from "../components/toast.js";
 import { alert, avatar, card, emptyState } from "../components/ui.js";
 import { show } from "./page.js";
@@ -197,6 +198,19 @@ export function linksCard(record, ctx) {
     hidden ? h("p", { class: "subtle" }, `And ${hidden} more that you do not have access to.`) : null);
 }
 
+/** The risks that concern this record, as far as the viewer may see them. */
+function risksCard(ctx) {
+  const risks = ctx.risks;
+  return card({ title: "Risks", flush: risks.length > 0 },
+    risks.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Risk"), h("th", { scope: "col" }, "Residual"), h("th", { scope: "col" }, "Standing"))),
+      h("tbody", {}, risks.map((risk) => h("tr", {},
+        h("td", {}, h("a", { class: "cell-main", href: hrefOf(risk.ref) }, risk.name), h("div", { class: "cell-sub" }, risk.ref)),
+        h("td", {}, rating(ctx.program, risk.ratings.residual.rating)),
+        h("td", {}, standingPill(risk.standing)))))))
+      : h("p", { class: "muted" }, "No risk has been raised that concerns this. Raise one from the register and attach it here."));
+}
+
 function overview(record, ctx) {
   const v = ctx.vocab;
   const meta = TYPES[record.type];
@@ -216,7 +230,7 @@ function overview(record, ctx) {
   if (record.type === "third_party") glance.push(["Website", outside(record.website)]);
   if (record.tags?.length) glance.push(["Tags", record.tags.join(", ")]);
   return h("div", { class: "split" },
-    h("div", { class: "stack-lg" }, about, linksCard(record, ctx)),
+    h("div", { class: "stack-lg" }, about, risksCard(ctx), linksCard(record, ctx)),
     h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), ownersCard(record, ctx)));
 }
 
@@ -265,15 +279,16 @@ export function recordPage(main, type, params) {
     title: params.ref,
     load: async () => {
       const base = `/api/v1/${meta.path}/${params.ref}`;
-      const [record, vocab, unitIndex, entries] = await Promise.all([
+      const [record, vocab, unitIndex, entries, programData, risks] = await Promise.all([
         get(base, null, { fresh: true }), vocabularies(), units(),
-        tab === "history" ? get(`${base}/history`, null, { fresh: true }) : null]);
-      return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [] };
+        tab === "history" ? get(`${base}/history`, null, { fresh: true }) : null,
+        loadProgram(), get("/api/v1/risks", { subject: params.ref, limit: 50 }, { fresh: true })]);
+      return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [], program: programData, risks: risks.data };
     },
     view: (data, reload) => {
       const record = data.record;
       document.title = `${record.name} · ${record.ref}`;
-      const ctx = { vocab: data.vocab, units: data.units, reload };
+      const ctx = { vocab: data.vocab, units: data.units, program: data.program, risks: data.risks, reload };
       const edit = record.can?.edit ? button("Edit", { iconName: "edit", onclick: () =>
         editRecord(type, { record, vocab: data.vocab, units: data.units, onDone: reload }) }) : null;
       return h("div", { class: "stack" },

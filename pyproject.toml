@@ -60,6 +60,8 @@ ignore = [
 "tests/**" = ["S104", "S105", "S106", "S108", "S311", "S608"]
 # Migrations are written once and read rarely; long constraint lines stay whole.
 "src/riskwren/db/migrations/versions/**" = ["E501"]
+# Its content is tables of sentences, kept one entry to a line.
+"scripts/build-default-program.py" = ["E501"]
 # The demo organization is invented with a seeded generator.
 "src/riskwren/demo/**" = ["S311"]
 

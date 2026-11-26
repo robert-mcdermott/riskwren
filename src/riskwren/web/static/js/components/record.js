@@ -16,6 +16,9 @@ export const TYPES = {
   third_party: { prefix: "TP", path: "third-parties", label: "Third party", plural: "Third parties", noun: "third party", nouns: "third parties",
     article: "a third party", iconName: "third_party", section: "Inventory", kinds: "third_party_kinds",
     lede: "The outside organizations the work depends on or shares with: suppliers, partners, sponsors." },
+  risk: { prefix: "RSK", path: "risks", label: "Risk", plural: "Risks", noun: "risk", nouns: "risks",
+    article: "a risk", iconName: "risk", section: "Risks",
+    lede: "What could go wrong, how much is at stake, and whether each risk is in order." },
 };
 
 const BY_PREFIX = Object.fromEntries(Object.entries(TYPES).map(([key, type]) => [type.prefix, key]));

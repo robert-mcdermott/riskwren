@@ -53,6 +53,7 @@ class Lookups:
             **record_type.extra.get("history_vocabularies", {}),
         }
         self.labels.update(record_type.extra.get("history_labels", {}))
+        self.special = record_type.extra.get("history_value")
         self._vocab: dict[str, dict[str, str]] = {}
         self._names: dict[str, dict[int, str]] = {}
 
@@ -77,15 +78,19 @@ class Lookups:
     def value(self, field: str, value: Any) -> Any:
         if value is None or value == "" or value == []:
             return None
+        if self.special is not None:
+            said = self.special(self, field, value)
+            if said is not None:
+                return said
         if field in self.vocabularies:
             if isinstance(value, list):
                 return ", ".join(self.vocab(self.vocabularies[field], item) for item in value)
             return self.vocab(self.vocabularies[field], value)
-        if field == "org_unit_id":
+        if field.endswith("unit_id"):
             return self.name("unit", value)
         if field.endswith("_by") or field == "owner_id":
             return self.name("account", value)
-        if field == "status":
+        if field in ("status", "standing", "response"):
             return words(str(value))
         if isinstance(value, bool):
             return "Yes" if value else "No"

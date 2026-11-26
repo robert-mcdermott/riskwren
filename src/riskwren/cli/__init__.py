@@ -57,6 +57,66 @@ def _database(config: Config, *, current: bool = True) -> Database:
     return db
 
 
+def _install_program(db: Database) -> dict[str, int]:
+    """Load the default program and the starter libraries where they are missing."""
+    from riskwren.events.actor import Actor
+    from riskwren.program import packs
+
+    with db.write(Actor.command("Setup")) as session:
+        return packs.install(session)
+
+
+def cmd_program_export(args: argparse.Namespace) -> int:
+    import json
+
+    from riskwren.program import packs
+
+    config, _ = _load(args)
+    db = _database(config)
+    try:
+        with db.read() as session:
+            text = json.dumps(packs.export(session), indent=2, ensure_ascii=False) + "\n"
+    finally:
+        db.dispose()
+    if args.output:
+        Path(args.output).write_text(text, encoding="utf-8")
+        print(f"Wrote {args.output}")
+    else:
+        sys.stdout.write(text)
+    return EXIT_OK
+
+
+def cmd_program_import(args: argparse.Namespace) -> int:
+    import json
+
+    from riskwren.access.principal import Principal
+    from riskwren.core.errors import Invalid
+    from riskwren.program import packs
+
+    config, _ = _load(args)
+    try:
+        pack = json.loads(Path(args.file).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise RiskWrenError(f"{args.file} could not be read as a pack: {exc}") from exc
+    db = _database(config)
+    principal = Principal.for_command()
+    try:
+        with db.write(principal.actor) as session:
+            try:
+                result = packs.import_(session, principal, pack, dry_run=args.dry_run)
+            except Invalid as exc:
+                raise RiskWrenError(f"{exc} {' '.join(exc.errors.values())}") from exc
+    finally:
+        db.dispose()
+    if not result["changed"]:
+        print("Nothing to change: the program already matches the pack.")
+        return EXIT_OK
+    print("Would change:" if args.dry_run else "Changed:")
+    for line in result["changed"]:
+        print(f"  {line}")
+    return EXIT_OK
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     path = find_config_path(args.config)
     if path.exists() and not args.force:
@@ -83,6 +143,9 @@ def cmd_init(args: argparse.Namespace) -> int:
         print(f"Database: {kind}, now at migration {after}")
     db = Database(config.database_url)
     try:
+        loaded = _install_program(db)
+        if any(loaded.values()):
+            print("Program: loaded the default program and the starter libraries")
         users.first_admin(db, config, args)
     finally:
         db.dispose()
@@ -155,9 +218,12 @@ def cmd_db_upgrade(args: argparse.Namespace) -> int:
             migrate.require_current(db.engine)  # explains that the database is newer
         migrate.upgrade(db.engine)
         after = migrate.current_revision(db.engine)
+        loaded = _install_program(db)
     finally:
         db.dispose()
     print(f"Already at migration {after}." if before == after else f"Upgraded {before} → {after}.")
+    if any(loaded.values()):
+        print("Loaded what was missing from the default program and the starter libraries.")
     return EXIT_OK
 
 
@@ -393,6 +459,36 @@ def build_parser() -> argparse.ArgumentParser:
         "first one that does not hold. Exits with 1 if the history is broken.",
     )
     verify.set_defaults(handler=cmd_verify)
+
+    program = commands.add_parser(
+        "program",
+        help="move the program between installations",
+        description="The program is everything a risk and compliance team configures: "
+        "vocabularies, the risk categories and their appetite, the scoring method, cadences, "
+        "and who may accept what. It lives in the database and moves as one file.",
+    )
+    program_commands = program.add_subparsers(dest="program_command", metavar="ACTION")
+    program.set_defaults(handler=lambda _args: program.print_help() or EXIT_OK)
+    program_export = program_commands.add_parser(
+        "export",
+        help="write the program as a pack",
+        description="Write the whole program as one JSON document, to a file or to "
+        "standard output.",
+    )
+    program_export.add_argument("--output", "-o", metavar="FILE", help="write to this file")
+    program_export.set_defaults(handler=cmd_program_export)
+    program_import = program_commands.add_parser(
+        "import",
+        help="load a program pack",
+        description="Load a program pack. The whole pack is checked first, and nothing is "
+        "loaded unless all of it can be. A new scoring method is published as a new version; "
+        "assessments already made keep the version they were made under.",
+    )
+    program_import.add_argument("file", metavar="FILE", help="the pack to load")
+    program_import.add_argument(
+        "--dry-run", action="store_true", help="say what would change, and change nothing"
+    )
+    program_import.set_defaults(handler=cmd_program_import)
 
     doctor = commands.add_parser(
         "doctor",

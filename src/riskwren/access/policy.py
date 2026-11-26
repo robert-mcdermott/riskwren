@@ -65,24 +65,40 @@ POLICIES: dict[tuple[str, str], Needs] = {
 }
 
 
-def record_policies(path: str) -> dict[tuple[str, str], Needs]:
+def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], Needs]:
     """What every record type's routes need. Any member may ask; the services decide what
     each may see and change, by the record's unit, its owners, and its visibility."""
     base = f"/api/v1/{path}"
-    return {
+    found = {
         ("GET", base): Needs.MEMBER,
         ("POST", base): Needs.STEWARD,
         ("GET", base + "/{ref}"): Needs.MEMBER,
         ("PATCH", base + "/{ref}"): Needs.MEMBER,
         ("PUT", base + "/{ref}/owners"): Needs.MEMBER,
-        ("POST", base + "/{ref}/links"): Needs.MEMBER,
-        ("DELETE", base + "/{ref}/links/{link_id}"): Needs.MEMBER,
         ("GET", base + "/{ref}/history"): Needs.MEMBER,
     }
+    if links:
+        found[("POST", base + "/{ref}/links")] = Needs.MEMBER
+        found[("DELETE", base + "/{ref}/links/{link_id}")] = Needs.MEMBER
+    return found
 
 
 for _path in ("processes", "systems", "third-parties"):
     POLICIES.update(record_policies(_path))
+
+# The risk register
+POLICIES.update(record_policies("risks", links=False))
+POLICIES.update(
+    {
+        ("GET", "/api/v1/program"): Needs.MEMBER,
+        ("PATCH", "/api/v1/risk-categories/{key}"): Needs.CONFIGURE,
+        ("GET", "/api/v1/risk-library"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/assessments"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/assessments"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/subjects"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/escalation"): Needs.MEMBER,
+    }
+)
 
 
 def allowed(principal: Principal | None, needs: Needs) -> bool:

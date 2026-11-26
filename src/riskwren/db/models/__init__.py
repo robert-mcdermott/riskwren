@@ -13,6 +13,14 @@ from riskwren.db.models.people import (
     SessionToken,
 )
 from riskwren.db.models.program import Setting
+from riskwren.db.models.risk import (
+    Risk,
+    RiskAssessment,
+    RiskCategory,
+    RiskLibraryEntry,
+    RiskSubject,
+    ScoringMethod,
+)
 from riskwren.db.models.system import ChainHead, Counter, Event
 
 __all__ = [
@@ -27,7 +35,13 @@ __all__ = [
     "Process",
     "RecordLink",
     "RecordOwner",
+    "Risk",
+    "RiskAssessment",
+    "RiskCategory",
+    "RiskLibraryEntry",
+    "RiskSubject",
     "RoleGrant",
+    "ScoringMethod",
     "SessionToken",
     "Setting",
     "System",

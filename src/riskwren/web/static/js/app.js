@@ -53,10 +53,13 @@ async function boot() {
 
   route("/", page("home", "home", meta));
   route("/account", page("account", "account"));
+  route("/risks", page("risks", "riskRegister"));
+  route("/risks/:ref", page("risk", "riskPage"));
   for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"]]) {
     route(`/${path}`, page("records", "recordList", type));
     route(`/${path}/:ref`, page("record", "recordPage", type));
   }
+  if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   if (can("admin")) {
     route("/admin/people", page("admin-people", "adminPeople"));
     route("/admin/units", page("admin-units", "adminUnits"));

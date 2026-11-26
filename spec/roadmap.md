@@ -33,7 +33,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 | 2 | Accounts, roles, and units | Local accounts and sessions, the seven roles with scopes, the route policy table, the unit hierarchy, import of units and people | ☑ |
 | 3 | Web app and design system | Vanilla JS shell, tokens, three palettes in light and dark, the wren mark, branding settings with live preview, command palette, core components | ☑ |
 | 4 | Inventory | Processes, systems, and third parties with owners, typed links, lists, detail pages, and history; the default program's vocabularies | ☑ |
-| 5 | Risk register | The taxonomy with appetite, the scoring method in Python and JavaScript, risks, assessments with reasons, standing, review dates, roll-up and escalation, the risk library | ☐ |
+| 5 | Risk register | The taxonomy with appetite, the scoring method in Python and JavaScript, risks, assessments with reasons, standing, review dates, roll-up and escalation, the risk library | ☑ |
 | 6 | Controls and treatment | The control library and starter controls, effectiveness ratings, the suggested residual with its working, responses, treatment plans, actions, and acceptance under the authority table | ☐ |
 | 7 | Home, heat map, and dashboard | What each person owes; the heat map with the appetite boundary; the risk dashboard with every figure linked to its records | ☐ |
 | 8 | Demo organization | The fictional institute, built through the services under a simulated clock, with storylines for every wave 1 screen | ☐ |
@@ -54,7 +54,7 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 | 5 | Assessments and tests | Assessments, the test queue, procedures and results with review, results flowing to controls, requirements, and risks; readiness in five states | ☐ |
 | 6 | Issues and exceptions | The issue register, severity clocks, action plans, validated closure, root cause, exceptions with compensating controls and expiry, the plan-of-action view; in-app notices | ☐ |
 | 7 | Import and export | Spreadsheet import with mapping and a dry run for every record type; CSV and JSON export of every list; external references | ☐ |
-| 8 | Compliance dashboard and demo | Readiness by scope and framework, stale evidence, issues by age; the demo's scopes, assessment, and issues | ☐ |
+| 8 | Dashboard, graph, and demo | Readiness by scope and framework, stale evidence, issues by age; the dependency graph around any record; an organization-wide history view; the demo's scopes, assessment, and issues | ☐ |
 | 9 | Release prep | Guides, changelog, dependency review, release | ☐ |
 
 Detail of the content: [content-packs.md](content-packs.md)
@@ -85,7 +85,7 @@ Decision record: [ADR-0009](decisions/0009-documentation-toolchain.md)
 | 3 | Questionnaires | Questionnaires as versioned data with conditional questions; the condition evaluator in Python and JavaScript | ☐ |
 | 4 | Campaigns | Risk and control self-assessment, control attestation, and unit completeness campaigns, with coverage by unit; attestation as a basis of assurance | ☐ |
 | 5 | Indicators | Indicators with thresholds, readings, and trends, linked to risks; breaches raise notices | ☐ |
-| 6 | Find and tidy | Search across all records, saved views, the dependency graph, completeness, duplicates, and reassignment when someone leaves | ☐ |
+| 6 | Find and tidy | Search across all records, saved views, completeness, duplicates, and reassignment when someone leaves | ☐ |
 | 7 | Program editors | Editing the taxonomy, scoring method, appetite, cadences, and vocabularies in the app with an impact preview; structured risk assessments over a scope | ☐ |
 | 8 | Release prep | Guides, changelog, release | ☐ |
 

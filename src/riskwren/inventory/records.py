@@ -171,6 +171,9 @@ def _apply(
             else:
                 record.status = values["status"]
     apply_fields(session, record_type, record, values, errors, creating=creating)
+    hook = record_type.extra.get("apply")
+    if hook is not None:
+        hook(session, record, values, errors, creating)
     return errors
 
 
@@ -186,6 +189,9 @@ def create(
     record.tags, record.restricted, record.version = [], False, 1
     if record_type.is_thing:
         record.status = "active"
+    starting = record_type.extra.get("new")
+    if starting is not None:
+        starting(record)
     errors = _apply(session, record_type, record, values, creating=True)
     if errors:
         raise Invalid(f"The {record_type.label} was not saved.", errors)
@@ -374,6 +380,9 @@ def conditions_for(
         value = filters.get(name)
         if value not in (None, ""):
             conditions.append(getattr(model, name) == value)
+    more = record_type.extra.get("conditions")
+    if more is not None:
+        conditions += more(session, principal, filters)
     owner = filters.get("owner")
     if filters.get("mine"):
         owner = principal.account_id
@@ -395,7 +404,10 @@ def ordering(session: Session, record_type: RecordType, sort: str) -> list[Any]:
             {"sort": f"Sort by one of: {', '.join(record_type.sorts)}."},
         )
     column = getattr(model, name)
-    if name == "criticality":
+    special = record_type.extra.get("sort_columns", {}).get(name)
+    if special is not None:
+        column = special(session, model)
+    elif name == "criticality":
         # An ordered vocabulary sorts by its order, not by its spelling.
         from sqlalchemy import case
 
@@ -466,7 +478,12 @@ def card(record_type: RecordType, record: Any, owners: list[dict[str, Any]]) -> 
 
 def cards(session: Session, record_type: RecordType, rows: list[Any]) -> list[dict[str, Any]]:
     owners = owners_of(session, record_type, [row.id for row in rows])
-    return [card(record_type, row, owners.get(row.id, [])) for row in rows]
+    out = [card(record_type, row, owners.get(row.id, [])) for row in rows]
+    more = record_type.extra.get("cards")
+    if more is not None:
+        for item, extra in zip(out, more(session, rows), strict=True):
+            item.update(extra)
+    return out
 
 
 def detail(
@@ -477,7 +494,7 @@ def detail(
     if not access.can_see(session, principal, record_type, record):
         raise NotFound(f"There is no {record_type.label} {record.ref}.")
     owners = owners_of(session, record_type, [record.id]).get(record.id, [])
-    out = card(record_type, record, owners)
+    out = cards(session, record_type, [record])[0]
     out["owners"] = owners
     for field in record_type.fields:
         out[field.name] = getattr(record, field.name)
@@ -491,6 +508,9 @@ def detail(
             "assess": access.can_assess(session, principal, record_type, record),
         },
     )
+    more = record_type.extra.get("detail")
+    if more is not None:
+        out.update(more(session, principal, record))
     return out
 
 

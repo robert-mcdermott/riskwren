@@ -53,3 +53,28 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   process, system, and third party, hosting, lifecycle, owner capacities, and kinds of link
   are lists the organization can relabel, extend, and retire. They start from the default
   program pack.
+- **The risk register.** A risk is a cause, an event, and a consequence, in a category, owned
+  by a unit and by named people, attached to the processes, systems, and third parties it
+  concerns. Each of those shows its risks. Risks can be raised from a library of 57 starting
+  statements and then made specific (migration 0005).
+- **Ratings that explain themselves.** Likelihood and impact are judged against written
+  definitions; impact is judged on five dimensions (mission, safety, financial, legal and
+  regulatory, trust) and the overall impact is the highest of them. A matrix combines the
+  two into Low, Moderate, High, or Critical. The rating appears as the levels are chosen.
+  Every assessment keeps who made it, when, why, and the version of the scoring method in
+  force; it is never edited, only superseded, and both stay on the record.
+- **Inherent, residual, and target.** A risk carries all three, shown side by side, each
+  opening the judgment behind it.
+- **Appetite and standing.** Each category of risk has a highest residual rating the
+  organization will live with. A risk is within appetite, or needs a decision; how much is at
+  stake and whether it is in order are always shown as two separate signals. Changing an
+  appetite says how many risks changed standing.
+- **Review dates.** A risk is due for review sooner the more is at stake: every three months
+  when critical, every two years when low. An overdue review is flagged.
+- **Roll-up and escalation.** A list narrowed to a unit includes everything beneath it. A risk
+  can be escalated to a unit above its own, with a reason.
+- **The program as a pack.** `riskwren program export` writes the vocabularies, risk
+  categories, scoring method, cadences, and acceptance authority as one file;
+  `riskwren program import` loads one, checking all of it first, with `--dry-run` to see what
+  would change. A new scoring method is a new version. Admin → Program shows the method, the
+  matrix, and every definition.

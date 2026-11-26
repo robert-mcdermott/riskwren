@@ -101,21 +101,25 @@ None block the start. These defaults have been taken and can be changed before t
 
 **Acceptance (met):** each record type can be created, edited, linked, and found; every edit is in its history under a named operation; a table of what each of the seven roles sees is tested for single records and for lists, which must agree; a stale edit is refused and an invalid one leaves the record as it was. 209 tests pass on SQLite. Checked in the browser: the three lists with filters and sorting, a record page, adding a link, editing owners, and the history timeline.
 
-## Slice 5: Risk register ☐
+## Slice 5: Risk register ☑
 
 **Goal:** a rating that explains itself, and a register that knows what is in order.
 
-- [ ] `risk_category` as a tree with appetite; the default taxonomy; `scoring_method` with immutable versions and the default method, with a definition for every level
-- [ ] The scoring module in Python and its JavaScript twin, held to one shared file of cases: rating from likelihood and impact levels, overall impact as the highest dimension rated, the matrix lookup
-- [ ] Risks with a statement of cause, event, and consequence; category, unit, owners; the processes, systems, and third parties a risk concerns, and each of those showing its risks
-- [ ] Assessments: inherent, residual, and target, each with levels by dimension, a rationale, and the method version; never edited, only superseded; the copies on the risk
-- [ ] Standing worked out from rating, appetite, plans, and acceptances; the *review overdue* flag; next review date from the cadence table
-- [ ] The assess screen: the level picker with definitions, the rating appearing as levels are chosen; the *journey* strip and the reasons popover on the risk
-- [ ] The register: a dense list with filters for rating, standing, category, unit, and owner, and grouping by category or unit
-- [ ] Roll-up by unit; escalation to a higher unit with a reason
-- [ ] The risk library pack, and starting a risk from an entry
+- [x] `risk_category` as a tree with appetite, its own or inherited from above; the default taxonomy of nine categories; `scoring_method` with immutable versions and the default method, with a definition for every level (migration 0005)
+- [x] The scoring module in Python and its JavaScript twin, held to one shared file of 70 cases: rating from likelihood and impact levels, overall impact as the highest dimension rated, the matrix lookup, and (ready for slice 6) control strength and the suggested residual with its working
+- [x] A method that cannot be used says everything wrong with it in one pass: a matrix in which a rating falls as likelihood or impact rises is refused
+- [x] Risks with a statement of cause, event, and consequence; category, unit, owners; the processes, systems, and third parties a risk concerns, and each of those showing its risks
+- [x] Assessments: inherent, residual, and target, each with levels by dimension, a rationale, and the method version; never edited, only superseded; the copies on the risk
+- [x] Standing worked out from rating and appetite; the *review overdue* flag; next review date from the cadence table; closing a risk with a reason, and reopening it
+- [x] The assess screen: the level picker with definitions, the rating appearing as levels are chosen; the *journey* strip and the reasoning behind each rating on the risk
+- [x] The register: a dense list with filters for category, rating, standing, unit, and owner, sorted by what is at stake
+- [x] Roll-up by unit; escalation to a higher unit with a reason
+- [x] The risk library pack of 57 statements, and starting a risk from an entry
+- [x] From slice 4: `riskwren program export | import`, with the whole pack checked before any of it is loaded and a dry run that says what would change; the default program and the library loaded by `riskwren init` and `riskwren db upgrade`
+- [x] Admin → Program: the categories with their appetite, which can be changed there and says how many risks changed standing; the matrix; what follows from each rating; every definition
+- [ ] Moved to slice 7, with the dashboard: grouping the register by category or unit
 
-**Acceptance:** the two scoring implementations agree on every shared case; an assessment always shows the method version it was made under after the method changes; changing a category's appetite changes the standing of its risks and nothing else; a leader's list contains their unit's risks and those beneath it; an assessment cannot be altered through any route.
+**Acceptance (met):** the two scoring implementations agree on every shared case; an assessment always shows the method version it was made under after the method changes; changing a category's appetite changes the standing of its risks and nothing else; a leader's list contains their unit's risks and those beneath it; an assessment cannot be altered through any route. A table of which risks each of the seven roles sees under each of the three visibility settings is tested for single risks and for lists, which must agree. 302 tests pass on SQLite. Checked in the browser: the register, a risk page, the assessment form with its live rating, the recorded reasoning, and the Program page.
 
 ## Slice 6: Controls and treatment ☐
 
@@ -172,4 +176,8 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Sign-in is throttled three ways:** five failures for one account from one address, and a much higher limit for the account alone and for the address alone, so nobody can lock a colleague out by typing their address. Each attempt is counted before the password is checked.
 - **The inventory is open; the register follows the setting.** Under the planned default, a steward could not link their system to a supplier recorded by another unit, because they could not see it. Processes, systems, and third parties are now visible to everyone signed in unless restricted, and the visibility setting governs risks and controls. [security.md](../security.md) says so.
 - **A link is recorded once and read both ways.** Its changes appear in the history of the record it starts from.
+- **Escalation is prominence, not ownership.** A risk escalated to a higher unit still belongs to its own; the unit above already sees it in its roll-up. Escalating says "this needs you", with a reason, and puts it among the risks that sit at that level.
+- **A matrix must never run backwards.** A scoring method in which a rating falls as likelihood or impact rises cannot be published, whether typed in or imported.
+- **The program is installed, not migrated.** Migrations build tables; `init` and `db upgrade` then add whatever of the default program and libraries is missing, as ordinary audited writes, and never overwrite what an organization has shaped.
+- **Parts and wholes are links, not record types.** A system built on a platform, or a service within a broader line of work, is said with an *is part of* link between two systems or two processes. The dependency graph that makes these links visible moves forward from wave 3 to wave 2, where scopes, controls, and requirements give it more to show.
 - **The rating ramp has five steps.** A method with fewer ratings spreads them across the ramp, so the lowest and the highest always sit at its ends.

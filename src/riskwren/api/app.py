@@ -12,7 +12,7 @@ from riskwren import PRODUCT_NAME, __version__
 from riskwren.access.middleware import install_access
 from riskwren.access.policy import authorize
 from riskwren.api.problems import install_problem_handlers
-from riskwren.api.routers import branding, inventory, people, session, system
+from riskwren.api.routers import branding, inventory, people, risks, session, system
 from riskwren.api.routers.branding import install_branding
 from riskwren.api.security import install_security_headers
 from riskwren.api.static import install_static
@@ -20,7 +20,7 @@ from riskwren.config import ENV_CONFIG, Config, load_config
 from riskwren.db.engine import Database
 from riskwren.home import DataHome
 
-ROUTERS = (system, session, people, branding, inventory)
+ROUTERS = (system, session, people, branding, inventory, risks)
 
 
 def create_app(config: Config) -> FastAPI:

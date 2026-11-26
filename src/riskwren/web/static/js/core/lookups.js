@@ -6,6 +6,23 @@ export async function vocabularies() {
   return (await get("/api/v1/vocabularies")).data;
 }
 
+/** How risks are rated: the scoring method, the categories with their appetite, and the rules. */
+export async function program({ fresh = false } = {}) {
+  return (await get("/api/v1/program", null, { fresh })).data;
+}
+
+/** Risk categories as select options, the narrower ones indented under the broader. */
+export function categoryOptions(programData, { blank = null, topOnly = false } = {}) {
+  const out = blank == null ? [] : [["", blank]];
+  for (const top of programData.categories) {
+    if (top.status !== "active") continue;
+    out.push([top.key, top.name]);
+    if (topOnly) continue;
+    for (const child of top.children) if (child.status === "active") out.push([child.key, `\u00a0\u00a0\u00a0${child.name}`]);
+  }
+  return out;
+}
+
 export async function units() {
   const { units: list, tree } = (await get("/api/v1/units")).data;
   return { list, tree, byId: new Map(list.map((unit) => [unit.id, unit])) };

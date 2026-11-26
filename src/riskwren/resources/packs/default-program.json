@@ -368,7 +368,458 @@
             "system"
           ]
         ]
+      },
+      {
+        "key": "part_of",
+        "label": "Is part of",
+        "reverse": "Includes",
+        "between": [
+          [
+            "process",
+            "process"
+          ],
+          [
+            "system",
+            "system"
+          ]
+        ]
       }
     ]
+  },
+  "categories": [
+    {
+      "key": "strategic",
+      "name": "Strategic",
+      "appetite": "high",
+      "description": "The organization's direction, standing, and sources of support.",
+      "children": [
+        {
+          "key": "funding_environment",
+          "name": "Funding environment"
+        },
+        {
+          "key": "scientific_direction",
+          "name": "Scientific direction"
+        },
+        {
+          "key": "partnerships",
+          "name": "Partnerships and affiliations"
+        },
+        {
+          "key": "reputation",
+          "name": "Reputation and standing"
+        }
+      ]
+    },
+    {
+      "key": "research",
+      "name": "Research and scientific integrity",
+      "appetite": "moderate",
+      "description": "The conduct of research and the soundness of what it produces.",
+      "children": [
+        {
+          "key": "integrity",
+          "name": "Research integrity"
+        },
+        {
+          "key": "human_subjects",
+          "name": "Human participants"
+        },
+        {
+          "key": "animals",
+          "name": "Animal research"
+        },
+        {
+          "key": "data_quality",
+          "name": "Data and specimen integrity"
+        },
+        {
+          "key": "research_security",
+          "name": "Research security"
+        }
+      ]
+    },
+    {
+      "key": "clinical",
+      "name": "Clinical and participant safety",
+      "appetite": "low",
+      "description": "The safety of patients and of participants in clinical research.",
+      "children": [
+        {
+          "key": "patient_safety",
+          "name": "Patient safety"
+        },
+        {
+          "key": "medication",
+          "name": "Medication"
+        },
+        {
+          "key": "infection",
+          "name": "Infection prevention"
+        },
+        {
+          "key": "clinical_trial_conduct",
+          "name": "Conduct of clinical trials"
+        }
+      ]
+    },
+    {
+      "key": "regulatory",
+      "name": "Regulatory and legal",
+      "appetite": "low",
+      "description": "What the law, regulators, sponsors, and agreements require.",
+      "children": [
+        {
+          "key": "privacy",
+          "name": "Privacy"
+        },
+        {
+          "key": "grants",
+          "name": "Award and agreement terms"
+        },
+        {
+          "key": "licensing",
+          "name": "Licensing and accreditation"
+        },
+        {
+          "key": "employment",
+          "name": "Employment and conduct"
+        }
+      ]
+    },
+    {
+      "key": "technology",
+      "name": "Information and technology",
+      "appetite": "moderate",
+      "description": "The confidentiality, integrity, and availability of information and systems.",
+      "children": [
+        {
+          "key": "confidentiality",
+          "name": "Confidentiality of information"
+        },
+        {
+          "key": "availability",
+          "name": "Availability of systems"
+        },
+        {
+          "key": "integrity_change",
+          "name": "Integrity and change"
+        },
+        {
+          "key": "ai",
+          "name": "Use of AI and automation"
+        }
+      ]
+    },
+    {
+      "key": "operations",
+      "name": "Operations and facilities",
+      "appetite": "moderate",
+      "description": "The buildings, equipment, and services that work depends on.",
+      "children": [
+        {
+          "key": "facilities",
+          "name": "Facilities and utilities"
+        },
+        {
+          "key": "equipment",
+          "name": "Equipment and instruments"
+        },
+        {
+          "key": "biosafety",
+          "name": "Biological, chemical, and radiation safety"
+        },
+        {
+          "key": "continuity",
+          "name": "Continuity of operations"
+        }
+      ]
+    },
+    {
+      "key": "people",
+      "name": "People and culture",
+      "appetite": "moderate",
+      "description": "The people who do the work, and how they are treated.",
+      "children": [
+        {
+          "key": "workforce",
+          "name": "Workforce and succession"
+        },
+        {
+          "key": "wellbeing",
+          "name": "Safety and wellbeing of staff"
+        },
+        {
+          "key": "conduct",
+          "name": "Conduct and training"
+        }
+      ]
+    },
+    {
+      "key": "financial",
+      "name": "Financial and stewardship",
+      "appetite": "low",
+      "description": "The organization's money, and the money entrusted to it.",
+      "children": [
+        {
+          "key": "stewardship",
+          "name": "Stewardship of sponsored funds"
+        },
+        {
+          "key": "fraud",
+          "name": "Fraud and misuse"
+        },
+        {
+          "key": "liquidity",
+          "name": "Liquidity and reserves"
+        },
+        {
+          "key": "philanthropy",
+          "name": "Philanthropy"
+        }
+      ]
+    },
+    {
+      "key": "third_party",
+      "name": "Third party",
+      "appetite": "moderate",
+      "description": "What the organization depends on others for.",
+      "children": [
+        {
+          "key": "supplier_dependence",
+          "name": "Dependence on a supplier"
+        },
+        {
+          "key": "supplier_security",
+          "name": "A supplier's handling of information"
+        },
+        {
+          "key": "subrecipients",
+          "name": "Subrecipients and collaborators"
+        }
+      ]
+    }
+  ],
+  "scoring_method": {
+    "title": "Five by five, by the highest impact",
+    "likelihood": [
+      {
+        "level": 1,
+        "key": "rare",
+        "label": "Rare",
+        "definition": "Not expected within ten years"
+      },
+      {
+        "level": 2,
+        "key": "unlikely",
+        "label": "Unlikely",
+        "definition": "Could happen once in five to ten years"
+      },
+      {
+        "level": 3,
+        "key": "possible",
+        "label": "Possible",
+        "definition": "Could happen once in two to five years"
+      },
+      {
+        "level": 4,
+        "key": "likely",
+        "label": "Likely",
+        "definition": "Expected about once a year"
+      },
+      {
+        "level": 5,
+        "key": "almost_certain",
+        "label": "Almost certain",
+        "definition": "Expected several times a year"
+      }
+    ],
+    "impact_levels": [
+      {
+        "level": 1,
+        "key": "negligible",
+        "label": "Negligible"
+      },
+      {
+        "level": 2,
+        "key": "minor",
+        "label": "Minor"
+      },
+      {
+        "level": 3,
+        "key": "moderate",
+        "label": "Moderate"
+      },
+      {
+        "level": 4,
+        "key": "major",
+        "label": "Major"
+      },
+      {
+        "level": 5,
+        "key": "severe",
+        "label": "Severe"
+      }
+    ],
+    "dimensions": [
+      {
+        "key": "mission",
+        "label": "Mission",
+        "question": "How far would research, care, or teaching be set back, and could the loss be recovered?",
+        "levels": {
+          "1": "No noticeable effect on research, care, or teaching.",
+          "2": "A delay of days to one group's work, fully recovered.",
+          "3": "Weeks of delay to several groups, or a study's timeline at risk; recoverable with effort.",
+          "4": "Months of work lost, a major program or service halted, or a study compromised.",
+          "5": "Irreplaceable material, data, or years of work lost, or the organization unable to carry out its mission."
+        }
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "question": "Could patients, participants, staff, or the public be harmed?",
+        "levels": {
+          "1": "No harm to anyone.",
+          "2": "Minor injury or distress needing no more than first aid or reassurance.",
+          "3": "Harm needing medical treatment, or a patient or participant exposed to avoidable risk.",
+          "4": "Serious harm to one person, or lesser harm to many.",
+          "5": "Death, permanent harm, or serious harm to many."
+        }
+      },
+      {
+        "key": "financial",
+        "label": "Financial",
+        "question": "What would it cost, as a share of the annual operating budget?",
+        "levels": {
+          "1": "Under one hundredth of one percent of the annual operating budget.",
+          "2": "Up to one tenth of one percent.",
+          "3": "Up to one percent.",
+          "4": "Up to five percent.",
+          "5": "More than five percent, or the organization's solvency in question."
+        }
+      },
+      {
+        "key": "legal",
+        "label": "Legal and regulatory",
+        "question": "Would an obligation be breached, and what would follow?",
+        "levels": {
+          "1": "No obligation breached.",
+          "2": "A minor lapse, corrected internally, with nothing to report.",
+          "3": "A reportable breach, or a finding that needs a corrective action plan.",
+          "4": "Sanctions, repayment of funds, or an award or approval suspended.",
+          "5": "Loss of eligibility for funding, loss of a license or accreditation, or prosecution."
+        }
+      },
+      {
+        "key": "trust",
+        "label": "Trust",
+        "question": "How would it affect the confidence of participants, patients, funders, partners, and the public?",
+        "levels": {
+          "1": "Not noticed outside the team.",
+          "2": "Noticed inside the organization, with no lasting effect.",
+          "3": "Complaints or local coverage; some participants, donors, or partners ask questions.",
+          "4": "Sustained coverage; participants withdraw, or a partner or funder steps back.",
+          "5": "Lasting loss of public confidence; recruitment, giving, or partnerships damaged for years."
+        }
+      }
+    ],
+    "ratings": [
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "Managed as part of ordinary work"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "Watched, with an owner and a review each year"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "Needs a plan or a formal acceptance, and leadership's attention"
+      },
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Needs action now, and the attention of the most senior leaders"
+      }
+    ],
+    "matrix": [
+      [
+        "low",
+        "low",
+        "low",
+        "low",
+        "moderate"
+      ],
+      [
+        "low",
+        "low",
+        "moderate",
+        "moderate",
+        "moderate"
+      ],
+      [
+        "low",
+        "moderate",
+        "moderate",
+        "high",
+        "high"
+      ],
+      [
+        "moderate",
+        "moderate",
+        "high",
+        "high",
+        "critical"
+      ],
+      [
+        "high",
+        "high",
+        "high",
+        "critical",
+        "critical"
+      ]
+    ],
+    "control_effect": {
+      "reliance": {
+        "primary": 1.0,
+        "supporting": 0.5
+      },
+      "strength": {
+        "effective": 1.0,
+        "partly": 0.5,
+        "ineffective": 0.0,
+        "not_assessed": 0.0
+      },
+      "limit": 2
+    }
+  },
+  "cadences": {
+    "risk_review_months": {
+      "critical": 3,
+      "high": 6,
+      "moderate": 12,
+      "low": 24
+    },
+    "unrated_risk_review_months": 3,
+    "control_rating_months": 12
+  },
+  "authority": {
+    "acceptance": {
+      "moderate": {
+        "max_months": 24,
+        "needs_limit": false
+      },
+      "high": {
+        "max_months": 12,
+        "needs_limit": true
+      },
+      "critical": {
+        "max_months": 6,
+        "needs_limit": true
+      }
+    }
   }
 }

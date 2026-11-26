@@ -107,6 +107,7 @@ All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_uni
 | `supplied_by` | System → Third party | supplied by / supplies |
 | `performed_by` | Process → Third party | performed by / performs |
 | `depends_on` | System → System, Process → Process | depends on / is depended on by |
+| `part_of` | System → System, Process → Process | is part of / includes |
 | `holds` | System → Information asset (wave 2) | holds / is held in |
 
 ### Tags
@@ -125,7 +126,7 @@ Free labels, for whatever the vocabularies do not cover, kept as a list on the r
 
 ### Risk
 
-`risk(ref, title, cause, event, consequence, category_id, org_unit_id, status, response, inherent_*, residual_*, target_*, standing, next_review_on, escalated_to_unit_id, library_key, version, …)`.
+`risk(ref, name, cause, event, consequence, category_id, org_unit_id, status, closed_reason, response, inherent_*, residual_*, target_*, standing, next_review_on, residual_in_doubt, escalated_to_unit_id, library_key, version, …)`. `name` is its short title.
 
 - `status`: draft, open, closed.
 - `response`: a vocabulary (reduce, accept, transfer, avoid), with a rationale.
@@ -135,7 +136,7 @@ Free labels, for whatever the vocabularies do not cover, kept as a list on the r
 
 ### Assessment of a risk
 
-`risk_assessment(id, risk_id, kind, likelihood, impact, impact_levels, rating, rationale, suggested, method_id, assessed_by, assessed_at, superseded_by)`.
+`risk_assessment(id, risk_id, kind, likelihood, impact, impact_levels, rating, rationale, suggested, method_id, assessed_by, assessed_by_name, assessed_at, superseded_by)`. The assessor's name is kept as it was, so the record reads the same after an account is renamed.
 
 - `kind`: inherent, residual, target.
 - `impact_levels`: the level chosen on each dimension rated.
