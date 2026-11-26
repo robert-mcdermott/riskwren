@@ -1,15 +1,78 @@
 name: CI
 
+# The same files are tested once.
+#
+# - A branch in this repository is tested when it is pushed. A pull request from that branch
+#   is not tested again: it shows the result of the push, which is the same commit.
+# - A pull request from a fork is tested as a pull request, since its pushes do not run here.
+# - A commit whose files are exactly those of a commit that has already passed is not tested
+#   again. Merging a tested branch into a main that has not moved is the usual case: the merge
+#   commit holds the branch's files and nothing else.
+# - A newer push to a branch stops the run for the push before it.
+#
+# Tags and releases start nothing: a tag names a commit that has already been through this.
 on:
   push:
-    branches: [main, "wave-*"]
+    branches: ["**"]
   pull_request:
 
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  already-tested:
+    name: Tested already?
+    # A pull request from a branch of this repository was tested when the branch was pushed.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    outputs:
+      as: ${{ steps.look.outputs.as }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Look for a passed run of the same files
+        id: look
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          tree=$(git rev-parse 'HEAD^{tree}')
+          # Where the same files may have been tested before: this commit's parents, and, for
+          # a squashed or rebased merge that has no such parent, the head of the pull request
+          # it came from.
+          candidates=$(git rev-list --parents -n 1 HEAD | cut -d' ' -f2-)
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            merged=$(gh api "repos/$REPO/commits/$GITHUB_SHA/pulls" \
+              --jq '.[] | select(.merged_at != null) | .head.sha' 2>/dev/null || true)
+            candidates="$candidates $merged"
+          fi
+          for sha in $candidates; do
+            git cat-file -e "$sha^{commit}" 2>/dev/null \
+              || git fetch --quiet --depth 1 origin "$sha" 2>/dev/null || continue
+            [ "$(git rev-parse "$sha^{tree}")" = "$tree" ] || continue
+            # Only a run started by a push counts: a pull request's run may have been skipped.
+            passed=$(gh api \
+              "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$sha&event=push&status=success" \
+              --jq '.total_count' 2>/dev/null || echo 0)
+            if [ "${passed:-0}" -gt 0 ]; then
+              echo "as=$sha" >> "$GITHUB_OUTPUT"
+              echo "These files passed as commit $sha. They are not tested again." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
+          echo "as=" >> "$GITHUB_OUTPUT"
+          echo "These files have not been tested before." >> "$GITHUB_STEP_SUMMARY"
+
   checks:
+    needs: already-tested
+    if: needs.already-tested.outputs.as == ''
     runs-on: ubuntu-latest
     services:
       postgres:
