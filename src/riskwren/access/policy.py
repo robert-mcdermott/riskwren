@@ -1,0 +1,179 @@
+"""The one table that says what each API route requires (PLT-04).
+
+Every route under ``/api`` must appear here. A route that does not is refused, and a test
+fails the build if one is added without an entry. This is the coarse check; services check
+again against the record itself (its unit, its owners, its visibility).
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+from fastapi import HTTPException, Request
+
+from riskwren.access.principal import Principal
+
+
+class Needs(StrEnum):
+    PUBLIC = "public"  # no sign-in: health, product name, signing in
+    MEMBER = "member"  # anyone signed in
+    ASSESS = "assess"  # assessors and managers, each within their scope
+    STEWARD = "steward"  # stewards and managers, each within their scope
+    LEAD = "lead"  # leaders, within their scope
+    MANAGE = "manage"  # managers for the whole organization: running the program
+    CONFIGURE = "configure"  # those managers, and administrators: shaping the program
+    READ_ALL = "read_all"  # those managers, auditors, and administrators
+    ADMIN = "admin"  # administrators
+
+
+POLICIES: dict[tuple[str, str], Needs] = {
+    ("GET", "/api/v1/health/live"): Needs.PUBLIC,
+    ("GET", "/api/v1/health/ready"): Needs.PUBLIC,
+    ("GET", "/api/v1/meta"): Needs.PUBLIC,
+    # Signing in and out
+    ("GET", "/api/v1/session"): Needs.PUBLIC,  # answers 401 itself, so the app can show sign-in
+    ("POST", "/api/v1/session"): Needs.PUBLIC,
+    ("DELETE", "/api/v1/session"): Needs.PUBLIC,
+    ("POST", "/api/v1/session/demo"): Needs.PUBLIC,  # answers 404 unless this is a demo
+    ("POST", "/api/v1/session/password"): Needs.MEMBER,
+    # People
+    ("GET", "/api/v1/accounts"): Needs.MEMBER,  # the people picker; members see names only
+    ("POST", "/api/v1/accounts"): Needs.ADMIN,
+    ("GET", "/api/v1/accounts/{account_id}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/accounts/{account_id}"): Needs.MEMBER,  # one's own details, or admin
+    ("PUT", "/api/v1/accounts/{account_id}/roles"): Needs.ADMIN,
+    ("PUT", "/api/v1/accounts/{account_id}/units"): Needs.ADMIN,
+    ("POST", "/api/v1/accounts/{account_id}/password"): Needs.ADMIN,
+    ("GET", "/api/v1/roles"): Needs.MEMBER,
+    # Units
+    ("GET", "/api/v1/units"): Needs.MEMBER,
+    ("POST", "/api/v1/units"): Needs.ADMIN,
+    ("GET", "/api/v1/units/{unit_id}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/units/{unit_id}"): Needs.ADMIN,
+    # Branding
+    ("GET", "/api/v1/admin/branding"): Needs.ADMIN,
+    ("PUT", "/api/v1/admin/branding"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/branding/check"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/branding/images/{kind}"): Needs.ADMIN,
+    ("DELETE", "/api/v1/admin/branding/images/{kind}"): Needs.ADMIN,
+    # Imports
+    ("POST", "/api/v1/imports/units"): Needs.ADMIN,
+    ("POST", "/api/v1/imports/people"): Needs.ADMIN,
+    # The program
+    ("GET", "/api/v1/vocabularies"): Needs.MEMBER,
+    ("GET", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+    ("PUT", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+}
+
+
+def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], Needs]:
+    """What every record type's routes need. Any member may ask; the services decide what
+    each may see and change, by the record's unit, its owners, and its visibility."""
+    base = f"/api/v1/{path}"
+    found = {
+        ("GET", base): Needs.MEMBER,
+        ("POST", base): Needs.STEWARD,
+        ("GET", base + "/{ref}"): Needs.MEMBER,
+        ("PATCH", base + "/{ref}"): Needs.MEMBER,
+        ("PUT", base + "/{ref}/owners"): Needs.MEMBER,
+        ("GET", base + "/{ref}/history"): Needs.MEMBER,
+    }
+    if links:
+        found[("POST", base + "/{ref}/links")] = Needs.MEMBER
+        found[("DELETE", base + "/{ref}/links/{link_id}")] = Needs.MEMBER
+    return found
+
+
+for _path in ("processes", "systems", "third-parties"):
+    POLICIES.update(record_policies(_path))
+
+# The risk register
+POLICIES.update(record_policies("risks", links=False))
+POLICIES.update(
+    {
+        ("GET", "/api/v1/program"): Needs.MEMBER,
+        ("PATCH", "/api/v1/risk-categories/{key}"): Needs.CONFIGURE,
+        ("GET", "/api/v1/risk-library"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/assessments"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/assessments"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/subjects"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/escalation"): Needs.MEMBER,
+    }
+)
+
+# Controls and treatment. As with every record, any member may ask, and the services decide
+# by the record: who owns it, whose unit it is in, and who has the authority.
+POLICIES.update(record_policies("controls", links=False))
+POLICIES.update(
+    {
+        ("GET", "/api/v1/control-library"): Needs.MEMBER,
+        ("GET", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
+        ("POST", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/controls"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/controls"): Needs.MEMBER,
+        ("DELETE", "/api/v1/risks/{ref}/controls/{control_ref}"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/treatment"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/response"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/plans"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/acceptances"): Needs.LEAD,
+        ("POST", "/api/v1/acceptances/{acceptance_id}/withdrawal"): Needs.MEMBER,
+        ("GET", "/api/v1/acceptances"): Needs.MEMBER,
+        ("GET", "/api/v1/plans"): Needs.MEMBER,
+        ("GET", "/api/v1/plans/{ref}"): Needs.MEMBER,
+        ("POST", "/api/v1/plans/{ref}/cancellation"): Needs.MEMBER,
+        ("POST", "/api/v1/plans/{ref}/actions"): Needs.MEMBER,
+        ("GET", "/api/v1/actions"): Needs.MEMBER,
+        ("PATCH", "/api/v1/actions/{ref}"): Needs.MEMBER,
+    }
+)
+
+# Reporting: every figure counts only what the asker may see.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/home"): Needs.MEMBER,
+        ("GET", "/api/v1/heat-map"): Needs.MEMBER,
+        ("GET", "/api/v1/dashboard"): Needs.MEMBER,
+    }
+)
+
+
+def allowed(principal: Principal | None, needs: Needs) -> bool:
+    if needs is Needs.PUBLIC:
+        return True
+    if principal is None:
+        return False
+    return {
+        Needs.MEMBER: True,
+        Needs.ASSESS: principal.assesses,
+        Needs.STEWARD: principal.stewards or principal.manages_somewhere,
+        Needs.LEAD: principal.leads,
+        Needs.MANAGE: principal.manages,
+        Needs.CONFIGURE: principal.configures,
+        Needs.READ_ALL: principal.reads_all,
+        Needs.ADMIN: principal.is_admin,
+    }[needs]
+
+
+def authorize(request: Request) -> None:
+    """The app-wide dependency: look the matched route up in the table and check it."""
+    route = request.scope.get("route")
+    path = getattr(route, "path", "")
+    if not path.startswith("/api/"):
+        return  # the web app's own files
+    needs = POLICIES.get((request.method, path))
+    if needs is None:
+        raise HTTPException(403, "This route has no access policy.")
+    principal: Principal | None = getattr(request.state, "principal", None)
+    if allowed(principal, needs):
+        return
+    if principal is None:
+        raise HTTPException(401, "Sign in to continue.")
+    raise HTTPException(403, "Your role does not allow this.")
+
+
+def current(request: Request) -> Principal:
+    """The signed-in person, for routes that the table says need one."""
+    principal: Principal | None = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(401, "Sign in to continue.")
+    return principal

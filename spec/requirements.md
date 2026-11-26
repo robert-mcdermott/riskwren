@@ -21,10 +21,11 @@ The things risk attaches to.
 | INV-08 | S | Spreadsheet import | Any record type is imported from CSV with column mapping and a dry run that reports every problem by row; nothing is loaded unless all of it can be | 2 |
 | INV-09 | S | External references | A record can carry its identifier in another system (an asset tag, a contract number), shown as a link where a pattern is configured | 2 |
 | INV-10 | S | Search and saved views | One search across every record type, filtered by what the searcher may see; a filtered list can be saved and shared | 3 |
-| INV-11 | S | Dependency graph | A focused picture of what a record depends on and what depends on it, with a list beside it | 3 |
+| INV-11 | S | Dependency graph | A focused picture of how one record connects to the others: what it relies on, what relies on it, and its risks, controls, and scopes. Neighbors expand on request, and a list beside it says the same thing | 2 |
 | INV-12 | S | Completeness and duplicates | Each record shows which expected facts are missing; likely duplicates are suggested and can be merged, keeping both histories | 3 |
 | INV-13 | S | Sites | Buildings, floors, and facilities as records, for continuity planning and physical risk | 8 |
 | INV-14 | C | Custom fields | An organization adds its own fields to a record type without code | 9 |
+| INV-15 | S | Organization-wide history | Those who may read everything can browse every change in one place, filtered by person, record, and date | 2 |
 
 ## Risk (RSK)
 

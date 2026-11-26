@@ -92,15 +92,17 @@ RiskWren is designed **not** to hold the regulated data it describes. Records de
 
 ### Visibility
 
-A register is useful in proportion to how widely it is read and dangerous in proportion to how widely it is exposed. Organizations differ on where to draw the line, so visibility of risks, controls, and the inventory for ordinary members is a setting with three levels:
+**The inventory is open.** Processes, systems, and third parties are visible to everyone signed in, because a record can only be linked to what its author can see: a lab cannot say that its work relies on central storage if it cannot find central storage. What they describe is rarely sensitive, and what is can be marked restricted.
+
+**The register follows a setting.** A register of risks and controls is useful in proportion to how widely it is read and dangerous in proportion to how widely it is exposed. Organizations differ on where to draw the line, so for ordinary members it is a setting with three levels:
 
 | Setting | A member sees |
 |---|---|
-| **Open** | Every open risk, control, process, system, and third party, in full |
-| **Unit** (default) | The records of the units they belong to, and any record they own or are named on |
-| **Assigned** | Only records they own or are named on |
+| **Open** | Every risk and control that is not restricted |
+| **Unit** (default) | The risks and controls of the units they belong to, and any they own or are named on |
+| **Assigned** | Only the risks and controls they own or are named on |
 
-Whatever the setting, leaders and stewards see their unit and everything beneath it, and managers, assessors in scope, auditors, and administrators see what their role needs. Issues, test results, and evidence (wave 2) are visible only to those with a role in them. A record can be marked **restricted**, which limits even its existence to its owners, its unit's stewards and leaders, managers, and auditors.
+Whatever the setting, leaders and stewards see their unit and everything beneath it, and managers, assessors in scope, auditors, and administrators see what their role needs. Issues, test results, and evidence (wave 2) are visible only to those with a role in them. Any record can be marked **restricted**, which limits even its existence to its owners, its unit's stewards and leaders, managers, and auditors; an assessor does not see restricted records unless named on them.
 
 One function per record type decides what a principal may see. Single records, lists, counts, charts, searches, and exports all call it, so they always agree.
 
@@ -109,7 +111,8 @@ One function per record type decides what a principal may see. Single records, l
 | Capability | Member | Owner of the record | Steward (in scope) | Leader (in scope) | Assessor (in scope) | Manager | Auditor | Admin |
 |---|---|---|---|---|---|---|---|---|
 | See what is assigned to them; complete an action | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Read records | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Read the inventory (unless restricted) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Read risks and controls | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Add a record in a unit | | | ✓ | | | ✓ | | |
 | Edit a record; link and unlink | | ✓ | ✓ | | | ✓ | | |
 | Assess a risk; rate a control | | ✓ | ✓ | | ✓ | ✓ | | |

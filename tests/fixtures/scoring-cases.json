@@ -1,0 +1,842 @@
+{
+ "about": "Cases that the Python and JavaScript scoring modules must both pass, against the default scoring method.",
+ "cases": [
+  {
+   "fn": "rating",
+   "args": [
+    1,
+    1
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    2,
+    1
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    3,
+    1
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    4,
+    1
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    5,
+    1
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    1,
+    2
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    2,
+    2
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    3,
+    2
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    4,
+    2
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    5,
+    2
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    1,
+    3
+   ],
+   "expect": "low"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    2,
+    3
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    3,
+    3
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    4,
+    3
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    5,
+    3
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    1,
+    4
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    2,
+    4
+   ],
+   "expect": "moderate"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    3,
+    4
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    4,
+    4
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    5,
+    4
+   ],
+   "expect": "critical"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    1,
+    5
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    2,
+    5
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    3,
+    5
+   ],
+   "expect": "high"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    4,
+    5
+   ],
+   "expect": "critical"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    5,
+    5
+   ],
+   "expect": "critical"
+  },
+  {
+   "fn": "rating",
+   "args": [
+    0,
+    3
+   ],
+   "expect": {
+    "error": true
+   }
+  },
+  {
+   "fn": "rating",
+   "args": [
+    3,
+    6
+   ],
+   "expect": {
+    "error": true
+   }
+  },
+  {
+   "fn": "overall_impact",
+   "args": [
+    {
+     "mission": 3,
+     "safety": 5,
+     "financial": null
+    }
+   ],
+   "expect": 5,
+   "name": "the highest dimension rated, not the average"
+  },
+  {
+   "fn": "overall_impact",
+   "args": [
+    {
+     "mission": 2
+    }
+   ],
+   "expect": 2
+  },
+  {
+   "fn": "overall_impact",
+   "args": [
+    {
+     "mission": null,
+     "trust": 0
+    }
+   ],
+   "expect": null,
+   "name": "nothing rated"
+  },
+  {
+   "fn": "overall_impact",
+   "args": [
+    {}
+   ],
+   "expect": null
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    0,
+    4
+   ],
+   "expect": 0
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    1,
+    4
+   ],
+   "expect": 1
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    2,
+    4
+   ],
+   "expect": 2
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    3,
+    4
+   ],
+   "expect": 4
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    4,
+    4
+   ],
+   "expect": 5
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    1,
+    3
+   ],
+   "expect": 1
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    2,
+    3
+   ],
+   "expect": 3
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    3,
+    3
+   ],
+   "expect": 5
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    1,
+    5
+   ],
+   "expect": 1
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    3,
+    5
+   ],
+   "expect": 3
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    5,
+    5
+   ],
+   "expect": 5
+  },
+  {
+   "fn": "ramp_level",
+   "args": [
+    1,
+    1
+   ],
+   "expect": 5
+  },
+  {
+   "fn": "position",
+   "args": [
+    "low"
+   ],
+   "expect": 1
+  },
+  {
+   "fn": "position",
+   "args": [
+    "critical"
+   ],
+   "expect": 4
+  },
+  {
+   "fn": "position",
+   "args": [
+    "purple"
+   ],
+   "expect": 0
+  },
+  {
+   "fn": "position",
+   "args": [
+    null
+   ],
+   "expect": 0
+  },
+  {
+   "fn": "exceeds",
+   "args": [
+    "high",
+    "moderate"
+   ],
+   "expect": true
+  },
+  {
+   "fn": "exceeds",
+   "args": [
+    "moderate",
+    "moderate"
+   ],
+   "expect": false
+  },
+  {
+   "fn": "exceeds",
+   "args": [
+    "low",
+    "high"
+   ],
+   "expect": false
+  },
+  {
+   "fn": "exceeds",
+   "args": [
+    null,
+    "low"
+   ],
+   "expect": false,
+   "name": "an unrated risk exceeds nothing"
+  },
+  {
+   "fn": "exceeds",
+   "args": [
+    "critical",
+    null
+   ],
+   "expect": false
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "effective",
+    "effective"
+   ],
+   "expect": "effective"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "effective",
+    "partly"
+   ],
+   "expect": "partly"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "partly",
+    "effective"
+   ],
+   "expect": "partly"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "effective",
+    "ineffective"
+   ],
+   "expect": "ineffective"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "ineffective",
+    "partly"
+   ],
+   "expect": "ineffective"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "effective",
+    "not_assessed"
+   ],
+   "expect": "not_assessed"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    null,
+    "effective"
+   ],
+   "expect": "not_assessed"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "not_assessed",
+    "ineffective"
+   ],
+   "expect": "not_assessed"
+  },
+  {
+   "fn": "control_state",
+   "args": [
+    "effective",
+    "effective"
+   ],
+   "expect": "stale",
+   "stale": true,
+   "name": "a rating that has aged out counts for nothing"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    4,
+    5,
+    [
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "partly"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "supporting",
+      "design": null,
+      "operation": null
+     },
+     {
+      "reduces": "impact",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "impact",
+      "reliance": "supporting",
+      "design": "effective",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 3,
+    "impact": 4,
+    "rating": "high",
+    "steps": {
+     "likelihood": 1,
+     "impact": 1
+    },
+    "totals": {
+     "likelihood": 1.5,
+     "impact": 1.5
+    }
+   },
+   "name": "the worked example in the engine document"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    4,
+    5,
+    []
+   ],
+   "expect": {
+    "likelihood": 4,
+    "impact": 5,
+    "rating": "critical",
+    "steps": {
+     "likelihood": 0,
+     "impact": 0
+    },
+    "totals": {
+     "likelihood": 0,
+     "impact": 0
+    }
+   },
+   "name": "no controls, no reduction"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    5,
+    3,
+    [
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 3,
+    "impact": 3,
+    "rating": "moderate",
+    "steps": {
+     "likelihood": 2,
+     "impact": 0
+    },
+    "totals": {
+     "likelihood": 5,
+     "impact": 0
+    }
+   },
+   "name": "no number of controls lowers an axis past the limit"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    1,
+    2,
+    [
+     {
+      "reduces": "both",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "both",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 1,
+    "impact": 1,
+    "rating": "low",
+    "steps": {
+     "likelihood": 0,
+     "impact": 1
+    },
+    "totals": {
+     "likelihood": 2,
+     "impact": 2
+    }
+   },
+   "name": "never below level 1"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    3,
+    3,
+    [
+     {
+      "reduces": "both",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 2,
+    "impact": 2,
+    "rating": "low",
+    "steps": {
+     "likelihood": 1,
+     "impact": 1
+    },
+    "totals": {
+     "likelihood": 1,
+     "impact": 1
+    }
+   },
+   "name": "a control that reduces both"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    4,
+    4,
+    [
+     {
+      "reduces": "likelihood",
+      "reliance": "supporting",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "supporting",
+      "design": "effective",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 3,
+    "impact": 4,
+    "rating": "high",
+    "steps": {
+     "likelihood": 1,
+     "impact": 0
+    },
+    "totals": {
+     "likelihood": 1,
+     "impact": 0
+    }
+   },
+   "name": "two supporting controls make one step"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    4,
+    4,
+    [
+     {
+      "reduces": "impact",
+      "reliance": "primary",
+      "design": "partly",
+      "operation": "effective"
+     },
+     {
+      "reduces": "impact",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "partly"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 4,
+    "impact": 3,
+    "rating": "high",
+    "steps": {
+     "likelihood": 0,
+     "impact": 1
+    },
+    "totals": {
+     "likelihood": 0,
+     "impact": 1
+    }
+   },
+   "name": "two partly effective controls make one step"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    4,
+    4,
+    [
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective",
+      "stale": true
+     },
+     {
+      "reduces": "likelihood",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "ineffective"
+     },
+     {
+      "reduces": "impact",
+      "reliance": "primary",
+      "design": "not_assessed",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 4,
+    "impact": 4,
+    "rating": "high",
+    "steps": {
+     "likelihood": 0,
+     "impact": 0
+    },
+    "totals": {
+     "likelihood": 0,
+     "impact": 0
+    }
+   },
+   "name": "stale, ineffective, and unassessed controls count for nothing"
+  },
+  {
+   "fn": "suggest",
+   "args": [
+    3,
+    3,
+    [
+     {
+      "reduces": "likelihood",
+      "reliance": "sometimes",
+      "design": "effective",
+      "operation": "effective"
+     },
+     {
+      "reduces": "neither",
+      "reliance": "primary",
+      "design": "effective",
+      "operation": "effective"
+     }
+    ]
+   ],
+   "expect": {
+    "likelihood": 3,
+    "impact": 3,
+    "rating": "moderate",
+    "steps": {
+     "likelihood": 0,
+     "impact": 0
+    },
+    "totals": {
+     "likelihood": 0,
+     "impact": 0
+    }
+   },
+   "name": "what the method does not know counts for nothing"
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "wave-*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: riskwren
+          POSTGRES_PASSWORD: riskwren-ci
+          POSTGRES_DB: riskwren_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U riskwren -d riskwren_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: uv sync --extra postgres
+      - name: Lint
+        run: uv run ruff check
+      - name: Format
+        run: uv run ruff format --check
+      - name: Tests on SQLite
+        run: uv run pytest -q
+      - name: Tests on PostgreSQL
+        env:
+          RISKWREN_TEST_DATABASE: postgres
+          RISKWREN_TEST_POSTGRES_URL: postgresql+psycopg://riskwren:riskwren-ci@127.0.0.1:5432/riskwren_test
+        run: uv run --extra postgres pytest -q

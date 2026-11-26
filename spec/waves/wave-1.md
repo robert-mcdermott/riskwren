@@ -2,7 +2,7 @@
 
 **Goal:** prove the core loop. Something the organization depends on has a risk; RiskWren rates it and shows why; controls of known effectiveness bring it down, and the arithmetic is on the screen; what remains above appetite is treated through a plan or accepted by a named person with the authority; and every step is on a record that cannot be quietly changed. Everything else in the roadmap builds on this loop being quick, clear, and trustworthy.
 
-**Branch:** `wave-1` · **Target version:** `0.1.0` · **Status:** ◐ in progress
+**Branch:** `wave-1` · **Target version:** `0.1.0` · **Status:** ☑ released
 
 ## Exit criteria
 
@@ -38,128 +38,165 @@ None block the start. These defaults have been taken and can be changed before t
 
 ---
 
-## Slice 1: Foundation ☐
+## Slice 1: Foundation ☑
 
 **Goal:** a skeleton in which the rules of the architecture are already enforced.
 
-- [ ] Project: `pyproject.toml` with the five runtime dependencies and the optional PostgreSQL driver, `uv.lock`, `.python-version`, `src/riskwren` layout, `riskwren` entry point, ruff and pytest configuration, Apache 2.0 `LICENSE` and `NOTICE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`
-- [ ] Configuration: `riskwren.toml` read with the standard library into frozen typed settings; unknown keys are errors; all problems reported together; environment overrides; secrets refused in the file
-- [ ] Data home: creation, marker, and checks
-- [ ] Database: engine for SQLite (write-ahead log, foreign keys on) and PostgreSQL; portable JSON and UTC date-time types; a naming convention for constraints; declarative ORM base; one session per request
-- [ ] Migrations: Alembic inside the package with no `alembic.ini`; revision `0001`; `riskwren db upgrade | current`; `serve` refuses a schema that is behind
-- [ ] History: the `event` table; sessions that record every change to an audited row, with before and after values, in the same transaction; refusal of writes with no actor and of bulk statements on audited tables; the hash chain; `riskwren verify`; triggers on both databases refusing update and delete
-- [ ] References: per-prefix counters that never reuse a number
-- [ ] Command line: `init`, `serve`, `db`, `verify`, `doctor`, with a reference page generated from the parser
-- [ ] API: the app factory, the envelope and problem-document conventions, security headers, health and `meta` endpoints, the static shell with a fallback route, `docs/openapi.json` kept current by a test
-- [ ] Tests on both databases: fixtures, a script to start a local PostgreSQL, `scripts/test-both.sh`
-- [ ] Continuous integration: lint, format check, tests on SQLite and PostgreSQL (the private-terms check runs locally, from git hooks, because its list is never published)
-- [ ] `scripts/check_terms.py` with pre-commit and commit-message hooks
+- [x] Project: `pyproject.toml` with the five runtime dependencies and the optional PostgreSQL driver, `uv.lock`, `.python-version`, `src/riskwren` layout, `riskwren` entry point, ruff and pytest configuration, Apache 2.0 `LICENSE` and `NOTICE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`
+- [x] Configuration: `riskwren.toml` read with the standard library into frozen typed settings; unknown keys are errors; all problems reported together; environment overrides; secrets refused in the file
+- [x] Data home: creation, marker, and checks
+- [x] Database: engine for SQLite (write-ahead log, foreign keys on) and PostgreSQL; portable JSON and UTC date-time types; a naming convention for constraints; declarative ORM base; one session per request
+- [x] Migrations: Alembic inside the package with no `alembic.ini`; revision `0001`; `riskwren db upgrade | current`; `serve` refuses a schema that is behind
+- [x] History: the `event` table; sessions that record every change to an audited row, with before and after values, in the same transaction; refusal of writes with no actor and of bulk statements on audited tables; the hash chain; `riskwren verify`; triggers on both databases refusing update and delete
+- [x] References: per-prefix counters that never reuse a number
+- [x] Command line: `init`, `serve`, `db`, `verify`, `doctor`, with a reference page generated from the parser
+- [x] API: the app factory, the envelope and problem-document conventions, security headers, health and `meta` endpoints, the static shell with a fallback route, `docs/openapi.json` kept current by a test
+- [x] Tests on both databases: fixtures, a script to start a local PostgreSQL, `scripts/test-both.sh`
+- [x] Continuous integration: lint, format check, tests on SQLite and PostgreSQL (the private-terms check runs locally, from git hooks, because its list is never published)
+- [x] `scripts/check_terms.py` with pre-commit and commit-message hooks
 
-**Acceptance:** a fresh clone initializes and serves an empty shell; the suite passes on both databases; altering an event row by hand is caught by `riskwren verify`; a write that bypasses the service helper fails a test that compares table changes with events.
+**Acceptance (met):** a fresh clone initializes and serves an empty shell; the suite passes on both databases; altering an event row by hand is caught by `riskwren verify`; a write that bypasses the service helper fails a test that compares table changes with events.
 
-## Slice 2: Accounts, roles, and units ☐
+## Slice 2: Accounts, roles, and units ☑
 
 **Goal:** people can sign in, and the system knows who may do what, where.
 
-- [ ] `account`, `credential`, `membership`, `role_grant`, `session_token`, `failed_sign_in`; scrypt hashing; password rules; throttling per account and address; `HttpOnly`, `SameSite=Strict` cookies; CSRF token and origin checks
-- [ ] `riskwren init` creates the first administrator; `riskwren users add | list | disable | enable | reset-password | roles`; `serve` refuses to start with no administrator
-- [ ] `role_grant` with unit scope and, for a leader, an acceptance limit; the principal, with the units each scoped role covers worked out at sign-in; the policy table as an app-wide dependency; refusal of any route without a policy
-- [ ] `org_unit` tree and `membership`; import of units and people from CSV with a dry run that lists every problem by row
-- [ ] API: session, accounts, roles, units, and imports
+- [x] `account`, `credential`, `membership`, `role_grant`, `session_token`, `failed_sign_in`; scrypt hashing; password rules; throttling per account and address; `HttpOnly`, `SameSite=Strict` cookies; CSRF token and origin checks
+- [x] `riskwren init` creates the first administrator; `riskwren users add | list | disable | enable | reset-password | roles`; `serve` refuses to start with no administrator
+- [x] `role_grant` with unit scope and, for a leader, an acceptance limit; the principal, with the units each scoped role covers worked out at sign-in; the policy table as an app-wide dependency; refusal of any route without a policy
+- [x] `org_unit` tree and `membership`; import of units and people from CSV with a dry run that lists every problem by row
+- [x] API: session, accounts, roles, units, and imports
 
-**Acceptance:** the role-by-route matrix test signs in as each role and exercises every route, and a second test fails when a route has no policy or a policy has no route; a steward of a division covers its labs and no others; the last administrator can be neither demoted nor disabled, in the app or at the command line; CSRF, cross-site requests, throttling, idle and absolute expiry, sign-out, and the ending of sessions on disablement and password change are tested.
+**Acceptance (met):** the role-by-route matrix test signs in as each role and exercises every route, and a second test fails when a route has no policy or a policy has no route; a steward of a division covers its labs and no others; the last administrator can be neither demoted nor disabled, in the app or at the command line; CSRF, cross-site requests, throttling, idle and absolute expiry, sign-out, and the ending of sessions on disablement and password change are tested.
 
-## Slice 3: Web app and design system ☐
+## Slice 3: Web app and design system ☑
 
 **Goal:** a shell that already looks and behaves like a finished product.
 
-- [ ] The sign-in page, user menu, password change, and Admin → People and units (accounts, roles, units, and the import screens)
-- [ ] `tokens.css`, `palettes.css` (Wren, Slate, Garnet), `base.css`, `components.css`, `pages.css`; light, dark, and system modes; the rating ramp in its ordinal and signal forms
-- [ ] The wren mark as SVG: mark, mark with wordmark, single color; the default favicon
-- [ ] Core modules: DOM helper, router with URL state, API client with CSRF and caching, session and permissions, preferences
-- [ ] Components: shell, sidebar, top bar, page header, tabs, drawer, dialog, table, record chip, rating badge, standing pill, stat tile, toast, form fields with server errors on their fields, empty and error states, skeletons
-- [ ] Command palette (⌘K, Ctrl-K, or `/`) and Escape to close anything open
-- [ ] Branding: the `setting` table, `/theme.css` generated from it, logo and tab-icon upload with type sniffing and SVG sanitizing, Admin → Appearance with a live preview in both modes and contrast results before saving
-- [ ] Home: for a new installation's administrator, a setup checklist that ticks itself off
-- [ ] Tests: no inline script or style, no third-party origins, no parsing of data as HTML, every import and route resolves, every script parses, size budgets, and contrast for the token pairs in every palette and mode
+- [x] The sign-in page, user menu, password change, and Admin → People and units (accounts, roles, units, and the import screens)
+- [x] `tokens.css`, `palettes.css` (Wren, Slate, Garnet), `base.css`, `components.css`, `pages.css`; light, dark, and system modes; the rating ramp in its ordinal and signal forms
+- [x] The wren mark as SVG: mark, mark with wordmark, single color; the default favicon
+- [x] Core modules: DOM helper, router with URL state, API client with CSRF and caching, session and permissions, preferences
+- [x] Components: shell, sidebar, top bar, page header, tabs, drawer, dialog, table, record chip, rating badge, standing pill, stat tile, toast, form fields with server errors on their fields, empty and error states, skeletons
+- [x] Command palette (⌘K, Ctrl-K, or `/`) and Escape to close anything open
+- [x] Branding: the `setting` table, `/theme.css` generated from it, logo and tab-icon upload with type sniffing and SVG sanitizing, Admin → Appearance with a live preview in both modes and contrast results before saving
+- [x] Home: for a new installation's administrator, a setup checklist that ticks itself off
+- [x] Tests: no inline script or style, no third-party origins, no parsing of data as HTML, every import and route resolves, every script parses, size budgets, and contrast for the token pairs in every palette and mode
 
-**Acceptance:** an administrator changes the organization name, palette, accent, and rating ramp in the browser and sees them applied at once, with no file touched; every palette passes AA for text, standing, rating, and control-border tokens in both modes; the shell is within its size budget.
+**Acceptance (met):** an administrator changes the organization name, palette, accent, and rating ramp in the browser and sees them applied at once, with no file touched; every palette passes AA for text, standing, rating, and control-border tokens in both modes, on the ordinal ramp and on the signal ramp; the shell is within its size budget. 194 tests pass on SQLite and 190 on PostgreSQL (four are about the SQLite file). Checked in the browser: sign-in, the shell, Admin → Appearance with both ramps, and the roles editor.
 
-## Slice 4: Inventory ☐
+## Slice 4: Inventory ☑
 
 **Goal:** the things risk attaches to, done properly.
 
-- [ ] Models and services for processes, systems, and third parties with the shared header; owners in three capacities; typed links with forward and reverse labels; tags
-- [ ] Vocabularies as settings, with defaults from the default program pack: criticality, data classes (each with a definition and examples), process, system, and third-party kinds, hosting, lifecycle, owner capacities, link kinds, and unit kinds. A value in use can be relabelled or retired, never removed
-- [ ] The default program pack as a file, loaded by `riskwren init` and `riskwren db upgrade`; `riskwren program export | import`, with the whole pack checked before any of it is loaded
-- [ ] List pages with search, filters, sort, and paging, all in the URL; detail pages with a shared header and tabs; *relies on* and *supports* lists on every record
-- [ ] The History tab as a readable timeline: who did what, and each changed field with what it was and what it became, in the organization's own labels
-- [ ] Visibility: the open, unit, and assigned settings; restricted records; one rule used for single records and for lists
-- [ ] Optimistic concurrency on edits; orphaned records shown when an owner's account is disabled
+- [x] Models and services for processes, systems, and third parties with the shared header; owners in three capacities; typed links with forward and reverse labels; tags (migration 0004)
+- [x] A registry that describes each record type as data, so that adding, editing, finding, owners, links, visibility, and history are written once and later record types join by registering
+- [x] Vocabularies as settings, with defaults from the default program pack: criticality, data classes (each with a definition and examples), process, system, and third-party kinds, hosting, lifecycle, owner capacities, link kinds, and unit kinds. A value in use can be relabelled or retired, never removed
+- [x] The default program pack as a file, written by `scripts/build-default-program.py` and read as the defaults
+- [x] List pages with search, filters, sort, and paging, all in the URL; detail pages with a shared header and tabs; what a record relies on and what relies on it, with a count of links the viewer may not see
+- [x] The History tab as a readable timeline: who did what, and each changed field with what it was and what it became, in the organization's own labels
+- [x] Visibility: the inventory open to everyone signed in; restricted records; the open, unit, and assigned setting kept for the register of risks and controls; one rule used for single records and for lists
+- [x] Optimistic concurrency on edits; orphaned records shown when an owner's account is disabled
+- [ ] Moved to slice 5, where the program gains its taxonomy and scoring method: `riskwren program export | import`, with the whole pack checked before any of it is loaded
 
-**Acceptance:** each record type can be created, edited, linked, and found; every edit is in its history under a named operation; a table of what each of the seven roles sees under each of the three visibility settings is tested for single records and for lists, which must agree; a stale edit is refused and an invalid one leaves the record as it was.
+**Acceptance (met):** each record type can be created, edited, linked, and found; every edit is in its history under a named operation; a table of what each of the seven roles sees is tested for single records and for lists, which must agree; a stale edit is refused and an invalid one leaves the record as it was. 209 tests pass on SQLite. Checked in the browser: the three lists with filters and sorting, a record page, adding a link, editing owners, and the history timeline.
 
-## Slice 5: Risk register ☐
+## Slice 5: Risk register ☑
 
 **Goal:** a rating that explains itself, and a register that knows what is in order.
 
-- [ ] `risk_category` as a tree with appetite; the default taxonomy; `scoring_method` with immutable versions and the default method, with a definition for every level
-- [ ] The scoring module in Python and its JavaScript twin, held to one shared file of cases: rating from likelihood and impact levels, overall impact as the highest dimension rated, the matrix lookup
-- [ ] Risks with a statement of cause, event, and consequence; category, unit, owners; the processes, systems, and third parties a risk concerns, and each of those showing its risks
-- [ ] Assessments: inherent, residual, and target, each with levels by dimension, a rationale, and the method version; never edited, only superseded; the copies on the risk
-- [ ] Standing worked out from rating, appetite, plans, and acceptances; the *review overdue* flag; next review date from the cadence table
-- [ ] The assess screen: the level picker with definitions, the rating appearing as levels are chosen; the *journey* strip and the reasons popover on the risk
-- [ ] The register: a dense list with filters for rating, standing, category, unit, and owner, and grouping by category or unit
-- [ ] Roll-up by unit; escalation to a higher unit with a reason
-- [ ] The risk library pack, and starting a risk from an entry
+- [x] `risk_category` as a tree with appetite, its own or inherited from above; the default taxonomy of nine categories; `scoring_method` with immutable versions and the default method, with a definition for every level (migration 0005)
+- [x] The scoring module in Python and its JavaScript twin, held to one shared file of 70 cases: rating from likelihood and impact levels, overall impact as the highest dimension rated, the matrix lookup, and (ready for slice 6) control strength and the suggested residual with its working
+- [x] A method that cannot be used says everything wrong with it in one pass: a matrix in which a rating falls as likelihood or impact rises is refused
+- [x] Risks with a statement of cause, event, and consequence; category, unit, owners; the processes, systems, and third parties a risk concerns, and each of those showing its risks
+- [x] Assessments: inherent, residual, and target, each with levels by dimension, a rationale, and the method version; never edited, only superseded; the copies on the risk
+- [x] Standing worked out from rating and appetite; the *review overdue* flag; next review date from the cadence table; closing a risk with a reason, and reopening it
+- [x] The assess screen: the level picker with definitions, the rating appearing as levels are chosen; the *journey* strip and the reasoning behind each rating on the risk
+- [x] The register: a dense list with filters for category, rating, standing, unit, and owner, sorted by what is at stake
+- [x] Roll-up by unit; escalation to a higher unit with a reason
+- [x] The risk library pack of 57 statements, and starting a risk from an entry
+- [x] From slice 4: `riskwren program export | import`, with the whole pack checked before any of it is loaded and a dry run that says what would change; the default program and the library loaded by `riskwren init` and `riskwren db upgrade`
+- [x] Admin → Program: the categories with their appetite, which can be changed there and says how many risks changed standing; the matrix; what follows from each rating; every definition
+- [ ] Moved to slice 7, with the dashboard: grouping the register by category or unit
 
-**Acceptance:** the two scoring implementations agree on every shared case; an assessment always shows the method version it was made under after the method changes; changing a category's appetite changes the standing of its risks and nothing else; a leader's list contains their unit's risks and those beneath it; an assessment cannot be altered through any route.
+**Acceptance (met):** the two scoring implementations agree on every shared case; an assessment always shows the method version it was made under after the method changes; changing a category's appetite changes the standing of its risks and nothing else; a leader's list contains their unit's risks and those beneath it; an assessment cannot be altered through any route. A table of which risks each of the seven roles sees under each of the three visibility settings is tested for single risks and for lists, which must agree. 302 tests pass on SQLite. Checked in the browser: the register, a risk page, the assessment form with its live rating, the recorded reasoning, and the Program page.
 
-## Slice 6: Controls and treatment ☐
+## Slice 6: Controls and treatment ☑
 
 **Goal:** controls that are known to work, and a named person behind whatever remains.
 
-- [ ] Controls with statement, objective, kind, nature, frequency, unit, and owners; the starter control library pack
-- [ ] Control ratings for design and operation with a basis and a note; never edited; strength as the weaker part; stale when older than the cadence
-- [ ] Links from controls to risks with what each reduces and how much it is relied on
-- [ ] The suggested residual rating with its working, in Python and JavaScript on the same cases; kept on the assessment beside the assessor's judgment
-- [ ] The *residual may be out of date* flag when today's suggestion is worse than the rating on record, naming the control responsible
-- [ ] Responses with a rationale; treatment plans with a target rating and actions; the one `action` table and the Actions list
-- [ ] Acceptance: the authority table, the limit on a leader's grant, the maximum period by rating, refusal for an owner or above the limit, withdrawal, and expiry changing the standing
-- [ ] Separation of duties in the service layer, tested for every role
+- [x] Controls with statement, objective, kind, nature, frequency, unit, and owners; a library of 56 starter controls in plain words, from which a control is started and made the organization's own; every library risk suggests the controls commonly used for it (migration 0006)
+- [x] Control ratings for design and operation with a basis and a note; never edited; strength as the weaker part; stale when older than the cadence
+- [x] Links from controls to risks with what each reduces and how much it is relied on; one control bears on a risk once
+- [x] The suggested residual rating with its working, in Python and JavaScript on the same cases; kept on the assessment beside the assessor's judgment
+- [x] The *residual may be out of date* flag when what is now known suggests worse than it did at the assessment and worse than the rating on record, naming the controls responsible; the rating itself is never changed by the system
+- [x] Responses with a rationale; treatment plans with a target rating and actions; the one `action` table and the Actions list; moving an action's date needs a reason, and the original date and every move stay on the record
+- [x] A plan completes when its last action does; that asks the owner for a new assessment and does not change the rating
+- [x] Acceptance: the authority table, the limit on a leader's grant, the maximum period by rating, refusal for an owner or above the limit, withdrawal, and expiry changing the standing
+- [x] Standing kept in step with the calendar: when an acceptance expires or a plan runs late, the risk returns to needing a decision the next time the register is read
+- [x] Separation of duties in the service layer, tested for every role
+- [x] Screens: the control library and control page with its ratings; the Controls and Treatment tabs of a risk; lists of treatment plans, acceptances, and actions
+- [x] Found on the way: a day with no time (a due date, a review date) was shown a day early west of Greenwich. Fixed, with a test that runs the browser's modules in such a time zone
 
-**Acceptance:** the worked example in [engine.md](../engine.md) produces the figures shown there; a control that is not assessed or is stale contributes nothing; no number of controls lowers an axis by more than the limit; an acceptance is refused for the risk's owner and for a leader above their limit, in the API and the app; an expired acceptance returns the risk to *needs a decision*; closing a plan's last action asks its owner for a new assessment and does not change the rating.
+**Acceptance (met):** the worked example in [engine.md](../engine.md) produces the figures shown there; a control that is not assessed or is stale contributes nothing; no number of controls lowers an axis by more than the limit; an acceptance is refused for the risk's owner and for a leader above their limit, in the API and the app; an expired acceptance returns the risk to *needs a decision*; closing a plan's last action asks its owner for a new assessment and does not change the rating. 316 tests pass on SQLite. Checked in the browser: adding and linking a suggested control, the suggestion's arithmetic, a plan with an overdue action, the actions list, and a control page.
 
-## Slice 7: Home, heat map, and dashboard ☐
+## Slice 7: Home, heat map, and dashboard ☑
 
 **Goal:** one place to see what you owe, and one to see where the register stands.
 
-- [ ] Home: one list of what the person owes, overdue first: reviews due, actions, acceptances expiring, orphaned records for stewards; for leaders, their unit's risks that need a decision
-- [ ] The heat map: counts by likelihood and impact for inherent, residual, or target; filters by unit and category; the appetite boundary; a cell opens its risks beside the grid; a table of the same figures
-- [ ] The dashboard: top risks, risks by standing, by category and unit, reviews and actions overdue, controls by effectiveness including not assessed; each tile linked to its records
-- [ ] Print styles for a risk, the register, the heat map, and the dashboard
+- [x] Home: one list of what the person owes, overdue first: risks to assess or review, risks whose rating is in doubt, actions, controls to rate, acceptances about to expire; for leaders, the risks in their units that need a decision; for stewards, records nobody answers for
+- [x] The heat map: counts by likelihood and impact for inherent, residual, or target; filters by unit and category; cells above a category's appetite marked; each cell a link to its risks; counts by rating beneath
+- [x] The dashboard: figures for open risks, above appetite, needing a decision, reviews overdue, ratings in doubt, and actions overdue; the residual heat map; the highest risks; risks by standing, by rating, by category, and by unit; controls by what is known of them. Each figure carries the filters of the list that produces it
+- [x] From slice 5: the register grouped by category or by unit
+- [x] Print styles: a page prints as the record, without the application around it
+- [ ] Not built: a separate table view of the heat map. The grid is itself a table whose cells are counts with spoken labels, so a second copy would say the same thing
 
-**Acceptance:** every figure on the dashboard and every cell of the heat map opens a list whose length equals the figure, for each of the seven roles; the heat map has a complete table alternative and passes the accessibility audit.
+**Acceptance (met):** every figure on the dashboard and every cell of the heat map opens a list whose length equals the figure, for each of the seven roles, for the whole organization and for one division, in all three ratings; the parts of each breakdown add up to the whole. 321 tests pass on SQLite. Checked in the browser: home with something overdue, the dashboard, the heat map with a category's appetite, and the grouped register.
 
-## Slice 8: Demo organization ☐
+## Slice 8: Demo organization ☑
 
 **Goal:** a believable institute that exercises everything in the wave.
 
-- [ ] The generator: units, people, processes, systems, third parties, risks, controls, plans, acceptances, and actions, built through the services under a simulated clock, deterministic by seed
-- [ ] The storylines in [demo-organization.md](../demo-organization.md), written by hand
-- [ ] The "Demo data" marker, one-click sign-in as each sample person, and the refusal to listen beyond the local machine unless told to
-- [ ] The demo build as an end-to-end test, with its history verified
+- [x] The generator: units, people, processes, systems, third parties, risks, controls, plans, acceptances, and actions, built through the services under a simulated clock, deterministic by seed
+- [x] The storylines in [demo-organization.md](../demo-organization.md), written by hand
+- [x] The "Demo data" marker, one-click sign-in as each sample person, and the refusal to listen beyond the local machine unless told to
+- [x] The demo build as an end-to-end test, with its history verified
 
 **Acceptance:** `riskwren demo` builds in under a minute; the same seed gives the same organization; every wave 1 screen has data worth reading; `riskwren verify` passes on the result.
 
-## Slice 9: Release prep ☐
+**Done:** `riskwren demo` builds Northmere in about five seconds: 60 units, about 210 people, 220 inventory records, 180 risks, 110 controls, and some 6,000 events over two years, all through the services and under a simulated clock. Twelve storylines are written by hand and asserted by the tests. A demo marks itself on every page, signs in any of nine sample people with one click from the machine it runs on, and refuses to listen on the network unless told to.
 
-- [ ] Guides in `docs/`: getting started, configuration, the register (inventory, risks, controls, treatment), running the program, the command-line reference, the API guide
-- [ ] `README.md` with the quickstart; `CHANGELOG.md` for 0.1.0
-- [ ] The automated accessibility audit over every wave 1 screen in every palette and mode
-- [ ] Fresh-clone install and quickstart checked on both databases
-- [ ] Version `0.1.0`; pull request from `wave-1`; tag and release
+## Slice 9: Release prep ☑
+
+- [x] Guides in `docs/`: getting started, configuration, the register (inventory, risks, controls, treatment), running the program, the command-line reference, the API guide
+- [x] `README.md` with the quickstart; `CHANGELOG.md` for 0.1.0
+- [x] The automated accessibility audit over every wave 1 screen in every palette and mode
+- [x] Fresh-clone install and quickstart checked on both databases
+- [x] Version `0.1.0`; pull request from `wave-1`; tag and release
+
+**Done:** five guides and two references; a README a stranger can install from; the audit, which is RiskWren's own script driving headless Chrome with no packages, over 32 scenes in three palettes and two modes; and a fresh clone installed, set up, and served on SQLite and on PostgreSQL.
 
 ## Notes
 
 Decisions and discoveries made during the wave are logged here, newest last.
+
+- **A scoped role held with no unit covers the whole organization.** A manager or assessor may be limited to units; only a manager for the whole organization runs the program (edits the taxonomy and scoring method, reads everything). A manager of one division manages that division's records and no more.
+- **Administration is not judgment.** The admin role reads and configures; it does not edit records, assess, or accept. An administrator who also does that work holds a second role.
+- **A leader's limit is the key of a rating**, not a number, so it stays meaningful when an organization renames or reshapes its ratings. It is checked against the scoring method when an acceptance is made (slice 6).
+- **Sign-in is throttled three ways:** five failures for one account from one address, and a much higher limit for the account alone and for the address alone, so nobody can lock a colleague out by typing their address. Each attempt is counted before the password is checked.
+- **The inventory is open; the register follows the setting.** Under the planned default, a steward could not link their system to a supplier recorded by another unit, because they could not see it. Processes, systems, and third parties are now visible to everyone signed in unless restricted, and the visibility setting governs risks and controls. [security.md](../security.md) says so.
+- **A link is recorded once and read both ways.** Its changes appear in the history of the record it starts from.
+- **A figure and its list are the same question.** The dashboard does not have queries of its own. Each figure is the count of a list filter, and is sent with those filters, so the page can only ever link to exactly what it counted.
+- **Starter controls are a library, not records.** A control needs a unit and an owner to mean anything, so an installation is not seeded with fifty ownerless controls. The library offers them where they are wanted: on a risk started from the library, the controls commonly used for it are one step away.
+- **Doubt is about change, not disagreement.** An assessor who judges a residual rating lower than the controls suggest has made a judgment, and it is kept with its reason. The flag is raised only when what is known about the controls later gets worse than it was at that assessment.
+- **An acceptance covers what was accepted.** If the residual rating later rises above the rating that was accepted, the acceptance no longer covers the risk and it needs a decision again.
+- **Until scheduled jobs arrive (wave 3), the calendar is caught up on reading.** Reading the register checks, cheaply, whether any acceptance has expired or plan has run late, and writes only if one has, as the system and not as the reader.
+- **Escalation is prominence, not ownership.** A risk escalated to a higher unit still belongs to its own; the unit above already sees it in its roll-up. Escalating says "this needs you", with a reason, and puts it among the risks that sit at that level.
+- **A matrix must never run backwards.** A scoring method in which a rating falls as likelihood or impact rises cannot be published, whether typed in or imported.
+- **The program is installed, not migrated.** Migrations build tables; `init` and `db upgrade` then add whatever of the default program and libraries is missing, as ordinary audited writes, and never overwrite what an organization has shaped.
+- **Parts and wholes are links, not record types.** A system built on a platform, or a service within a broader line of work, is said with an *is part of* link between two systems or two processes. The dependency graph that makes these links visible moves forward from wave 3 to wave 2, where scopes, controls, and requirements give it more to show.
+- **A control another unit runs is linked by the second line.** Under the default visibility a steward cannot see, and so cannot link, a control owned by a unit outside their own. Building the demo through the services made this plain: central controls (backups, patching, training) are tied to a unit's risks by the risk team, who see everything. Wave 2's scopes and inherited controls give units a way to lean on a provider's controls themselves.
+- **The demo is the widest test the product has.** It found nothing to fix in the services, which is the result hoped for; it does take most of a minute of the test run, because several tests each build it afresh.
+- **Writing the guides found a setting with no screen.** How much of the register a person with no role sees could be set through the API and nowhere else. Admin → Program now has it.
+- **The audit found five things.** Sort buttons in table headers, name buttons in the People list, and radio rows on Appearance were under the 24 pixels a click target needs; the placeholder in the dark-logo slot was too faint by day; and choosing a second sample person while signed in as the first was refused for want of a token, which sign-in itself does not need. All are fixed, and the last has a test.
+- **The rating ramp has five steps.** A method with fewer ratings spreads them across the ramp, so the lowest and the highest always sit at its ends.

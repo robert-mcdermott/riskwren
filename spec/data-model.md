@@ -85,7 +85,7 @@ Units are the backbone of scoping. Every process, system, risk, and control belo
 
 ## The things risk attaches to
 
-All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_unit_id`, `status` (active, retired), `criticality` (a vocabulary, ordered), `data_class` (a vocabulary, ordered: the highest class of data handled), `restricted`, `version`, and timestamps.
+All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_unit_id`, `status` (active, retired), `criticality` (a vocabulary, ordered), `data_class` (a vocabulary, ordered: the highest class of data handled), `tags`, `restricted`, `version`, and timestamps. What differs between record types is described once, in a registry, so that adding, editing, listing, owners, links, visibility, and history are written once for all of them.
 
 - **Process** (wave 1): `process(…, kind, purpose)`. Something the organization does: a research service, a clinical service, an administrative process. `kind` is a vocabulary.
 - **System** (wave 1): `system(…, kind, hosting, lifecycle)`. An application, platform, instrument, device, or piece of infrastructure. `hosting` and `lifecycle` are vocabularies.
@@ -95,11 +95,11 @@ All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_uni
 
 ### Owners
 
-`record_owner(subject_type, subject_id, account_id, capacity)`. `capacity` is a vocabulary: by default *owner* (accountable), *delegate* (acts for the owner), and *contact*. Every record must have at least one *owner* to be active. An owner whose account is disabled leaves the record **orphaned**, which is shown on the record and to its unit's steward.
+`record_owner(record_type, record_id, account_id, kind)`. `kind` is a vocabulary: by default *owner* (accountable), *delegate* (acts for the owner and may edit), and *contact*. Whoever adds a record becomes its owner until they name someone else, and the owners of a record can never be set to a list without one. A record whose every owner's account is disabled, or which was imported with nobody named, is **orphaned**, which is shown on the record and in every list.
 
 ### Links
 
-`link(from_type, from_id, kind, to_type, to_id, note)`. `kind` is a vocabulary of named relationships, each with a forward and a reverse label and the record types it may join.
+`record_link(from_type, from_id, relation, to_type, to_id, note)`. `relation` is a vocabulary of named relationships, each with a forward and a reverse label and the pairs of record types it may join. A link's changes appear in the history of the record it starts from.
 
 | Kind (default) | From → to | Reads as |
 |---|---|---|
@@ -107,11 +107,12 @@ All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_uni
 | `supplied_by` | System → Third party | supplied by / supplies |
 | `performed_by` | Process → Third party | performed by / performs |
 | `depends_on` | System → System, Process → Process | depends on / is depended on by |
+| `part_of` | System → System, Process → Process | is part of / includes |
 | `holds` | System → Information asset (wave 2) | holds / is held in |
 
 ### Tags
 
-`tag(subject_type, subject_id, label)`: free labels, for whatever the vocabularies do not cover.
+Free labels, for whatever the vocabularies do not cover, kept as a list on the record.
 
 ## Risk (wave 1)
 
@@ -125,7 +126,7 @@ All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_uni
 
 ### Risk
 
-`risk(ref, title, cause, event, consequence, category_id, org_unit_id, status, response, inherent_*, residual_*, target_*, standing, next_review_on, escalated_to_unit_id, library_key, version, …)`.
+`risk(ref, name, cause, event, consequence, category_id, org_unit_id, status, closed_reason, response, inherent_*, residual_*, target_*, standing, next_review_on, residual_in_doubt, escalated_to_unit_id, library_key, version, …)`. `name` is its short title.
 
 - `status`: draft, open, closed.
 - `response`: a vocabulary (reduce, accept, transfer, avoid), with a rationale.
@@ -135,7 +136,7 @@ All three wave 1 record types share a header: `ref`, `name`, `summary`, `org_uni
 
 ### Assessment of a risk
 
-`risk_assessment(id, risk_id, kind, likelihood, impact, impact_levels, rating, rationale, suggested, method_id, assessed_by, assessed_at, superseded_by)`.
+`risk_assessment(id, risk_id, kind, likelihood, impact, impact_levels, rating, rationale, suggested, method_id, assessed_by, assessed_by_name, assessed_at, superseded_by)`. The assessor's name is kept as it was, so the record reads the same after an account is renamed.
 
 - `kind`: inherent, residual, target.
 - `impact_levels`: the level chosen on each dimension rated.
