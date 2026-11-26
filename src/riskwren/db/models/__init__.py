@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from riskwren.db.models.inventory import Process, RecordLink, RecordOwner, System, ThirdParty
 from riskwren.db.models.people import (
     Account,
     Credential,
@@ -23,7 +24,12 @@ __all__ = [
     "FailedSignIn",
     "Membership",
     "OrgUnit",
+    "Process",
+    "RecordLink",
+    "RecordOwner",
     "RoleGrant",
     "SessionToken",
     "Setting",
+    "System",
+    "ThirdParty",
 ]

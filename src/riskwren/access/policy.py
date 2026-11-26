@@ -58,7 +58,31 @@ POLICIES: dict[tuple[str, str], Needs] = {
     # Imports
     ("POST", "/api/v1/imports/units"): Needs.ADMIN,
     ("POST", "/api/v1/imports/people"): Needs.ADMIN,
+    # The program
+    ("GET", "/api/v1/vocabularies"): Needs.MEMBER,
+    ("GET", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+    ("PUT", "/api/v1/admin/visibility"): Needs.CONFIGURE,
 }
+
+
+def record_policies(path: str) -> dict[tuple[str, str], Needs]:
+    """What every record type's routes need. Any member may ask; the services decide what
+    each may see and change, by the record's unit, its owners, and its visibility."""
+    base = f"/api/v1/{path}"
+    return {
+        ("GET", base): Needs.MEMBER,
+        ("POST", base): Needs.STEWARD,
+        ("GET", base + "/{ref}"): Needs.MEMBER,
+        ("PATCH", base + "/{ref}"): Needs.MEMBER,
+        ("PUT", base + "/{ref}/owners"): Needs.MEMBER,
+        ("POST", base + "/{ref}/links"): Needs.MEMBER,
+        ("DELETE", base + "/{ref}/links/{link_id}"): Needs.MEMBER,
+        ("GET", base + "/{ref}/history"): Needs.MEMBER,
+    }
+
+
+for _path in ("processes", "systems", "third-parties"):
+    POLICIES.update(record_policies(_path))
 
 
 def allowed(principal: Principal | None, needs: Needs) -> bool:

@@ -32,7 +32,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 | 1 | Foundation | Project skeleton, configuration, data home, the ORM model and migrations on SQLite and PostgreSQL, the service layer with the event log and hash chain, command line and API skeletons, tooling and continuous integration | ☑ |
 | 2 | Accounts, roles, and units | Local accounts and sessions, the seven roles with scopes, the route policy table, the unit hierarchy, import of units and people | ☑ |
 | 3 | Web app and design system | Vanilla JS shell, tokens, three palettes in light and dark, the wren mark, branding settings with live preview, command palette, core components | ☑ |
-| 4 | Inventory | Processes, systems, and third parties with owners, typed links, lists, detail pages, and history; the default program's vocabularies | ☐ |
+| 4 | Inventory | Processes, systems, and third parties with owners, typed links, lists, detail pages, and history; the default program's vocabularies | ☑ |
 | 5 | Risk register | The taxonomy with appetite, the scoring method in Python and JavaScript, risks, assessments with reasons, standing, review dates, roll-up and escalation, the risk library | ☐ |
 | 6 | Controls and treatment | The control library and starter controls, effectiveness ratings, the suggested residual with its working, responses, treatment plans, actions, and acceptance under the authority table | ☐ |
 | 7 | Home, heat map, and dashboard | What each person owes; the heat map with the appetite boundary; the risk dashboard with every figure linked to its records | ☐ |

@@ -10,7 +10,7 @@ from fastapi import APIRouter
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 
-from riskwren.access.policy import POLICIES, Needs
+from riskwren.access.policy import POLICIES, Needs, record_policies
 from riskwren.api.app import create_app
 from riskwren.auth import sessions
 from riskwren.core.clock import frozen_at, utc_now
@@ -262,6 +262,18 @@ REACH: dict[tuple[str, str], set[str]] = {
     ("POST", "/api/v1/imports/people"): {"admin"},
 }
 
+EVERYONE = set(ROLES)
+RECORD_PATHS = {"processes": "PRC", "systems": "SYS", "third-parties": "TP"}
+REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
+REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
+REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
+for _path in RECORD_PATHS:
+    for _method, _template in record_policies(_path):
+        # Anyone may ask about a record, and the service decides what they may see and do.
+        # Adding one is for a unit's steward or a manager.
+        adding = _method == "POST" and _template == f"/api/v1/{_path}"
+        REACH[(_method, _template)] = {"manager", "steward"} if adding else EVERYONE
+
 
 def api_routes(instance: Instance) -> set[tuple[str, str]]:
     """Every API route, read from the document the app publishes about itself."""
@@ -303,6 +315,10 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 "{unit_id}", str(people.units["HALE"])
             )
             path = path.replace("{kind}", "favicon")
+            for record_path, prefix in RECORD_PATHS.items():
+                if template.startswith(f"/api/v1/{record_path}"):
+                    # A record that is not there: reached, and answered with "not found".
+                    path = path.replace("{ref}", f"{prefix}-9999").replace("{link_id}", "1")
             if template.endswith("/password") and "{account_id}" in template:
                 path = template.replace(
                     "{account_id}",
@@ -324,6 +340,12 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"product_name": "RiskWren", "palette": "wren"}
             elif template.endswith("/branding/check"):
                 body = {"accent": "#1f6f5c"}
+            elif template == "/api/v1/admin/visibility":
+                body = {"visibility": "unit"}
+            elif template.endswith("/owners"):
+                body = {"owners": []}
+            elif template.endswith("/links"):
+                body = {"relation": "relies_on", "to": "SYS-9999"}
             elif template == "/api/v1/units" and method == "POST":
                 body = {"name": f"Unit by {role}", "kind": "lab", "parent_id": people.units["NMI"]}
             kwargs = (

@@ -14,6 +14,14 @@ import { avatar } from "./ui.js";
 export const NAV = [
   { items: [{ href: "/", label: "Home", iconName: "home", exact: true }] },
   {
+    heading: "Inventory",
+    items: [
+      { href: "/processes", label: "Processes", iconName: "process" },
+      { href: "/systems", label: "Systems", iconName: "system" },
+      { href: "/third-parties", label: "Third parties", iconName: "third_party" },
+    ],
+  },
+  {
     heading: "Admin",
     items: [
       { href: "/admin/people", label: "People", iconName: "people", when: "admin" },

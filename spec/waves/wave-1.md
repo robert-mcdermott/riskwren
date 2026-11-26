@@ -85,19 +85,21 @@ None block the start. These defaults have been taken and can be changed before t
 
 **Acceptance (met):** an administrator changes the organization name, palette, accent, and rating ramp in the browser and sees them applied at once, with no file touched; every palette passes AA for text, standing, rating, and control-border tokens in both modes, on the ordinal ramp and on the signal ramp; the shell is within its size budget. 194 tests pass on SQLite and 190 on PostgreSQL (four are about the SQLite file). Checked in the browser: sign-in, the shell, Admin → Appearance with both ramps, and the roles editor.
 
-## Slice 4: Inventory ☐
+## Slice 4: Inventory ☑
 
 **Goal:** the things risk attaches to, done properly.
 
-- [ ] Models and services for processes, systems, and third parties with the shared header; owners in three capacities; typed links with forward and reverse labels; tags
-- [ ] Vocabularies as settings, with defaults from the default program pack: criticality, data classes (each with a definition and examples), process, system, and third-party kinds, hosting, lifecycle, owner capacities, link kinds, and unit kinds. A value in use can be relabelled or retired, never removed
-- [ ] The default program pack as a file, loaded by `riskwren init` and `riskwren db upgrade`; `riskwren program export | import`, with the whole pack checked before any of it is loaded
-- [ ] List pages with search, filters, sort, and paging, all in the URL; detail pages with a shared header and tabs; *relies on* and *supports* lists on every record
-- [ ] The History tab as a readable timeline: who did what, and each changed field with what it was and what it became, in the organization's own labels
-- [ ] Visibility: the open, unit, and assigned settings; restricted records; one rule used for single records and for lists
-- [ ] Optimistic concurrency on edits; orphaned records shown when an owner's account is disabled
+- [x] Models and services for processes, systems, and third parties with the shared header; owners in three capacities; typed links with forward and reverse labels; tags (migration 0004)
+- [x] A registry that describes each record type as data, so that adding, editing, finding, owners, links, visibility, and history are written once and later record types join by registering
+- [x] Vocabularies as settings, with defaults from the default program pack: criticality, data classes (each with a definition and examples), process, system, and third-party kinds, hosting, lifecycle, owner capacities, link kinds, and unit kinds. A value in use can be relabelled or retired, never removed
+- [x] The default program pack as a file, written by `scripts/build-default-program.py` and read as the defaults
+- [x] List pages with search, filters, sort, and paging, all in the URL; detail pages with a shared header and tabs; what a record relies on and what relies on it, with a count of links the viewer may not see
+- [x] The History tab as a readable timeline: who did what, and each changed field with what it was and what it became, in the organization's own labels
+- [x] Visibility: the inventory open to everyone signed in; restricted records; the open, unit, and assigned setting kept for the register of risks and controls; one rule used for single records and for lists
+- [x] Optimistic concurrency on edits; orphaned records shown when an owner's account is disabled
+- [ ] Moved to slice 5, where the program gains its taxonomy and scoring method: `riskwren program export | import`, with the whole pack checked before any of it is loaded
 
-**Acceptance:** each record type can be created, edited, linked, and found; every edit is in its history under a named operation; a table of what each of the seven roles sees under each of the three visibility settings is tested for single records and for lists, which must agree; a stale edit is refused and an invalid one leaves the record as it was.
+**Acceptance (met):** each record type can be created, edited, linked, and found; every edit is in its history under a named operation; a table of what each of the seven roles sees is tested for single records and for lists, which must agree; a stale edit is refused and an invalid one leaves the record as it was. 209 tests pass on SQLite. Checked in the browser: the three lists with filters and sorting, a record page, adding a link, editing owners, and the history timeline.
 
 ## Slice 5: Risk register ☐
 
@@ -168,4 +170,6 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Administration is not judgment.** The admin role reads and configures; it does not edit records, assess, or accept. An administrator who also does that work holds a second role.
 - **A leader's limit is the key of a rating**, not a number, so it stays meaningful when an organization renames or reshapes its ratings. It is checked against the scoring method when an acceptance is made (slice 6).
 - **Sign-in is throttled three ways:** five failures for one account from one address, and a much higher limit for the account alone and for the address alone, so nobody can lock a colleague out by typing their address. Each attempt is counted before the password is checked.
+- **The inventory is open; the register follows the setting.** Under the planned default, a steward could not link their system to a supplier recorded by another unit, because they could not see it. Processes, systems, and third parties are now visible to everyone signed in unless restricted, and the visibility setting governs risks and controls. [security.md](../security.md) says so.
+- **A link is recorded once and read both ways.** Its changes appear in the history of the record it starts from.
 - **The rating ramp has five steps.** A method with fewer ratings spreads them across the ramp, so the lowest and the highest always sit at its ends.

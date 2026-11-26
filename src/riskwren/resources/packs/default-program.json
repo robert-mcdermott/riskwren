@@ -1,0 +1,374 @@
+{
+  "pack": {
+    "key": "default-program",
+    "kind": "program",
+    "title": "Default program",
+    "version": "1",
+    "pack_version": "0.1.0",
+    "publisher": "The RiskWren Authors",
+    "license": "Apache-2.0",
+    "text_policy": "verbatim"
+  },
+  "vocabularies": {
+    "criticalities": [
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "Could be done without for weeks with little effect"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "Its loss would be felt within days and worked around"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "Its loss would stop important work within a day or two"
+      },
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Research, care, or safety depends on it hour by hour"
+      }
+    ],
+    "data_classes": [
+      {
+        "key": "public",
+        "label": "Public",
+        "description": "Poses little or no risk if disclosed, and may be shared with anyone.",
+        "examples": {
+          "Research": [
+            "Published papers and results",
+            "Data already in a public repository"
+          ],
+          "Health": [
+            "Published population statistics"
+          ],
+          "People": [
+            "Public staff directory entries"
+          ],
+          "Business": [
+            "Press releases",
+            "Figures in a published annual report"
+          ]
+        }
+      },
+      {
+        "key": "internal",
+        "label": "Internal",
+        "description": "Meant for the organization's own people and work. Not to be shared outside without a reason.",
+        "examples": {
+          "Research": [
+            "Drafts and plans for future work",
+            "Laboratory procedures"
+          ],
+          "Health": [
+            "Aggregate counts in which nobody can be identified"
+          ],
+          "People": [
+            "Work contact details",
+            "Organization charts"
+          ],
+          "Business": [
+            "Internal policies and procedures",
+            "Most correspondence and minutes"
+          ]
+        }
+      },
+      {
+        "key": "confidential",
+        "label": "Confidential",
+        "description": "Could harm people or the organization if seen by the wrong person, inside or out. Access is limited to those who need it.",
+        "examples": {
+          "Research": [
+            "Unpublished data, results, and manuscripts",
+            "De-identified participant data",
+            "Data held under a data use agreement"
+          ],
+          "Health": [
+            "Staff immunization and fitness-for-work records"
+          ],
+          "People": [
+            "Personnel records",
+            "Student and trainee records"
+          ],
+          "Business": [
+            "Budgets and financial records",
+            "Contracts",
+            "Security plans"
+          ]
+        }
+      },
+      {
+        "key": "restricted",
+        "label": "Restricted",
+        "description": "Governed by specific legal, regulatory, or contractual obligations. Loss or disclosure may require notifying people, partners, or authorities.",
+        "examples": {
+          "Research": [
+            "Identifiable participant data",
+            "Controlled-access genomic data",
+            "Export-controlled information"
+          ],
+          "Health": [
+            "Identifiable health information",
+            "Health insurance numbers"
+          ],
+          "People": [
+            "A name with a government identifier or full date of birth",
+            "Payroll and bank details"
+          ],
+          "Business": [
+            "Payment card numbers",
+            "Passwords, keys, and access codes"
+          ]
+        }
+      }
+    ],
+    "unit_kinds": [
+      {
+        "key": "organization",
+        "label": "Organization"
+      },
+      {
+        "key": "division",
+        "label": "Division"
+      },
+      {
+        "key": "department",
+        "label": "Department"
+      },
+      {
+        "key": "center",
+        "label": "Center"
+      },
+      {
+        "key": "core",
+        "label": "Core facility"
+      },
+      {
+        "key": "lab",
+        "label": "Lab"
+      },
+      {
+        "key": "clinic",
+        "label": "Clinic"
+      },
+      {
+        "key": "office",
+        "label": "Office"
+      }
+    ],
+    "owner_kinds": [
+      {
+        "key": "owner",
+        "label": "Owner",
+        "description": "Accountable for the record and for keeping it current"
+      },
+      {
+        "key": "delegate",
+        "label": "Delegate",
+        "description": "Acts for the owner day to day"
+      },
+      {
+        "key": "contact",
+        "label": "Contact",
+        "description": "Knows the detail and can be asked"
+      }
+    ],
+    "process_kinds": [
+      {
+        "key": "research",
+        "label": "Research",
+        "description": "Carrying out research"
+      },
+      {
+        "key": "research_support",
+        "label": "Research support",
+        "description": "Cores, shared services, and facilities"
+      },
+      {
+        "key": "clinical",
+        "label": "Clinical",
+        "description": "Care of patients and participants"
+      },
+      {
+        "key": "education",
+        "label": "Education and training"
+      },
+      {
+        "key": "administrative",
+        "label": "Administrative",
+        "description": "Finance, people, legal, and the like"
+      },
+      {
+        "key": "technology",
+        "label": "Technology",
+        "description": "Running information systems and services"
+      },
+      {
+        "key": "facilities",
+        "label": "Facilities and safety"
+      }
+    ],
+    "system_kinds": [
+      {
+        "key": "application",
+        "label": "Application",
+        "description": "Software people use to do their work"
+      },
+      {
+        "key": "platform",
+        "label": "Platform",
+        "description": "Something other systems are built or run on"
+      },
+      {
+        "key": "infrastructure",
+        "label": "Infrastructure",
+        "description": "Networks, storage, compute, and identity"
+      },
+      {
+        "key": "instrument",
+        "label": "Instrument",
+        "description": "Laboratory or imaging equipment and its computer"
+      },
+      {
+        "key": "device",
+        "label": "Device",
+        "description": "A medical, building, or other connected device"
+      },
+      {
+        "key": "data_store",
+        "label": "Data store",
+        "description": "A database, repository, or archive"
+      }
+    ],
+    "hosting": [
+      {
+        "key": "on_premises",
+        "label": "On premises",
+        "description": "Run in the organization's own facilities"
+      },
+      {
+        "key": "cloud",
+        "label": "Cloud, run by us",
+        "description": "In a cloud account the organization administers"
+      },
+      {
+        "key": "hosted",
+        "label": "Hosted by a supplier",
+        "description": "Run entirely by a third party"
+      },
+      {
+        "key": "hybrid",
+        "label": "Hybrid"
+      },
+      {
+        "key": "standalone",
+        "label": "Standalone",
+        "description": "A single machine, often not on the network"
+      }
+    ],
+    "lifecycles": [
+      {
+        "key": "planned",
+        "label": "Planned"
+      },
+      {
+        "key": "in_service",
+        "label": "In service"
+      },
+      {
+        "key": "sunsetting",
+        "label": "Being retired",
+        "description": "Still in use, with an end date"
+      },
+      {
+        "key": "unsupported",
+        "label": "Unsupported",
+        "description": "In use, and no longer maintained by its maker"
+      }
+    ],
+    "third_party_kinds": [
+      {
+        "key": "supplier",
+        "label": "Supplier",
+        "description": "Sells goods the organization depends on"
+      },
+      {
+        "key": "service_provider",
+        "label": "Service provider",
+        "description": "Runs a service or a system for it"
+      },
+      {
+        "key": "contractor",
+        "label": "Contractor",
+        "description": "Does work on its behalf"
+      },
+      {
+        "key": "collaborator",
+        "label": "Collaborator",
+        "description": "A research or clinical partner"
+      },
+      {
+        "key": "sponsor",
+        "label": "Sponsor or funder"
+      },
+      {
+        "key": "subrecipient",
+        "label": "Subrecipient",
+        "description": "Receives funds the organization passes through"
+      }
+    ],
+    "link_kinds": [
+      {
+        "key": "relies_on",
+        "label": "Relies on",
+        "reverse": "Supports",
+        "between": [
+          [
+            "process",
+            "system"
+          ]
+        ]
+      },
+      {
+        "key": "performed_by",
+        "label": "Performed by",
+        "reverse": "Performs",
+        "between": [
+          [
+            "process",
+            "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "supplied_by",
+        "label": "Supplied by",
+        "reverse": "Supplies",
+        "between": [
+          [
+            "system",
+            "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "depends_on",
+        "label": "Depends on",
+        "reverse": "Is depended on by",
+        "between": [
+          [
+            "process",
+            "process"
+          ],
+          [
+            "system",
+            "system"
+          ]
+        ]
+      }
+    ]
+  }
+}

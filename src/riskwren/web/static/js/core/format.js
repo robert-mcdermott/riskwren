@@ -26,3 +26,22 @@ export function greeting(now = new Date()) {
   if (hour < 18) return "Good afternoon";
   return "Good evening";
 }
+
+const RELATIVE = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+const STEPS = [["year", 31536000], ["month", 2592000], ["week", 604800], ["day", 86400], ["hour", 3600], ["minute", 60]];
+
+/** "3 days ago", "in 2 weeks", "just now". */
+export function relative(value, now = Date.now()) {
+  if (!value) return "";
+  const seconds = (new Date(value).getTime() - now) / 1000;
+  for (const [unit, size] of STEPS) {
+    if (Math.abs(seconds) >= size) return RELATIVE.format(Math.round(seconds / size), unit);
+  }
+  return "just now";
+}
+
+const DATE_TIME = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
+
+export function dateTime(value) {
+  return value ? DATE_TIME.format(new Date(value)) : "";
+}

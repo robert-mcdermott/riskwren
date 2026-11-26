@@ -39,3 +39,17 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   on a green-to-red signal ramp. An accent is lifted automatically for dark mode and refused
   if it cannot be read. Uploaded SVG is reduced to drawing and served so that it cannot run
   anything (migration 0003).
+- **Inventory.** Processes, systems, and third parties, each with a permanent reference
+  (`SYS-0042`), a unit, a criticality, the highest class of data it handles, named owners,
+  and a page of its own. Records are joined by named links (a process *relies on* a system,
+  a system is *supplied by* a third party) that read both ways, so every record shows what
+  it depends on and what depends on it. Lists search, filter, sort, and page, with their
+  state in the address so any view can be shared. The inventory is open to everyone signed
+  in; a record can be marked restricted. An edit made against an older version is refused,
+  and a record whose owner has left is shown as needing one (migration 0004).
+- **History you can read.** Every record has a History tab: who did what, and each changed
+  field with what it was and what it became, in the organization's own words.
+- **Vocabularies.** Criticality, data classes with definitions and examples, kinds of
+  process, system, and third party, hosting, lifecycle, owner capacities, and kinds of link
+  are lists the organization can relabel, extend, and retire. They start from the default
+  program pack.
