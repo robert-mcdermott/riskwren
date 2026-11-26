@@ -32,3 +32,7 @@ htmlcov/
 
 # Deployment secrets
 /deploy/.env
+
+# Left behind by patch
+*.orig
+*.rej
