@@ -317,11 +317,16 @@ function apiReference(spec) {
   return { md, blocks };
 }
 
+/** Words from the code's own documentation: escaped, with ``names`` shown as code. */
+export function prose(text) {
+  return escapeHtml(text.replace(/\s+/g, " ").trim()).replace(/``([^`]+)``|`([^`]+)`/g, (_, two, one) => `<code>${two ?? one}</code>`);
+}
+
 function renderEndpoint(b) {
   const table = (head, rows) => (rows.length ? `<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table class="fields fields-${head.length}"><thead><tr>${head.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows
-    .map((r) => `<tr>${r.map((c, i) => `<td>${i === 0 ? `<code>${escapeHtml(c)}</code>` : escapeHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : "");
+    .map((r) => `<tr>${r.map((c, i) => `<td>${i === 0 ? `<code>${escapeHtml(c)}</code>` : prose(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : "");
   return `<section class="endpoint" id="${b.id}"><h3><span class="method method-${b.method.toLowerCase()}">${b.method}</span> <code>${escapeHtml(b.path)}</code><a class="anchor" href="#${b.id}" aria-label="Link to this route">#</a></h3>`
-    + `<p>${escapeHtml(b.summary)}</p>${b.description && b.description !== b.summary ? `<p class="muted">${escapeHtml(b.description)}</p>` : ""}`
+    + `<p>${prose(b.summary)}</p>${b.description && b.description !== b.summary ? `<p class="muted">${prose(b.description)}</p>` : ""}`
     + table(["Parameter", "In", "Type", "Required", "Meaning"], b.params)
     + (b.fields.length ? `<p class="muted">JSON body:</p>${table(["Field", "Type", "Required", "Meaning"], b.fields)}` : "")
     + "</section>";

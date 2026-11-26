@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
-import { check, inline, markdown, MENU, slug } from "../../scripts/site/build.mjs";
+import { check, inline, markdown, MENU, prose, slug } from "../../scripts/site/build.mjs";
 
 test("a heading's anchor is the one the repository's own reader gives it", () => {
   assert.equal(slug("Independence, and a second pair of eyes"), "independence-and-a-second-pair-of-eyes");
@@ -59,6 +59,11 @@ test("a paragraph that is only a picture is handed to the figure maker", () => {
   const { html } = markdown('Before.\n\n![What it shows](img/home-light.webp "A caption")\n\nAfter ![inline](img/x.webp) text.\n', { figure });
   assert.deepEqual(seen, [["What it shows", "img/home-light.webp", "A caption"]]);
   assert.match(html, /<p>Before\.<\/p>\n<figure><\/figure>\n<p>After <img src="img\/x\.webp" alt="inline" loading="lazy"> text\.<\/p>/);
+});
+
+test("words from the code's documentation show their names as code", () => {
+  assert.equal(prose("With ``dry_run`` (the default)\nnothing <is> changed, like `this`."),
+    "With <code>dry_run</code> (the default) nothing &lt;is&gt; changed, like <code>this</code>.");
 });
 
 test("a quotation holds its own blocks", () => {
