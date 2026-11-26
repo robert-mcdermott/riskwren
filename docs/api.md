@@ -21,7 +21,7 @@ The answer describes who you are, and sets a session cookie, `riskwren_session`:
   "data": {
     "account": {"id": 12, "name": "Your Name", "email": "you@example.org"},
     "roles": ["manager"],
-    "permissions": ["…"],
+    "permissions": {"…": true},
     "units": {"manager": null},
     "member_units": [4],
     "has_password": true,
