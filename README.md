@@ -2,6 +2,8 @@
 
 **Risk and compliance people actually keep current.**
 
+**Documentation, with pictures: <https://robert-mcdermott.github.io/riskwren/>**
+
 RiskWren is an open system of record for governance, risk, and compliance: one connected register of what an organization has, what could go wrong, what it must comply with, what it does about both, and the proof.
 
 It is built first for research and health organizations that are not large corporations: research institutes, academic medical centers, universities, and the nonprofits around them. Within them it is built first for the security team, whose work of frameworks, assessments, findings, and exceptions is the path it gets right before anything else. Nothing in it is specific to either, and any organization that wants a lightweight, self-hosted risk and compliance system can adopt it.
