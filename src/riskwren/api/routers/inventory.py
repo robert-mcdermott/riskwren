@@ -142,6 +142,14 @@ def show_record(request: Request, record_type: RecordType, ref: str) -> dict[str
         return envelope(data)
 
 
+def show_record_plain(request: Request, record_type: RecordType, ref: str) -> dict[str, Any]:
+    """One record of a type that is not joined to others by named links."""
+    principal = current(request)
+    with reading(request) as session:
+        record = records.load(session, principal, record_type, ref)
+        return envelope(records.detail(session, principal, record_type, record))
+
+
 def create_record(request: Request, record_type: RecordType, body: BaseModel) -> dict[str, Any]:
     principal = current(request)
     with writing(request, principal.actor) as session:

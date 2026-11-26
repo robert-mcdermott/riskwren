@@ -72,7 +72,7 @@ def test_a_new_installation_has_a_program(db: Database, people: People) -> None:
         assert len(entries) >= 50 and {entry.category_key for entry in entries} <= known
         assert all(e.cause and e.event and e.consequence for e in entries)
         # Loading again adds nothing and changes nothing.
-        assert packs.install(session) == {"scoring_method": 0, "categories": 0, "library": 0}
+        assert set(packs.install(session).values()) == {0}
         assert rules.get(session, "cadences")["risk_review_months"]["critical"] == 3
         assert rules.add_months(date(2026, 1, 31), 1) == date(2026, 2, 28)
         assert rules.add_months(date(2026, 11, 30), 3) == date(2027, 2, 28)

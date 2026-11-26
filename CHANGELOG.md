@@ -78,3 +78,36 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   `riskwren program import` loads one, checking all of it first, with `--dry-run` to see what
   would change. A new scoring method is a new version. Admin → Program shows the method, the
   matrix, and every definition.
+- **Controls.** A control is described once: who does what, how often, of what kind, owned
+  by a unit and by named people. A library of 56 common controls in plain words offers a
+  starting point, and a risk raised from the risk library is shown the controls commonly
+  used for it (migration 0006).
+- **Effectiveness that is recorded, not assumed.** A control's design and its operation are
+  each rated by a named person on a date, with what the rating rests on. A rating is never
+  edited, only superseded. A control nobody has rated, or whose rating is more than a year
+  old, is shown as such and counts for nothing.
+- **A suggested residual rating, with its working.** Controls are linked to the risks they
+  bear on, saying whether each reduces likelihood or impact and whether the risk relies on
+  it. From the inherent rating and what is known of the controls, RiskWren suggests a
+  residual rating and shows the arithmetic; the assessor agrees or judges otherwise, and
+  both are kept. No number of controls lowers a risk by more than two levels on either axis.
+- **When a control gets worse.** If what is known about a risk's controls later suggests a
+  worse rating than the one on record, the risk is flagged, the controls responsible are
+  named, and its owner is asked to assess it again. The rating is never changed for them.
+- **Treatment plans and actions.** A risk above appetite gets a response and a plan: an
+  objective, a target rating, an owner, a date, and actions each with an owner and a date.
+  Moving an action's date needs a reason, and the original date stays on the record. When
+  the last action is done the plan is complete, and the owner is asked for a new assessment.
+- **Acceptance.** A leader of the risk's unit, or of a unit above it, can accept a risk above
+  appetite, in their own name, with a rationale and conditions, until a date. How high a
+  rating a leader may accept is set on their role; how long is set by the rating. Nobody
+  accepts a risk they own. An acceptance is never edited; it can be withdrawn, and when it
+  expires the risk needs a decision again.
+- **Standing.** A risk above appetite is *being treated* while a plan is on time, *accepted*
+  while an acceptance covers it, and otherwise *needs a decision*.
+- **One list of actions**, with lists of treatment plans and of acceptances.
+
+### Fixed
+
+- A day with no time, such as a due date, was shown as the day before in time zones west of
+  Greenwich.

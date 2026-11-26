@@ -289,6 +289,79 @@
         "description": "In use, and no longer maintained by its maker"
       }
     ],
+    "control_kinds": [
+      {
+        "key": "preventive",
+        "label": "Preventive",
+        "description": "Stops the event from happening"
+      },
+      {
+        "key": "detective",
+        "label": "Detective",
+        "description": "Notices that it is happening, or has"
+      },
+      {
+        "key": "corrective",
+        "label": "Corrective",
+        "description": "Limits the damage and puts things right"
+      },
+      {
+        "key": "directive",
+        "label": "Directive",
+        "description": "Tells people what to do: a policy, a standard, training"
+      }
+    ],
+    "control_natures": [
+      {
+        "key": "manual",
+        "label": "Manual",
+        "description": "Done by a person"
+      },
+      {
+        "key": "automated",
+        "label": "Automated",
+        "description": "Done by a system without anyone acting"
+      },
+      {
+        "key": "both",
+        "label": "Both",
+        "description": "A system and a person together"
+      }
+    ],
+    "control_frequencies": [
+      {
+        "key": "continuous",
+        "label": "Continuous"
+      },
+      {
+        "key": "daily",
+        "label": "Daily"
+      },
+      {
+        "key": "weekly",
+        "label": "Weekly"
+      },
+      {
+        "key": "monthly",
+        "label": "Monthly"
+      },
+      {
+        "key": "quarterly",
+        "label": "Quarterly"
+      },
+      {
+        "key": "twice_a_year",
+        "label": "Twice a year"
+      },
+      {
+        "key": "annually",
+        "label": "Annually"
+      },
+      {
+        "key": "as_needed",
+        "label": "When the occasion arises"
+      }
+    ],
     "third_party_kinds": [
       {
         "key": "supplier",

@@ -10,11 +10,12 @@ import { recordChip } from "../components/record.js";
 import { flags, journey, rating, reasons, standingPill } from "../components/risk.js";
 import { assessRisk, closeRisk, editRisk, editSubjects, escalateRisk } from "../components/risk-forms.js";
 import { toast } from "../components/toast.js";
+import { controlsTab, treatmentTab } from "../components/treatment.js";
 import { alert, card, emptyState } from "../components/ui.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 
-const TABS = [["overview", "Overview"], ["assessments", "Assessments"], ["history", "History"]];
+const TABS = [["overview", "Overview"], ["controls", "Controls"], ["treatment", "Treatment"], ["assessments", "Assessments"], ["history", "History"]];
 const KIND_TITLES = { inherent: "Inherent rating", residual: "Residual rating", target: "Target rating" };
 
 function showReasons(program, risk, kind) {
@@ -76,9 +77,14 @@ export function riskPage(main, params) {
       const base = `/api/v1/risks/${params.ref}`;
       const [risk, programData, unitIndex, vocab, extra] = await Promise.all([
         get(base, null, { fresh: true }), loadProgram(), units(), vocabularies(),
-        tab === "history" ? get(`${base}/history`, null, { fresh: true })
-          : tab === "assessments" ? get(`${base}/assessments`, null, { fresh: true }) : null]);
-      return { risk: risk.data, program: programData, units: unitIndex, vocab, extra: extra?.data ?? [] };
+        ["history", "assessments", "controls", "treatment"].includes(tab) ? get(`${base}/${tab}`, null, { fresh: true }) : null]);
+      // What the library suggests for a risk started from it, offered on the Controls tab.
+      let suggested = [];
+      if (tab === "controls" && risk.data.library_key) {
+        const [entry] = (await get("/api/v1/risk-library", { key: risk.data.library_key })).data;
+        if (entry?.suggested_controls.length) suggested = (await get("/api/v1/control-library", { keys: entry.suggested_controls.join(",") })).data;
+      }
+      return { risk: risk.data, program: programData, units: unitIndex, vocab, extra: extra?.data ?? [], suggested };
     },
     view: (data, reload) => {
       const risk = data.risk;
@@ -98,7 +104,9 @@ export function riskPage(main, params) {
         recordHeader(risk, { badges: [rating(data.program, risk.ratings.residual.rating), standingPill(risk.standing), flags(risk)], actions }),
         tabBar(TABS, tab),
         tab === "history" ? card({ flush: true }, timeline(data.extra))
-          : tab === "assessments" ? assessmentsTab(risk, data.extra, ctx) : overview(risk, ctx));
+          : tab === "assessments" ? assessmentsTab(risk, data.extra, ctx)
+            : tab === "controls" ? controlsTab(risk, { controls: data.extra, suggested: data.suggested }, ctx)
+              : tab === "treatment" ? treatmentTab(risk, data.extra, ctx) : overview(risk, ctx));
     },
   });
 }

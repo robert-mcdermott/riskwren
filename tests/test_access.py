@@ -263,7 +263,13 @@ REACH: dict[tuple[str, str], set[str]] = {
 }
 
 EVERYONE = set(ROLES)
-RECORD_PATHS = {"processes": "PRC", "systems": "SYS", "third-parties": "TP", "risks": "RSK"}
+RECORD_PATHS = {
+    "processes": "PRC",
+    "systems": "SYS",
+    "third-parties": "TP",
+    "risks": "RSK",
+    "controls": "CTL",
+}
 REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
@@ -274,8 +280,14 @@ for _action in ("assessments", "subjects", "escalation"):
     for _method in ("GET", "POST", "PUT"):
         if (_method, f"/api/v1/risks/{{ref}}/{_action}") in POLICIES:
             REACH[(_method, f"/api/v1/risks/{{ref}}/{_action}")] = EVERYONE
+for _key, _needs in POLICIES.items():
+    # Everything about controls and treatment is reached by anyone and decided by the
+    # record, except accepting a risk, which is a leader's alone.
+    parts = ("control", "/treatment", "/response", "/plans", "/acceptances", "/actions")
+    if any(part in _key[1] for part in parts) and _key not in REACH:
+        REACH[_key] = {"leader"} if _needs is Needs.LEAD else EVERYONE
 for _path in RECORD_PATHS:
-    for _method, _template in record_policies(_path, links=_path != "risks"):
+    for _method, _template in record_policies(_path, links=_path not in ("risks", "controls")):
         # Anyone may ask about a record, and the service decides what they may see and do.
         # Adding one is for a unit's steward or a manager.
         adding = _method == "POST" and _template == f"/api/v1/{_path}"
@@ -322,6 +334,11 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 "{unit_id}", str(people.units["HALE"])
             )
             path = path.replace("{kind}", "favicon").replace("{key}", "technology")
+            path = path.replace("{control_ref}", "CTL-9999").replace("{acceptance_id}", "9999")
+            if template.startswith("/api/v1/plans/"):
+                path = path.replace("{ref}", "PLN-9999")
+            if template.startswith("/api/v1/actions/"):
+                path = path.replace("{ref}", "ACT-9999")
             for record_path, prefix in RECORD_PATHS.items():
                 if template.startswith(f"/api/v1/{record_path}"):
                     # A record that is not there: reached, and answered with "not found".
@@ -347,6 +364,20 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"product_name": "RiskWren", "palette": "wren"}
             elif template.endswith("/branding/check"):
                 body = {"accent": "#1f6f5c"}
+            elif template.endswith("/ratings"):
+                body = {"design": "effective", "operation": "effective", "note": "x"}
+            elif template.endswith("/risks/{ref}/controls"):
+                body = {"control": "CTL-9999", "reduces": "likelihood", "reliance": "primary"}
+            elif template.endswith("/response"):
+                body = {"response": "reduce", "rationale": "x"}
+            elif template.endswith("/plans"):
+                body = {"objective": "x", "owner_id": 1, "due_on": "2030-01-01"}
+            elif template.endswith("/plans/{ref}/actions"):
+                body = {"title": "x", "owner_id": 1, "due_on": "2030-01-01"}
+            elif template.endswith(("/cancellation", "/withdrawal")):
+                body = {"reason": "x"}
+            elif template.endswith("/acceptances") and method == "POST":
+                body = {"rationale": "x", "expires_on": "2030-01-01"}
             elif template.endswith("/assessments"):
                 body = {"kind": "inherent", "likelihood": 3, "impact_levels": {}, "rationale": ""}
             elif template.endswith("/subjects"):

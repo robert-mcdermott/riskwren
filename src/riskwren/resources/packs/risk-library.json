@@ -16,7 +16,11 @@
       "title": "Dependence on a single funder",
       "cause": "A large share of research funding comes from one sponsor or program",
       "event": "that sponsor's priorities or budget change",
-      "consequence": "programs lose support faster than they can be wound down or funded again"
+      "consequence": "programs lose support faster than they can be wound down or funded again",
+      "controls": [
+        "funding_diversified",
+        "budget_monitoring"
+      ]
     },
     {
       "key": "indirect_cost_change",
@@ -24,7 +28,11 @@
       "title": "Change to indirect cost recovery",
       "cause": "Sponsors revise what overhead they will pay",
       "event": "recovery falls well below the cost of supporting research",
-      "consequence": "shared services and facilities are cut or run at a loss"
+      "consequence": "shared services and facilities are cut or run at a loss",
+      "controls": [
+        "budget_monitoring",
+        "funding_diversified"
+      ]
     },
     {
       "key": "key_program_decline",
@@ -32,7 +40,10 @@
       "title": "A leading program loses its edge",
       "cause": "Investment follows established strengths while the field moves",
       "event": "a leading program falls behind its peers",
-      "consequence": "recruitment, funding, and standing decline together"
+      "consequence": "recruitment, funding, and standing decline together",
+      "controls": [
+        "funding_diversified"
+      ]
     },
     {
       "key": "affiliation_dispute",
@@ -40,7 +51,10 @@
       "title": "Breakdown of a major affiliation",
       "cause": "Shared governance with a partner institution rests on agreements that have aged",
       "event": "the partner changes strategy or leadership and the arrangement is contested",
-      "consequence": "shared programs, appointments, and facilities are disrupted"
+      "consequence": "shared programs, appointments, and facilities are disrupted",
+      "controls": [
+        "issues_communication"
+      ]
     },
     {
       "key": "public_controversy",
@@ -48,7 +62,11 @@
       "title": "Public controversy over research or conduct",
       "cause": "Work or behavior that some will object to is not anticipated",
       "event": "it becomes a public story before the organization has responded",
-      "consequence": "trust among participants, donors, and partners is damaged"
+      "consequence": "trust among participants, donors, and partners is damaged",
+      "controls": [
+        "issues_communication",
+        "reporting_channel"
+      ]
     },
     {
       "key": "misconduct_undetected",
@@ -56,7 +74,12 @@
       "title": "Research misconduct goes undetected",
       "cause": "Pressure to publish, and supervision that varies from lab to lab",
       "event": "fabricated, falsified, or plagiarized work is published",
-      "consequence": "retractions, sanctions from sponsors, and lasting harm to reputations"
+      "consequence": "retractions, sanctions from sponsors, and lasting harm to reputations",
+      "controls": [
+        "integrity_training",
+        "research_records",
+        "reporting_channel"
+      ]
     },
     {
       "key": "unreproducible_results",
@@ -64,7 +87,11 @@
       "title": "Results that cannot be supported",
       "cause": "Laboratory records are kept inconsistently and leave with people",
       "event": "published results cannot be reproduced or supported when questioned",
-      "consequence": "corrections or retractions, and loss of confidence in the lab's work"
+      "consequence": "corrections or retractions, and loss of confidence in the lab's work",
+      "controls": [
+        "research_records",
+        "integrity_training"
+      ]
     },
     {
       "key": "protocol_lapse",
@@ -72,7 +99,11 @@
       "title": "Research outside its approved protocol",
       "cause": "Amendments, renewals, and consent versions are tracked by hand",
       "event": "participants are enrolled or procedures carried out without current approval",
-      "consequence": "participants are put at risk, data cannot be used, and the study may be suspended"
+      "consequence": "participants are put at risk, data cannot be used, and the study may be suspended",
+      "controls": [
+        "protocol_tracking",
+        "training_tracked"
+      ]
     },
     {
       "key": "participant_privacy",
@@ -80,7 +111,13 @@
       "title": "Identifiable participant data disclosed",
       "cause": "Research data is copied, shared, and analyzed outside managed systems",
       "event": "identifiable information reaches someone not entitled to it",
-      "consequence": "harm to participants, a duty to notify, and loss of trust in the organization's research"
+      "consequence": "harm to participants, a duty to notify, and loss of trust in the organization's research",
+      "controls": [
+        "data_classified",
+        "encryption_at_rest",
+        "data_sharing_approved",
+        "access_reviewed"
+      ]
     },
     {
       "key": "animal_welfare",
@@ -88,7 +125,12 @@
       "title": "Animal welfare failure",
       "cause": "Environmental controls or staffing in an animal facility fail out of hours",
       "event": "animals suffer or die",
-      "consequence": "loss of research, regulatory findings, and public concern"
+      "consequence": "loss of research, regulatory findings, and public concern",
+      "controls": [
+        "animal_care_checks",
+        "environmental_monitoring",
+        "backup_power_tested"
+      ]
     },
     {
       "key": "specimen_loss",
@@ -96,7 +138,14 @@
       "title": "Loss of irreplaceable specimens",
       "cause": "Freezers, the supply of liquid nitrogen, or their monitoring fail",
       "event": "stored specimens thaw before anyone responds",
-      "consequence": "years of collection are lost and the studies that depend on them cannot be completed"
+      "consequence": "years of collection are lost and the studies that depend on them cannot be completed",
+      "controls": [
+        "freezer_monitoring",
+        "preventive_maintenance",
+        "specimen_split",
+        "backup_capacity",
+        "backup_power_tested"
+      ]
     },
     {
       "key": "research_data_loss",
@@ -104,7 +153,12 @@
       "title": "Loss of research data",
       "cause": "Data sits on instruments, laptops, and portable drives without managed backup",
       "event": "a device fails, is lost, or is encrypted by an attacker",
-      "consequence": "results cannot be reproduced and funded work must be repeated or abandoned"
+      "consequence": "results cannot be reproduced and funded work must be repeated or abandoned",
+      "controls": [
+        "backups_tested",
+        "data_classified",
+        "encryption_at_rest"
+      ]
     },
     {
       "key": "undisclosed_support",
@@ -112,7 +166,11 @@
       "title": "Undisclosed outside support or affiliation",
       "cause": "Researchers are unsure what must be disclosed, and nobody checks",
       "event": "a sponsor finds support, an appointment, or a conflict that was not reported",
-      "consequence": "repayment, loss of awards, and exclusion of people or the organization from funding"
+      "consequence": "repayment, loss of awards, and exclusion of people or the organization from funding",
+      "controls": [
+        "disclosure_review",
+        "integrity_training"
+      ]
     },
     {
       "key": "controlled_technology",
@@ -120,7 +178,11 @@
       "title": "Controlled items shared without authorization",
       "cause": "Controlled technology and information are not identified at the start of a project",
       "event": "they are shared with a person or place the law restricts",
-      "consequence": "penalties, loss of privileges, and personal liability"
+      "consequence": "penalties, loss of privileges, and personal liability",
+      "controls": [
+        "export_screening",
+        "training_tracked"
+      ]
     },
     {
       "key": "medication_error",
@@ -128,7 +190,11 @@
       "title": "Medication error",
       "cause": "Products that look alike, interruptions, and transcription by hand",
       "event": "a patient receives the wrong drug or dose",
-      "consequence": "harm to the patient and loss of confidence in the service"
+      "consequence": "harm to the patient and loss of confidence in the service",
+      "controls": [
+        "medication_double_check",
+        "two_identifiers"
+      ]
     },
     {
       "key": "patient_identification",
@@ -136,7 +202,10 @@
       "title": "Wrong patient or wrong procedure",
       "cause": "Identity is confirmed inconsistently at handoffs",
       "event": "a test, treatment, or specimen is attributed to the wrong person",
-      "consequence": "harm, repeated procedures, and results that cannot be relied on"
+      "consequence": "harm, repeated procedures, and results that cannot be relied on",
+      "controls": [
+        "two_identifiers"
+      ]
     },
     {
       "key": "care_infection",
@@ -144,7 +213,10 @@
       "title": "Infection acquired during care",
       "cause": "Lapses in hygiene, cleaning, or isolation among vulnerable patients",
       "event": "an infection spreads within a clinical area",
-      "consequence": "serious harm to patients and closure of the area"
+      "consequence": "serious harm to patients and closure of the area",
+      "controls": [
+        "infection_prevention"
+      ]
     },
     {
       "key": "trial_deviation",
@@ -152,7 +224,12 @@
       "title": "Serious deviation in a clinical trial",
       "cause": "Complex protocols and stretched study staff",
       "event": "eligibility, dosing, or safety reporting departs from the protocol",
-      "consequence": "participants are put at risk and the trial's data may be rejected"
+      "consequence": "participants are put at risk and the trial's data may be rejected",
+      "controls": [
+        "trial_monitoring",
+        "protocol_tracking",
+        "training_tracked"
+      ]
     },
     {
       "key": "clinical_downtime",
@@ -160,7 +237,11 @@
       "title": "Clinical systems unavailable during care",
       "cause": "Care depends on electronic records and connected devices",
       "event": "they are unavailable for hours and working without them has not been practiced",
-      "consequence": "care is delayed and errors become more likely"
+      "consequence": "care is delayed and errors become more likely",
+      "controls": [
+        "downtime_procedures",
+        "continuity_plan"
+      ]
     },
     {
       "key": "missed_deterioration",
@@ -168,7 +249,10 @@
       "title": "A patient's decline is missed",
       "cause": "Monitoring and escalation depend on individual vigilance",
       "event": "a patient's deterioration is noticed or acted on late",
-      "consequence": "avoidable harm or death"
+      "consequence": "avoidable harm or death",
+      "controls": [
+        "early_warning"
+      ]
     },
     {
       "key": "health_information_breach",
@@ -176,7 +260,13 @@
       "title": "Breach of protected health information",
       "cause": "Health information is held in many systems and handled by many people",
       "event": "it is lost, stolen, or seen by someone with no need to",
-      "consequence": "harm to individuals, notification to them and to regulators, and penalties"
+      "consequence": "harm to individuals, notification to them and to regulators, and penalties",
+      "controls": [
+        "access_reviewed",
+        "encryption_at_rest",
+        "logging_monitoring",
+        "security_training"
+      ]
     },
     {
       "key": "access_not_removed",
@@ -184,7 +274,11 @@
       "title": "Access kept after a person leaves or changes role",
       "cause": "Access is granted readily and removed only when someone remembers",
       "event": "a former or reassigned person still reaches sensitive systems",
-      "consequence": "unauthorized use or disclosure that the organization must answer for"
+      "consequence": "unauthorized use or disclosure that the organization must answer for",
+      "controls": [
+        "access_removed_on_leaving",
+        "access_reviewed"
+      ]
     },
     {
       "key": "award_terms",
@@ -192,7 +286,11 @@
       "title": "Terms of an award not met",
       "cause": "Each award has its own conditions, known mainly to its investigator",
       "event": "a condition on reporting, data sharing, or spending is missed",
-      "consequence": "funds are withheld or repaid and future applications are prejudiced"
+      "consequence": "funds are withheld or repaid and future applications are prejudiced",
+      "controls": [
+        "agreements_recorded",
+        "cost_review"
+      ]
     },
     {
       "key": "data_agreement",
@@ -200,7 +298,11 @@
       "title": "Data used outside its agreement",
       "cause": "Data received under an agreement is passed between projects and people",
       "event": "it is used, combined, or shared in a way the agreement forbids",
-      "consequence": "the provider withdraws the data and declines to share again"
+      "consequence": "the provider withdraws the data and declines to share again",
+      "controls": [
+        "agreements_recorded",
+        "data_sharing_approved"
+      ]
     },
     {
       "key": "accreditation_lapse",
@@ -208,7 +310,10 @@
       "title": "Loss of a license or accreditation",
       "cause": "Standards change, and evidence of meeting them is assembled only before a visit",
       "event": "an inspection finds serious gaps",
-      "consequence": "a service is suspended and its work must stop or move"
+      "consequence": "a service is suspended and its work must stop or move",
+      "controls": [
+        "standards_tracked"
+      ]
     },
     {
       "key": "conduct_not_addressed",
@@ -216,7 +321,10 @@
       "title": "Harassment or retaliation not addressed",
       "cause": "People doubt that reporting is safe or leads anywhere",
       "event": "serious conduct continues after it could have been stopped",
-      "consequence": "harm to individuals, legal action, and loss of talent"
+      "consequence": "harm to individuals, legal action, and loss of talent",
+      "controls": [
+        "reporting_channel"
+      ]
     },
     {
       "key": "ransomware",
@@ -224,7 +332,15 @@
       "title": "Ransomware",
       "cause": "Phishing, unpatched systems, and broad access rights",
       "event": "an attacker encrypts systems and data across the network",
-      "consequence": "research and care stop for days or weeks, and data may be lost or published"
+      "consequence": "research and care stop for days or weeks, and data may be lost or published",
+      "controls": [
+        "backups_tested",
+        "patching",
+        "second_factor",
+        "security_training",
+        "network_segmentation",
+        "incident_response"
+      ]
     },
     {
       "key": "compromised_account",
@@ -232,7 +348,13 @@
       "title": "Compromised account",
       "cause": "Passwords are reused and some access lacks a second factor",
       "event": "an attacker signs in as a member of staff",
-      "consequence": "information is stolen, and the account is used to reach further"
+      "consequence": "information is stolen, and the account is used to reach further",
+      "controls": [
+        "second_factor",
+        "security_training",
+        "logging_monitoring",
+        "privileged_access"
+      ]
     },
     {
       "key": "unsupported_systems",
@@ -240,7 +362,12 @@
       "title": "Unsupported systems in use",
       "cause": "Instruments and applications outlive the software they run on",
       "event": "a known weakness is exploited, or the system fails beyond repair",
-      "consequence": "the work that depends on it stops, and the weakness reaches other systems"
+      "consequence": "the work that depends on it stops, and the weakness reaches other systems",
+      "controls": [
+        "unsupported_contained",
+        "network_segmentation",
+        "patching"
+      ]
     },
     {
       "key": "failed_change",
@@ -248,7 +375,11 @@
       "title": "A change breaks a critical system",
       "cause": "Changes are made under time pressure with limited testing",
       "event": "an update or a change of configuration takes a critical system out of service",
-      "consequence": "work stops until it is undone, and data may be corrupted"
+      "consequence": "work stops until it is undone, and data may be corrupted",
+      "controls": [
+        "change_review",
+        "backups_tested"
+      ]
     },
     {
       "key": "backup_failure",
@@ -256,7 +387,10 @@
       "title": "Backups cannot be restored",
       "cause": "Backups run unattended and restores are rarely tested",
       "event": "data must be restored and the backup is incomplete or unusable",
-      "consequence": "permanent loss of data the organization believed was safe"
+      "consequence": "permanent loss of data the organization believed was safe",
+      "controls": [
+        "backups_tested"
+      ]
     },
     {
       "key": "exposed_storage",
@@ -264,7 +398,12 @@
       "title": "Data exposed by misconfiguration",
       "cause": "Cloud storage and sharing are set up by people outside central teams",
       "event": "sensitive data is left open to the internet or to everyone in the organization",
-      "consequence": "disclosure that may go unnoticed for months"
+      "consequence": "disclosure that may go unnoticed for months",
+      "controls": [
+        "data_classified",
+        "logging_monitoring",
+        "access_reviewed"
+      ]
     },
     {
       "key": "unreviewed_ai",
@@ -272,7 +411,12 @@
       "title": "Unreviewed use of AI with sensitive data",
       "cause": "AI tools are easy to adopt without anyone's approval",
       "event": "sensitive or regulated data is entered into a tool with no agreement covering it",
-      "consequence": "data is disclosed, and results are relied on that nobody has checked"
+      "consequence": "data is disclosed, and results are relied on that nobody has checked",
+      "controls": [
+        "ai_use_reviewed",
+        "data_classified",
+        "agreements_in_place"
+      ]
     },
     {
       "key": "sign_in_outage",
@@ -280,7 +424,12 @@
       "title": "Sign-in service unavailable",
       "cause": "Every system depends on one identity service",
       "event": "it fails or is locked by an attacker",
-      "consequence": "nobody can work until it is restored"
+      "consequence": "nobody can work until it is restored",
+      "controls": [
+        "continuity_plan",
+        "privileged_access",
+        "incident_response"
+      ]
     },
     {
       "key": "power_failure",
@@ -288,7 +437,11 @@
       "title": "Extended loss of power",
       "cause": "Backup generation is sized and tested for short outages",
       "event": "power is lost for longer than the backup can carry",
-      "consequence": "specimens, animals, experiments, and systems are lost"
+      "consequence": "specimens, animals, experiments, and systems are lost",
+      "controls": [
+        "backup_power_tested",
+        "continuity_plan"
+      ]
     },
     {
       "key": "environmental_control",
@@ -296,7 +449,11 @@
       "title": "Loss of environmental control",
       "cause": "Ventilation and cooling serve laboratories, animal rooms, and data rooms with little to spare",
       "event": "a plant failure takes temperature or air handling out of range",
-      "consequence": "work stops, materials are lost, and spaces become unsafe"
+      "consequence": "work stops, materials are lost, and spaces become unsafe",
+      "controls": [
+        "environmental_monitoring",
+        "preventive_maintenance"
+      ]
     },
     {
       "key": "critical_instrument",
@@ -304,7 +461,12 @@
       "title": "Failure of a critical instrument",
       "cause": "A core service depends on one instrument with a long repair time",
       "event": "it fails with no alternative arranged",
-      "consequence": "many groups' work waits for weeks"
+      "consequence": "many groups' work waits for weeks",
+      "controls": [
+        "preventive_maintenance",
+        "alternate_supplier",
+        "backup_capacity"
+      ]
     },
     {
       "key": "hazard_exposure",
@@ -312,7 +474,10 @@
       "title": "Exposure to a hazardous agent",
       "cause": "Hazardous biological, chemical, or radioactive materials are handled daily",
       "event": "a spill, release, or sharps injury exposes someone",
-      "consequence": "injury or illness, regulatory findings, and suspension of the work"
+      "consequence": "injury or illness, regulatory findings, and suspension of the work",
+      "controls": [
+        "safety_training"
+      ]
     },
     {
       "key": "fire_or_flood",
@@ -320,7 +485,12 @@
       "title": "Fire or flood in a research building",
       "cause": "Laboratories hold flammable materials and water-cooled equipment",
       "event": "a fire or major leak damages a building",
-      "consequence": "people are endangered, and space, equipment, and materials are lost for months"
+      "consequence": "people are endangered, and space, equipment, and materials are lost for months",
+      "controls": [
+        "safety_training",
+        "continuity_plan",
+        "specimen_split"
+      ]
     },
     {
       "key": "regional_disaster",
@@ -328,7 +498,11 @@
       "title": "Regional disaster",
       "cause": "The organization is concentrated in one place",
       "event": "an earthquake, storm, or epidemic closes it for an extended period",
-      "consequence": "research and care are interrupted well beyond what plans assume"
+      "consequence": "research and care are interrupted well beyond what plans assume",
+      "controls": [
+        "continuity_plan",
+        "backups_tested"
+      ]
     },
     {
       "key": "key_person",
@@ -336,7 +510,10 @@
       "title": "Loss of a key person",
       "cause": "Essential knowledge or relationships rest with one person",
       "event": "they leave or are suddenly unavailable",
-      "consequence": "a program, service, or system cannot continue as it was"
+      "consequence": "a program, service, or system cannot continue as it was",
+      "controls": [
+        "succession"
+      ]
     },
     {
       "key": "recruitment",
@@ -344,7 +521,11 @@
       "title": "Unable to recruit or keep skilled staff",
       "cause": "Pay and career paths lag behind competing employers",
       "event": "critical roles stay vacant or turn over repeatedly",
-      "consequence": "services degrade and the staff who remain are overloaded"
+      "consequence": "services degrade and the staff who remain are overloaded",
+      "controls": [
+        "workload_review",
+        "succession"
+      ]
     },
     {
       "key": "workplace_injury",
@@ -352,7 +533,10 @@
       "title": "Serious workplace injury",
       "cause": "Laboratory, clinical, and facilities work carries physical hazards",
       "event": "someone is seriously injured at work",
-      "consequence": "harm to the person, an investigation, and loss of confidence among colleagues"
+      "consequence": "harm to the person, an investigation, and loss of confidence among colleagues",
+      "controls": [
+        "safety_training"
+      ]
     },
     {
       "key": "sustained_overload",
@@ -360,7 +544,10 @@
       "title": "Sustained overload",
       "cause": "Demands rise faster than staffing",
       "event": "exhaustion becomes widespread in a team",
-      "consequence": "errors, absence, and departures increase together"
+      "consequence": "errors, absence, and departures increase together",
+      "controls": [
+        "workload_review"
+      ]
     },
     {
       "key": "training_lapse",
@@ -368,7 +555,10 @@
       "title": "Required training not completed",
       "cause": "Training requirements multiply and are tracked in several places",
       "event": "people do work they are not currently trained or authorized for",
-      "consequence": "avoidable incidents, and findings at inspection"
+      "consequence": "avoidable incidents, and findings at inspection",
+      "controls": [
+        "training_tracked"
+      ]
     },
     {
       "key": "unallowable_costs",
@@ -376,7 +566,11 @@
       "title": "Unallowable costs charged to an award",
       "cause": "Charges are approved by people unfamiliar with each sponsor's rules",
       "event": "costs the sponsor does not allow are charged and certified",
-      "consequence": "repayment, audit findings, and closer scrutiny of every award"
+      "consequence": "repayment, audit findings, and closer scrutiny of every award",
+      "controls": [
+        "cost_review",
+        "separation_of_duties"
+      ]
     },
     {
       "key": "effort_certification",
@@ -384,7 +578,11 @@
       "title": "Effort not certified accurately",
       "cause": "Effort is certified after the fact by busy investigators",
       "event": "salary charged to awards does not match the work done",
-      "consequence": "repayment, and findings that reach across the organization"
+      "consequence": "repayment, and findings that reach across the organization",
+      "controls": [
+        "effort_certified",
+        "cost_review"
+      ]
     },
     {
       "key": "subrecipient_monitoring",
@@ -392,7 +590,10 @@
       "title": "Subrecipient not monitored",
       "cause": "Funds pass to partner organizations whose controls are unknown",
       "event": "a subrecipient misspends the funds or cannot account for them",
-      "consequence": "the organization must repay them and answer for the failure"
+      "consequence": "the organization must repay them and answer for the failure",
+      "controls": [
+        "subrecipient_review"
+      ]
     },
     {
       "key": "payment_fraud",
@@ -400,7 +601,11 @@
       "title": "Payment fraud",
       "cause": "Requests to change bank details are accepted by email",
       "event": "a payment is sent to an impostor",
-      "consequence": "the money is lost and rarely recovered"
+      "consequence": "the money is lost and rarely recovered",
+      "controls": [
+        "payment_verification",
+        "separation_of_duties"
+      ]
     },
     {
       "key": "purchasing_misuse",
@@ -408,7 +613,10 @@
       "title": "Misuse of purchasing authority",
       "cause": "Many people can buy with little review",
       "event": "personal or improper purchases are made over time",
-      "consequence": "loss of funds, and of confidence in the organization's stewardship"
+      "consequence": "loss of funds, and of confidence in the organization's stewardship",
+      "controls": [
+        "separation_of_duties"
+      ]
     },
     {
       "key": "operating_shortfall",
@@ -416,7 +624,11 @@
       "title": "Operating shortfall",
       "cause": "Costs are committed years ahead while income is awarded year by year",
       "event": "income falls well short of plan",
-      "consequence": "reserves are drawn down and programs are cut at short notice"
+      "consequence": "reserves are drawn down and programs are cut at short notice",
+      "controls": [
+        "budget_monitoring",
+        "funding_diversified"
+      ]
     },
     {
       "key": "gift_terms",
@@ -424,7 +636,10 @@
       "title": "Gift used against its terms",
       "cause": "Restrictions on gifts are recorded at the time and forgotten later",
       "event": "a restricted gift is spent on something else",
-      "consequence": "the donor's trust is lost and the gift may have to be restored"
+      "consequence": "the donor's trust is lost and the gift may have to be restored",
+      "controls": [
+        "gift_terms_recorded"
+      ]
     },
     {
       "key": "sole_supplier",
@@ -432,7 +647,11 @@
       "title": "Dependence on a single supplier",
       "cause": "A critical material, reagent, or service has one source",
       "event": "the supplier fails, is acquired, or cannot deliver",
-      "consequence": "the work that depends on it stops until another source is found and qualified"
+      "consequence": "the work that depends on it stops until another source is found and qualified",
+      "controls": [
+        "alternate_supplier",
+        "backup_capacity"
+      ]
     },
     {
       "key": "hosted_service_outage",
@@ -440,7 +659,11 @@
       "title": "A hosted service is unavailable",
       "cause": "A critical system is run entirely by a supplier",
       "event": "the supplier has a prolonged outage or ends the service",
-      "consequence": "the organization cannot work and cannot fix it"
+      "consequence": "the organization cannot work and cannot fix it",
+      "controls": [
+        "exit_plan",
+        "continuity_plan"
+      ]
     },
     {
       "key": "supplier_breach",
@@ -448,7 +671,11 @@
       "title": "A supplier discloses the organization's information",
       "cause": "Sensitive information is held by suppliers whose safeguards are taken on trust",
       "event": "the supplier is breached or misuses the information",
-      "consequence": "the organization must notify those affected and answer for a failure it could not see"
+      "consequence": "the organization must notify those affected and answer for a failure it could not see",
+      "controls": [
+        "supplier_assessed",
+        "agreements_in_place"
+      ]
     },
     {
       "key": "missing_agreement",
@@ -456,7 +683,11 @@
       "title": "Regulated information shared without an agreement",
       "cause": "Services are bought and data shared before anyone checks what agreement is needed",
       "event": "protected information is held by a party with no agreement covering it",
-      "consequence": "a violation exists from the first day, whether or not anything goes wrong"
+      "consequence": "a violation exists from the first day, whether or not anything goes wrong",
+      "controls": [
+        "agreements_in_place",
+        "supplier_assessed"
+      ]
     },
     {
       "key": "collaborator_failure",
@@ -464,7 +695,11 @@
       "title": "A collaborator does not deliver",
       "cause": "A study depends on work at another institution",
       "event": "the collaborator falls behind, loses staff, or withdraws",
-      "consequence": "the study is delayed or cannot be completed as funded"
+      "consequence": "the study is delayed or cannot be completed as funded",
+      "controls": [
+        "subrecipient_review",
+        "agreements_recorded"
+      ]
     }
   ]
 }

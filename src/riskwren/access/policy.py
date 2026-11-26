@@ -100,6 +100,32 @@ POLICIES.update(
     }
 )
 
+# Controls and treatment. As with every record, any member may ask, and the services decide
+# by the record: who owns it, whose unit it is in, and who has the authority.
+POLICIES.update(record_policies("controls", links=False))
+POLICIES.update(
+    {
+        ("GET", "/api/v1/control-library"): Needs.MEMBER,
+        ("GET", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
+        ("POST", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/controls"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/controls"): Needs.MEMBER,
+        ("DELETE", "/api/v1/risks/{ref}/controls/{control_ref}"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/treatment"): Needs.MEMBER,
+        ("PUT", "/api/v1/risks/{ref}/response"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/plans"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/acceptances"): Needs.LEAD,
+        ("POST", "/api/v1/acceptances/{acceptance_id}/withdrawal"): Needs.MEMBER,
+        ("GET", "/api/v1/acceptances"): Needs.MEMBER,
+        ("GET", "/api/v1/plans"): Needs.MEMBER,
+        ("GET", "/api/v1/plans/{ref}"): Needs.MEMBER,
+        ("POST", "/api/v1/plans/{ref}/cancellation"): Needs.MEMBER,
+        ("POST", "/api/v1/plans/{ref}/actions"): Needs.MEMBER,
+        ("GET", "/api/v1/actions"): Needs.MEMBER,
+        ("PATCH", "/api/v1/actions/{ref}"): Needs.MEMBER,
+    }
+)
+
 
 def allowed(principal: Principal | None, needs: Needs) -> bool:
     if needs is Needs.PUBLIC:

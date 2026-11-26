@@ -121,20 +121,24 @@ None block the start. These defaults have been taken and can be changed before t
 
 **Acceptance (met):** the two scoring implementations agree on every shared case; an assessment always shows the method version it was made under after the method changes; changing a category's appetite changes the standing of its risks and nothing else; a leader's list contains their unit's risks and those beneath it; an assessment cannot be altered through any route. A table of which risks each of the seven roles sees under each of the three visibility settings is tested for single risks and for lists, which must agree. 302 tests pass on SQLite. Checked in the browser: the register, a risk page, the assessment form with its live rating, the recorded reasoning, and the Program page.
 
-## Slice 6: Controls and treatment ☐
+## Slice 6: Controls and treatment ☑
 
 **Goal:** controls that are known to work, and a named person behind whatever remains.
 
-- [ ] Controls with statement, objective, kind, nature, frequency, unit, and owners; the starter control library pack
-- [ ] Control ratings for design and operation with a basis and a note; never edited; strength as the weaker part; stale when older than the cadence
-- [ ] Links from controls to risks with what each reduces and how much it is relied on
-- [ ] The suggested residual rating with its working, in Python and JavaScript on the same cases; kept on the assessment beside the assessor's judgment
-- [ ] The *residual may be out of date* flag when today's suggestion is worse than the rating on record, naming the control responsible
-- [ ] Responses with a rationale; treatment plans with a target rating and actions; the one `action` table and the Actions list
-- [ ] Acceptance: the authority table, the limit on a leader's grant, the maximum period by rating, refusal for an owner or above the limit, withdrawal, and expiry changing the standing
-- [ ] Separation of duties in the service layer, tested for every role
+- [x] Controls with statement, objective, kind, nature, frequency, unit, and owners; a library of 56 starter controls in plain words, from which a control is started and made the organization's own; every library risk suggests the controls commonly used for it (migration 0006)
+- [x] Control ratings for design and operation with a basis and a note; never edited; strength as the weaker part; stale when older than the cadence
+- [x] Links from controls to risks with what each reduces and how much it is relied on; one control bears on a risk once
+- [x] The suggested residual rating with its working, in Python and JavaScript on the same cases; kept on the assessment beside the assessor's judgment
+- [x] The *residual may be out of date* flag when what is now known suggests worse than it did at the assessment and worse than the rating on record, naming the controls responsible; the rating itself is never changed by the system
+- [x] Responses with a rationale; treatment plans with a target rating and actions; the one `action` table and the Actions list; moving an action's date needs a reason, and the original date and every move stay on the record
+- [x] A plan completes when its last action does; that asks the owner for a new assessment and does not change the rating
+- [x] Acceptance: the authority table, the limit on a leader's grant, the maximum period by rating, refusal for an owner or above the limit, withdrawal, and expiry changing the standing
+- [x] Standing kept in step with the calendar: when an acceptance expires or a plan runs late, the risk returns to needing a decision the next time the register is read
+- [x] Separation of duties in the service layer, tested for every role
+- [x] Screens: the control library and control page with its ratings; the Controls and Treatment tabs of a risk; lists of treatment plans, acceptances, and actions
+- [x] Found on the way: a day with no time (a due date, a review date) was shown a day early west of Greenwich. Fixed, with a test that runs the browser's modules in such a time zone
 
-**Acceptance:** the worked example in [engine.md](../engine.md) produces the figures shown there; a control that is not assessed or is stale contributes nothing; no number of controls lowers an axis by more than the limit; an acceptance is refused for the risk's owner and for a leader above their limit, in the API and the app; an expired acceptance returns the risk to *needs a decision*; closing a plan's last action asks its owner for a new assessment and does not change the rating.
+**Acceptance (met):** the worked example in [engine.md](../engine.md) produces the figures shown there; a control that is not assessed or is stale contributes nothing; no number of controls lowers an axis by more than the limit; an acceptance is refused for the risk's owner and for a leader above their limit, in the API and the app; an expired acceptance returns the risk to *needs a decision*; closing a plan's last action asks its owner for a new assessment and does not change the rating. 316 tests pass on SQLite. Checked in the browser: adding and linking a suggested control, the suggestion's arithmetic, a plan with an overdue action, the actions list, and a control page.
 
 ## Slice 7: Home, heat map, and dashboard ☐
 
@@ -176,6 +180,10 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Sign-in is throttled three ways:** five failures for one account from one address, and a much higher limit for the account alone and for the address alone, so nobody can lock a colleague out by typing their address. Each attempt is counted before the password is checked.
 - **The inventory is open; the register follows the setting.** Under the planned default, a steward could not link their system to a supplier recorded by another unit, because they could not see it. Processes, systems, and third parties are now visible to everyone signed in unless restricted, and the visibility setting governs risks and controls. [security.md](../security.md) says so.
 - **A link is recorded once and read both ways.** Its changes appear in the history of the record it starts from.
+- **Starter controls are a library, not records.** A control needs a unit and an owner to mean anything, so an installation is not seeded with fifty ownerless controls. The library offers them where they are wanted: on a risk started from the library, the controls commonly used for it are one step away.
+- **Doubt is about change, not disagreement.** An assessor who judges a residual rating lower than the controls suggest has made a judgment, and it is kept with its reason. The flag is raised only when what is known about the controls later gets worse than it was at that assessment.
+- **An acceptance covers what was accepted.** If the residual rating later rises above the rating that was accepted, the acceptance no longer covers the risk and it needs a decision again.
+- **Until scheduled jobs arrive (wave 3), the calendar is caught up on reading.** Reading the register checks, cheaply, whether any acceptance has expired or plan has run late, and writes only if one has, as the system and not as the reader.
 - **Escalation is prominence, not ownership.** A risk escalated to a higher unit still belongs to its own; the unit above already sees it in its roll-up. Escalating says "this needs you", with a reason, and puts it among the risks that sit at that level.
 - **A matrix must never run backwards.** A scoring method in which a rating falls as likelihood or impact rises cannot be published, whether typed in or imported.
 - **The program is installed, not migrated.** Migrations build tables; `init` and `db upgrade` then add whatever of the default program and libraries is missing, as ordinary audited writes, and never overwrite what an organization has shaped.

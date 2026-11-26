@@ -422,3 +422,4 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
 .overdue { color: var(--danger); font-weight: 600; }
 @media (max-width: 640px) { .journey { flex-direction: column; } .journey-arrow { display: none; } }
 @media (max-width: 520px) { .levels { flex-wrap: wrap; } .level { flex: 1 1 30%; } }
+.section-title { font-size: var(--text-l); font-weight: 600; margin: 0; }

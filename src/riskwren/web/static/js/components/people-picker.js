@@ -37,3 +37,32 @@ export function peoplePicker({ label = "Add a person", exclude = () => false, on
   });
   return h("div", { class: "field" }, h("label", { for: id }, label), input, results);
 }
+
+/** One person, chosen by searching. Starts with `value` ({ account_id, name }) if given. */
+export function personField(label, { value = null, hint = null } = {}) {
+  let chosen = value;
+  const shown = h("div", {});
+  const errorNode = h("div", { class: "error", role: "alert", hidden: true });
+  const picker = peoplePicker({ label: "Find a person", onPick: (account) => {
+    chosen = { account_id: account.id, name: account.display_name };
+    draw();
+  } });
+  const draw = () => {
+    picker.hidden = Boolean(chosen);
+    shown.replaceChildren(...(chosen ? [h("div", { class: "row" }, avatar(chosen.name), h("span", { class: "cell-main grow" }, chosen.name),
+      h("button", { type: "button", class: "btn btn-ghost btn-sm", onclick: () => {
+        chosen = null;
+        draw();
+      } }, "Change"))] : []));
+  };
+  draw();
+  return {
+    node: h("div", { class: "field" }, h("div", { class: "label" }, label), hint ? h("div", { class: "hint" }, hint) : null, shown, picker, errorNode),
+    input: picker.querySelector("input"),
+    value: () => chosen?.account_id ?? null,
+    setError: (message) => {
+      errorNode.hidden = !message;
+      errorNode.textContent = message ?? "";
+    },
+  };
+}

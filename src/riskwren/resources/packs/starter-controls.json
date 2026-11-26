@@ -1,0 +1,518 @@
+{
+  "pack": {
+    "key": "starter-controls",
+    "kind": "control_library",
+    "title": "Starter controls",
+    "version": "1",
+    "pack_version": "0.1.0",
+    "publisher": "The RiskWren Authors",
+    "license": "Apache-2.0",
+    "text_policy": "verbatim"
+  },
+  "controls": [
+    {
+      "key": "access_removed_on_leaving",
+      "title": "Access removed when people leave",
+      "statement": "Access to systems is removed on the day a person leaves, and reviewed when they change role.",
+      "kind": "preventive",
+      "nature": "both",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "access_reviewed",
+      "title": "Access reviewed",
+      "statement": "Owners of sensitive systems confirm twice a year that everyone with access still needs it.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "twice_a_year",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "second_factor",
+      "title": "Second factor at sign-in",
+      "statement": "Signing in from outside the organization, or to anything holding restricted data, needs a second factor.",
+      "kind": "preventive",
+      "nature": "automated",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "privileged_access",
+      "title": "Administrative access limited",
+      "statement": "Administrative rights are held by named people, used from separate accounts, and recorded.",
+      "kind": "preventive",
+      "nature": "both",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "encryption_at_rest",
+      "title": "Devices and storage encrypted",
+      "statement": "Laptops, portable drives, and storage that hold confidential or restricted data are encrypted.",
+      "kind": "preventive",
+      "nature": "automated",
+      "frequency": "continuous",
+      "reduces": "impact"
+    },
+    {
+      "key": "backups_tested",
+      "title": "Backups tested by restoring",
+      "statement": "Critical data is backed up to a place an attacker on the network cannot reach, and a restore is tested every quarter.",
+      "kind": "corrective",
+      "nature": "both",
+      "frequency": "quarterly",
+      "reduces": "impact"
+    },
+    {
+      "key": "data_classified",
+      "title": "Data classified and handled accordingly",
+      "statement": "Each body of data has a class, and where it may be stored and shared follows from that class.",
+      "kind": "directive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "data_sharing_approved",
+      "title": "Data sharing approved",
+      "statement": "Sharing restricted data outside the organization needs an agreement in place and a named approver.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "patching",
+      "title": "Systems kept patched",
+      "statement": "Security updates are applied within a set time, and systems that cannot be patched are isolated and listed.",
+      "kind": "preventive",
+      "nature": "both",
+      "frequency": "monthly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "malware_protection",
+      "title": "Protection against malicious software",
+      "statement": "Servers and workstations run managed protection that is monitored centrally.",
+      "kind": "preventive",
+      "nature": "automated",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "network_segmentation",
+      "title": "Networks separated",
+      "statement": "Instruments, clinical devices, and systems that cannot be patched sit on networks separated from general use.",
+      "kind": "preventive",
+      "nature": "automated",
+      "frequency": "continuous",
+      "reduces": "impact"
+    },
+    {
+      "key": "unsupported_contained",
+      "title": "Unsupported systems listed and contained",
+      "statement": "Each system that no longer receives updates has an owner, an end date, and compensating safeguards.",
+      "kind": "directive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "change_review",
+      "title": "Changes reviewed and reversible",
+      "statement": "Changes to critical systems are tested, approved by a second person, and can be undone.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "logging_monitoring",
+      "title": "Security events monitored",
+      "statement": "Sign-ins and administrative actions on critical systems are logged and watched, and alerts are acted on.",
+      "kind": "detective",
+      "nature": "both",
+      "frequency": "continuous",
+      "reduces": "impact"
+    },
+    {
+      "key": "incident_response",
+      "title": "Incident response rehearsed",
+      "statement": "There is a written plan for a security incident, with named roles, and it is exercised each year.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "impact"
+    },
+    {
+      "key": "security_training",
+      "title": "Security awareness training",
+      "statement": "Everyone completes security training when they join and each year, and phishing exercises are run.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "ai_use_reviewed",
+      "title": "Use of AI tools reviewed",
+      "statement": "A new AI tool, or a new use of one with sensitive data, is reviewed before use, and approved tools are listed.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "freezer_monitoring",
+      "title": "Cold storage monitored and alarmed",
+      "statement": "Freezers and liquid nitrogen stores are monitored continuously, and an alarm reaches a person who can respond at any hour.",
+      "kind": "detective",
+      "nature": "both",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "preventive_maintenance",
+      "title": "Critical equipment maintained",
+      "statement": "Critical equipment is maintained on a schedule under contract, and the records are kept.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "quarterly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "specimen_split",
+      "title": "Irreplaceable material held in two places",
+      "statement": "Irreplaceable specimens are divided between two locations with separate power and cooling.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "impact"
+    },
+    {
+      "key": "backup_power_tested",
+      "title": "Backup power tested under load",
+      "statement": "Generators and their fuel supply are tested under load each month, and critical equipment is confirmed to be on backup circuits.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "monthly",
+      "reduces": "impact"
+    },
+    {
+      "key": "backup_capacity",
+      "title": "Spare capacity kept ready",
+      "statement": "Empty backup freezers and spare critical parts are kept ready for use.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "quarterly",
+      "reduces": "impact"
+    },
+    {
+      "key": "environmental_monitoring",
+      "title": "Environment monitored",
+      "statement": "Temperature, humidity, and air handling in laboratories, animal rooms, and data rooms are monitored and alarmed.",
+      "kind": "detective",
+      "nature": "automated",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "safety_training",
+      "title": "Laboratory safety training and inspection",
+      "statement": "People who work with hazardous materials are trained before they start, and laboratories are inspected each year.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "continuity_plan",
+      "title": "Continuity plans exercised",
+      "statement": "Critical services have a plan for carrying on without their systems or space, and it is exercised each year.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "impact"
+    },
+    {
+      "key": "animal_care_checks",
+      "title": "Animal facilities checked daily",
+      "statement": "Animal rooms are checked every day, weekends included, and environmental alarms reach on-call staff.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "daily",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "protocol_tracking",
+      "title": "Protocols tracked to renewal",
+      "statement": "Every study's approvals, amendments, and consent versions are tracked, with reminders before anything lapses.",
+      "kind": "preventive",
+      "nature": "both",
+      "frequency": "monthly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "research_records",
+      "title": "Research records kept to a standard",
+      "statement": "Laboratories keep records to a written standard, in a system the organization holds, and they stay when people leave.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "integrity_training",
+      "title": "Research integrity training and review",
+      "statement": "Researchers are trained in responsible conduct, and data is reviewed within the lab before publication.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "disclosure_review",
+      "title": "Outside interests disclosed and reviewed",
+      "statement": "Researchers disclose outside support, appointments, and interests each year and when they change, and disclosures are checked against applications.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "export_screening",
+      "title": "Controlled items identified at the start",
+      "statement": "Projects are screened for controlled technology, information, and restricted parties before work begins.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "agreements_recorded",
+      "title": "Agreements recorded with their terms",
+      "statement": "Each award and data use agreement is recorded with its conditions and an owner who answers for meeting them.",
+      "kind": "directive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "standards_tracked",
+      "title": "Standards tracked all year",
+      "statement": "Each license and accreditation has an owner who tracks its standards and keeps the evidence current all year.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "quarterly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "two_identifiers",
+      "title": "Two identifiers before any procedure",
+      "statement": "Identity is confirmed with two identifiers before any test, treatment, or specimen collection.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "medication_double_check",
+      "title": "High-risk medication double-checked",
+      "statement": "High-risk medications are checked independently by a second person or by scanning before they are given.",
+      "kind": "preventive",
+      "nature": "both",
+      "frequency": "continuous",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "infection_prevention",
+      "title": "Infection prevention audited",
+      "statement": "Hand hygiene, cleaning, and isolation practice are audited each month and the results shared.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "monthly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "downtime_procedures",
+      "title": "Downtime procedures practiced",
+      "statement": "Clinical areas keep procedures for working without their systems, and practice them twice a year.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "twice_a_year",
+      "reduces": "impact"
+    },
+    {
+      "key": "trial_monitoring",
+      "title": "Trials monitored against protocol",
+      "statement": "Each trial is monitored against its protocol, and deviations are reviewed and reported.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "quarterly",
+      "reduces": "impact"
+    },
+    {
+      "key": "early_warning",
+      "title": "Deterioration recognized and escalated",
+      "statement": "Vital signs are scored at set intervals, and a score above the threshold brings a rapid response.",
+      "kind": "detective",
+      "nature": "both",
+      "frequency": "continuous",
+      "reduces": "impact"
+    },
+    {
+      "key": "cost_review",
+      "title": "Charges to awards reviewed",
+      "statement": "Charges to sponsored awards are reviewed against the award's terms each month by someone trained in them.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "monthly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "effort_certified",
+      "title": "Effort certified on time",
+      "statement": "Effort charged to awards is certified by someone with direct knowledge, within the set period.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "twice_a_year",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "subrecipient_review",
+      "title": "Subrecipients assessed and monitored",
+      "statement": "Subrecipients are assessed before funds are passed to them, and their reports and invoices are reviewed.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "payment_verification",
+      "title": "Changes to payment details verified",
+      "statement": "A request to change bank details is confirmed by calling a known number before any payment is made.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "separation_of_duties",
+      "title": "Purchasing duties separated",
+      "statement": "Nobody both requests and approves a purchase, and card spending is reviewed each month.",
+      "kind": "preventive",
+      "nature": "both",
+      "frequency": "monthly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "budget_monitoring",
+      "title": "Budgets monitored and reserves held",
+      "statement": "Income and spending are compared with plan each month, and reserves are held to a set level.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "monthly",
+      "reduces": "impact"
+    },
+    {
+      "key": "gift_terms_recorded",
+      "title": "Gift restrictions recorded and checked",
+      "statement": "The terms of each restricted gift are recorded, and spending from it is checked against them.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "succession",
+      "title": "Knowledge shared and deputies named",
+      "statement": "Critical roles have a named deputy, and the knowledge they depend on is written down.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "impact"
+    },
+    {
+      "key": "training_tracked",
+      "title": "Required training tracked",
+      "statement": "Required training is recorded in one place, and people are reminded before it lapses.",
+      "kind": "detective",
+      "nature": "both",
+      "frequency": "monthly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "reporting_channel",
+      "title": "A safe way to raise concerns",
+      "statement": "Concerns can be raised in confidence and are followed up, and retaliation is not tolerated.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "continuous",
+      "reduces": "impact"
+    },
+    {
+      "key": "workload_review",
+      "title": "Workload and staffing reviewed",
+      "statement": "Leaders review workload, vacancies, and turnover each quarter and act on what they find.",
+      "kind": "detective",
+      "nature": "manual",
+      "frequency": "quarterly",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "supplier_assessed",
+      "title": "Suppliers assessed before use",
+      "statement": "A supplier that will hold restricted data or run a critical service is assessed before it is engaged, and again on a schedule.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "agreements_in_place",
+      "title": "Required agreements in place",
+      "statement": "No regulated information is shared with a third party until the agreement it requires is signed.",
+      "kind": "preventive",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "likelihood"
+    },
+    {
+      "key": "alternate_supplier",
+      "title": "A second source identified",
+      "statement": "For each critical material or service, a second source has been identified and, where possible, qualified.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "impact"
+    },
+    {
+      "key": "exit_plan",
+      "title": "A way out of each critical service",
+      "statement": "For each critical hosted service, the organization knows how it would get its data back and carry on elsewhere.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "impact"
+    },
+    {
+      "key": "funding_diversified",
+      "title": "Funding sources watched and spread",
+      "statement": "Leadership reviews the mix of funding each year and sets limits on dependence on any one source.",
+      "kind": "directive",
+      "nature": "manual",
+      "frequency": "annually",
+      "reduces": "impact"
+    },
+    {
+      "key": "issues_communication",
+      "title": "Sensitive issues anticipated",
+      "statement": "Sensitive work is identified in advance, and there is a plan for who speaks and what is said.",
+      "kind": "corrective",
+      "nature": "manual",
+      "frequency": "as_needed",
+      "reduces": "impact"
+    }
+  ]
+}

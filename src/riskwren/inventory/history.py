@@ -130,8 +130,9 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
     elif event.action == "created":
         title = f"Added this {record_type.label}"
     elif event.action == "updated":
+        quiet = record_type.extra.get("history_quiet", ())
         for field, (old, new) in changes.items():
-            if field in HIDDEN:
+            if field in HIDDEN or (field in quiet and event.subject_type == record_type.key):
                 continue
             lines.append(
                 {
@@ -176,4 +177,7 @@ def for_record(
         .limit(limit)
     ).all()
     lookups = Lookups(session, record_type)
-    return [entry(event, record_type, lookups) for event in events]
+    story = [entry(event, record_type, lookups) for event in events]
+    # A change that only copied what another entry already says (a rating onto its control,
+    # an assessment onto its risk) is not told twice.
+    return [item for item in story if item["action"] != "updated" or item["lines"]]

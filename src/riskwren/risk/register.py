@@ -241,6 +241,14 @@ RISK = register(
             },
             "history_title": _history_title,
             "history_value": _history_value,
+            "history_quiet": (
+                "next_review_on",
+                *(
+                    f"{kind}_{part}"
+                    for kind in ASSESSMENT_KINDS
+                    for part in ("likelihood", "impact", "rating")
+                ),
+            ),
             "history_labels": {
                 "category_id": "Category",
                 "closed_reason": "Why it was closed",

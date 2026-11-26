@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -47,13 +48,21 @@ def test_the_shared_cases(case: dict[str, Any]) -> None:
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="needs Node to run the browser's module")
-def test_the_browser_passes_the_same_cases() -> None:
+def test_the_browsers_modules_pass_their_tests() -> None:
     files = sorted(str(path) for path in (ROOT / "tests/js").glob("*.test.mjs"))
+    # West of Greenwich, where a day read as midnight UTC would be shown as the day before.
     result = subprocess.run(
-        ["node", "--test", *files], cwd=ROOT, capture_output=True, text=True, timeout=120
+        ["node", "--test", *files],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        env={**os.environ, "TZ": "America/Los_Angeles"},
     )
     assert result.returncode == 0, result.stdout[-3000:] + result.stderr[-2000:]
-    assert f"# pass {len(CASES) + 1}" in result.stdout
+    assert "# fail 0" in result.stdout
+    passed = int(result.stdout.split("# pass ")[1].split()[0])
+    assert passed >= len(CASES) + 1
 
 
 def test_a_suggestion_shows_its_working() -> None:

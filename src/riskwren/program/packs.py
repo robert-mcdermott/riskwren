@@ -15,6 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
+from riskwren.controls import service as controls
 from riskwren.core import scoring
 from riskwren.core.errors import Invalid, PermissionDenied
 from riskwren.db.models import RiskCategory, ScoringMethod
@@ -22,8 +23,10 @@ from riskwren.events import audit
 from riskwren.program import rules, vocab
 from riskwren.risk import categories, library
 from riskwren.risk import method as methods
+from riskwren.treatment import service as treatment  # noqa: F401  (what treatment says of standing)
 
 LIBRARY_PACKS = ("risk-library.json",)
+CONTROL_PACKS = ("starter-controls.json",)
 
 
 def builtin(name: str) -> dict[str, Any]:
@@ -66,7 +69,7 @@ def install(session: Session) -> dict[str, int]:
     """Give an installation what it needs to work on its first day. Safe to run again: it
     adds what is missing and leaves what is there."""
     pack = vocab.default_pack()
-    done = {"scoring_method": 0, "categories": 0, "library": 0}
+    done = {"scoring_method": 0, "categories": 0, "library": 0, "controls": 0}
     with audit.operation(session, "program.install"):
         if session.scalars(select(ScoringMethod.id)).first() is None:
             methods.publish(session, None, pack["scoring_method"])
@@ -74,6 +77,8 @@ def install(session: Session) -> dict[str, int]:
         done["categories"] = _add_categories(session, pack["categories"])
         for name in LIBRARY_PACKS:
             done["library"] += library.load(session, builtin(name))
+        for name in CONTROL_PACKS:
+            done["controls"] += controls.load_library(session, builtin(name))
     return done
 
 

@@ -17,6 +17,15 @@ export const NAV = [
     heading: "Risks",
     items: [
       { href: "/risks", label: "Register", iconName: "risk" },
+      { href: "/plans", label: "Treatment plans", iconName: "plan" },
+      { href: "/acceptances", label: "Acceptances", iconName: "accept" },
+      { href: "/actions", label: "Actions", iconName: "check" },
+    ],
+  },
+  {
+    heading: "Controls",
+    items: [
+      { href: "/controls", label: "Library", iconName: "control" },
     ],
   },
   {

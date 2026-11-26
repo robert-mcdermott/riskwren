@@ -19,6 +19,9 @@ export const TYPES = {
   risk: { prefix: "RSK", path: "risks", label: "Risk", plural: "Risks", noun: "risk", nouns: "risks",
     article: "a risk", iconName: "risk", section: "Risks",
     lede: "What could go wrong, how much is at stake, and whether each risk is in order." },
+  control: { prefix: "CTL", path: "controls", label: "Control", plural: "Controls", noun: "control", nouns: "controls",
+    article: "a control", iconName: "control", section: "Controls", kinds: "control_kinds",
+    lede: "What the organization does about its risks, each described once, with what is known of how well it works." },
 };
 
 const BY_PREFIX = Object.fromEntries(Object.entries(TYPES).map(([key, type]) => [type.prefix, key]));

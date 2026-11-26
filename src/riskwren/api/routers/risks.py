@@ -26,6 +26,7 @@ from riskwren.program import rules
 from riskwren.risk import categories, library, register
 from riskwren.risk import method as methods
 from riskwren.risk.register import RISK
+from riskwren.treatment import service as treatment
 
 router = APIRouter(prefix="/api/v1", tags=["risks"])
 
@@ -107,9 +108,14 @@ def update_category(request: Request, key: str, body: CategoryBody) -> dict[str,
 
 @router.get("/risk-library", summary="Reusable risk statements to start a risk from")
 def show_library(
-    request: Request, q: str | None = Q, category: str | None = None
+    request: Request,
+    q: str | None = Q,
+    category: str | None = None,
+    key: str | None = Query(default=None, description="One entry, by its key"),
 ) -> dict[str, Any]:
     with reading(request) as session:
+        if key is not None:
+            return envelope([library.view(library.by_key(session, key), categories.Tree(session))])
         return envelope(library.search(session, query=q, category=category))
 
 
@@ -155,6 +161,7 @@ def list_risks(
         "target_likelihood": target_likelihood, "target_impact": target_impact,
         "owner": owner, "mine": mine,
     }  # fmt: skip
+    treatment.catch_up(request.app.state.db)
     return list_records(request, RISK, filters, sort, limit, cursor)
 
 
@@ -169,6 +176,7 @@ def create_risk(request: Request, body: RiskBody) -> dict[str, Any]:
 @router.get("/risks/{ref}", summary="One risk, with its ratings and what it concerns")
 def show_risk(request: Request, ref: str) -> dict[str, Any]:
     principal = current(request)
+    treatment.catch_up(request.app.state.db)
     with reading(request) as session:
         risk = records.load(session, principal, RISK, ref)
         return envelope(records.detail(session, principal, RISK, risk))

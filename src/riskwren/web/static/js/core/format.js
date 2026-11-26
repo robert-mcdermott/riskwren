@@ -16,8 +16,16 @@ export function titleCase(text) {
 
 const DATE = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
+const DAY_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/**
+ * A date as people write it. A day with no time (a due date, a review date) is that day
+ * wherever the reader is: it is never shifted by their time zone. A moment is shown in it.
+ */
 export function date(value) {
-  return value ? DATE.format(new Date(value)) : "";
+  if (!value) return "";
+  const day = DAY_ONLY.exec(String(value));
+  return DATE.format(day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])) : new Date(value));
 }
 
 export function greeting(now = new Date()) {

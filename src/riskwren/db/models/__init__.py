@@ -2,6 +2,15 @@
 
 from __future__ import annotations
 
+from riskwren.db.models.controls import (
+    Acceptance,
+    Action,
+    Control,
+    ControlLibraryEntry,
+    ControlRating,
+    RiskControl,
+    TreatmentPlan,
+)
 from riskwren.db.models.inventory import Process, RecordLink, RecordOwner, System, ThirdParty
 from riskwren.db.models.people import (
     Account,
@@ -24,8 +33,13 @@ from riskwren.db.models.risk import (
 from riskwren.db.models.system import ChainHead, Counter, Event
 
 __all__ = [
+    "Acceptance",
     "Account",
+    "Action",
     "ChainHead",
+    "Control",
+    "ControlLibraryEntry",
+    "ControlRating",
     "Counter",
     "Credential",
     "Event",
@@ -38,6 +52,7 @@ __all__ = [
     "Risk",
     "RiskAssessment",
     "RiskCategory",
+    "RiskControl",
     "RiskLibraryEntry",
     "RiskSubject",
     "RoleGrant",
@@ -46,4 +61,5 @@ __all__ = [
     "Setting",
     "System",
     "ThirdParty",
+    "TreatmentPlan",
 ]

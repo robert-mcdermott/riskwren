@@ -53,6 +53,11 @@ async function boot() {
 
   route("/", page("home", "home", meta));
   route("/account", page("account", "account"));
+  route("/controls", page("controls", "controlLibrary"));
+  route("/controls/:ref", page("control", "controlPage"));
+  route("/plans", page("actions", "planList"));
+  route("/acceptances", page("actions", "acceptanceList"));
+  route("/actions", page("actions", "actionList"));
   route("/risks", page("risks", "riskRegister"));
   route("/risks/:ref", page("risk", "riskPage"));
   for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"]]) {
