@@ -228,6 +228,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .chip[data-record="process"] .icon { color: var(--rec-process); }
 .chip[data-record="system"] .icon { color: var(--rec-system); }
 .chip[data-record="third_party"] .icon { color: var(--rec-party); }
+.chip[data-record="information"] .icon { color: var(--rec-system); }
 
 .avatar {
   display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; flex: none;
@@ -330,8 +331,46 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .record-icon[data-record="process"] { color: var(--rec-process); }
 .record-icon[data-record="system"] { color: var(--rec-system); }
 .record-icon[data-record="third_party"] { color: var(--rec-party); }
+.record-icon[data-record="information"] { color: var(--rec-system); }
 .record-badges { margin-top: var(--space-2); }
 .prose { white-space: pre-wrap; max-width: 72ch; }
+
+/* ---- Requirements of a framework ---- */
+.requirement-list { list-style: none; margin: 0; padding: 0; }
+.requirement-tree { padding: var(--space-2); }
+.requirement-list .requirement-list { margin-left: 14px; padding-left: var(--space-2); border-left: 1px solid var(--border); }
+.requirement-line { display: flex; align-items: flex-start; gap: var(--space-1); }
+.requirement-line > .numeric { flex: none; padding: 8px var(--space-3) 0; }
+.requirement-toggle { flex: none; width: 28px; height: 28px; margin-top: 2px; display: grid; place-items: center; border: 0; background: none; color: var(--text-muted); border-radius: var(--radius-s); }
+button.requirement-toggle { cursor: pointer; }
+button.requirement-toggle:hover { background: var(--surface-2); color: var(--text); }
+.requirement-toggle .icon { transition: transform 120ms ease; }
+.requirement-toggle[aria-expanded="true"] .icon { transform: rotate(90deg); }
+.requirement-row { flex: 1 1 auto; min-width: 0; min-height: 32px; display: flex; align-items: baseline; gap: var(--space-3); padding: 6px var(--space-3); border: 0; background: none; font: inherit; color: inherit; text-align: left; border-radius: var(--radius-s); cursor: pointer; }
+.requirement-row:hover { background: var(--surface-2); }
+.requirement-row .cell-sub { display: block; }
+.requirement-code { flex: none; min-width: 7ch; font-family: var(--font-mono); font-size: var(--text-s); color: var(--accent); white-space: nowrap; }
+.mapped-count { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0 0; color: var(--text-muted); font-size: var(--text-s); font-variant-numeric: tabular-nums; }
+.mapped-control { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-s); }
+.picked { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); border-radius: var(--radius-s); background: var(--accent-soft); }
+.coverage { display: grid; gap: var(--space-2); }
+.coverage-bar { height: 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.coverage-fill { display: block; height: 100%; width: 0; background: var(--accent); }
+.record-icon[data-record="scope"] { color: var(--accent); }
+.add-control { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border); }
+.add-control .select { width: auto; flex: none; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.card-pad { padding: var(--space-4) var(--space-5); }
+.record-icon[data-record="evidence"] { color: var(--accent); }
+.field[hidden] { display: none; }
+.answered-by + .answered-by { margin-top: 2px; }
+.statement-head { display: grid; gap: var(--space-1); }
+.statement-head h2 { font-size: var(--text-l); }
+.unit-checks { max-height: 260px; overflow: auto; padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius-s); }
+.disclosure summary { cursor: pointer; color: var(--accent); font-weight: 550; width: fit-content; }
+.disclosure .prose { margin-top: var(--space-2); }
+.mono { font-family: var(--font-mono); font-size: var(--text-s); }
+@media (prefers-reduced-motion: reduce) { .requirement-toggle .icon { transition: none; } }
 .warn-text { color: var(--warn); }
 
 .filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
@@ -460,5 +499,91 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
   .split, .grid-2 { grid-template-columns: minmax(0, 1fr) !important; }
   a { color: inherit !important; text-decoration: none !important; }
   .matrix-cell, .rating, .pill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .no-print { display: none !important; }
+  .card:has(table) { break-inside: auto; }
+  tr { break-inside: avoid; }
 }
 .group-row th { text-align: left; padding: var(--space-2) var(--space-4); background: var(--surface-2); font-weight: 600; border-bottom: 1px solid var(--border); text-transform: none; letter-spacing: 0; font-size: var(--text-s); color: var(--text); }
+
+/* One bar in parts, with a legend that says the same in words. */
+.segments { display: grid; gap: var(--space-2); }
+.segbar { display: flex; gap: 2px; height: 12px; border-radius: var(--radius-full); overflow: hidden; }
+.segbar i { min-width: 4px; flex-basis: 0; }
+.segbar i, .seg-legend i { background: var(--surface-3); }
+.segments i[data-tone="ok"] { background: var(--ok); }
+.segments i[data-tone="info"] { background: var(--info); }
+.segments i[data-tone="warn"] { background: var(--warn); }
+.segments i[data-tone="danger"] { background: var(--danger); }
+.segments i[data-tone="gap"] { background: repeating-linear-gradient(135deg, var(--danger) 0 3px, var(--danger-soft) 3px 6px); }
+.segments i[data-tone="none"] { background: var(--surface-3); box-shadow: inset 0 0 0 1px var(--control-border); }
+.seg-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: var(--text-s); color: var(--text-muted); }
+.seg-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.seg-legend li[data-empty="true"] { color: var(--text-subtle); }
+.seg-legend i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.seg-legend strong { color: var(--text); font-weight: 600; }
+.steps { margin: 0; padding-left: 1.2em; display: grid; gap: var(--space-2); }
+.record-icon[data-record="assessment"] { color: var(--accent); }
+.owed-icon[data-kind="confirm"] { color: var(--info); background: var(--info-soft); }
+
+/* Notices: the bell and its count, and an unread row. */
+.notice-bell { position: relative; text-decoration: none; }
+.bell-count { position: absolute; top: 1px; right: 0; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full); background: var(--accent); color: var(--on-accent); font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; }
+.owed-item[data-unread="true"] { background: var(--accent-soft); }
+.owed-icon[data-kind="issue"], .owed-icon[data-kind="closure"] { color: var(--danger); background: var(--danger-soft); }
+.record-icon[data-record="issue"] { color: var(--danger); }
+.record-icon[data-record="exception"] { color: var(--accent); }
+/* Excepted: upright stripes, so it is told from "in place" beside it by more than its hue. */
+.segments i[data-tone="excepted"] { background: repeating-linear-gradient(90deg, var(--accent) 0 2px, var(--accent-soft) 2px 5px); }
+.row-actions { display: grid; justify-items: start; gap: 2px; }
+/* The plan of action: one issue to a row, its milestones beneath one another. */
+.milestones { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.milestones li { display: grid; gap: 1px; }
+
+/* The compliance dashboard. */
+.readiness-col { min-width: 260px; width: 38%; }
+.readiness-said { margin-top: 6px; }
+.list-row-wide { align-items: center; flex-wrap: wrap; }
+.assessment-progress { flex: 1 1 280px; max-width: 460px; }
+.connections-link { display: inline-flex; align-items: center; gap: 4px; }
+/* The picture of how a record is connected. */
+.graph-wrap { overflow-x: auto; }
+.graph { display: block; width: 100%; min-width: 760px; height: auto; font-family: var(--font-sans); }
+.gedge { fill: none; stroke: var(--control-border); stroke-width: 1.5; }
+.gnode > rect:first-child { fill: var(--surface-1); stroke: var(--control-border); stroke-width: 1.25; }
+.gnode[data-ring="0"] > rect:first-child { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.gnode text { fill: var(--text); font-size: 13px; font-weight: 550; }
+.gnode .gnode-ref, .gnode-beyond { fill: var(--text-muted); font-size: 10.5px; font-weight: 500; font-family: var(--font-mono); }
+.gnode-beyond { font-family: var(--font-sans); }
+.gnode-kind { fill: var(--text-muted); }
+.gnode[data-record="risk"] .gnode-kind { fill: var(--rec-risk); }
+.gnode[data-record="control"] .gnode-kind { fill: var(--rec-control); }
+.gnode[data-record="process"] .gnode-kind { fill: var(--rec-process); }
+.gnode[data-record="system"] .gnode-kind, .gnode[data-record="information"] .gnode-kind { fill: var(--rec-system); }
+.gnode[data-record="third_party"] .gnode-kind { fill: var(--rec-party); }
+.gnode[data-record="issue"] .gnode-kind { fill: var(--danger); }
+.gnode[data-record="scope"] .gnode-kind, .gnode[data-record="exception"] .gnode-kind, .gnode[data-record="assessment"] .gnode-kind, .gnode[data-record="evidence"] .gnode-kind { fill: var(--accent); }
+.gnode-more > rect { fill: var(--surface-2); stroke: var(--border); stroke-dasharray: 4 3; }
+.gnode-more text { fill: var(--text-muted); font-size: 12px; font-weight: 500; }
+.gnode[role="link"], .gexpand { cursor: pointer; }
+.gnode[role="link"]:hover > rect:first-child { fill: var(--surface-2); }
+.gexpand circle { fill: var(--surface-1); stroke: var(--control-border); stroke-width: 1.25; }
+.gexpand text { fill: var(--text); font-size: 15px; font-weight: 600; }
+.gexpand:hover circle { fill: var(--surface-3); }
+.gnode:focus-visible, .gexpand:focus-visible { outline: none; }
+.gnode:focus-visible > rect:first-child, .gexpand:focus-visible circle { stroke: var(--focus); stroke-width: 3; }
+.glabel { fill: var(--text-muted); font-size: 11px; font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase; }
+.glist { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.glist-more { margin: var(--space-2) 0 var(--space-2) var(--space-5); padding-left: var(--space-3); border-left: 2px solid var(--border); display: grid; gap: var(--space-2); }
+/* Every change in one place. */
+.timeline-record { margin-top: 4px; }
+.filters-history .filter-date .input { width: auto; }
+.split-history { align-items: start; }
+/* On a narrow screen a bar's second figure goes beneath the first, so the bar keeps its room. */
+@media (max-width: 640px) {
+  .bar-row { grid-template-columns: minmax(96px, 40%) minmax(40px, 1fr) minmax(40px, 34%); }
+  .bar-value { white-space: normal; }
+  .bar-value .cell-sub { display: block; }
+  /* A list's first column is the record's name: it keeps enough room to be read, and the
+     table scrolls. The picker tables in forms are left as they are. */
+  .table:not(.table-compact) th:first-child, .table:not(.table-compact) td:first-child { min-width: 190px; }
+}

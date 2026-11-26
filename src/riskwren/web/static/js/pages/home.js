@@ -31,7 +31,9 @@ function setup(data, meta) {
 
 const KINDS = {
   assess: ["risk", "Assess"], review: ["risk", "Review"], decide: ["alert", "Decide"], action: ["check", "Do"],
-  rate: ["control", "Rate"], acceptance: ["accept", "Renew"], orphan: ["user", "Assign"],
+  rate: ["control", "Rate"], acceptance: ["accept", "Renew"], orphan: ["user", "Assign"], evidence: ["evidence", "Renew"],
+  test: ["assessment", "Test"], confirm: ["assessment", "Review"],
+  issue: ["issue", "Put right"], closure: ["issue", "Confirm"], exception: ["exception", "Decide"],
 };
 
 function owed(listing) {
@@ -54,7 +56,9 @@ function summary(figures) {
     tile(figures.needs_decision, "Risks need a decision", "/risks", "danger"),
     tile(figures.above_appetite, "Risks above appetite", "/risks", ""),
     tile(figures.review_overdue, "Reviews overdue", "/risks", "warn"),
-    tile(figures.actions_overdue, "Actions overdue", "/actions", "danger"));
+    tile(figures.actions_overdue, "Actions overdue", "/actions", "danger"),
+    tile(figures.controls_failing, "Controls failing a test", "/controls", "danger"),
+    tile(figures.issues_overdue, "Issues overdue", "/issues", "danger"));
 }
 
 export function home(main, meta) {

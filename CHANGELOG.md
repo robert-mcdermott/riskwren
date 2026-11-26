@@ -8,6 +8,157 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 Nothing yet.
 
+## 0.2.0 (2026-11-26)
+
+Wave 2, *Compliance*: test once, satisfy many. Load a framework, see it mapped to the
+organization's controls, define the scope that must meet it, test each control once, hold
+the evidence, and follow what fails through an issue to a closure someone else confirms.
+Readiness against every framework is worked out from tests and evidence, never typed in.
+
+### Upgrading from 0.1.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0007 to 0013). Every row is
+kept. The upgrade loads the four public frameworks and the mappings the common controls
+carry to them. It does not map the controls you already have: each one that came from the
+library offers its mappings on its Requirements tab.
+
+### Added
+
+- **Frameworks.** Four public frameworks load at installation, each built from its
+  publisher's own machine-readable file and carried as published: the NIST Cybersecurity
+  Framework 2.0, NIST SP 800-53 Rev. 5 (release 5.2.0) with the Low, Moderate, High, and
+  Privacy baselines, NIST SP 800-171 Rev. 3, and the HIPAA Security Rule. Each shows its
+  publisher, version, license, and source. Anyone signed in can browse a framework's tree,
+  search it, narrow it to a baseline, and read any requirement in full (migration 0007).
+- **Frameworks of your own.** An agreement's terms, a sponsor's requirements, or an internal
+  standard is entered as a framework and behaves like any other. Requirements are added one
+  at a time or pasted in after a dry run, and every change to them is in the history.
+- **Crosswalks.** A control is mapped to every requirement it helps to satisfy, in any
+  number of frameworks, from the control or from the requirement, in full or in part, with
+  a note. Twenty-seven starter controls carry suggested mappings to the built-in frameworks:
+  a control started from the library arrives mapped, and others are offered the suggestions.
+  Each framework shows how many of its requirements have a control and lists those with
+  none. Counts leave out controls their reader may not see (migration 0008).
+- **Scopes.** A scope is a boundary that must meet one or more frameworks. It lists the
+  units, processes, systems, information, and third parties inside it; starts from a
+  baseline or from every requirement; and decides applicability a requirement at a time,
+  with a reason required to leave one out. Each control it uses has an implementation:
+  where it stands, who answers for it, and how it is done there (migration 0009).
+- **Inherited controls.** A scope can offer its controls. Another scope inherits one whole,
+  and it then stands wherever the provider's does, or shares it and records its own part.
+  A provider cannot withdraw a control others rely on.
+- **Statement of applicability.** For a scope and a framework: every requirement that
+  applies, the controls that answer it there and where they stand, and every requirement
+  left out with its reason, who decided, and when. It prints as a document.
+- **Information assets.** A fourth kind of inventory record for a body of information:
+  what it is, its data class, where it is held, who it is shared with, and under what
+  agreement. Systems hold it, processes use it, and it is shared with third parties.
+- **Evidence.** An item is a file, a link, a note of what was seen, or an attestation, with
+  who collected it, the period it covers, and the date it holds until (a year after
+  collection unless said otherwise). One item is attached to as many controls and scopes as
+  it supports. Past its date it stays on the record, is shown as no longer counting, and
+  its owner is reminded on Home a month beforehand (migration 0010).
+- **Assessments and tests.** An assessment of a scope plans a test for each control the
+  scope does itself: all of them, those that answer one framework, or a chosen few. Each
+  test has a method, a procedure, and a person it is assigned to, who sees it on Home. A
+  result records design and operation, what was looked at, what was found, and the evidence
+  it cites. It is recorded by someone who does not own the control and counts once a second
+  person confirms it; a result sent back is recorded again and the first is kept
+  (migration 0011).
+- **Test once.** A confirmed result becomes the control's rating. It shows in the scope that
+  does the control, in every scope that inherits it, and in the suggested residual rating
+  of every risk the control reduces. While a test result holds, a rating by judgment does
+  not replace it.
+- **Readiness worked out, never typed in.** Each applicable requirement of a scope is
+  failing, a gap, planned, excepted, in place, or verified, as weak as the weakest control
+  that answers it, and each control says in words why it is where it is. Verified takes a test found effective and
+  evidence that still counts; when the evidence goes stale the requirement drops back by
+  itself.
+- **Issues.** One register of what is wrong, whatever found it: a test, a gap, an audit, an
+  incident, a review, or somebody noticing. Each has a severity with a stated meaning and
+  is due on a date that follows from it (30, 90, 180, or 365 days, a table the program can
+  change). Moving the date needs a reason and is counted. A test that finds a control
+  partly effective or ineffective opens an issue for the control's owners, filled in from
+  the result and naming every scope that relies on the control (migration 0012).
+- **Closure confirmed by someone else.** An issue is put right through actions, the same
+  ones treatment plans use, on the one list of everything owed. Its owner proposes closure
+  with what was done, a root cause, and evidence. An assessor or a manager who neither owns
+  it nor proposed it confirms, or sends it back saying what is missing.
+- **Exceptions.** A departure from a control, or from a requirement within a scope, is asked
+  for with the reason and what makes up for it, and decided by a leader or manager who did
+  not ask. It runs between two dates, at most twelve months apart by default. While it is
+  in force a failing, missing, or planned state is shown as excepted with what lies
+  underneath; the day after it ends, that state is back by itself. Carrying on is a new
+  request.
+- **Plan of action.** A scope lists the open issues that bear on it, its own and those of
+  the controls it uses or inherits, most severe first, each with its milestones. It prints.
+- **Notices.** Each person has a list of what has been assigned to them or decided for
+  them, with a count in the top bar. Home gained issues to put right, closures to confirm,
+  and exceptions to decide or renew.
+- **Export.** Every list has an Export button: CSV or JSON, filtered as the page is, and
+  holding only what the person may see. Each export is recorded in the history with who
+  took it, how many rows, and under what filters. `GET /api/v1/exports/{list}`.
+- **Import from a spreadsheet.** Processes, systems, third parties, information, risks, and
+  controls are imported from CSV. The file's columns are matched to fields by their
+  headings and corrected by hand; a dry run reports every problem by row; nothing is added
+  unless every row can be. Each row is added by the same rules as one added by hand, in the
+  importer's name. A CSV exported from one installation imports into another with its
+  references kept. Ratings and other judgments are never imported.
+- **Requirements from a spreadsheet.** A framework of the organization's own takes its
+  requirements from a CSV of codes, titles, text, and parents.
+- **External references.** A record can carry what it is called in other systems: an asset
+  tag, a contract number, a ticket. It is found by them in search, and they are links
+  where the system has an address pattern (migration 0013).
+- **Compliance dashboard.** Beside the risk dashboard: each scope against each framework it
+  is held to, open issues by severity and age, the longest overdue, what the controls'
+  ratings rest on, evidence that still counts and that does not, exceptions waiting, in
+  force, and ended, and assessments in progress, for the whole organization or one unit.
+  Every figure opens the list that makes it. Home shows controls failing a test and
+  issues overdue.
+- **Connections.** Every record has a picture of what it is joined to: what it relies on
+  and what relies on it, its risks, controls, scopes, evidence, issues, exceptions, and
+  assessments. A neighbor can be opened in place or put in the middle, by mouse or
+  keyboard, and a list beside the picture says the same in full.
+- **History of everything.** Those who may read everything can browse every change in one
+  place, narrowed by person, record, kind of record, and date.
+- **More to filter by.** Issues by how long ago they were raised, exceptions ending within a
+  month, and controls by what a test that still holds found. Issues can name security
+  testing as what found them.
+- **Safe file storage.** Files are stored by the SHA-256 of their content, outside anything
+  the server serves. Their kind is judged by content, not name: PDF, common images, Word,
+  Excel, and PowerPoint documents, and plain text, up to 25 MB; programs are refused. A file
+  is only ever returned as a download that cannot run in the browser, to someone who may see
+  the item, and each download is recorded in the history.
+- **Framework packs.** A framework is one JSON document, checked whole before anything is
+  loaded and refused whole if anything is wrong. Each pack declares what text it may carry,
+  and a test holds every built-in pack to it. `riskwren frameworks list`, `show`, and `load`.
+
+### Changed
+
+- **Reports** has three pages: Compliance, Risk (the dashboard of 0.1.0), and, for those
+  who may read everything, History.
+- **A test outranks a judgment.** A control whose rating came from a confirmed test cannot
+  be re-rated by judgment until that result is out of date. `POST /controls/{ref}/ratings`
+  answers 409 meanwhile.
+- **Actions belong to a plan or an issue.** The list of actions shows both, and an action
+  in the API carries a `source` when it is an issue's.
+- **Search** also finds a record by what it is called in another system.
+- **The inventory is four kinds of record**, with information assets beside processes,
+  systems, and third parties, and three more kinds of link between them.
+- **Guides:** three new ones (Compliance, Evidence and testing, Issues and exceptions), and
+  the rest brought up to date. The register guide called two buttons by names the app does
+  not use; it now says Raise a risk and Add a control.
+
+### Fixed
+
+- The picture of a record's connections keeps the keyboard focus where it was when a
+  neighbor is opened or closed.
+- The accessibility audit now fails when a screen it means to open has no such button,
+  where before it passed over it.
+- The default program is written by a script, and a test now holds the shipped file to it.
+- On a narrow screen, a list's name column keeps enough room to be read while the table
+  scrolls, and a bar with two figures keeps its track.
+
 ## 0.1.0 (2026-11-25)
 
 Wave 1, *The register*: install, sign in, and hold a risk register over an inventory of

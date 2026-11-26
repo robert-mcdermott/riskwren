@@ -38,6 +38,23 @@ export function bars(items, { empty = "Nothing to show yet." } = {}) {
       item.part ? h("span", { class: "cell-sub" }, ` ${item.part} ${item.partLabel ?? ""}`) : null))));
 }
 
+/**
+ * One bar cut into parts, with the figures spelled out beneath it, so nothing is said by
+ * color alone. parts: [{ label, value, tone }]; tone is ok, info, warn, danger, gap, excepted, or none.
+ */
+export function segments(parts, { label, legend = true }) {
+  const total = parts.reduce((sum, part) => sum + part.value, 0);
+  const bar = h("div", { class: "segbar", role: "img", "aria-label": label }, parts.filter((part) => part.value).map((part) => {
+    const piece = h("i", { "data-tone": part.tone });
+    piece.style.setProperty("flex-grow", String(part.value));
+    return piece;
+  }));
+  if (!legend) return h("div", { class: "segments" }, total ? bar : null);
+  return h("div", { class: "segments" }, total ? bar : null,
+    h("ul", { class: "seg-legend" }, parts.map((part) => h("li", { "data-empty": String(!part.value) },
+      h("i", { "data-tone": part.tone, "aria-hidden": "true" }), h("strong", {}, String(part.value)), ` ${part.label}`))));
+}
+
 /** Widths cannot be set inline under the content security policy, so they are applied here. */
 export function sizeBars(root) {
   for (const node of root.querySelectorAll("[data-width]")) node.style.setProperty("width", `${node.dataset.width}%`);

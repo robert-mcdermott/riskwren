@@ -7,6 +7,7 @@ import { label, options, unitOptions, units, vocabularies } from "../core/lookup
 import { query, setQuery } from "../core/router.js";
 import { can } from "../core/session.js";
 import { criticality, hrefOf, statusOptions, statusPill, TYPES } from "../components/record.js";
+import { exportButton } from "../components/exchange.js";
 import { editRecord } from "../components/record-forms.js";
 import { card, emptyState, pageHeader } from "../components/ui.js";
 import { show } from "./page.js";
@@ -120,7 +121,8 @@ export function recordList(main, type) {
             action: mayAdd ? button(`Add ${meta.article}`, { kind: "btn-primary", onclick: add }) : null });
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: meta.section, title: meta.plural, lede: meta.lede,
-          actions: mayAdd ? button(`Add ${meta.article}`, { kind: "btn-primary", iconName: "plus", onclick: add }) : null }),
+          actions: [mayAdd ? button(`Add ${meta.article}`, { kind: "btn-primary", iconName: "plus", onclick: add }) : null,
+            mayAdd ? button("Import", { iconName: "upload", onclick: async () => (await import("../components/exchange.js")).openRecordImport({ path: `records/${meta.path}`, what: meta.nouns, onDone: reload }) }) : null, exportButton(meta.path)] }),
         bar,
         card({ title: plural(total, meta.noun, meta.nouns), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

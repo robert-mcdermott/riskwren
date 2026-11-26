@@ -55,6 +55,22 @@ def next_ref(session: Session, prefix: str) -> str:
     return format_ref(prefix, number)
 
 
+def claim_ref(session: Session, prefix: str, wanted: str) -> str:
+    """Take a particular reference, as an import does to keep the ones a file came with. The
+    counter moves past it, so it is never given out again. Whether it is already in use is
+    for the caller to have checked."""
+    parsed = parse_ref(wanted)
+    if parsed is None or parsed[0] != prefix:
+        raise ValueError(f"{wanted!r} is not a {prefix} reference")
+    conn = session.connection()
+    current = conn.execute(select(Counter.value).where(Counter.prefix == prefix)).scalar()
+    if current is None:
+        conn.execute(insert(Counter).values(prefix=prefix, value=parsed[1]))
+    elif parsed[1] > current:
+        conn.execute(update(Counter).where(Counter.prefix == prefix).values(value=parsed[1]))
+    return format_ref(prefix, parsed[1])
+
+
 def parse_ref(text: str) -> tuple[str, int] | None:
     match = REF_PATTERN.match(text.strip().upper())
     if not match or match.group(1) not in PREFIXES:

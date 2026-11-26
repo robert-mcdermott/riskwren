@@ -13,6 +13,7 @@ from riskwren.api.routers.inventory import (
     LIMIT,
     MINE,
     UNIT,
+    ExternalRefBody,
     OwnersBody,
     Q,
     list_records,
@@ -49,6 +50,7 @@ class RiskBody(BaseModel):
     library_key: str | None = Field(
         default=None, description="The library entry it was started from"
     )
+    external_refs: list[ExternalRefBody] | None = None
 
 
 class AssessmentBody(BaseModel):

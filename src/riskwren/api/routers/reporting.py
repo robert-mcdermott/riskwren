@@ -9,6 +9,7 @@ from fastapi import APIRouter, Query, Request
 from riskwren.access.policy import current
 from riskwren.api.common import envelope, reading
 from riskwren.api.routers.inventory import UNIT
+from riskwren.inventory import records
 from riskwren.reporting import service as reporting
 from riskwren.treatment import service as treatment
 
@@ -37,6 +38,72 @@ def heat_map(
     with reading(request) as session:
         return envelope(
             reporting.heat_map(session, principal, kind=kind, unit=unit, category=category)
+        )
+
+
+@router.get(
+    "/compliance",
+    summary="Where compliance stands: readiness by scope, issues, evidence, and exceptions",
+)
+def compliance_board(request: Request, unit: int | None = UNIT) -> dict[str, Any]:
+    from riskwren.reporting import compliance
+
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(compliance.board(session, principal, unit=unit))
+
+
+@router.get("/graph/{ref}", summary="A record and what it is connected to, in groups")
+def graph_around(request: Request, ref: str) -> dict[str, Any]:
+    from riskwren.inventory.registry import find_any
+    from riskwren.reporting import graph
+
+    principal = current(request)
+    with reading(request) as session:
+        record_type, found = find_any(session, ref)
+        record = records.load(session, principal, record_type, found.ref)
+        return envelope(graph.around(session, principal, record_type, record))
+
+
+@router.get("/history", summary="Every change, newest first, for those who read everything")
+def whole_history(
+    request: Request,
+    actor: int | None = Query(default=None, description="An account's id"),
+    about: str | None = Query(default=None, description="A record's reference"),
+    kind: str | None = Query(default=None, description="A kind of record, or other"),
+    since: str | None = Query(default=None, description="From this date, year-month-day"),
+    until: str | None = Query(default=None, description="Up to and including this date"),
+    before: int | None = Query(default=None, description="The `next` of the page before"),
+) -> dict[str, Any]:
+    from datetime import UTC, date, datetime, timedelta
+
+    from riskwren.core.errors import Invalid
+    from riskwren.inventory import history
+    from riskwren.inventory.registry import find_any
+
+    def day(value: str | None, field: str, *, end: bool = False) -> datetime | None:
+        if not value:
+            return None
+        try:
+            found = date.fromisoformat(value)
+        except ValueError:
+            raise Invalid(
+                "The dates were not understood.", {field: "Give a date, as year-month-day."}
+            ) from None
+        moment = datetime(found.year, found.month, found.day, tzinfo=UTC)
+        return moment + timedelta(days=1) if end else moment
+
+    with reading(request) as session:
+        return envelope(
+            history.everywhere(
+                session,
+                actor=actor,
+                about=find_any(session, about) if about else None,
+                kind=kind or None,
+                since=day(since, "since"),
+                until=day(until, "until", end=True),
+                before=before,
+            )
         )
 
 

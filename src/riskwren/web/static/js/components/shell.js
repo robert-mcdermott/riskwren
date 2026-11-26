@@ -1,6 +1,6 @@
 // The app shell: sidebar, top bar, and the place pages are drawn.
 
-import { del } from "../core/api.js";
+import { del, get } from "../core/api.js";
 import { h, icon, iconButton } from "../core/dom.js";
 import { wren } from "../core/icons.js";
 import { onNavigate } from "../core/router.js";
@@ -30,17 +30,31 @@ export const NAV = [
     ],
   },
   {
+    heading: "Compliance",
+    items: [
+      { href: "/frameworks", label: "Frameworks", iconName: "framework" },
+      { href: "/scopes", label: "Scopes", iconName: "scope" },
+      { href: "/evidence", label: "Evidence", iconName: "evidence" },
+      { href: "/assessments", label: "Assessments", iconName: "assessment" },
+      { href: "/issues", label: "Issues", iconName: "issue" },
+      { href: "/exceptions", label: "Exceptions", iconName: "exception" },
+    ],
+  },
+  {
     heading: "Inventory",
     items: [
       { href: "/processes", label: "Processes", iconName: "process" },
       { href: "/systems", label: "Systems", iconName: "system" },
       { href: "/third-parties", label: "Third parties", iconName: "third_party" },
+      { href: "/information", label: "Information", iconName: "information" },
     ],
   },
   {
     heading: "Reports",
     items: [
-      { href: "/dashboard", label: "Dashboard", iconName: "chart" },
+      { href: "/compliance", label: "Compliance", iconName: "shield-check" },
+      { href: "/dashboard", label: "Risk", iconName: "chart" },
+      { href: "/history", label: "History", iconName: "history", when: "read_all" },
     ],
   },
   {
@@ -163,11 +177,29 @@ export function mountShell(root, meta) {
           icon(item.iconName), item.label));
       })))));
   };
+  // How many notices are unread, beside the bell. Asked for again whenever the page changes.
+  const count = h("span", { class: "bell-count", "aria-hidden": "true", hidden: true });
+  const bell = h("a", { class: "icon-button notice-bell", href: "/notices", "aria-label": "Notices" }, icon("bell"), count);
+  const showUnread = (unread) => {
+    count.hidden = !unread;
+    count.textContent = unread > 99 ? "99+" : String(unread);
+    bell.setAttribute("aria-label", unread ? `Notices, ${unread} unread` : "Notices");
+  };
+  const askUnread = async () => {
+    try {
+      showUnread((await get("/api/v1/notices/count", null, { fresh: true })).data.unread);
+    } catch {
+      // The bell is a convenience: if the count cannot be had, it shows none.
+    }
+  };
+  document.addEventListener("notices", (event) => showUnread(event.detail.unread));
   onNavigate(() => {
     drawNav();
     shell.removeAttribute("data-nav");
+    askUnread();
   });
   drawNav();
+  askUnread();
 
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
   const search = h("button", { type: "button", class: "search-button", "aria-label": "Open the command palette",
@@ -188,6 +220,7 @@ export function mountShell(root, meta) {
         search,
         h("div", { class: "spacer row-sm" },
           meta.demo ? h("span", { class: "demo-flag", title: "A fictional organization. Nothing here is real." }, "Demo data") : null,
+          bell,
           iconButton("appearance", "Appearance", { onclick: () => openAppearance(meta) }),
           userMenu(meta))),
       main));

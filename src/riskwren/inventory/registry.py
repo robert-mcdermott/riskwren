@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from riskwren.core.errors import NotFound
 from riskwren.db.base import Base
-from riskwren.db.models import Process, System, ThirdParty
+from riskwren.db.models import Information, Process, System, ThirdParty
 from riskwren.db.refs import parse_ref
 
 
@@ -121,6 +121,25 @@ THIRD_PARTY = register(
             Field("kind", "Kind", "choice", vocab="third_party_kinds", required=True),
             Field("website", "Website", "url", max_length=300),
             Field("notes", "Notes", "long"),
+        ),
+        open=True,
+        sorts=THING_SORTS,
+        filters=THING_FILTERS,
+    )
+)
+INFORMATION = register(
+    RecordType(
+        "information",
+        Information,
+        "INF",
+        "information",
+        "information asset",
+        "information assets",
+        fields=(
+            Field("kind", "Kind", "choice", vocab="information_kinds", required=True),
+            Field("held_in", "Where it is held", "long"),
+            Field("shared_with", "Who it is shared with", "long"),
+            Field("agreement", "Agreement", "text", max_length=300),
         ),
         open=True,
         sorts=THING_SORTS,

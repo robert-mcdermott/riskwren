@@ -227,21 +227,22 @@ For a scope and a framework, each applicable requirement is in exactly one state
 
 | State | Rule |
 |---|---|
-| **Gap** | No control is mapped to it, or a mapped control has no implementation in this scope |
+| **Gap** | No control mapped to it is used in this scope |
 | **Planned** | Controls are mapped, and at least one implementation is not yet in place |
 | **In place** | Every implementation is in place, but at least one lacks a current, counted test with current evidence |
 | **Verified** | Every implementation is in place and has a current test result of effective, with current evidence |
 | **Failing** | At least one control's current test result is partly effective or ineffective |
+| **Excepted** | It would be failing, a gap, or planned, and an approved exception that covers it is in force today |
 
-A requirement takes the weakest state among its controls, with *failing* weakest of all. Requirements excluded as not applicable are left out of every figure and listed separately with their reasons. The readiness bar for a scope is the count in each state, and each segment opens the requirements in it.
+A requirement takes the weakest state among its controls, with *failing* weakest of all and *excepted* ranking between planned and in place. Requirements excluded as not applicable are left out of every figure and listed separately with their reasons. The readiness bar for a scope is the count in each state, the list narrows to any one of them, and each control in it says in words why it is where it is.
 
-An owner's attestation alone can take a requirement to *in place*, never to *verified*; rules say which frameworks demand an independent test.
+An owner's attestation alone can take a requirement to *in place*, never to *verified*. That takes a test: recorded by someone who does not own the control, confirmed by a second person who does not own it either, and still within the cadence that keeps a rating current. A confirmed test result is the control's rating, and a judgment does not replace it while it holds. A control is tested in the scope that does it; scopes that inherit it take the result.
 
 ## Issues and their clocks (wave 2)
 
-An issue has a **severity** with a defined meaning, and its due date follows from severity by rule (by default: Critical 30 days, High 90, Moderate 180, Low 365). Moving the date needs a reason and is counted. An issue closes only when someone other than its owner has confirmed the evidence of closure.
+An issue has a **severity** with a defined meaning, and its due date follows from severity by rule (by default: Critical 30 days, High 90, Moderate 180, Low 365), counted from the day it was raised. Changing the severity applies the rule again. Moving the date needs a reason and is counted. An issue is put right through actions. Its owner proposes closure, saying what was done, why it happened, and what shows it; it closes only when an assessor or manager who neither owns it nor proposed it has confirmed that. A confirmed test result of partly effective or ineffective opens an issue for the control's owners, unless one is already open for that control.
 
-An **exception** is an approved, time-limited departure from a control, a requirement, or a policy, with compensating controls. While it is in force the item it covers is shown as *excepted*, not failing; when it expires, the underlying state returns.
+An **exception** is an approved, time-limited departure from a control or a requirement (and, from wave 4, a policy), with what makes up for it. It is asked for by whoever keeps the scope or the control, decided by a leader or manager over the unit who did not ask, and runs for at most twelve months by default. Whether it is in force is worked out from its dates on the day. While it is, a state of failing, gap, or planned is shown as *excepted* with what lies underneath; when it ends, the underlying state returns without anyone acting. Carrying on is a new request, decided again.
 
 ## Rules are data
 

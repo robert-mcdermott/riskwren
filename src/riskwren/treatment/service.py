@@ -9,7 +9,8 @@ own.
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
@@ -36,6 +37,28 @@ from riskwren.risk.register import RISK
 
 PLAN = "treatment_plan"
 OPEN = ("open", "in_progress")
+
+
+@dataclass(frozen=True)
+class Source:
+    """Something other than a treatment plan that actions can belong to (an issue, and later
+    an incident or an audit finding). It says who manages its actions, what follows when one
+    changes, how it is shown beside an action, and who may see it."""
+
+    key: str
+    manage: Callable[[Session, Principal, int], bool]
+    settle: Callable[[Session, int], None]
+    describe: Callable[[Session, Principal, int], dict[str, Any] | None]
+    visible: Callable[[Session, Principal], Any]
+    in_units: Callable[[list[int]], Any]
+
+
+SOURCES: dict[str, Source] = {}
+
+
+def register_source(source: Source) -> Source:
+    SOURCES[source.key] = source
+    return source
 
 
 def _day(value: Any, field: str, errors: records.Errors) -> date | None:
@@ -204,6 +227,25 @@ def add_action(
         raise PermissionDenied("You cannot change this plan.")
     if plan.status != "active":
         raise Conflict("This plan is closed.")
+    return new_action(
+        session, principal, PLAN, plan.id, title=title, owner_id=owner_id, due_on=due_on,
+        detail=detail,
+    )  # fmt: skip
+
+
+def new_action(
+    session: Session,
+    principal: Principal,
+    source_type: str,
+    source_id: int,
+    *,
+    title: str | None,
+    owner_id: Any,
+    due_on: Any,
+    detail: str | None = None,
+) -> Action:
+    """Write an action for a plan or another source. Whether the person may is the caller's
+    to have checked."""
     errors = records.Errors()
     name = records.text(title)
     if not name or len(name) > 200:
@@ -223,8 +265,8 @@ def add_action(
             original_due_on=due,
             extensions=[],
             status="open",
-            source_type=PLAN,
-            source_id=plan.id,
+            source_type=source_type,
+            source_id=source_id,
             created_by=principal.account_id,
             created_at=utc_now(),
         )
@@ -239,10 +281,15 @@ def _plan_of(session: Session, action: Action) -> TreatmentPlan | None:
 
 def can_act(session: Session, principal: Principal, action: Action) -> bool:
     """Its owner may progress an action; those who manage what it came from may change it."""
-    if action.owner_id == principal.account_id:
-        return True
+    return action.owner_id == principal.account_id or _manages(session, principal, action)
+
+
+def _manages(session: Session, principal: Principal, action: Action) -> bool:
     plan = _plan_of(session, action)
-    return plan is not None and can_manage(session, principal, plan)
+    if plan is not None:
+        return can_manage(session, principal, plan)
+    source = SOURCES.get(action.source_type)
+    return source is not None and source.manage(session, principal, action.source_id)
 
 
 def update_action(
@@ -253,12 +300,14 @@ def update_action(
     if not can_act(session, principal, action):
         raise PermissionDenied("This action is not yours to change.")
     plan = _plan_of(session, action)
-    manages = plan is not None and can_manage(session, principal, plan)
+    manages = _manages(session, principal, action)
     if action.status in ("done", "cancelled") and changes.get("status") not in OPEN:
         raise Conflict("This action is closed. Reopen it to change it.")
     errors = records.Errors()
     if not manages and {"title", "detail", "owner_id"} & set(changes):
-        raise PermissionDenied("Only those who manage the plan can rewrite or reassign an action.")
+        raise PermissionDenied(
+            "Only those who manage what it belongs to can rewrite or reassign an action."
+        )
     if "title" in changes:
         name = records.text(changes["title"])
         if not name or len(name) > 200:
@@ -294,7 +343,7 @@ def update_action(
         if status not in ("open", "in_progress", "done", "cancelled"):
             errors.add("status", "Use open, in_progress, done, or cancelled.")
         elif status == "cancelled" and not manages:
-            raise PermissionDenied("Only those who manage the plan can cancel an action.")
+            raise PermissionDenied("Only those who manage what it belongs to can cancel an action.")
         else:
             action.status = status
             if status == "done":
@@ -309,6 +358,8 @@ def update_action(
         session.flush()
         if plan is not None:
             _settle(session, plan)
+        elif action.source_type in SOURCES:
+            SOURCES[action.source_type].settle(session, action.source_id)
     return action
 
 
@@ -566,6 +617,7 @@ def action_view(
     plan = _plan_of(session, action)
     risk = risk_of(session, plan) if plan is not None else None
     seen = risk is not None and access.can_see(session, principal, RISK, risk)
+    source = SOURCES.get(action.source_type)
     return {
         "ref": action.ref,
         "title": action.title,
@@ -580,9 +632,11 @@ def action_view(
         "completion_note": action.completion_note,
         "plan": plan.ref if plan is not None else None,
         "risk": records.chip(RISK, risk) if seen and risk is not None else None,
+        # What it belongs to when that is not a plan: an issue, for one.
+        "source": source.describe(session, principal, action.source_id) if source else None,
         "can": {
             "act": can_act(session, principal, action),
-            "manage": plan is not None and can_manage(session, principal, plan),
+            "manage": _manages(session, principal, action),
         },
     }
 
@@ -703,9 +757,10 @@ def search_actions(
         )
         .outerjoin(Risk, Risk.id == TreatmentPlan.risk_id)
     )
-    conditions: list[Any] = [
-        or_(Action.owner_id == principal.account_id, _visible_risk(session, principal))
-    ]
+    seen = [and_(Action.source_type == PLAN, _visible_risk(session, principal))]
+    for source in SOURCES.values():
+        seen.append(and_(Action.source_type == source.key, source.visible(session, principal)))
+    conditions: list[Any] = [or_(Action.owner_id == principal.account_id, *seen)]
     owner = principal.account_id if filters.get("mine") else filters.get("owner")
     if owner:
         conditions.append(Action.owner_id == int(owner))
@@ -717,8 +772,15 @@ def search_actions(
     if filters.get("overdue"):
         conditions += [Action.status.in_(OPEN), Action.due_on < today]
     if filters.get("unit"):
+        within = list(units.with_descendants(session, [int(filters["unit"])]))
         conditions.append(
-            Risk.org_unit_id.in_(units.with_descendants(session, [int(filters["unit"])]))
+            or_(
+                Risk.org_unit_id.in_(within),
+                *(
+                    and_(Action.source_type == source.key, source.in_units(within))
+                    for source in SOURCES.values()
+                ),
+            )
         )
     words = records.text(filters.get("q"))
     if words:

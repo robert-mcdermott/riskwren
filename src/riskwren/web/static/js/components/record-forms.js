@@ -70,7 +70,16 @@ const EXTRA = {
   },
 };
 
+EXTRA.information = (record) => {
+  const held = field("Where it is held", { type: "textarea", rows: 2, value: record?.held_in ?? "", hint: "The systems and places. Link the systems themselves once it is saved." });
+  const shared = field("Who it is shared with", { type: "textarea", rows: 2, value: record?.shared_with ?? "" });
+  const agreement = field("Agreement", { value: record?.agreement ?? "", maxlength: 300, hint: "What it is held or shared under: a consent, a data use agreement, an award's terms." });
+  return { nodes: [held.node, shared.node, agreement.node], fields: { held_in: held, shared_with: shared, agreement },
+    values: () => ({ held_in: held.input.value, shared_with: shared.input.value, agreement: agreement.input.value }) };
+};
+
 const NAME_HINTS = {
+  information: "What people call it. For example: Cohort survey responses. Never the information itself.",
   process: "What is done, in a few words. For example: Specimen storage and retrieval.",
   system: "What people call it. For example: Freezer monitoring.",
   third_party: "The organization's legal or trading name.",

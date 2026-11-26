@@ -11,19 +11,21 @@ function focusables(root) {
 
 export function closeOverlay() {
   if (!open) return;
-  const { backdrop, panel, returnFocus, onKey } = open;
+  const { backdrop, panel, returnFocus, onKey, onClose } = open;
   document.removeEventListener("keydown", onKey, true);
   backdrop.remove();
   panel.remove();
   open = null;
   returnFocus?.focus?.();
+  onClose?.();
 }
 
 /**
  * Open a panel. render(body, footer, close) fills it and may be async. kind is "drawer"
- * (from the right, for editing) or "dialog" (centered, for a question).
+ * (from the right, for editing) or "dialog" (centered, for a question). onClose runs once
+ * the panel has gone, however it was closed.
  */
-export function openOverlay({ title, subtitle = null, render, kind = "drawer" }) {
+export function openOverlay({ title, subtitle = null, render, kind = "drawer", onClose = null }) {
   closeOverlay();
   const returnFocus = document.activeElement;
   const titleId = uid("overlay-title");
@@ -56,7 +58,7 @@ export function openOverlay({ title, subtitle = null, render, kind = "drawer" })
   };
   document.addEventListener("keydown", onKey, true);
   document.body.append(backdrop, panel);
-  open = { backdrop, panel, returnFocus, onKey };
+  open = { backdrop, panel, returnFocus, onKey, onClose };
   Promise.resolve(render(body, footer, closeOverlay)).then(() => {
     if (open?.panel !== panel) return;
     const items = focusables(panel);

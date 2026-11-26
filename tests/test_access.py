@@ -268,16 +268,24 @@ RECORD_PATHS = {
     "processes": "PRC",
     "systems": "SYS",
     "third-parties": "TP",
+    "information": "INF",
     "risks": "RSK",
     "controls": "CTL",
+    "scopes": "SCP",
 }
 REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
-for _report in ("home", "heat-map", "dashboard"):
+for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
+REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
+for (_method, _template), _needs in POLICIES.items():
+    if _template.startswith("/api/v1/frameworks"):
+        REACH[(_method, _template)] = (
+            {"admin", "manager"} if _needs is Needs.CONFIGURE else EVERYONE
+        )
 REACH[("PATCH", "/api/v1/risk-categories/{key}")] = {"admin", "manager"}
 for _action in ("assessments", "subjects", "escalation"):
     for _method in ("GET", "POST", "PUT"):
@@ -289,8 +297,33 @@ for _key, _needs in POLICIES.items():
     parts = ("control", "/treatment", "/response", "/plans", "/acceptances", "/actions")
     if any(part in _key[1] for part in parts) and _key not in REACH:
         REACH[_key] = {"leader"} if _needs is Needs.LEAD else EVERYONE
+for _key in POLICIES:
+    # Everything about a scope is reached by anyone and decided by the scope.
+    if _key[1].startswith("/api/v1/scopes/{ref}/") and _key not in REACH:
+        REACH[_key] = EVERYONE
+for _key, _needs in POLICIES.items():
+    # Assessing is for assessors and managers; the rest is decided by the assessment.
+    mine = _key[1].startswith(("/api/v1/assessments", "/api/v1/tests", "/api/v1/results"))
+    if mine and _key not in REACH:
+        REACH[_key] = {"assessor", "manager"} if _needs is Needs.ASSESS else EVERYONE
+for _key, _needs in POLICIES.items():
+    # Issues, exceptions, and notices are reached by anyone and decided by the record.
+    # Confirming a closure, withdrawing an issue, and reopening one are the second line's.
+    mine = _key[1].startswith(("/api/v1/issues", "/api/v1/exceptions", "/api/v1/notices"))
+    if mine and _key not in REACH:
+        REACH[_key] = {"assessor", "manager"} if _needs is Needs.ASSESS else EVERYONE
+REACH[("GET", "/api/v1/exports/{kind}")] = EVERYONE
+for _step in ("", "/columns"):
+    REACH[("POST", f"/api/v1/imports/records/{{path}}{_step}")] = {"manager", "steward"}
+    REACH[("POST", f"/api/v1/imports/requirements/{{key}}{_step}")] = {"admin", "manager"}
+for _key in POLICIES:
+    # Evidence is reached by anyone and decided by the item.
+    if _key[1].startswith("/api/v1/evidence") and _key not in REACH:
+        REACH[_key] = EVERYONE
 for _path in RECORD_PATHS:
-    for _method, _template in record_policies(_path, links=_path not in ("risks", "controls")):
+    for _method, _template in record_policies(
+        _path, links=_path not in ("risks", "controls", "scopes")
+    ):
         # Anyone may ask about a record, and the service decides what they may see and do.
         # Adding one is for a unit's steward or a manager.
         adding = _method == "POST" and _template == f"/api/v1/{_path}"
@@ -336,12 +369,28 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
             path = template.replace("{account_id}", str(own)).replace(
                 "{unit_id}", str(people.units["HALE"])
             )
+            if template.startswith("/api/v1/graph"):
+                path = path.replace("{ref}", "SYS-9999")
+            if template.startswith("/api/v1/exports"):
+                path = path.replace("{kind}", "processes")
+            if template.startswith("/api/v1/imports/records"):
+                path = path.replace("{path}", "processes")
             path = path.replace("{kind}", "favicon").replace("{key}", "technology")
             path = path.replace("{control_ref}", "CTL-9999").replace("{acceptance_id}", "9999")
+            path = path.replace("{mapping_id}", "9999").replace("{implementation_id}", "9999")
             if template.startswith("/api/v1/plans/"):
                 path = path.replace("{ref}", "PLN-9999")
             if template.startswith("/api/v1/actions/"):
                 path = path.replace("{ref}", "ACT-9999")
+            path = path.replace("{test_id}", "9999").replace("{result_id}", "9999")
+            if template.startswith("/api/v1/assessments"):
+                path = path.replace("{ref}", "ASM-9999")
+            if template.startswith("/api/v1/evidence"):
+                path = path.replace("{ref}", "EV-9999")
+            if template.startswith("/api/v1/issues"):
+                path = path.replace("{ref}", "ISS-9999")
+            if template.startswith("/api/v1/exceptions"):
+                path = path.replace("{ref}", "EXC-9999")
             for record_path, prefix in RECORD_PATHS.items():
                 if template.startswith(f"/api/v1/{record_path}"):
                     # A record that is not there: reached, and answered with "not found".
@@ -367,6 +416,32 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"product_name": "RiskWren", "palette": "wren"}
             elif template.endswith("/branding/check"):
                 body = {"accent": "#1f6f5c"}
+            elif template.endswith("/controls/{ref}/requirements"):
+                body = {"framework": "nist-csf", "code": "GV.OC-01", "coverage": "full"}
+            elif template.endswith("/scopes/{ref}/frameworks"):
+                body = {"framework": "nist-csf"}
+            elif template.endswith("/scopes/{ref}/requirements"):
+                body = {"framework": "nist-csf", "code": "GV.OC-01", "applicable": True}
+            elif template.endswith("/scopes/{ref}/controls"):
+                body = {"control": "CTL-9999", "status": "planned"}
+            elif template.endswith("/controls/inherited"):
+                body = {"implementation": 9999, "inheritance": "inherited"}
+            elif template.endswith("/issues/{ref}/actions"):
+                body = {"title": "x", "owner_id": 1, "due_on": "2030-01-01"}
+            elif template.endswith("/due-date"):
+                body = {"due_on": "2030-01-01", "reason": "x"}
+            elif template.endswith("/closure"):
+                body = {"note": "x", "root_cause": "other"}
+            elif template.endswith("/validation"):
+                body = {"confirm": True}
+            elif template.endswith("/decision"):
+                body = {"approve": True}
+            elif template.endswith("/results"):
+                body = {"design": "effective", "operation": "effective", "note": "x"}
+            elif template.endswith("/review"):
+                body = {"confirm": True}
+            elif template.endswith("/assessments/{ref}/tests"):
+                body = {"control": "CTL-9999"}
             elif template.endswith("/ratings"):
                 body = {"design": "effective", "operation": "effective", "note": "x"}
             elif template.endswith("/risks/{ref}/controls"):

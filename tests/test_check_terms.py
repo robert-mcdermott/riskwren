@@ -31,3 +31,13 @@ def test_a_commit_message_is_checked(tmp_path: Path) -> None:
     assert check_terms.main(["--terms", str(terms), "--message", str(message)]) == 0
     message.write_text("Add the Acme Corp importer\n")
     assert check_terms.main(["--terms", str(terms), "--message", str(message)]) == 1
+
+
+def test_a_term_can_be_allowed_in_named_files_and_nowhere_else() -> None:
+    terms = check_terms.parse_terms(["=Mercury !! packs/published/*.json docs/elements.md"])
+    text = "Mercury is a planet.\n"
+    assert [t.text for t in terms] == ["Mercury"]
+    assert list(check_terms.find_hits("packs/published/catalog.json", text, terms)) == []
+    assert list(check_terms.find_hits("docs/elements.md", text, terms)) == []
+    assert len(list(check_terms.find_hits("README.md", text, terms))) == 1
+    assert len(list(check_terms.find_hits("commit message", text, terms))) == 1

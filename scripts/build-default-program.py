@@ -170,6 +170,17 @@ VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ("sponsor", "Sponsor or funder"),
         ("subrecipient", "Subrecipient", "Receives funds the organization passes through"),
     ),
+    "information_kinds": items(
+        ("research_data", "Research data", "Data produced or collected by research"),
+        ("participant_data", "Participant data", "About people who take part in research"),
+        ("patient_records", "Patient records", "Records of care"),
+        ("specimen_records", "Specimen records", "What is known about stored specimens"),
+        ("controlled_data", "Controlled-access data", "Held under another party's terms"),
+        ("personnel_records", "Personnel records", "About staff, students, and applicants"),
+        ("financial_records", "Financial records", "Accounts, awards, payments, and donors"),
+        ("intellectual_property", "Intellectual property", "Unpublished results and inventions"),
+        ("operational", "Operational", "What the organization needs to run"),
+    ),
 }
 
 # The named relationships between records. ``label`` reads from the first to the second;
@@ -192,6 +203,24 @@ LINK_KINDS: list[dict[str, Any]] = [
         "label": "Supplied by",
         "reverse": "Supplies",
         "between": [["system", "third_party"]],
+    },
+    {
+        "key": "holds",
+        "label": "Holds",
+        "reverse": "Is held in",
+        "between": [["system", "information"]],
+    },
+    {
+        "key": "uses",
+        "label": "Uses",
+        "reverse": "Is used by",
+        "between": [["process", "information"]],
+    },
+    {
+        "key": "shared_with",
+        "label": "Is shared with",
+        "reverse": "Receives",
+        "between": [["information", "third_party"]],
     },
     {
         "key": "depends_on",
@@ -350,11 +379,81 @@ SCORING_METHOD: dict[str, Any] = {
     },
 }
 
-# How often a risk is reviewed, by its residual rating; and how long a control's rating holds.
+# What wave 2 added. Severities are ordered from most to least: an issue's date follows from
+# its severity by the table in CADENCES.
+COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
+    "issue_severities": items(
+        (
+            "critical",
+            "Critical",
+            "Leaves people, patients, or regulated data exposed now, or breaks a legal obligation",
+        ),
+        (
+            "high",
+            "High",
+            "A control the organization relies on does not work, with nothing making up for it",
+        ),
+        (
+            "moderate",
+            "Moderate",
+            "A control works in part, or something else partly makes up for it",
+        ),
+        (
+            "low",
+            "Low",
+            "A weakness in how something is done or recorded that does not yet leave anything exposed",
+        ),
+    ),
+    # What can find an issue.
+    "issue_sources": items(
+        ("test", "Test", "A test in an assessment found a control wanting"),
+        ("gap", "Gap", "A requirement that nothing answers, or a control with no evidence"),
+        (
+            "security_test",
+            "Security testing",
+            "A penetration test, a scan, or an exercise found it",
+        ),
+        ("audit", "Audit", "A finding from an internal or external audit"),
+        ("incident", "Incident", "Something that went wrong showed it"),
+        ("review", "Review", "A review of a supplier, a system, or a process"),
+        ("observation", "Observation", "Somebody noticed it and said so"),
+    ),
+    # Why it happened, said when an issue is closed, so that causes can be counted.
+    "root_causes": items(
+        ("procedure", "Procedure", "There was no procedure, or it was unclear or out of date"),
+        ("people", "People and time", "Not enough people, time, or training to do it"),
+        (
+            "ownership",
+            "Ownership",
+            "Nobody was clearly responsible, or it changed hands and was dropped",
+        ),
+        ("technology", "Technology", "A system could not do what was needed, or failed"),
+        ("design", "Design", "The control was done as described and still did not meet the need"),
+        ("change", "Change", "A change elsewhere was not followed through here"),
+        ("third_party", "Third party", "A supplier or partner did not do its part"),
+        ("other", "Other", "None of these, or not known"),
+    ),
+    # The other systems a record can be known in. An entry may carry a ``url`` with ``{id}``
+    # in it, and identifiers in that system then become links.
+    "external_systems": items(
+        ("asset_tag", "Asset tag", "The number on the label, or in the asset register"),
+        ("contract", "Contract number", "As the contracts or purchasing system knows it"),
+        ("ticket", "Ticket", "A request or change in the service desk"),
+        ("configuration_item", "Configuration item", "Its entry in a configuration database"),
+        ("award", "Award number", "A grant or sponsored agreement"),
+        ("other", "Other", "An identifier in any other system"),
+    ),
+}
+
+# How often a risk is reviewed, by its residual rating; how long a control's rating, a test
+# result, and evidence hold; how long after it is raised an issue is due, by severity; and
+# the longest an exception may run.
 CADENCES: dict[str, Any] = {
     "risk_review_months": {"critical": 3, "high": 6, "moderate": 12, "low": 24},
     "unrated_risk_review_months": 3,
     "control_rating_months": 12,
+    "issue_due_days": {"critical": 30, "high": 90, "moderate": 180, "low": 365},
+    "exception_max_months": 12,
 }
 
 # Who may accept a risk above appetite, by its residual rating, and for how long.
@@ -466,7 +565,7 @@ PACK: dict[str, Any] = {
         "license": "Apache-2.0",
         "text_policy": "verbatim",
     },
-    "vocabularies": {**VOCABULARIES, "link_kinds": LINK_KINDS},
+    "vocabularies": {**VOCABULARIES, "link_kinds": LINK_KINDS, **COMPLIANCE_VOCABULARIES},
     "categories": CATEGORIES,
     "scoring_method": SCORING_METHOD,
     "cadences": CADENCES,
@@ -991,13 +1090,145 @@ CONTROL_ROWS: list[tuple[str, str, str, str, str, str, str]] = [
      "corrective", "manual", "as_needed", "impact"),
 ]  # fmt: skip
 
+# Which requirements of the built-in frameworks each starter control helps to satisfy. A
+# starting point, written for RiskWren and meant to be corrected: a control adopted from the
+# library arrives mapped, each mapping marked as partial until someone says it is more.
+# Every code here is checked against the framework packs by a test.
+CROSSWALK: dict[str, dict[str, list[str]]] = {
+    "access_removed_on_leaving": {
+        "nist-csf": ["PR.AA-01", "PR.AA-05", "GV.RR-04"],
+        "nist-800-53": ["PS-4", "PS-5", "AC-2"],
+        "nist-800-171": ["03.09.02", "03.01.01"],
+        "hipaa-security": ["164.308(a)(3)(ii)(C)"],
+    },
+    "access_reviewed": {
+        "nist-csf": ["PR.AA-05"],
+        "nist-800-53": ["AC-2", "AC-6(7)"],
+        "nist-800-171": ["03.01.01", "03.01.05"],
+        "hipaa-security": ["164.308(a)(4)(ii)(C)"],
+    },
+    "second_factor": {
+        "nist-csf": ["PR.AA-03"],
+        "nist-800-53": ["IA-2", "IA-2(1)", "IA-2(2)"],
+        "nist-800-171": ["03.05.03"],
+        "hipaa-security": ["164.312(d)"],
+    },
+    "privileged_access": {
+        "nist-csf": ["PR.AA-05"],
+        "nist-800-53": ["AC-6", "AC-6(2)", "AC-6(5)", "AC-6(9)"],
+        "nist-800-171": ["03.01.05", "03.01.06", "03.01.07"],
+        "hipaa-security": ["164.308(a)(4)(ii)(B)", "164.312(a)(2)(i)"],
+    },
+    "encryption_at_rest": {
+        "nist-csf": ["PR.DS-01"],
+        "nist-800-53": ["SC-28", "SC-28(1)"],
+        "nist-800-171": ["03.13.08"],
+        "hipaa-security": ["164.312(a)(2)(iv)"],
+    },
+    "backups_tested": {
+        "nist-csf": ["PR.DS-11", "RC.RP-03"],
+        "nist-800-53": ["CP-9", "CP-9(1)", "CP-10"],
+        "hipaa-security": ["164.308(a)(7)(ii)(A)", "164.308(a)(7)(ii)(D)", "164.310(d)(2)(iv)"],
+    },
+    "data_classified": {
+        "nist-csf": ["ID.AM-07", "ID.AM-05"],
+        "nist-800-53": ["RA-2", "MP-3"],
+        "nist-800-171": ["03.08.04"],
+    },
+    "data_sharing_approved": {
+        "nist-csf": ["GV.OC-03"],
+        "nist-800-53": ["AC-21", "CA-3"],
+        "nist-800-171": ["03.12.05"],
+        "hipaa-security": ["164.308(b)(1)", "164.314(a)(1)"],
+    },
+    "patching": {
+        "nist-csf": ["PR.PS-02", "ID.RA-01"],
+        "nist-800-53": ["SI-2", "RA-5"],
+        "nist-800-171": ["03.14.01", "03.11.02"],
+        "hipaa-security": ["164.308(a)(1)(ii)(B)"],
+    },
+    "malware_protection": {
+        "nist-csf": ["DE.CM-09", "PR.PS-05"],
+        "nist-800-53": ["SI-3"],
+        "nist-800-171": ["03.14.02"],
+        "hipaa-security": ["164.308(a)(5)(ii)(B)"],
+    },
+    "network_segmentation": {
+        "nist-csf": ["PR.IR-01"],
+        "nist-800-53": ["SC-7", "AC-4"],
+        "nist-800-171": ["03.13.01", "03.01.03"],
+    },
+    "unsupported_contained": {
+        "nist-csf": ["PR.PS-02", "ID.AM-08"],
+        "nist-800-53": ["SA-22"],
+        "nist-800-171": ["03.16.02"],
+        "hipaa-security": ["164.308(a)(1)(ii)(B)"],
+    },
+    "change_review": {
+        "nist-csf": ["PR.PS-01", "ID.RA-07"],
+        "nist-800-53": ["CM-3", "CM-4"],
+        "nist-800-171": ["03.04.03", "03.04.04"],
+    },
+    "logging_monitoring": {
+        "nist-csf": ["PR.PS-04", "DE.CM-01", "DE.CM-03", "DE.AE-02"],
+        "nist-800-53": ["AU-2", "AU-6", "AU-12", "SI-4"],
+        "nist-800-171": ["03.03.01", "03.03.05", "03.14.06"],
+        "hipaa-security": ["164.312(b)", "164.308(a)(1)(ii)(D)", "164.308(a)(5)(ii)(C)"],
+    },
+    "incident_response": {
+        "nist-csf": ["RS.MA-01", "ID.IM-04", "ID.IM-02"],
+        "nist-800-53": ["IR-8", "IR-3", "IR-4"],
+        "nist-800-171": ["03.06.01", "03.06.03", "03.06.05"],
+        "hipaa-security": ["164.308(a)(6)(i)", "164.308(a)(6)(ii)"],
+    },
+    "security_training": {
+        "nist-csf": ["PR.AT-01", "PR.AT-02"],
+        "nist-800-53": ["AT-2", "AT-2(3)", "AT-3"],
+        "nist-800-171": ["03.02.01", "03.02.02"],
+        "hipaa-security": ["164.308(a)(5)(i)", "164.308(a)(5)(ii)(A)"],
+    },
+    "backup_power_tested": {"nist-csf": ["PR.IR-02"], "nist-800-53": ["PE-11"]},
+    "environmental_monitoring": {"nist-csf": ["PR.IR-02"], "nist-800-53": ["PE-14"]},
+    "continuity_plan": {
+        "nist-csf": ["ID.IM-04", "PR.IR-03", "RC.RP-01"],
+        "nist-800-53": ["CP-2", "CP-4"],
+        "hipaa-security": ["164.308(a)(7)(i)", "164.308(a)(7)(ii)(C)", "164.308(a)(7)(ii)(D)"],
+    },
+    "downtime_procedures": {
+        "nist-csf": ["RC.RP-01"],
+        "nist-800-53": ["CP-2", "CP-4"],
+        "hipaa-security": ["164.308(a)(7)(ii)(C)", "164.310(a)(2)(i)"],
+    },
+    "agreements_recorded": {"nist-csf": ["GV.OC-03"]},
+    "standards_tracked": {"nist-csf": ["GV.OC-03"]},
+    "training_tracked": {
+        "nist-csf": ["PR.AT-01"],
+        "nist-800-53": ["AT-4"],
+        "hipaa-security": ["164.308(a)(5)(i)"],
+    },
+    "supplier_assessed": {
+        "nist-csf": ["GV.SC-06", "GV.SC-07"],
+        "nist-800-53": ["SR-6", "SA-9"],
+        "nist-800-171": ["03.16.03", "03.17.03"],
+        "hipaa-security": ["164.308(b)(1)"],
+    },
+    "agreements_in_place": {
+        "nist-csf": ["GV.SC-05"],
+        "nist-800-53": ["SA-9", "CA-3"],
+        "nist-800-171": ["03.16.03", "03.12.05"],
+        "hipaa-security": ["164.308(b)(1)", "164.308(b)(3)", "164.314(a)(1)"],
+    },
+    "alternate_supplier": {"nist-800-53": ["SR-3(1)"]},
+    "exit_plan": {"nist-csf": ["GV.SC-10"]},
+}
+
 CONTROL_LIBRARY: dict[str, Any] = {
     "pack": {
         "key": "starter-controls",
         "kind": "control_library",
         "title": "Starter controls",
         "version": "1",
-        "pack_version": "0.1.0",
+        "pack_version": "0.2.0",
         "publisher": "The RiskWren Authors",
         "license": "Apache-2.0",
         "text_policy": "verbatim",
@@ -1011,6 +1242,7 @@ CONTROL_LIBRARY: dict[str, Any] = {
             "nature": row[4],
             "frequency": row[5],
             "reduces": row[6],
+            **({"requirements": CROSSWALK[row[0]]} if row[0] in CROSSWALK else {}),
         }
         for row in CONTROL_ROWS
     ],

@@ -54,15 +54,31 @@ async function boot() {
   route("/", page("home", "home", meta));
   route("/account", page("account", "account"));
   route("/dashboard", page("dashboard", "dashboard"));
+  route("/compliance", page("compliance", "complianceDashboard"));
+  route("/graph/:ref", page("graph", "graphPage"));
+  route("/history", page("history", "wholeHistory"));
   route("/heat-map", page("heat-map", "heatMap"));
   route("/controls", page("controls", "controlLibrary"));
   route("/controls/:ref", page("control", "controlPage"));
+  route("/frameworks", page("frameworks", "frameworkList"));
+  route("/evidence", page("evidence", "evidenceList"));
+  route("/evidence/:ref", page("evidence", "evidencePage"));
+  route("/assessments", page("assessments", "assessmentList"));
+  route("/assessments/:ref", page("assessments", "assessmentPage"));
+  route("/issues", page("issues", "issueList"));
+  route("/issues/:ref", page("issues", "issuePage"));
+  route("/exceptions", page("exceptions", "exceptionList"));
+  route("/exceptions/:ref", page("exceptions", "exceptionPage"));
+  route("/notices", page("notices", "noticeList"));
+  route("/scopes", page("scopes", "scopeList"));
+  route("/scopes/:ref", page("scopes", "scopePage"));
+  route("/frameworks/:key", page("frameworks", "frameworkPage"));
   route("/plans", page("actions", "planList"));
   route("/acceptances", page("actions", "acceptanceList"));
   route("/actions", page("actions", "actionList"));
   route("/risks", page("risks", "riskRegister"));
   route("/risks/:ref", page("risk", "riskPage"));
-  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"]]) {
+  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"]]) {
     route(`/${path}`, page("records", "recordList", type));
     route(`/${path}/:ref`, page("record", "recordPage", type));
   }

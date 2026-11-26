@@ -84,7 +84,7 @@ def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], N
     return found
 
 
-for _path in ("processes", "systems", "third-parties"):
+for _path in ("processes", "systems", "third-parties", "information"):
     POLICIES.update(record_policies(_path))
 
 # The risk register
@@ -107,6 +107,10 @@ POLICIES.update(record_policies("controls", links=False))
 POLICIES.update(
     {
         ("GET", "/api/v1/control-library"): Needs.MEMBER,
+        ("GET", "/api/v1/controls/{ref}/requirements"): Needs.MEMBER,
+        ("PUT", "/api/v1/controls/{ref}/requirements"): Needs.MEMBER,
+        ("POST", "/api/v1/controls/{ref}/requirements/suggested"): Needs.MEMBER,
+        ("DELETE", "/api/v1/controls/{ref}/requirements/{mapping_id}"): Needs.MEMBER,
         ("GET", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
         ("POST", "/api/v1/controls/{ref}/ratings"): Needs.MEMBER,
         ("GET", "/api/v1/risks/{ref}/controls"): Needs.MEMBER,
@@ -127,10 +131,133 @@ POLICIES.update(
     }
 )
 
+# Frameworks: anyone signed in may read what the organization is held to; those who run the
+# program enter and keep its own.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/frameworks"): Needs.MEMBER,
+        ("POST", "/api/v1/frameworks"): Needs.CONFIGURE,
+        ("GET", "/api/v1/frameworks/{key}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/frameworks/{key}"): Needs.CONFIGURE,
+        ("GET", "/api/v1/frameworks/{key}/requirements"): Needs.MEMBER,
+        ("GET", "/api/v1/frameworks/{key}/coverage"): Needs.MEMBER,
+        ("POST", "/api/v1/frameworks/{key}/requirements"): Needs.CONFIGURE,
+        ("POST", "/api/v1/frameworks/{key}/requirements/paste"): Needs.CONFIGURE,
+        ("GET", "/api/v1/frameworks/{key}/requirement"): Needs.MEMBER,
+        ("PATCH", "/api/v1/frameworks/{key}/requirement"): Needs.CONFIGURE,
+        ("DELETE", "/api/v1/frameworks/{key}/requirement"): Needs.CONFIGURE,
+    }
+)
+
+# Scopes. As with every record, any member may ask, and the service decides by the scope:
+# whose unit it is in, and who owns it.
+POLICIES.update(record_policies("scopes", links=False))
+POLICIES.update(
+    {
+        ("PUT", "/api/v1/scopes/{ref}/members"): Needs.MEMBER,
+        ("PUT", "/api/v1/scopes/{ref}/frameworks"): Needs.MEMBER,
+        ("DELETE", "/api/v1/scopes/{ref}/frameworks/{key}"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/requirements"): Needs.MEMBER,
+        ("PUT", "/api/v1/scopes/{ref}/requirements"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/controls"): Needs.MEMBER,
+        ("PUT", "/api/v1/scopes/{ref}/controls"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/controls/candidates"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/controls/offered"): Needs.MEMBER,
+        ("POST", "/api/v1/scopes/{ref}/controls/inherited"): Needs.MEMBER,
+        ("DELETE", "/api/v1/scopes/{ref}/controls/{implementation_id}"): Needs.MEMBER,
+    }
+)
+
+# Evidence. Anyone may add it for a unit they work in; who sees an item, and its file, is
+# decided by the item.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/evidence"): Needs.MEMBER,
+        ("POST", "/api/v1/evidence"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/evidence/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/evidence/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence/{ref}/history"): Needs.MEMBER,
+        ("PUT", "/api/v1/evidence/{ref}/subjects"): Needs.MEMBER,
+        ("POST", "/api/v1/evidence/{ref}/file"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence/{ref}/file"): Needs.MEMBER,
+        ("GET", "/api/v1/evidence-for/{ref}"): Needs.MEMBER,
+    }
+)
+
+# Assessments and tests. Any member may ask; the services decide who may plan, record, and
+# review, and nobody does so for a control they own.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/assessments"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments"): Needs.ASSESS,
+        ("GET", "/api/v1/assessments/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/assessments/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/assessments/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/assessments/{ref}/history"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments/{ref}/tests"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments/{ref}/completion"): Needs.MEMBER,
+        ("POST", "/api/v1/assessments/{ref}/cancellation"): Needs.MEMBER,
+        ("PATCH", "/api/v1/tests/{test_id}"): Needs.MEMBER,
+        ("DELETE", "/api/v1/tests/{test_id}"): Needs.MEMBER,
+        ("POST", "/api/v1/tests/{test_id}/results"): Needs.ASSESS,
+        ("POST", "/api/v1/results/{result_id}/review"): Needs.ASSESS,
+    }
+)
+
+# Issues and exceptions. Any member may ask, and may say that something is wrong; the
+# services decide the rest. Confirming a closure, withdrawing an issue, and reopening one are
+# the second line's. Nobody confirms their own closure or decides their own request.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/issues"): Needs.MEMBER,
+        ("POST", "/api/v1/issues"): Needs.MEMBER,
+        ("GET", "/api/v1/issues/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/issues/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/issues/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/issues/{ref}/history"): Needs.MEMBER,
+        ("PUT", "/api/v1/issues/{ref}/subjects"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/actions"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/due-date"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/closure"): Needs.MEMBER,
+        ("POST", "/api/v1/issues/{ref}/validation"): Needs.ASSESS,
+        ("POST", "/api/v1/issues/{ref}/cancellation"): Needs.ASSESS,
+        ("POST", "/api/v1/issues/{ref}/reopening"): Needs.ASSESS,
+        ("GET", "/api/v1/scopes/{ref}/plan-of-action"): Needs.MEMBER,
+        ("GET", "/api/v1/exceptions"): Needs.MEMBER,
+        ("POST", "/api/v1/exceptions"): Needs.MEMBER,
+        ("GET", "/api/v1/exceptions/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/exceptions/{ref}"): Needs.MEMBER,
+        ("GET", "/api/v1/exceptions/{ref}/history"): Needs.MEMBER,
+        ("POST", "/api/v1/exceptions/{ref}/decision"): Needs.MEMBER,
+        ("POST", "/api/v1/exceptions/{ref}/withdrawal"): Needs.MEMBER,
+        ("GET", "/api/v1/notices"): Needs.MEMBER,
+        ("GET", "/api/v1/notices/count"): Needs.MEMBER,
+        ("POST", "/api/v1/notices/read"): Needs.MEMBER,
+    }
+)
+
+# Import and export. An export is the list its asker could already see, and is recorded.
+# Records are imported by those who could add them by hand, a row at a time by the same
+# service; requirements by those who shape the program.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/exports/{kind}"): Needs.MEMBER,
+        ("POST", "/api/v1/imports/records/{path}/columns"): Needs.STEWARD,
+        ("POST", "/api/v1/imports/records/{path}"): Needs.STEWARD,
+        ("POST", "/api/v1/imports/requirements/{key}/columns"): Needs.CONFIGURE,
+        ("POST", "/api/v1/imports/requirements/{key}"): Needs.CONFIGURE,
+    }
+)
+
 # Reporting: every figure counts only what the asker may see.
 POLICIES.update(
     {
         ("GET", "/api/v1/home"): Needs.MEMBER,
+        ("GET", "/api/v1/compliance"): Needs.MEMBER,
+        ("GET", "/api/v1/graph/{ref}"): Needs.MEMBER,
+        # Every change in one place is for those who may read everything.
+        ("GET", "/api/v1/history"): Needs.READ_ALL,
         ("GET", "/api/v1/heat-map"): Needs.MEMBER,
         ("GET", "/api/v1/dashboard"): Needs.MEMBER,
     }

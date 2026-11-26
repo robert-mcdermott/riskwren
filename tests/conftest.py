@@ -137,7 +137,9 @@ def people(instance: Instance):  # type: ignore[no-untyped-def]
     from tests.people import seed
 
     with instance.db.write(Actor.command("Setup")) as session:
-        packs.install(session)  # the default program, as `riskwren init` loads it
+        # The default program, as `riskwren init` loads it. The public frameworks are left
+        # out here for speed; the tests about them load them.
+        packs.install(session, frameworks=False)
     return seed(instance.db)
 
 

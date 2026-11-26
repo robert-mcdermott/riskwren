@@ -127,6 +127,10 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
         title = (
             f"Now {label} {other}" if event.action == "created" else f"No longer {label} {other}"
         )
+    elif event.subject_type == "external_ref":
+        system = lookups.vocab("external_systems", now("system")).lower()
+        verb = "Now also known as" if event.action == "created" else "No longer known as"
+        title = f"{verb} {now('value')} ({system})"
     elif event.action == "created":
         title = f"Added this {record_type.label}"
     elif event.action == "updated":
@@ -158,6 +162,7 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
         "operation": operation,
         "title": title,
         "lines": lines,
+        "told": bool(describe and title and not lines and event.action == "updated"),
     }
 
 
@@ -179,5 +184,167 @@ def for_record(
     lookups = Lookups(session, record_type)
     story = [entry(event, record_type, lookups) for event in events]
     # A change that only copied what another entry already says (a rating onto its control,
-    # an assessment onto its risk) is not told twice.
-    return [item for item in story if item["action"] != "updated" or item["lines"]]
+    # an assessment onto its risk) is not told twice, unless the type says its own titled
+    # changes are each worth telling (a result confirmed, in an assessment).
+    keeps = bool(record_type.extra.get("history_keeps_titled"))
+    return [
+        {key: value for key, value in item.items() if key != "told"}
+        for item in story
+        if item["action"] != "updated" or item["lines"] or (keeps and item["told"])
+    ]
+
+
+# --- Every change, in one place -------------------------------------------------------------
+
+PAGE = 100
+# What happened, for events that are not a change to a record.
+SAID = {
+    "exported": "Exported a list",
+    "evidence.downloaded": "Downloaded a file",
+    "signed_in": "Signed in",
+    "signed_out": "Signed out",
+    "sign_in_failed": "Failed to sign in",
+}
+
+
+def _plain(event: Event) -> dict[str, Any]:
+    """An event about something that is not a record: a sign-in, an export, a setting."""
+    changes = event.changes or {}
+
+    def now(field: str) -> Any:
+        pair = changes.get(field) or [None, None]
+        return pair[1] if pair[1] is not None else pair[0]
+
+    title = SAID.get(event.action)
+    if event.action == "exported":
+        title = f"Exported {now('list')} as {str(now('format')).upper()}: {now('rows')} rows"
+    elif title is None:
+        what = words(event.subject_type).lower()
+        verb = {"created": "Added", "updated": "Changed", "deleted": "Removed"}.get(event.action)
+        title = f"{verb} {what}" if verb else f"{words(event.action.replace('.', ' '))}"
+    lines = [
+        {"field": field, "label": words(field), "before": _shown(old), "after": _shown(new)}
+        for field, (old, new) in changes.items()
+        if field not in HIDDEN and event.action == "updated"
+    ]
+    return {
+        "id": event.id,
+        "at": event.at,
+        "actor": event.actor_label,
+        "actor_kind": event.actor_kind,
+        "action": event.action,
+        "operation": str((event.context or {}).get("op", "")).rsplit(".", 1)[-1],
+        "title": title,
+        "lines": lines,
+    }
+
+
+def _shown(value: Any) -> Any:
+    if value is None or value == "" or value == []:
+        return None
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    if isinstance(value, (dict, list)):
+        return str(value)[:300]
+    return value
+
+
+def everywhere(
+    session: Session,
+    *,
+    actor: int | None = None,
+    about: tuple[RecordType, Any] | None = None,
+    kind: str | None = None,
+    since: Any = None,
+    until: Any = None,
+    before: int | None = None,
+    limit: int = PAGE,
+) -> dict[str, Any]:
+    """Every change, newest first, for those who may read everything: narrowed to a person,
+    a record, a kind of record, or a span of dates. Each entry says which record it was."""
+    conditions: list[Any] = []
+    if actor is not None:
+        conditions += [Event.actor_kind == "account", Event.actor_id == actor]
+    if about is not None:
+        record_type, record = about
+        conditions.append(
+            or_(
+                (Event.subject_type == record_type.key) & (Event.subject_id == record.id),
+                (Event.parent_type == record_type.key) & (Event.parent_id == record.id),
+            )
+        )
+    if kind == "records":
+        known = list(TYPES)
+        conditions.append(or_(Event.subject_type.in_(known), Event.parent_type.in_(known)))
+    elif kind == "other":
+        known = list(TYPES)
+        conditions += [
+            Event.subject_type.not_in(known),
+            or_(Event.parent_type.is_(None), Event.parent_type.not_in(known)),
+        ]
+    elif kind:
+        conditions.append(or_(Event.subject_type == kind, Event.parent_type == kind))
+    if since is not None:
+        conditions.append(Event.at >= since)
+    if until is not None:
+        conditions.append(Event.at < until)
+    if before is not None:
+        conditions.append(Event.id < before)
+    lookups: dict[str, Lookups] = {}
+    names: dict[tuple[str, int], dict[str, Any] | None] = {}
+
+    def record_of(key: str, identifier: int | None) -> dict[str, Any] | None:
+        if identifier is None or key not in TYPES:
+            return None
+        if (key, identifier) not in names:
+            row = session.get(TYPES[key].model, identifier)
+            names[(key, identifier)] = (
+                {"type": key, "ref": row.ref, "name": row.name} if row is not None else None
+            )
+        return names[(key, identifier)]
+
+    entries: list[dict[str, Any]] = []
+    last: int | None = None
+    more = False
+    # Changes that only copy what another entry says are left out, so more are read than
+    # are shown, a page at a time, until the page is full.
+    cursor = before
+    while len(entries) < limit:
+        batch_conditions = [c for c in conditions if c is not None]
+        if cursor is not None and cursor != before:
+            batch_conditions.append(Event.id < cursor)
+        events = session.scalars(
+            select(Event).where(*batch_conditions).order_by(Event.id.desc()).limit(limit * 2)
+        ).all()
+        if not events:
+            break
+        for event in events:
+            cursor = event.id
+            key = (
+                event.parent_type
+                if event.parent_type in TYPES
+                else event.subject_type
+                if event.subject_type in TYPES
+                else None
+            )
+            if key is None:
+                item = _plain(event)
+                record = None
+            else:
+                if key not in lookups:
+                    lookups[key] = Lookups(session, TYPES[key])
+                item = entry(event, TYPES[key], lookups[key])
+                keeps = bool(TYPES[key].extra.get("history_keeps_titled"))
+                told = item.pop("told", False)
+                if item["action"] == "updated" and not item["lines"] and not (keeps and told):
+                    continue
+                identifier = event.parent_id if event.parent_type in TYPES else event.subject_id
+                record = record_of(key, identifier)
+            if len(entries) == limit:
+                more = True
+                break
+            entries.append({**item, "record": record, "kind": key or event.subject_type})
+            last = event.id
+        if more or len(events) < limit * 2:
+            break
+    return {"entries": entries, "next": last if more else None}

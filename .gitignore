@@ -36,3 +36,4 @@ htmlcov/
 # Left behind by patch
 *.orig
 *.rej
+/.cache/

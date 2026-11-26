@@ -27,6 +27,8 @@ RiskWren is built first for **research and health organizations that are not lar
 - **A small risk and compliance team.** Often two to five people covering enterprise risk, compliance, security assurance, and vendor reviews between them, with no budget for a platform administrator.
 - **No shareholders.** The financial-reporting control regimes that commercial tools are organized around apply only by analogy; stewardship of grant funds matters far more.
 
+**The security team comes first.** In most organizations of this shape, the people who adopt a system like this first are the chief information security officer and the security assurance team: they already hold the frameworks, run the assessments, chase the findings, and answer the questionnaires. So the path they walk every week has to be right before anything else is: a security framework mapped to controls, a scope for each boundary, controls tested once, evidence that goes stale by itself, findings followed to a closure someone else confirms, exceptions that end, and one page that says where all of it stands. The rest of a risk and compliance program is built around that path and not instead of it.
+
 Nothing in RiskWren is specific to research or to health care, though. The taxonomy, scales, frameworks, cadences, and vocabulary are all configuration, and any organization that wants a lightweight, self-hosted risk and compliance system can adopt it.
 
 | Persona | What they need from RiskWren |

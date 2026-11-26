@@ -11,13 +11,13 @@ from collections.abc import Mapping
 from datetime import UTC, date, datetime
 from typing import Any
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
 from riskwren.core import scoring
 from riskwren.core.clock import utc_now
-from riskwren.core.errors import Invalid, NotFound, PermissionDenied
+from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
 from riskwren.db.models import Control, ControlLibraryEntry, ControlRating, Event, Risk, RiskControl
 from riskwren.db.models.controls import BASES, EFFECTIVENESS, REDUCES, RELIANCE
 from riskwren.db.models.inventory import RECORD_STATUSES
@@ -53,6 +53,15 @@ def _apply(
         control.is_key = bool(values["is_key"])
     if "library_key" in values and creating:
         control.library_key = records.text(values["library_key"])
+
+
+def _created(session: Session, principal: Any, control: Control) -> None:
+    """A control started from the library arrives mapped to the requirements the library
+    suggests for it, in whichever frameworks are loaded."""
+    if control.library_key:
+        from riskwren.compliance import crosswalk  # it builds on this module
+
+        crosswalk.apply_library(session, control, account_id=principal.account_id)
 
 
 def is_stale(session: Session, control: Control, *, today: date | None = None) -> bool:
@@ -99,6 +108,7 @@ def _detail(session: Session, principal: Principal, control: Control) -> dict[st
     return {
         "library_key": control.library_key,
         "rating": next(iter(ratings(session, control)), None),
+        "tested": current_test(session, control) is not None,
         "reduces": risks_of(session, principal, control),
     }
 
@@ -122,6 +132,26 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         found.append(Control.rated_at < datetime.combine(
             rules.add_months(utc_now().date(), -months), datetime.min.time(), tzinfo=UTC
         ))  # fmt: skip
+    tested = filters.get("tested")
+    if tested in ("effective", "failing", "none"):
+        # What stands behind the control's rating: a test that still holds, or not.
+        months = int(rules.get(session, "cadences").get("control_rating_months", 12))
+        since = datetime.combine(
+            rules.add_months(utc_now().date(), -months), datetime.min.time(), tzinfo=UTC
+        )
+        by_test = exists(
+            select(ControlRating.id).where(
+                ControlRating.control_id == Control.id,
+                ControlRating.superseded_by.is_(None),
+                ControlRating.basis == "test",
+                ControlRating.rated_at >= since,
+            )
+        )
+        fine = and_(Control.design == "effective", Control.operation == "effective")
+        if tested == "none":
+            found.append(~by_test)
+        else:
+            found += [by_test, fine if tested == "effective" else ~fine]
     if filters.get("is_key"):
         found.append(Control.is_key.is_(True))
     if filters.get("risk"):
@@ -184,6 +214,7 @@ CONTROL = register(
         extra={
             "new": _new,
             "apply": _apply,
+            "created": _created,
             "cards": _cards,
             "detail": _detail,
             "conditions": _conditions,
@@ -242,6 +273,45 @@ def rate(
     is never edited. Risks that leaned on the control are told if it now suggests worse."""
     if not access.can_assess(session, principal, CONTROL, control):
         raise PermissionDenied("You cannot rate this control.")
+    tested = current_test(session, control)
+    if tested is not None and basis != "test":
+        # A test by someone independent outranks a judgment or an attestation of its age.
+        raise Conflict(
+            f"This control has a test result from {tested.rated_at.date().isoformat()} that "
+            "still holds. Until it goes out of date, a new test is what changes its rating."
+        )
+    return record_rating(
+        session, control, design=design, operation=operation, note=note, basis=basis,
+        by_id=principal.account_id, by_name=principal.name, at=at,
+    )  # fmt: skip
+
+
+def current_test(session: Session, control: Control) -> ControlRating | None:
+    """The control's rating in force, if it came from a test and has not gone out of date."""
+    latest = session.scalars(
+        select(ControlRating).where(
+            ControlRating.control_id == control.id, ControlRating.superseded_by.is_(None)
+        )
+    ).first()
+    if latest is None or latest.basis != "test" or is_stale(session, control):
+        return None
+    return latest
+
+
+def record_rating(
+    session: Session,
+    control: Control,
+    *,
+    design: str | None,
+    operation: str | None,
+    note: str | None,
+    basis: str,
+    by_id: int | None,
+    by_name: str,
+    at: datetime | None = None,
+) -> ControlRating:
+    """Write a rating, whoever was entitled to give it: a person judging the control, or an
+    assessment whose test result has been reviewed."""
     errors = records.Errors()
     for field, value in (("design", design), ("operation", operation)):
         if value not in EFFECTIVENESS:
@@ -261,8 +331,8 @@ def rate(
             operation=operation,
             basis=basis,
             note=reason,
-            rated_by=principal.account_id,
-            rated_by_name=principal.name,
+            rated_by=by_id,
+            rated_by_name=by_name,
             rated_at=at or utc_now(),
         )
         session.add(new)
@@ -500,6 +570,7 @@ def load_library(session: Session, pack: dict[str, Any]) -> int:
             "nature": item.get("nature"),
             "frequency": item.get("frequency"),
             "reduces": item.get("reduces", "likelihood"),
+            "requirements": item.get("requirements", {}),
             "source_pack": source,
         }
         row = have.get(item["key"])

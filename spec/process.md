@@ -50,6 +50,16 @@ main ──●──────────────────────
 - [ ] Roadmap and wave status updated
 - [ ] Once the documentation site exists: screenshots of changed screens retaken, guides checked against the changelog, the site built and reviewed in both themes and at phone width, and published after the release
 
+## What the automated checks run on
+
+Every push is checked on a hosted runner: lint, format, and the whole suite on SQLite and on PostgreSQL. The same files are checked once:
+
+- A branch is checked when it is pushed. A pull request from that branch is not checked again; it shows the push's result, which is for the same commit. Only a pull request from a fork is checked as a pull request.
+- A commit whose files are exactly those of a commit that has already passed is not checked again. Merging a wave into a main that has not moved makes such a commit, so the merge is not re-tested, and neither is the tag or the release, which start nothing.
+- A newer push to a branch stops the run for the one before it.
+
+So merge only when the wave branch's own run is green: that run is the one the merge relies on.
+
 ## Tools
 
 All Python work goes through `uv`:

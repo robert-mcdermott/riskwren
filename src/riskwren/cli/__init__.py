@@ -219,6 +219,106 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_frameworks_list(args: argparse.Namespace) -> int:
+    from riskwren.compliance import frameworks
+
+    config, _ = _load(args)
+    db = _database(config)
+    try:
+        with db.read() as session:
+            rows = frameworks.all_(session, retired=True)
+            if not rows:
+                print("No frameworks are loaded. Load the built-in ones with:")
+                print("  riskwren frameworks load --builtin")
+                return EXIT_OK
+            width = max(len(row.key) for row in rows)
+            for row in rows:
+                state = "" if row.status == "active" else "  (retired)"
+                print(
+                    f"{row.key.ljust(width)}  {row.citable_count:>5} requirements  "
+                    f"{row.title}, {row.version or 'no version'}{state}"
+                )
+    finally:
+        db.dispose()
+    return EXIT_OK
+
+
+def cmd_frameworks_load(args: argparse.Namespace) -> int:
+    import json
+
+    from riskwren.compliance import packs as framework_packs
+    from riskwren.core.errors import Conflict
+    from riskwren.events.actor import Actor
+
+    if bool(args.file) == bool(args.builtin):
+        raise RiskWrenError("Name a pack file, or use --builtin for the ones that ship.")
+    config, _ = _load(args)
+    pack = None
+    if args.file:
+        try:
+            pack = json.loads(Path(args.file).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise RiskWrenError(f"{args.file} could not be read as a pack: {exc}") from exc
+        found = framework_packs.problems(pack)
+        if found:
+            print(f"{args.file} cannot be loaded:")
+            for line in found:
+                print(f"  {line}")
+            return EXIT_ERROR
+        if args.dry_run:
+            head = pack["pack"]
+            print(f"{args.file} is a sound pack: {head['title']} ({head['key']}).")
+            return EXIT_OK
+    db = _database(config)
+    try:
+        with db.write(Actor.command("Frameworks")) as session:
+            if pack is None:
+                added = 0 if args.dry_run else framework_packs.install(session)
+                print(f"Loaded {added} built-in framework{'s' if added != 1 else ''}.")
+                return EXIT_OK
+            try:
+                made = framework_packs.load(session, pack)
+            except Conflict as exc:
+                raise RiskWrenError(str(exc)) from exc
+            print(f"Loaded {made.title}: {made.citable_count} requirements.")
+    finally:
+        db.dispose()
+    return EXIT_OK
+
+
+def cmd_frameworks_show(args: argparse.Namespace) -> int:
+    from riskwren.compliance import frameworks
+    from riskwren.core.errors import NotFound
+
+    config, _ = _load(args)
+    db = _database(config)
+    try:
+        with db.read() as session:
+            try:
+                row = frameworks.by_key(session, args.key)
+            except NotFound as exc:
+                raise RiskWrenError(str(exc)) from exc
+            print(f"{row.title} ({row.key})")
+            for label, value in (
+                ("Version", row.version),
+                ("Publisher", row.publisher),
+                ("License", row.license),
+                ("Text", frameworks.POLICY_LABELS[row.text_policy]),
+                ("Source", row.source_url),
+                ("Built from", row.built_from),
+                ("Pack", row.pack_version),
+            ):
+                if value:
+                    print(f"  {label + ':':<11} {value}")
+            held = f"{row.citable_count} requirements in {row.requirement_count} entries"
+            print(f"  {'Holds:':<11} {held}")
+            for baseline in frameworks.baselines(session, row):
+                print(f"  {'Baseline:':<11} {baseline.title}, {baseline.requirement_count}")
+    finally:
+        db.dispose()
+    return EXIT_OK
+
+
 DEMO_MARKER = ".riskwren-demo"
 
 
@@ -255,7 +355,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
     db = Database(config.database_url)
     try:
         migrate.upgrade(db.engine)
-        summary = demo_build.build(db, seed=args.seed)
+        summary = demo_build.build(db, seed=args.seed, files=DataHome(config.data.home).files)
         with db.engine.connect() as conn:
             report = chain.verify(conn)
     finally:
@@ -269,7 +369,8 @@ def cmd_demo(args: argparse.Namespace) -> int:
     )
     print(
         f"  {counts.get('risks', 0)} risks, {counts.get('controls', 0)} controls, "
-        f"{counts.get('plans', 0)} treatment plans, {counts.get('acceptances', 0)} acceptances"
+        f"{counts.get('plans', 0)} treatment plans, {counts.get('acceptances', 0)} acceptances, "
+        f"{counts.get('scopes', 0)} scopes, {counts.get('evidence', 0)} items of evidence"
     )
     print(
         f"  {report.events} events of history, which "
@@ -560,6 +661,41 @@ def build_parser() -> argparse.ArgumentParser:
         "first one that does not hold. Exits with 1 if the history is broken.",
     )
     verify.set_defaults(handler=cmd_verify)
+
+    held = commands.add_parser(
+        "frameworks",
+        help="see and load what the organization is held to",
+        description="A framework is a source of requirements: a public standard, a "
+        "regulation, an agreement's terms. Four public ones ship with RiskWren and are loaded "
+        "at installation. Others are loaded from a pack file, or entered in the app.",
+    )
+    held_commands = held.add_subparsers(dest="frameworks_command", metavar="ACTION")
+    held.set_defaults(handler=lambda _args: held.print_help() or EXIT_OK)
+    held_list = held_commands.add_parser(
+        "list", help="list the frameworks on record", description="List every framework."
+    )
+    held_list.set_defaults(handler=cmd_frameworks_list)
+    held_load = held_commands.add_parser(
+        "load",
+        help="load a framework pack",
+        description="Load a framework from a pack file, or the built-in ones that are "
+        "missing. A pack is checked whole first and refused whole if anything is wrong.",
+    )
+    held_load.add_argument("file", nargs="?", metavar="FILE", help="the pack to load")
+    held_load.add_argument(
+        "--builtin", action="store_true", help="load the built-in frameworks not yet here"
+    )
+    held_load.add_argument(
+        "--dry-run", action="store_true", help="check the pack, and load nothing"
+    )
+    held_load.set_defaults(handler=cmd_frameworks_load)
+    held_show = held_commands.add_parser(
+        "show",
+        help="show one framework and where it comes from",
+        description="Show a framework's publisher, version, license, and source.",
+    )
+    held_show.add_argument("key", metavar="KEY", help="the framework's key, such as nist-csf")
+    held_show.set_defaults(handler=cmd_frameworks_show)
 
     program = commands.add_parser(
         "program",

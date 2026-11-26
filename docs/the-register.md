@@ -1,24 +1,27 @@
 # The register
 
-This guide is for everyone who owns, assesses, or reads a risk. It covers the inventory, risks and their ratings, controls, what the controls suggest, treatment plans, and acceptance.
+This guide is for everyone who owns, assesses, or reads a risk. It covers the inventory, risks and their ratings, controls, what the controls suggest, treatment plans, and acceptance. What the organization is held to, and the proof that it meets it, is in [Compliance](compliance.md).
 
 RiskWren is one connected register. A system is recorded once and every risk that concerns it points at it. A control is described once and every risk it bears on leans on the same record, with the same rating of how well it works.
 
 ## Home
 
-Home is the page for what you owe. **Waiting on you** lists, most urgent first, the things that need you in particular: an action that is yours, a risk of yours that has not been assessed or is due for review, a risk whose rating is in doubt, a risk that needs a decision, a control of yours to rate, an acceptance you gave that is about to expire, and, for those who can name a new owner, a record with nobody answering for it. Each item is a link to the place where it is done.
+Home is the page for what you owe. **Waiting on you** lists, most urgent first, the things that need you in particular: an action that is yours, a risk of yours that has not been assessed or is due for review, a risk whose rating is in doubt, a risk that needs a decision, a control of yours to rate, an acceptance you gave that is about to expire, evidence of yours that has stopped counting or soon will, a test you have been asked to do, a result waiting for your review, an issue that is yours to put right, a closure waiting for you to confirm, an exception to decide or one of yours about to end, and, for those who can name a new owner, a record with nobody answering for it. Each item is a link to the place where it is done.
+
+The bell at the top right counts what has been assigned to you or decided for you since you last looked. See [Notices](issues-and-exceptions.md#notices).
 
 The figures above the list count the same things for everything you may see, and each opens the list it counts.
 
 ## The inventory
 
-The inventory is what the organization has and depends on. It has three kinds of record:
+The inventory is what the organization has and depends on. It has four kinds of record:
 
 | Record | What it is | Reference |
 |---|---|---|
 | **Process** | Something the organization does: a service a core provides, a clinical activity, payroll | `PRC-0001` |
 | **System** | What the work runs on: an application, a platform, an instrument, a device, a data store | `SYS-0001` |
 | **Third party** | Who it depends on: suppliers, service providers, collaborators, sponsors, subrecipients | `TP-0001` |
+| **Information asset** | A body of information it holds: what it is, where it is kept, and who it is shared with. The record describes the information and never contains it | `INF-0001` |
 
 Every record has a name, a unit, a criticality, the most sensitive class of data it touches, and named owners. Systems also say how they are hosted and where they are in their life: planned, in service, being retired, or unsupported.
 
@@ -33,9 +36,33 @@ A record says what it relies on:
 | Process | relies on | System |
 | Process | is performed by | Third party |
 | System | is supplied by | Third party |
+| System | holds | Information asset |
+| Process | uses | Information asset |
+| Information asset | is shared with | Third party |
 | Process or system | depends on · is part of | Another of the same kind |
 
 A link is made once, from either end, and can be read from both. A lab can say that its work relies on central storage without anyone in central computing doing anything.
+
+### Connections
+
+Every record has a **Connections** link beside its name. It opens a picture of everything joined to the record: its links in both directions, the risks that bear on it, the controls that reduce them, the scopes it is in, and the evidence, issues, and exceptions about it. A list beside the picture says the same in full. See [Connections](compliance.md#connections).
+
+### Known elsewhere as
+
+A record can carry what it is called in other systems: an asset tag, a contract number, a ticket, an entry in a configuration database. **Known elsewhere as → Edit** on the record. Search finds a record by any of them, and where the system has an address pattern they are links.
+
+### Import and export
+
+Every list has an **Export** button. It gives the list as it is filtered, and as much of it as you may see, as a spreadsheet (CSV) or as data (JSON). Taking an export is recorded in the history.
+
+A steward or a manager can **Import** processes, systems, third parties, information assets, risks, and controls from a spreadsheet saved as CSV:
+
+1. Choose the file. RiskWren reads its headings and matches them to fields where the names make it plain.
+2. Say which column holds anything it could not match. A unit is given by its code or its name, an owner by their email address, and a choice by its key or by the words you see in the app.
+3. **Check the file.** Every problem is listed with its row. Nothing has been added yet.
+4. **Import**, once every row is good.
+
+Each row is added as if by hand, by the same rules, in your name. Nothing is added unless every row can be, and a file imported twice adds nothing the second time. A file exported from one installation imports into another with its references kept. A rating is never imported: what a file says of how a control works, or how much risk remains, is a judgment to be made here by a named person.
 
 ### Owners
 
@@ -51,7 +78,7 @@ Every record has a **History** tab: who changed what, when, with each value befo
 
 ### Raise a risk
 
-**Register → New risk.** Start from the library when you can, by searching it at the top of the form: it holds 57 common risks, written as a cause, an event, and a consequence, each with its category and the controls commonly used for it. Change the wording to fit; the library is a starting point, not a standard.
+**Register → Raise a risk.** Start from the library when you can, by searching it at the top of the form: it holds 57 common risks, written as a cause, an event, and a consequence, each with its category and the controls commonly used for it. Change the wording to fit; the library is a starting point, not a standard.
 
 A risk needs a name, a category, and a unit. Say what it **concerns** by linking the processes, systems, and third parties involved, so that anyone looking at a system sees the risks that bear on it.
 
@@ -103,7 +130,7 @@ Close a risk when it no longer applies, with the reason. It leaves the open regi
 
 A control is something the organization does to make a risk less likely or less harmful. It has a statement of what is done, an owner, a unit, a kind (preventive, detective, corrective, or directive), and how often it happens.
 
-**Controls → Library** is your organization's own controls. **New control** can start from a set of 56 common controls in plain words: search it, choose one, and then make it specific. The starting text says "backups are tested"; yours says which systems, how often, and by whom.
+**Controls → Library** is your organization's own controls. **Add a control** can start from a set of 56 common controls in plain words: search it, choose one, and then make it specific. The starting text says "backups are tested"; yours says which systems, how often, and by whom.
 
 ### Rate a control
 
@@ -115,6 +142,8 @@ What is known about a control is recorded as a rating with two parts and a note:
 Each is effective, partly effective, or ineffective. The note says what was looked at. As with assessments, a rating is never edited, only superseded.
 
 A control that has never been rated is **not assessed**, and a rating older than twelve months is **out of date**. Neither counts for anything until someone looks.
+
+A rating by its owner or a steward is a judgment. A rating from a **test** in an assessment, recorded by someone who does not own the control and confirmed by a second person, outranks it: while a test result holds, the control cannot be re-rated by judgment. See [Evidence and testing](evidence-and-testing.md#assessments).
 
 ### Link a control to a risk
 
@@ -172,7 +201,7 @@ An acceptance covers the rating that was accepted. If the residual rating later 
 
 - **Register** lists risks, with filters for category, residual rating, standing, and unit, a switch for the ones you are named on, and grouping by category or unit.
 - **Heat map** places every rated risk on the matrix, for the residual, inherent, or target rating, for a unit and everything beneath it, or for one category. Each cell opens the risks in it.
-- **Dashboard** shows where the register stands. Every figure opens the list it counts. See [Read the dashboard](running-the-program.md#read-the-dashboard).
+- **Reports → Risk** shows where the register stands, and **Reports → Compliance** how ready each scope is against what it is held to. Every figure opens the list it counts. See [Read the dashboards](running-the-program.md#read-the-dashboards).
 - **⌘K** (or Ctrl K) finds any record by name or reference.
 
 What you see in all of these is what you are allowed to see. See [Who sees what](running-the-program.md#who-sees-what).

@@ -393,6 +393,53 @@
         "description": "Receives funds the organization passes through"
       }
     ],
+    "information_kinds": [
+      {
+        "key": "research_data",
+        "label": "Research data",
+        "description": "Data produced or collected by research"
+      },
+      {
+        "key": "participant_data",
+        "label": "Participant data",
+        "description": "About people who take part in research"
+      },
+      {
+        "key": "patient_records",
+        "label": "Patient records",
+        "description": "Records of care"
+      },
+      {
+        "key": "specimen_records",
+        "label": "Specimen records",
+        "description": "What is known about stored specimens"
+      },
+      {
+        "key": "controlled_data",
+        "label": "Controlled-access data",
+        "description": "Held under another party's terms"
+      },
+      {
+        "key": "personnel_records",
+        "label": "Personnel records",
+        "description": "About staff, students, and applicants"
+      },
+      {
+        "key": "financial_records",
+        "label": "Financial records",
+        "description": "Accounts, awards, payments, and donors"
+      },
+      {
+        "key": "intellectual_property",
+        "label": "Intellectual property",
+        "description": "Unpublished results and inventions"
+      },
+      {
+        "key": "operational",
+        "label": "Operational",
+        "description": "What the organization needs to run"
+      }
+    ],
     "link_kinds": [
       {
         "key": "relies_on",
@@ -428,6 +475,39 @@
         ]
       },
       {
+        "key": "holds",
+        "label": "Holds",
+        "reverse": "Is held in",
+        "between": [
+          [
+            "system",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "uses",
+        "label": "Uses",
+        "reverse": "Is used by",
+        "between": [
+          [
+            "process",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "shared_with",
+        "label": "Is shared with",
+        "reverse": "Receives",
+        "between": [
+          [
+            "information",
+            "third_party"
+          ]
+        ]
+      },
+      {
         "key": "depends_on",
         "label": "Depends on",
         "reverse": "Is depended on by",
@@ -456,6 +536,139 @@
             "system"
           ]
         ]
+      }
+    ],
+    "issue_severities": [
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Leaves people, patients, or regulated data exposed now, or breaks a legal obligation"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "A control the organization relies on does not work, with nothing making up for it"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "A control works in part, or something else partly makes up for it"
+      },
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "A weakness in how something is done or recorded that does not yet leave anything exposed"
+      }
+    ],
+    "issue_sources": [
+      {
+        "key": "test",
+        "label": "Test",
+        "description": "A test in an assessment found a control wanting"
+      },
+      {
+        "key": "gap",
+        "label": "Gap",
+        "description": "A requirement that nothing answers, or a control with no evidence"
+      },
+      {
+        "key": "security_test",
+        "label": "Security testing",
+        "description": "A penetration test, a scan, or an exercise found it"
+      },
+      {
+        "key": "audit",
+        "label": "Audit",
+        "description": "A finding from an internal or external audit"
+      },
+      {
+        "key": "incident",
+        "label": "Incident",
+        "description": "Something that went wrong showed it"
+      },
+      {
+        "key": "review",
+        "label": "Review",
+        "description": "A review of a supplier, a system, or a process"
+      },
+      {
+        "key": "observation",
+        "label": "Observation",
+        "description": "Somebody noticed it and said so"
+      }
+    ],
+    "root_causes": [
+      {
+        "key": "procedure",
+        "label": "Procedure",
+        "description": "There was no procedure, or it was unclear or out of date"
+      },
+      {
+        "key": "people",
+        "label": "People and time",
+        "description": "Not enough people, time, or training to do it"
+      },
+      {
+        "key": "ownership",
+        "label": "Ownership",
+        "description": "Nobody was clearly responsible, or it changed hands and was dropped"
+      },
+      {
+        "key": "technology",
+        "label": "Technology",
+        "description": "A system could not do what was needed, or failed"
+      },
+      {
+        "key": "design",
+        "label": "Design",
+        "description": "The control was done as described and still did not meet the need"
+      },
+      {
+        "key": "change",
+        "label": "Change",
+        "description": "A change elsewhere was not followed through here"
+      },
+      {
+        "key": "third_party",
+        "label": "Third party",
+        "description": "A supplier or partner did not do its part"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these, or not known"
+      }
+    ],
+    "external_systems": [
+      {
+        "key": "asset_tag",
+        "label": "Asset tag",
+        "description": "The number on the label, or in the asset register"
+      },
+      {
+        "key": "contract",
+        "label": "Contract number",
+        "description": "As the contracts or purchasing system knows it"
+      },
+      {
+        "key": "ticket",
+        "label": "Ticket",
+        "description": "A request or change in the service desk"
+      },
+      {
+        "key": "configuration_item",
+        "label": "Configuration item",
+        "description": "Its entry in a configuration database"
+      },
+      {
+        "key": "award",
+        "label": "Award number",
+        "description": "A grant or sponsored agreement"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "An identifier in any other system"
       }
     ]
   },
@@ -877,7 +1090,14 @@
       "low": 24
     },
     "unrated_risk_review_months": 3,
-    "control_rating_months": 12
+    "control_rating_months": 12,
+    "issue_due_days": {
+      "critical": 30,
+      "high": 90,
+      "moderate": 180,
+      "low": 365
+    },
+    "exception_max_months": 12
   },
   "authority": {
     "acceptance": {

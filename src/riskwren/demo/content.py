@@ -82,7 +82,8 @@ CAST: list[tuple[str, str, str, str, list[tuple[str, str | None, str | None]]]] 
     ("auditor", "Greta Bergstrom", "Director of Internal Audit", "RISK", [("auditor", None, None)]),
     ("admin", "Tobias Larsen", "Systems Administrator", "IT", [("admin", None, None)]),
     ("cio", "Priya Chaudhry", "Chief Information Officer", "IT", [("leader", "IT", "high")]),
-    ("ciso", "Goran Dimitrov", "Chief Information Security Officer", "SEC", [("leader", "SEC", "high")]),
+    ("ciso", "Goran Dimitrov", "Chief Information Security Officer", "SEC",
+     [("leader", "SEC", "high"), ("assessor", None, None)]),
     ("cfo", "Odette Moreau", "Chief Financial Officer", "FIN", [("leader", "FIN", "high")]),
     ("cores_lead", "Soren Eriksen", "Director of Core Facilities", "CORES", [("leader", "CORES", "high")]),
     ("clinic_lead", "Farah Haddad", "Medical Director", "CLIN", [("leader", "CLIN", "high")]),
@@ -123,7 +124,12 @@ SAMPLE = [
     ("bio_dir", "Unit leader", "Leads a core; may accept only moderate risks"),
     ("cores_lead", "Division leader", "May accept risks rated high in Core Facilities"),
     ("president", "Executive", "May accept risks rated critical, anywhere"),
-    ("assess1", "Assessor", "Assesses risks and rates controls, everywhere"),
+    (
+        "ciso",
+        "Security leader",
+        "Leads Information Security: decides its exceptions, sees every scope",
+    ),
+    ("assess1", "Assessor", "Tests controls, reviews results, and confirms closures, everywhere"),
     ("auditor", "Auditor", "Reads everything and changes nothing"),
     ("admin", "Administrator", "Accounts, units, and appearance; not the register"),
     ("member", "Staff member", "Sees their own unit's risks and what they owe"),
@@ -619,3 +625,326 @@ WITHDRAW_REASONS = [
     "Circumstances changed: the exposure is larger than when it was accepted.",
 ]
 RETIRE_NOTE = "Replaced, and its data moved to managed storage."
+
+# A framework of the institute's own: the terms of one of its agreements.
+AGREEMENT = {
+    "title": "Data use agreement: Open Cohort Trust",
+    "kind": "agreement",
+    "publisher": "Open Cohort Trust",
+    "version": "Signed March 2025; renews every three years",
+    "summary": "The terms under which the trust shares its cohort data with Population "
+    "Sciences: who may use it, where it may be held, and what the trust must be told.",
+}
+AGREEMENT_TERMS = """\
+DUA-2.1 The data are used only for the approved study, by people named in the access list.
+DUA-2.2 The access list is reviewed by the principal investigator every six months, and the trust is told of each change within thirty days.
+DUA-3.1 The data are held only on systems the institute manages, in the country where they were provided.
+DUA-3.2 The data are encrypted wherever they are stored and whenever they are moved.
+DUA-3.3 No copy is made onto a personally owned device or removable media.
+DUA-4.1 No attempt is made to identify a participant, or to link the data to another source, without the trust's written agreement.
+DUA-4.2 Results are released only in a form in which no participant can be identified, with no cell smaller than ten.
+DUA-5.1 Any loss of, or unauthorized access to, the data is reported to the trust within seventy-two hours of discovery.
+DUA-6.1 The data and every copy are destroyed within ninety days of the agreement ending, and the destruction is certified in writing.
+"""
+
+# control (library key), the unit that runs it, the term it answers, how far, and a note.
+AGREEMENT_CONTROLS = [
+    ("access_reviewed", "SEC", "DUA-2.2", "partial",
+     "The review happens twice a year. Telling the trust of changes is not yet anyone's job."),
+    ("encryption_at_rest", "IT", "DUA-3.2", "partial",
+     "Covers storage and managed laptops. Transfers are covered by the network standard."),
+    ("data_classified", "CMPL", "DUA-3.1", "partial", None),
+    ("incident_response", "SEC", "DUA-5.1", "partial",
+     "The plan names the privacy office; the seventy-two hours is in the checklist."),
+    ("data_sharing_approved", "CMPL", "DUA-4.1", "full", None),
+]  # fmt: skip
+
+# Bodies of information. key, name, unit, kind, criticality, data class, held in, shared with, agreement
+INFORMATION: list[tuple[str, str, str, str, str, str, str, str | None, str | None]] = [
+    ("info_cohort", "Cohort survey responses", "PS", "participant_data", "high", "restricted",
+     "The cohort database and the survey platform.", "Calder Bay University, under the shared cohort protocol.", "Consent form, version 4"),
+    ("info_specimens", "Specimen records", "BIO", "specimen_records", "critical", "restricted",
+     "The specimen tracking service.", None, "Repository consent and the material transfer agreements"),
+    ("info_patients", "Patient records", "CLIN", "patient_records", "critical", "restricted",
+     "The clinical record system and the laboratory information system.", "Lakeshore Reference Laboratory, for tests sent out.", None),
+    ("info_trials", "Trial participant data", "CR", "participant_data", "high", "restricted",
+     "Electronic data capture and the trial management system.", "Each trial's sponsor, as its protocol provides.", "Trial agreements"),
+    ("info_genomic", "Controlled-access genomic data", "RC", "controlled_data", "critical", "restricted",
+     "The data enclave, and nowhere else.", None, "The repository's data use certification"),
+    ("info_open_cohort", "Open Cohort Trust data", "PS", "controlled_data", "high", "restricted",
+     "Research storage, in the cohort project's own area.", None, "Data use agreement: Open Cohort Trust"),
+    ("info_people", "Personnel records", "HR", "personnel_records", "high", "restricted",
+     "The people system.", None, None),
+    ("info_awards", "Award and effort records", "SP", "financial_records", "high", "confidential",
+     "The grants management system and the finance system.", "Sponsors, in required reports.", None),
+    ("info_donors", "Donor records", "PHIL", "financial_records", "moderate", "confidential",
+     "The donor database.", None, None),
+    ("info_results", "Unpublished research results", "RES", "intellectual_property", "high", "confidential",
+     "Research storage and the electronic lab notebook.", None, None),
+]  # fmt: skip
+INFORMATION_LINKS: list[tuple[str, str, str]] = [
+    ("cohortdb", "holds", "info_cohort"), ("survey", "holds", "info_cohort"),
+    ("Cohort follow-up", "uses", "info_cohort"), ("info_cohort", "shared_with", "univ1"),
+    ("tracking", "holds", "info_specimens"), ("Specimen storage and retrieval", "uses", "info_specimens"),
+    ("record", "holds", "info_patients"), ("lis", "holds", "info_patients"),
+    ("Infusion therapy", "uses", "info_patients"), ("info_patients", "shared_with", "labref"),
+    ("edc", "holds", "info_trials"), ("ctms", "holds", "info_trials"),
+    ("Trial data management", "uses", "info_trials"), ("info_trials", "shared_with", "pharma1"),
+    ("enclave", "holds", "info_genomic"), ("Controlled-access data hosting", "uses", "info_genomic"),
+    ("storage", "holds", "info_open_cohort"), ("hris", "holds", "info_people"),
+    ("grants", "holds", "info_awards"), ("finance", "holds", "info_awards"),
+    ("donors", "holds", "info_donors"), ("storage", "holds", "info_results"), ("eln", "holds", "info_results"),
+]  # fmt: skip
+
+# Scopes. Central IT provides; the clinic and the enclave rely on it.
+SCOPE_PROVIDER = {
+    "name": "Central information technology",
+    "unit": "IT",
+    "summary": "The services Information Technology and Information Security run for the whole institute.",
+    "boundary": "Identity, the campus network, backup, the server platform, email, and endpoint "
+    "management, and the people who run them. Systems that units run for themselves are outside it.",
+    "members": ["identity", "network", "backup", "servers", "email", "endpoints", "siem", "scanner"],
+    "units": ["IT", "SEC"],
+    "framework": ("nist-csf", None),
+    # control (library key), the unit that runs it, who answers for it
+    "controls": [
+        ("second_factor", "IT", "Identity team"), ("privileged_access", "IT", "Identity team"),
+        ("access_removed_on_leaving", "IT", "Identity team"), ("backups_tested", "IT", "Infrastructure team"),
+        ("patching", "IT", "Infrastructure team"), ("network_segmentation", "IT", "Network team"),
+        ("encryption_at_rest", "IT", "Endpoint team"), ("change_review", "IT", "Change board"),
+        ("access_reviewed", "SEC", "Security operations"), ("malware_protection", "SEC", "Security operations"),
+        ("logging_monitoring", "SEC", "Security operations"), ("incident_response", "SEC", "Security operations"),
+        ("security_training", "SEC", "Security awareness lead"), ("supplier_assessed", "SEC", "Security assurance"),
+    ],
+}  # fmt: skip
+# The assessment the security team is carrying out on what central IT provides.
+ASSESSMENT = {
+    "name": "Central information technology: security assessment",
+    "approach": "Each control is examined against its own records for the last four quarters, and "
+    "the team that runs it is interviewed. Results are recorded by one assessor and confirmed by "
+    "the other. Systems that units run for themselves are assessed with their own scopes.",
+    # The one control the assessment finds wanting, whatever was believed of it before.
+    "finding": ("access_removed_on_leaving", "effective", "partly",
+                "Leavers between July and September, from the personnel system: 25 people.",
+                "Twenty-two accounts were disabled on the last working day. Three stayed active for "
+                "between nine and twenty-three days, all of them people on fixed-term contracts whose "
+                "end dates were not sent to the identity team."),
+    "returned": "Say which quarter was sampled, and how many were looked at.",
+}  # fmt: skip
+# What a test looked at and what it found, by outcome.
+TESTS = {
+    "effective": [
+        ("The last four quarters of records, and ten instances chosen at random.",
+         "All ten were done as described, on time, with the record kept where the procedure says."),
+        ("Settings exported from the system on the day, and the change history for the year.",
+         "The settings match the standard. No change in the year weakened them."),
+        ("An interview with the team lead, and the team's own log for the past six months.",
+         "Done as described every time it fell due. Exceptions were recorded and followed up."),
+    ],
+    "partly": [
+        ("Twenty instances from the past year, chosen at random.",
+         "Sixteen were done as described. Four were late by more than a month, all in one team."),
+        ("Settings exported from every system in the boundary.",
+         "In force on all but two older systems, which cannot support it and have no plan yet."),
+    ],
+    "ineffective": [
+        ("The records for the past year, and an interview with the people named in the procedure.",
+         "No record that it has been done since the person responsible moved to another team."),
+    ],
+}  # fmt: skip
+SCOPE_CLINIC = {
+    "name": "Clinical systems",
+    "unit": "CLIN",
+    "summary": "The systems that hold and use patient records in the research clinic.",
+    "boundary": "The clinical record system, the laboratory information system, dispensing "
+    "cabinets, infusion pumps, and scheduling, with the clinic staff who use them.",
+    "members": ["record", "lis", "cabinets", "pumps", "scheduling", "info_patients", "recordco"],
+    "units": ["CLIN"],
+    "framework": ("hipaa-security", None),
+    "inherited": ["second_factor", "backups_tested", "patching", "malware_protection",
+                  "logging_monitoring", "incident_response", "encryption_at_rest",
+                  "access_removed_on_leaving"],
+    # control, where the clinic's part stands, what the clinic does
+    "shared": [
+        ("access_reviewed", "in_place",
+         "Clinic managers review who can open the clinical record each quarter, and Security reviews the rest."),
+        ("security_training", "partly",
+         "The clinic adds a module on patient privacy. A third of agency staff have not yet taken it."),
+    ],
+    "own": [("downtime_procedures", "in_place", "Nurse managers",
+             "Each area keeps paper forms and a downtime box, and practices in spring and autumn.")],
+    "excluded": [
+        (["164.308(a)(4)(ii)(A)"], "Northmere is not, and does not include, a health care clearinghouse."),
+        (["164.314(b)(1)", "164.314(b)(2)", "164.314(b)(2)(i)", "164.314(b)(2)(ii)",
+          "164.314(b)(2)(iii)", "164.314(b)(2)(iv)"],
+         "These apply to group health plans. The clinic is a provider, not a plan."),
+    ],
+}  # fmt: skip
+SCOPE_ENCLAVE = {
+    "name": "Controlled-access data enclave",
+    "unit": "RC",
+    "summary": "Where genomic data obtained under a repository's certification is held and analysed.",
+    "boundary": "The enclave's hosts and storage in racks 4 to 6, its own network segment, and "
+    "the twelve approved users. Nothing leaves it except results a data steward has released.",
+    "members": ["enclave", "info_genomic", "genomevault", "Controlled-access data hosting"],
+    "units": [],
+    "framework": ("nist-800-171", None),
+    "inherited": ["second_factor", "network_segmentation", "malware_protection", "incident_response"],
+    "shared": [
+        ("patching", "in_place",
+         "Research Computing patches the enclave's own hosts on the institute's schedule; IT patches what is beneath them."),
+        ("logging_monitoring", "planned",
+         "The enclave's hosts do not yet send their logs to security monitoring. Due with the next storage refresh."),
+        ("backups_tested", "partly",
+         "The enclave is backed up to its own encrypted set. A full restore has not been tried."),
+    ],
+    "own": [("privileged_access", "in_place", "Enclave administrators",
+             "Two named administrators, separate accounts, and every session recorded.")],
+    "excluded": [],
+}  # fmt: skip
+
+# Issues at every stage. Each: where it is, what found it, how serious, what is wrong, the
+# detail, and its actions as (what, days from the build that it is due, whether it is done).
+ISSUES = {
+    "alarm": {
+        "unit": "BIO", "source": "observation", "severity": "high",
+        "name": "The freezer alarm call list names people who have left",
+        "summary": "When the minus-eighty in bay 3 alarmed on a Sunday, the first two numbers on "
+        "the call list belonged to people who left in the spring. The third answered after forty minutes.",
+        "actions": [("Rebuild the call list from this quarter's rota", -40, True),
+                    ("Test the call-out at night, unannounced", -12, False)],
+    },
+    "pentest": {
+        "unit": "IT", "source": "security_test", "severity": "critical", "urgent": True,
+        "name": "Guest wireless can reach the instrument network",
+        "summary": "This year's external penetration test reached two instrument controllers from "
+        "the guest wireless network through a firewall rule left from the building move. The "
+        "testers stopped there, as agreed. The controllers run software that cannot be patched.",
+        "actions": [("Remove the rule, and confirm from guest wireless that the path is closed", -8, True),
+                    ("Review every rule added during the building move", 9, False),
+                    ("Ask the testers to try the path again", 16, False)],
+    },
+    "cabinets": {
+        "unit": "PHARM", "source": "audit", "severity": "high",
+        "name": "Override reports from the dispensing cabinets are not reviewed",
+        "summary": "Internal audit found that the weekly report of overrides was produced and filed, "
+        "and that nobody had signed one off since the pharmacy manager changed.",
+        "actions": [("Name a reviewer and a deputy for the weekly report", -70, True),
+                    ("Review the backlog of unsigned reports and follow up the outliers", -30, True)],
+        "done": "A pharmacist and a deputy now sign the report each Monday. The backlog was reviewed: "
+        "three overrides were followed up with the nurses concerned, and none was a diversion.",
+        "cause": "ownership",
+        "proof": ("Signed override reports, eight weeks", "The eight most recent weekly reports, each signed and dated."),
+    },
+    "visitors": {
+        "unit": "FAC", "source": "observation", "severity": "low",
+        "name": "Contractors are let into plant rooms without signing the log",
+        "summary": "Three visits by the chiller contractor in one month have no entry in the plant room log.",
+        "actions": [("Move the log to the security desk, where keys are issued", -190, True)],
+        "done": "Keys to plant rooms are now issued at the security desk against a signature. "
+        "A month of entries was checked against the contractor's invoices.",
+        "cause": "procedure",
+        "proof": ("Plant room log against invoices", "Every invoiced visit in the month has an entry."),
+    },
+    "letters": {
+        "unit": "SP", "source": "review", "severity": "moderate",
+        "name": "Monitoring letters are missing for two sub-recipients",
+        "summary": "The annual review of sub-awards found no monitoring letter on file for two of "
+        "the fourteen sub-recipients.",
+        "actions": [("Obtain and file the two letters", -25, True)],
+        "done": "Both letters have been requested and filed.",
+        "cause": "people",
+        "returned": "Only one of the two letters is on file. The other is a request for it.",
+        "moved": (45, "The second sub-recipient's finance office is closed until the new year."),
+    },
+    "duplicate": {
+        "unit": "IT", "source": "observation", "severity": "moderate",
+        "name": "Two legacy hosts cannot be patched",
+        "summary": "The hosts behind the old instrument booking system have had no patches this year.",
+        "actions": [],
+        "withdrawn": "Recorded twice: the assessment has opened an issue for the same control.",
+    },
+    "gap": {
+        "unit": "CLIN", "source": "gap", "severity": "moderate",
+        "summary": "Nothing the clinic does, and nothing it inherits, answers this. It was noted "
+        "when the clinic's requirements were first gone through, and nobody has taken it up.",
+        "actions": [],
+    },
+}  # fmt: skip
+# What is done about the control the assessment found wanting.
+FINDING_ACTIONS = [
+    (
+        "Send contract end dates from the personnel system to the identity team each night",
+        20,
+        False,
+    ),
+    ("Disable the three accounts found, and check the last year's leavers for others", -15, True),
+]
+# Exceptions at every stage.
+EXCEPTIONS = {
+    "leavers": {
+        "why": "Agency nurses are engaged through the agency, and their end dates are not in the "
+        "personnel system that the identity team works from. That feed is being built.",
+        "instead": "Each Friday the nurse managers send the identity team the names of agency staff "
+        "who have finished, and the accounts are disabled that day.",
+        "note": "Until the feed is in. Not to be renewed without a date for it.",
+    },
+    "rooms": {
+        "why": "The enclave shares a machine room with other tenants until it moves to the new data "
+        "hall, and this cannot be met there before then.",
+        "instead": "Racks 4 to 6 are locked, the two administrators hold the only keys, and the "
+        "room's door log is reviewed against their visits every month.",
+        "note": None,
+    },
+    "training": {
+        "why": "Agency staff cannot be enrolled in the learning system, so a third of them have "
+        "not taken the privacy module.",
+        "instead": "A printed briefing is signed on the first shift, and kept by the nurse manager.",
+    },
+    "logs": {
+        "why": "The enclave's hosts cannot send their logs to security monitoring until the storage "
+        "refresh gives them a route out that the data-use terms allow.",
+        "instead": "The administrators review the hosts' own logs each week and record that they did.",
+        "note": "For the length of the refresh project.",
+    },
+    "patching": {
+        "why": "Two hosts behind the old instrument booking system run a release the maker no "
+        "longer patches, and the system cannot move until the cores agree a replacement.",
+        "instead": "The hosts are on their own network segment, reachable only from the booking desk.",
+        "refused": "This has been the answer for two years. Retire them or move them, and bring a date.",
+    },
+}
+
+# Evidence collected when a control is rated. kind: (name, what the item says)
+EVIDENCE = {
+    "file": [
+        ("Sample of records", "sample"),
+        ("Quarterly report", "report"),
+        ("Export from the system", "export"),
+    ],
+    "link": [
+        (
+            "Procedure and its last run",
+            "The procedure, with the log of when it was last carried out.",
+        ),
+        ("Ticket queue for the period", "Every request and how long each took."),
+    ],
+    "note": [
+        ("Walkthrough notes", None),
+        ("Interview with the owner", None),
+    ],
+    "attestation": [
+        (
+            "Owner's attestation",
+            "I confirm that this control operated as described throughout the period.",
+        ),
+    ],
+}
+EVIDENCE_ROWS = [
+    "date,item,done,checked_by",
+    "{d1},1,yes,owner",
+    "{d2},2,yes,owner",
+    "{d3},3,yes,deputy",
+    "{d4},4,no,owner",
+    "{d5},5,yes,owner",
+]

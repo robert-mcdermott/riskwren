@@ -107,6 +107,24 @@ class ThirdParty(ThingMixin, Base):
     )
 
 
+class Information(ThingMixin, Base):
+    """A body of information the organization holds: what it is, where it is kept, and who
+    it is shared with. It describes the information; it never contains it."""
+
+    __tablename__ = "information"
+    __subject__ = "information"
+
+    kind: Mapped[str] = mapped_column(String(40))
+    held_in: Mapped[str | None] = mapped_column(Text)
+    shared_with: Mapped[str | None] = mapped_column(Text)
+    agreement: Mapped[str | None] = mapped_column(String(300))
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
+        Index("ix_information_org_unit_id", "org_unit_id"),
+    )
+
+
 class RecordOwner(Base):
     """A person named on a record, and in what capacity."""
 
@@ -123,6 +141,25 @@ class RecordOwner(Base):
         UniqueConstraint("record_type", "record_id", "account_id", "kind"),
         Index("ix_record_owner_account_id", "account_id"),
         Index("ix_record_owner_record", "record_type", "record_id"),
+    )
+
+
+class ExternalRef(Base):
+    """What a record is called in another system: an asset tag, a contract number, a ticket."""
+
+    __tablename__ = "external_ref"
+    __audit_parent__ = ("@record_type", "record_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    record_type: Mapped[str] = mapped_column(String(24))
+    record_id: Mapped[int] = mapped_column(Integer)
+    system: Mapped[str] = mapped_column(String(40))
+    value: Mapped[str] = mapped_column(String(200))
+
+    __table_args__ = (
+        UniqueConstraint("record_type", "record_id", "system", "value"),
+        Index("ix_external_ref_record", "record_type", "record_id"),
+        Index("ix_external_ref_value", "value"),
     )
 
 

@@ -63,9 +63,9 @@ RiskWren is designed **not** to hold the regulated data it describes. Records de
 
 ### Files (wave 2)
 
-- Uploads have a size limit and an allowlist of types, checked by content, not by name.
+- Uploads have a size limit (25 MB) and an allowlist of types, checked by content, not by name. Text of any kind is kept as plain text; programs and unrecognized binary are refused.
 - Files are stored by hash outside any served directory and are only ever returned through a route that checks access to something the file is attached to.
-- Downloads are always sent as attachments with a restrictive content security policy, so an uploaded HTML or SVG file cannot run in the app's origin.
+- Downloads are always sent as attachments with a policy of `default-src 'none'; sandbox` and sniffing off, and anything that is not an inert type leaves as plain bytes, so an uploaded HTML or SVG file cannot run in the app's origin. Each download is an event.
 - Uploaded logos are sanitized and served from a route with its own locked-down policy.
 
 ### The history
@@ -92,7 +92,7 @@ RiskWren is designed **not** to hold the regulated data it describes. Records de
 
 ### Visibility
 
-**The inventory is open.** Processes, systems, and third parties are visible to everyone signed in, because a record can only be linked to what its author can see: a lab cannot say that its work relies on central storage if it cannot find central storage. What they describe is rarely sensitive, and what is can be marked restricted.
+**The inventory is open.** Processes, systems, information assets, and third parties are visible to everyone signed in, because a record can only be linked to what its author can see: a lab cannot say that its work relies on central storage if it cannot find central storage. What they describe is rarely sensitive, and what is can be marked restricted.
 
 **The register follows a setting.** A register of risks and controls is useful in proportion to how widely it is read and dangerous in proportion to how widely it is exposed. Organizations differ on where to draw the line, so for ordinary members it is a setting with three levels:
 
@@ -113,16 +113,30 @@ One function per record type decides what a principal may see. Single records, l
 | See what is assigned to them; complete an action | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read the inventory (unless restricted) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read risks and controls | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Read frameworks and their requirements (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Read scopes (wave 2) | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Keep a scope: its boundary, frameworks, applicability, and implementations (wave 2) | | ✓ | ✓ | | | ✓ | | |
+| Add evidence for a unit they work in or have a role over (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| Attach evidence to a control or a scope (wave 2) | | ✓ | ✓ | | ✓ | ✓ | | |
 | Add a record in a unit | | | ✓ | | | ✓ | | |
-| Edit a record; link and unlink | | ✓ | ✓ | | | ✓ | | |
+| Edit a record; link and unlink; map a control to requirements (wave 2) | | ✓ | ✓ | | | ✓ | | |
 | Assess a risk; rate a control | | ✓ | ✓ | | ✓ | ✓ | | |
 | Record a response; create and manage a treatment plan | | ✓ | ✓ | | | ✓ | | |
 | Accept a risk | | | | ✓ (not their own; up to their limit) | | | | |
 | Escalate a risk; reassign owners | | | ✓ | ✓ | | ✓ | | |
+| Start an assessment; plan its tests (wave 2) | | | | | ✓ | ✓ | | |
 | Record a test result (wave 2) | | | | | ✓ (not their own control) | ✓ (not their own control) | | |
-| Validate closure of an issue (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
-| Read the full history; export | | | | | | ✓ | ✓ | ✓ |
-| Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | |
+| Confirm or return a test result (wave 2) | | | | | ✓ (not their own control or result) | ✓ (not their own control or result) | | |
+| Raise an issue for a unit they work in or have a role over (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| Work on an issue: actions, its date, proposing closure (wave 2) | | ✓ | ✓ | | | ✓ | | |
+| Validate closure of an issue; withdraw or reopen one (wave 2) | | | | | ✓ (not their own) | ✓ (not their own) | | |
+| Ask for an exception (wave 2) | | ✓ (of the scope or control) | ✓ | | | ✓ | | |
+| Decide an exception (wave 2) | | | | ✓ (not their own request) | | ✓ (not their own request) | | |
+| Export a list they can see, as CSV or JSON; each export is recorded (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Import records from a spreadsheet, each row as if added by hand (wave 2) | | | ✓ | | | ✓ | | |
+| Read the full history | | | | | | ✓ | ✓ | ✓ |
+| Edit the taxonomy, scoring method, appetite, cadences, libraries, and vocabularies | | | | | | ✓ | | ✓ |
+| Enter and keep the organization's own frameworks; retire a framework (wave 2) | | | | | | ✓ | | ✓ |
 | Manage accounts, roles, units, branding, and system settings | | | | | | | | ✓ |
 
 A manager's authority to edit any record does not include accepting risk: acceptance belongs to the first line, to a named leader with the authority for that rating.

@@ -68,6 +68,9 @@ def can_see(
     setting: str | None = None,
 ) -> bool:
     """Whether the person may know this record exists."""
+    own_rule = record_type.extra.get("can_see")
+    if own_rule is not None:
+        return bool(own_rule(session, principal, record))
     if principal.reads_all:
         return True
     unit = record.org_unit_id
@@ -93,6 +96,9 @@ def visible(
     session: Session, principal: Principal, record_type: RecordType
 ) -> ColumnElement[bool] | None:
     """A condition that keeps only the records the person may see, or None for all of them."""
+    own_rule = record_type.extra.get("visible")
+    if own_rule is not None:
+        return own_rule(session, principal)  # type: ignore[no-any-return]
     if principal.reads_all:
         return None
     trusted = principal.units_for(*TRUSTED)
@@ -130,6 +136,9 @@ def can_add(principal: Principal, org_unit_id: int | None) -> bool:
 
 
 def can_edit(session: Session, principal: Principal, record_type: RecordType, record: Any) -> bool:
+    own_rule = record_type.extra.get("can_edit")
+    if own_rule is not None:
+        return bool(own_rule(session, principal, record))
     if principal.manages_unit(record.org_unit_id) or principal.stewards_unit(record.org_unit_id):
         return True
     kinds = owner_kinds(session, record_type, record.id, principal.account_id)

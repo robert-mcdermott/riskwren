@@ -7,7 +7,9 @@ lives outside version control, by default in ``.private/terms.txt``.
 
 Term file format: one term per line; ``#`` starts a comment. Terms match
 case-insensitively at word boundaries. Prefix a term with ``=`` to match it
-case-sensitively (useful for names that are also ordinary words).
+case-sensitively (useful for names that are also ordinary words). Follow a term with
+``!!`` and one or more path patterns to allow it in those files only: for a word that is
+also ordinary English and appears in a publisher's own text that is shipped as published.
 
 Usage::
 
@@ -22,6 +24,7 @@ Standard library only, so hooks run fast without a virtual environment.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import os
 import re
 import subprocess
@@ -46,6 +49,7 @@ HOOKS = {
 class Term:
     text: str
     pattern: re.Pattern[str]
+    allowed_in: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -61,6 +65,8 @@ def parse_terms(lines: Iterable[str]) -> list[Term]:
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
+        line, _, allowed = line.partition("!!")
+        line = line.strip()
         flags = re.IGNORECASE
         if line.startswith("="):
             line = line[1:].strip()
@@ -68,11 +74,15 @@ def parse_terms(lines: Iterable[str]) -> list[Term]:
         if not line:
             continue
         body = r"\s+".join(re.escape(part) for part in line.split())
-        terms.append(Term(line, re.compile(rf"(?<![A-Za-z0-9]){body}(?![A-Za-z0-9])", flags)))
+        pattern = re.compile(rf"(?<![A-Za-z0-9]){body}(?![A-Za-z0-9])", flags)
+        terms.append(Term(line, pattern, tuple(allowed.split())))
     return terms
 
 
 def find_hits(where: str, text: str, terms: list[Term]) -> Iterator[Hit]:
+    terms = [
+        term for term in terms if not any(fnmatch.fnmatch(where, ok) for ok in term.allowed_in)
+    ]
     for number, line in enumerate(text.splitlines(), 1):
         for term in terms:
             if term.pattern.search(line):

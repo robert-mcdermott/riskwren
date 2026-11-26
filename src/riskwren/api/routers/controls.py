@@ -14,6 +14,7 @@ from riskwren.api.routers.inventory import (
     MINE,
     SORT,
     UNIT,
+    ExternalRefBody,
     OwnersBody,
     Q,
     create_record,
@@ -23,6 +24,7 @@ from riskwren.api.routers.inventory import (
     show_record_plain,
     update_record,
 )
+from riskwren.compliance import crosswalk
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
 from riskwren.inventory import records
@@ -49,6 +51,7 @@ class ControlBody(BaseModel):
     tags: list[str] | None = None
     restricted: bool | None = None
     library_key: str | None = None
+    external_refs: list[ExternalRefBody] | None = None
 
 
 class RatingBody(BaseModel):
@@ -87,6 +90,10 @@ def list_controls(
     state: str | None = Query(
         default=None, description="effective, partly, ineffective, or not_assessed"
     ),
+    tested: str | None = Query(
+        default=None,
+        description="By a test that still holds: effective, failing, or none (no such test)",
+    ),
     is_key: bool = False,
     stale: bool = Query(default=False, description="Rated, but too long ago to rely on"),
     risk: str | None = Query(default=None, description="A risk's reference: the controls on it"),
@@ -98,8 +105,8 @@ def list_controls(
 ) -> dict[str, Any]:
     filters = {
         "q": q, "unit": unit, "status": status, "kind": kind, "nature": nature,
-        "frequency": frequency, "state": state, "is_key": is_key, "stale": stale, "risk": risk,
-        "owner": owner, "mine": mine,
+        "frequency": frequency, "state": state, "tested": tested, "is_key": is_key,
+        "stale": stale, "risk": risk, "owner": owner, "mine": mine,
     }  # fmt: skip
     return list_records(request, CONTROL, filters, sort, limit, cursor)
 
@@ -147,6 +154,56 @@ def rate_control(request: Request, ref: str, body: RatingBody) -> dict[str, Any]
             note=body.note,
         )  # fmt: skip
         return envelope(records.detail(session, principal, CONTROL, control))
+
+
+class MappingBody(BaseModel):
+    framework: str = Field(description="The framework's key, such as nist-csf")
+    code: str = Field(description="The requirement's code, such as PR.AA-05")
+    coverage: str = Field(default="partial", description="full or partial")
+    note: str | None = None
+
+
+@router.get("/controls/{ref}/requirements", summary="The requirements a control helps to satisfy")
+def control_requirements(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        control = records.load(session, principal, CONTROL, ref)
+        return envelope(crosswalk.of_control(session, principal, control))
+
+
+@router.put("/controls/{ref}/requirements", summary="Map a control to a requirement, or change how")
+def map_requirement(request: Request, ref: str, body: MappingBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        control = records.load(session, principal, CONTROL, ref)
+        crosswalk.map_(
+            session, principal, control, framework=body.framework, code=body.code,
+            coverage=body.coverage, note=body.note,
+        )  # fmt: skip
+        return envelope(crosswalk.of_control(session, principal, control))
+
+
+@router.post(
+    "/controls/{ref}/requirements/suggested",
+    summary="Map a control to everything the library suggests for it",
+)
+def map_suggested(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        control = records.load(session, principal, CONTROL, ref)
+        added = crosswalk.apply_suggestions(session, principal, control)
+        return envelope(crosswalk.of_control(session, principal, control), added=added)
+
+
+@router.delete(
+    "/controls/{ref}/requirements/{mapping_id}", summary="Take a requirement off a control"
+)
+def unmap_requirement(request: Request, ref: str, mapping_id: int) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        control = records.load(session, principal, CONTROL, ref)
+        crosswalk.unmap(session, principal, control, mapping_id)
+        return envelope(crosswalk.of_control(session, principal, control))
 
 
 @router.get("/risks/{ref}/controls", summary="The controls on a risk, and what they suggest")

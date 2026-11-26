@@ -1,5 +1,6 @@
 // The control library. Filters, sort, and page all live in the URL.
 
+import { exportButton } from "../components/exchange.js";
 import { get } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date, plural, relative } from "../core/format.js";
@@ -31,6 +32,7 @@ export function controlLibrary(main) {
       const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
         filterSelect("kind", options(vocab, "control_kinds", { blank: "Any kind" }), "Kind"),
         filterSelect("state", stateOptions("Any effectiveness"), "Effectiveness"),
+        filterSelect("tested", [["", "Tested or not"], ["effective", "Tested, and effective"], ["failing", "Tested, and found wanting"], ["none", "No test that still holds"]], "What its rating rests on"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
         mineToggle());
       const body = rows.length
@@ -52,7 +54,8 @@ export function controlLibrary(main) {
             action: mayAdd ? button("Add a control", { kind: "btn-primary", onclick: add }) : null });
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Controls", title: "Library", lede: meta.lede,
-          actions: mayAdd ? button("Add a control", { kind: "btn-primary", iconName: "plus", onclick: add }) : null }),
+          actions: [mayAdd ? button("Add a control", { kind: "btn-primary", iconName: "plus", onclick: add }) : null,
+            can("steward") ? button("Import", { iconName: "upload", onclick: async () => (await import("../components/exchange.js")).openRecordImport({ path: `records/${meta.path}`, what: meta.nouns, onDone: reload }) }) : null, exportButton("controls")] }),
         bar,
         card({ title: plural(data.page.meta.total, "control"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },

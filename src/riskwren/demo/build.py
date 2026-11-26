@@ -20,20 +20,45 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
+from riskwren.compliance import (
+    assessments,
+    crosswalk,
+    evidence,
+    exceptions,
+    frameworks,
+    issues,
+    scopes,
+)
+from riskwren.compliance.evidence import EVIDENCE
+from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
 from riskwren.core.clock import clock_set_to
-from riskwren.core.errors import PermissionDenied, RiskWrenError
+from riskwren.core.errors import Conflict, PermissionDenied, RiskWrenError
 from riskwren.db.engine import Database
-from riskwren.db.models import Acceptance, Action, Control, Risk, TreatmentPlan
+from riskwren.db.models import (
+    Acceptance,
+    Action,
+    Control,
+    ControlTest,
+    Evidence,
+    EvidenceLink,
+    ExceptionRequest,
+    Issue,
+    Risk,
+    Scope,
+    TreatmentPlan,
+)
 from riskwren.demo import content as c
 from riskwren.inventory import access, links, records
-from riskwren.inventory.registry import PROCESS, SYSTEM, THIRD_PARTY, RecordType
+from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.people import accounts, units
 from riskwren.program import branding, packs, settings
 from riskwren.risk import categories, register
@@ -69,10 +94,13 @@ def email_for(name: str) -> str:
 
 
 class Builder:
-    def __init__(self, db: Database, *, seed: int, today: date) -> None:
+    def __init__(self, db: Database, *, seed: int, today: date, files: Path | None = None) -> None:
         self.db = db
+        self.files = files  # where evidence files are kept; without it, items have none
         self.seed = seed
         self.rng = random.Random(seed)
+        # A second stream for details added later, so that they do not shift the first.
+        self.side = random.Random(seed + 7919)
         self.end = datetime(today.year, today.month, today.day, 16, 30, tzinfo=UTC)
         self.start = self._workday(self.end - timedelta(days=MONTHS * 30.4))
         self.now = self.start
@@ -361,6 +389,15 @@ class Builder:
         self, by: int, record_type: RecordType, key: str, values: dict[str, Any], owner: int
     ) -> None:
         unit = values["org_unit_id"]
+        # Some things are known by a number elsewhere: an asset tag, or a contract.
+        if record_type.key == "system" and self.side.random() < 0.45:
+            tag = f"NM-{self.side.randrange(100000, 999999)}"
+            values = {**values, "external_refs": [{"system": "asset_tag", "value": tag}]}
+        elif record_type.key == "third_party" and self.side.random() < 0.6:
+            number = (
+                f"C-{self.side.choice((2022, 2023, 2024, 2025))}-{self.side.randrange(100, 999)}"
+            )
+            values = {**values, "external_refs": [{"system": "contract", "value": number}]}
         with self.act(by) as (session, who):
             record = records.create(session, who, record_type, values)
             if owner != by:
@@ -393,6 +430,33 @@ class Builder:
                 values = {"name": name, "kind": kind, "criticality": criticality,
                           "data_class": data_class, "summary": summary, "org_unit_id": unit}  # fmt: skip
                 self.add_thing(by, THIRD_PARTY, key, values, self.pick(unit))
+
+    def _information(self) -> Script:
+        """The bodies of information the institute holds, and where each is kept."""
+        yield self.start + timedelta(days=104)
+        for index, (
+            key,
+            name,
+            code,
+            kind,
+            criticality,
+            data_class,
+            held,
+            shared,
+            agreement,
+        ) in enumerate(c.INFORMATION):
+            if index % 4 == 3:
+                yield self.later(0.5, 4)
+            unit = self.units[code]
+            values = {"name": name, "kind": kind, "criticality": criticality, "data_class": data_class,
+                      "held_in": held, "shared_with": shared, "agreement": agreement, "org_unit_id": unit}  # fmt: skip
+            self.add_thing(self.steward(unit), INFORMATION, key, values, self.pick(unit))
+        yield self.later(2, 6)
+        for source, relation, target in c.INFORMATION_LINKS:
+            with self.db.read() as session:
+                record_type, record_id, _ = self.things[source]
+                unit = session.get(record_type.model, record_id).org_unit_id
+            self.link_things(self.steward(unit), source, relation, target)
 
     def _lab_inventory(self, lab: int) -> Script:
         yield self.later(10, 110)
@@ -509,11 +573,61 @@ class Builder:
         return known
 
     def rate(self, by: int, control_id: int, design: str, operation: str, note: str) -> None:
-        with self.act(by) as (session, who):
-            control = session.get(Control, control_id)
-            controls.rate(session, who, control, design=design, operation=operation, note=note)
+        try:
+            with self.act(by) as (session, who):
+                control = session.get(Control, control_id)
+                controls.rate(session, who, control, design=design, operation=operation, note=note)
+        except Conflict:
+            return  # a test result still holds, and a judgment does not replace it
         self.last_rated[control_id] = self.now
         self.tally("control ratings")
+        if self.rng.random() < 0.6:
+            self._evidence(by, control_id, note)
+
+    def _evidence(self, by: int, control_id: int, seen: str) -> None:
+        """Whoever rates a control often keeps what they looked at. It holds for a year, so
+        what was collected for an old rating has stopped counting by now."""
+        kind = self.rng.choices(["file", "link", "note", "attestation"], weights=[40, 20, 30, 10])[
+            0
+        ]
+        name, said = self.rng.choice(c.EVIDENCE[kind])
+        day = self.today
+        with self.act(by) as (session, who):
+            control = session.get(Control, control_id)
+            assert control is not None
+            values = {
+                "name": f"{name}: {control.name}"[:200],
+                "kind": kind,
+                "org_unit_id": control.org_unit_id,
+                "collected_on": day,
+                "covers_from": day - timedelta(days=90),
+                "covers_to": day,
+                "data_class": self.rng.choice(["internal", "internal", "confidential"]),
+                "note": seen if kind == "note" else said if kind == "attestation" else None,
+                "url": f"https://docs.{c.DOMAIN}/controls/{control.ref.lower()}"
+                if kind == "link"
+                else None,
+                "summary": said if kind == "link" else None,
+            }
+            item = records.create(session, who, EVIDENCE, values)
+            if kind == "file" and self.files is not None:
+                days = [
+                    (day - timedelta(days=offset)).isoformat() for offset in (80, 62, 41, 23, 5)
+                ]
+                rows = "\n".join(c.EVIDENCE_ROWS).format(
+                    **{f"d{n + 1}": d for n, d in enumerate(days)}
+                )
+                text = f"# {control.ref} {control.name}\n{rows}\n"
+                evidence.attach_file(
+                    session,
+                    who,
+                    item,
+                    self.files,
+                    text.encode(),
+                    f"{control.ref.lower()}-{said}.csv",
+                )
+            evidence.set_subjects(session, who, item, [control.ref])
+        self.tally("evidence")
 
     def _rating(self, fate: str) -> tuple[str, str, str]:
         note = self.rng.choice(c.RATING_NOTES[fate])
@@ -1228,7 +1342,11 @@ class Builder:
             "A second chemistry was tried once in a pilot. It is not validated for any of "
             "the core's assays."))  # fmt: skip
         self.link(maren, risk, second, "likelihood", "primary")
-        self.link(maren, risk, self.control("agreements_in_place", self.units["LEGAL"]), "impact", "supporting")  # fmt: skip
+        # The contract helps the odds a little and the consequence not at all, so however it
+        # is rated the picture stays the same.
+        self.link(
+            maren, risk, self.control("agreements_in_place", self.units["LEGAL"]), "likelihood", "supporting"
+        )  # fmt: skip
         yield self.ago(418)
         self.residual(maren, risk, "I agree with the suggestion: stock buys weeks, not months, and there is no second source.")  # fmt: skip
         yield self.ago(404)
@@ -1450,6 +1568,466 @@ class Builder:
         yield self.ago(15)
         self.residual(bryn, risk, "Reviewed. The new generator is due in the spring. The acceptance expires this month and will need to be given again.")  # fmt: skip
 
+    def _story_agreement(self) -> Script:
+        """An agreement's terms, entered as a framework of the institute's own."""
+        lead = self.cast["risk2"]
+        yield self.ago(402)
+        with self.act(lead) as (session, who):
+            made = frameworks.create(session, who, c.AGREEMENT)
+            frameworks.paste(session, who, made, c.AGREEMENT_TERMS, dry_run=False)
+        self.tally("frameworks of its own")
+        yield self.ago(396)
+        with self.act(lead) as (session, who):
+            made = frameworks.by_key(session, frameworks.slug(c.AGREEMENT["title"]))
+            frameworks.update_requirement(
+                session, who, made, frameworks.find(session, made, "DUA-5.1"),
+                {"guidance": "The trust's privacy office confirmed that discovery means the "
+                 "moment anyone at the institute first suspects it, not when it is confirmed."},
+            )  # fmt: skip
+        yield self.ago(381)
+        # The controls the institute already runs answer most of the agreement's terms.
+        for key, unit, code, coverage, note in c.AGREEMENT_CONTROLS:
+            control = self.control(key, self.units[unit])
+            with self.act(lead) as (session, who):
+                crosswalk.map_(
+                    session, who, session.get(Control, control), framework=made.key, code=code,
+                    coverage=coverage, note=note,
+                )  # fmt: skip
+            self.tally("requirements mapped by hand")
+
+    def _scope(self, by: int, spec: dict[str, Any]) -> int:
+        """A scope with its boundary and the framework it is held to."""
+        values = {"name": spec["name"], "org_unit_id": self.units[spec["unit"]],
+                  "summary": spec["summary"], "boundary": spec["boundary"]}  # fmt: skip
+        with self.act(by) as (session, who):
+            scope = records.create(session, who, SCOPE, values)
+            scopes.set_members(
+                session, who, scope, [self.things[key][2] for key in spec["members"]],
+                [self.units[code] for code in spec["units"]],
+            )  # fmt: skip
+            scopes.hold_to(session, who, scope, *spec["framework"])
+            self.tally("scopes")
+            return scope.id
+
+    def _standing(self, control_id: int) -> str:
+        """Where a control stands in its own scope, from what is known of how well it works."""
+        with self.db.read() as session:
+            state = controls.state_of(session, session.get(Control, control_id))
+        return "partly" if state in ("partly", "ineffective") else "in_place"
+
+    def _story_scopes(self) -> Script:
+        """Central IT provides controls; the clinic and the data enclave inherit them."""
+        lead = self.cast["risk2"]
+        yield self.ago(296)
+        provider = self._scope(lead, c.SCOPE_PROVIDER)
+        offered: dict[str, int] = {}
+        for key, unit, team in c.SCOPE_PROVIDER["controls"]:
+            control = self.control(key, self.units[unit])
+            with self.act(lead) as (session, who):
+                row = scopes.implement(
+                    session, who, session.get(Scope, provider), session.get(Control, control),
+                    status=self._standing(control), responsibility=team,
+                )  # fmt: skip
+                offered[key] = row.id
+        yield self.ago(288)
+        with self.act(lead) as (session, who):
+            scope = session.get(Scope, provider)
+            records.update(
+                session, who, SCOPE, scope, {"offers_controls": True}, version=scope.version
+            )
+        for days, spec in ((262, c.SCOPE_CLINIC), (231, c.SCOPE_ENCLAVE)):
+            yield self.ago(days)
+            made = self._scope(lead, spec)
+            framework = spec["framework"][0]
+            with self.act(lead) as (session, who):
+                scope = session.get(Scope, made)
+                for key in spec["inherited"]:
+                    scopes.inherit(session, who, scope, offered[key], inheritance="inherited")
+                for key, status, part in spec["shared"]:
+                    scopes.inherit(
+                        session, who, scope, offered[key], inheritance="shared", status=status,
+                        statement=part,
+                    )  # fmt: skip
+            yield self.ago(days - 6)
+            for key, status, team, how in spec["own"]:
+                control = self.control(key, self.units[spec["unit"]])
+                with self.act(lead) as (session, who):
+                    scopes.implement(
+                        session, who, session.get(Scope, made), session.get(Control, control),
+                        status=status, responsibility=team, statement=how,
+                    )  # fmt: skip
+            for codes, reason in spec["excluded"]:
+                with self.act(lead) as (session, who):
+                    for code in codes:
+                        scopes.decide(
+                            session, who, session.get(Scope, made), framework=framework, code=code,
+                            applicable=False, reason=reason,
+                        )  # fmt: skip
+
+    def _independent(self, control_id: int, *, besides: int | None = None) -> int:
+        """Someone who may test or review this control: an assessor who does not own it."""
+        with self.db.read() as session:
+            for key in ("assess1", "assess2", "risk1", "risk2", "risk3"):
+                person = self.cast[key]
+                if person != besides and not access.owner_kinds(
+                    session, CONTROL, control_id, person
+                ):
+                    return person
+        raise AssertionError("nobody is left to test this control")
+
+    def _result(self, test_id: int, by: int, found: tuple[str, str, str, str]) -> int:
+        """Record what a test found, citing what is already held for the control or, more
+        often than not, something collected for the test."""
+        design, operation, sample, note = found
+        with self.db.read() as session:
+            control_id = session.get(ControlTest, test_id).control_id
+            held = [
+                item.ref
+                for item in session.scalars(
+                    select(Evidence)
+                    .join(EvidenceLink, EvidenceLink.evidence_id == Evidence.id)
+                    .where(
+                        EvidenceLink.subject_type == "control",
+                        EvidenceLink.subject_id == control_id,
+                    )
+                    .order_by(Evidence.id.desc())
+                )
+                if evidence.state_of(item, self.today) != "stale"
+            ][:1]
+        if not held and self.rng.random() < 0.75:
+            self._evidence(by, control_id, note)
+            return self._result(test_id, by, found)
+        with self.act(by) as (session, who):
+            result = assessments.record(
+                session, who, session.get(ControlTest, test_id), design=design,
+                operation=operation, sample=sample, note=note, evidence_refs=held,
+            )  # fmt: skip
+            self.tally("test results")
+            return result.id
+
+    def _confirm(self, result_id: int, by: int, *, confirm: bool = True, note: str | None = None) -> None:  # fmt: skip
+        with self.act(by) as (session, who):
+            result, test, _ = assessments.find_result(session, who, result_id)
+            assessments.review(session, who, result, confirm=confirm, note=note)
+            if confirm:
+                self.last_rated[test.control_id] = self.now
+
+    def _story_assessment(self) -> Script:
+        """The security team tests what central IT provides. Most results are counted, one is
+        sent back and recorded again, one waits for a second person, and two are still to do.
+        One control is found wanting, and shows as failing wherever it is inherited."""
+        lead = self.cast["assess1"]
+        yield self.ago(44)
+        with self.act(lead) as (session, who):
+            scope = session.scalars(
+                select(Scope).where(Scope.name == c.SCOPE_PROVIDER["name"])
+            ).one()
+            made = assessments.create(
+                session, who,
+                {"name": f"{c.ASSESSMENT['name']} {self.end.year}", "scope": scope.ref,
+                 "framework": c.SCOPE_PROVIDER["framework"][0], "period_start": self.today,
+                 "period_end": self.day(24), "approach": c.ASSESSMENT["approach"]},
+            )  # fmt: skip
+            planned = [
+                (test["id"], session.get(ControlTest, test["id"]).control_id)
+                for test in assessments.tests_of(session, who, made)
+            ]
+            self.tally("assessments")
+        finding_key, *finding = c.ASSESSMENT["finding"]
+        wanting = self.controls.get((finding_key, self.units["IT"]))
+        # The result that waits at the end is on a control the lead may review.
+        open_ = [each for each in planned if each[1] != wanting]
+        mine = [each for each in open_ if self._independent(each[1]) == lead]
+        waiting = mine[len(mine) // 2]
+        todo = [each for each in open_ if each != waiting][-2:]
+        done = [each for each in planned if each != waiting and each not in todo]
+        testers = {}
+        for index, (test_id, control_id) in enumerate(planned):
+            # The two assessors take turns, and each confirms what the other found. The lead
+            # keeps the last of the tests still to do.
+            each = (test_id, control_id)
+            turn = each == todo[-1] or (index % 2 == 1 and each not in (waiting, todo[0]))
+            tester = lead if turn and self._independent(control_id) == lead else None
+            tester = tester or self._independent(control_id, besides=lead)
+            testers[test_id] = tester
+            with self.act(lead) as (session, who):
+                assessments.update_test(
+                    session, who, session.get(ControlTest, test_id),
+                    {"assigned_to": tester, "method": self.rng.choice(["examine", "examine", "interview", "test"])},
+                )  # fmt: skip
+        for index, (test_id, control_id) in enumerate(done):
+            yield self.ago(40 - index * 3)
+            tester = testers[test_id]
+            if control_id == wanting:
+                found = tuple(finding)
+            else:
+                with self.db.read() as session:
+                    state = controls.state_of(session, session.get(Control, control_id))
+                outcome = state if state in ("partly", "ineffective") else "effective"
+                sample, note = self.rng.choice(c.TESTS[outcome])
+                design, operation = {
+                    "effective": ("effective", "effective"), "partly": ("effective", "partly"),
+                    "ineffective": ("partly", "ineffective"),
+                }[outcome]  # fmt: skip
+                found = (design, operation, sample, note)
+            result = self._result(test_id, tester, found)
+            reviewer = self._independent(control_id, besides=tester)
+            yield self.later(1, 2)
+            if index == 1:
+                # Sent back once, recorded again with what was asked for, then confirmed.
+                self._confirm(result, reviewer, confirm=False, note=c.ASSESSMENT["returned"])
+                yield self.later(1, 2)
+                design, operation, sample, note = found
+                again = (design, operation, f"{sample} Quarter three; ten instances.", note)
+                result = self._result(test_id, tester, again)
+                yield self.later(1, 2)
+            self._confirm(result, reviewer)
+        yield self.ago(2)
+        test_id, control_id = waiting
+        sample, note = c.TESTS["effective"][0]
+        self._result(test_id, testers[test_id], ("effective", "effective", sample, note))
+
+    # --- Issues and exceptions ------------------------------------------------------------
+
+    def _story_issues_later(self) -> Script:
+        """Issues begin once the scopes are there for them to be about."""
+        yield self.ago(232)
+        self.schedule(self._story_issues())
+
+    def _story_exceptions_later(self) -> Script:
+        yield self.ago(205)
+        self.schedule(self._story_exceptions())
+
+    def _raise(self, by: int, key: str, owner: int, **more: Any) -> int:
+        spec = c.ISSUES[key]
+        values = {
+            "name": spec.get("name"), "summary": spec["summary"], "severity": spec["severity"],
+            "org_unit_id": self.units[spec["unit"]], "source_kind": spec["source"],
+            "owner_id": owner, **more,
+        }  # fmt: skip
+        with self.act(by) as (session, who):
+            issue = issues.create(session, who, values)
+            self.tally("issues")
+            return issue.id
+
+    def _issue_actions(self, by: int, issue_id: int, wanted: list[tuple[str, int, bool]], owners: list[int]) -> list[tuple[str, int, bool]]:  # fmt: skip
+        made = []
+        for index, (title, due, done) in enumerate(wanted):
+            with self.act(by) as (session, who):
+                action = issues.add_action(
+                    session, who, session.get(Issue, issue_id), title=title,
+                    owner_id=owners[index % len(owners)], due_on=self.day(due),
+                )  # fmt: skip
+                made.append((action.ref, action.owner_id, done))
+                self.tally("actions")
+        return made
+
+    def _finish(self, actions: list[tuple[str, int, bool]]) -> None:
+        for ref, owner, done in actions:
+            if done:
+                with self.act(owner) as (session, who):
+                    treatment.update_action(
+                        session, who, treatment.find_action(session, ref), {"status": "done"}
+                    )
+
+    def _propose(self, by: int, issue_id: int, key: str) -> None:
+        spec = c.ISSUES[key]
+        cited = []
+        if spec.get("proof"):
+            name, note = spec["proof"]
+            with self.act(by) as (session, who):
+                item = records.create(
+                    session, who, EVIDENCE,
+                    {"name": name, "kind": "note", "note": note,
+                     "org_unit_id": self.units[spec["unit"]], "collected_on": self.today},
+                )  # fmt: skip
+                cited.append(item.ref)
+                self.tally("evidence")
+        with self.act(by) as (session, who):
+            issues.propose(
+                session, who, session.get(Issue, issue_id), note=spec["done"],
+                root_cause=spec["cause"], evidence_refs=cited,
+            )  # fmt: skip
+
+    def _issue_story(self, key: str, raised: float, by: int, owner: int, **more: Any) -> Script:
+        """One issue from the day it is raised to wherever it has got to."""
+        spec = c.ISSUES[key]
+        yield self.ago(raised)
+        issue = self._raise(by, key, owner, **more)
+        if spec["actions"]:
+            yield self.later(0.3, 1) if spec.get("urgent") else self.later(2, 6)
+            staff = self.staff[self.units[spec["unit"]]]
+            # Whoever noticed it helps to put it right, if they work there.
+            helper = (
+                by
+                if by != owner and by in staff
+                else next((person for person in staff if person != owner), owner)
+            )
+            actions = self._issue_actions(owner, issue, spec["actions"], [helper, owner])
+            yield self.later(2, 4) if spec.get("urgent") else self.later(12, 25)
+            self._finish(actions)
+        if spec.get("withdrawn"):
+            yield self.later(1, 3)
+            with self.act(self.cast["assess1"]) as (session, who):
+                issues.cancel(session, who, session.get(Issue, issue), reason=spec["withdrawn"])
+            return
+        if not spec.get("done"):
+            return
+        yield (
+            self.later(8, 20) if key == "visitors" else self.ago(20 if spec.get("returned") else 3)
+        )
+        self._propose(owner, issue, key)
+        if spec.get("returned"):
+            yield self.later(3, 4)
+            with self.act(self.cast["assess2"]) as (session, who):
+                issues.validate(
+                    session, who, session.get(Issue, issue), confirm=False, note=spec["returned"]
+                )
+            yield self.later(2, 3)
+            days, why = spec["moved"]
+            with self.act(owner) as (session, who):
+                issues.reschedule(
+                    session, who, session.get(Issue, issue), due_on=self.day(days), reason=why
+                )
+        elif key == "visitors":
+            yield self.later(4, 9)
+            with self.act(self.cast["assess2"]) as (session, who):
+                issues.validate(session, who, session.get(Issue, issue), confirm=True, note=None)
+
+    def _scope_named(self, session: Session, name: str) -> Scope:
+        return session.scalars(select(Scope).where(Scope.name == name)).one()
+
+    def _first_gap(self, name: str, framework: str, prefix: str = "") -> str:
+        """A requirement that nothing in a scope answers: the first under a prefix, or at all."""
+        with self.db.read() as session:
+            found = scopes.statement(
+                session, Principal.for_command(), self._scope_named(session, name), framework,
+                state="gap",
+            )  # fmt: skip
+        codes = [row["code"] for row in found["requirements"]]
+        return next((code for code in codes if code.startswith(prefix)), codes[0])
+
+    def _story_issues(self) -> Script:
+        """Issues at every stage: raised by someone who noticed, found by audit, sent back,
+        closed, withdrawn, and a gap nobody has taken up; and what is being done about the
+        control the assessment found wanting."""
+        member, chidi = self.cast["member"], self.cast["bio_mgr"]
+        bio = self.units["BIO"]
+        cold = next((cid for (_, unit), cid in sorted(self.controls.items()) if unit == bio), None)
+        about = []
+        if cold is not None:
+            with self.db.read() as session:
+                about = [session.get(Control, cold).ref]
+        self.schedule(self._issue_story("alarm", 75, member, chidi, subjects=about))
+        self.schedule(
+            self._issue_story("cabinets", 100, self.cast["risk2"], self.cast["pharm_mgr"])
+        )
+        fac, sp, it = (self.units[code] for code in ("FAC", "SP", "IT"))
+        walls = self.controls.get(("network_segmentation", it))
+        with self.db.read() as session:
+            about = [session.get(Control, walls).ref] if walls else []
+        self.schedule(
+            self._issue_story("pentest", 13, self.cast["assess1"], self.steward(it), subjects=about)
+        )
+        self.schedule(self._issue_story("visitors", 230, self.pick(fac), self.steward(fac)))
+        self.schedule(self._issue_story("letters", 170, self.cast["risk1"], self.steward(sp)))
+        self.schedule(self._issue_story("duplicate", 6, self.pick(it), self.steward(it)))
+        yield self.ago(200)
+        clinic = c.SCOPE_CLINIC
+        code = self._first_gap(clinic["name"], clinic["framework"][0], "164.310")
+        with self.db.read() as session:
+            scope_ref = self._scope_named(session, clinic["name"]).ref
+        self._raise(
+            self.cast["risk2"], "gap", self.steward(self.units["CLIN"]),
+            name=f"{code}: nothing answers it in {clinic['name']}", subjects=[scope_ref],
+            requirements=[{"framework": clinic["framework"][0], "code": code}],
+        )  # fmt: skip
+        # The assessment's own finding: its owners have a plan, and have done half of it.
+        yield self.ago(4)
+        finding = self.controls.get((c.ASSESSMENT["finding"][0], it))
+        with self.db.read() as session:
+            control = session.get(Control, finding) if finding else None
+            found = issues.open_for_test(session, control) if control is not None else None
+            issue = found.id if found is not None else None
+        if issue is not None:
+            steward = self.steward(it)
+            actions = self._issue_actions(steward, issue, c.FINDING_ACTIONS, [steward])
+            yield self.later(1, 2)
+            self._finish(actions)
+
+    def _ask(self, by: int, key: str, values: dict[str, Any]) -> int:
+        spec = c.EXCEPTIONS[key]
+        with self.act(by) as (session, who):
+            item = exceptions.request(
+                session, who,
+                {"justification": spec["why"], "compensating": spec["instead"], **values},
+            )  # fmt: skip
+            self.tally("exceptions")
+            return item.id
+
+    def _decide(self, by: int, exception_id: int, key: str) -> None:
+        spec = c.EXCEPTIONS[key]
+        with self.act(by) as (session, who):
+            exceptions.decide(
+                session, who, session.get(ExceptionRequest, exception_id),
+                approve="refused" not in spec, note=spec.get("refused") or spec.get("note"),
+            )  # fmt: skip
+
+    def _story_exceptions(self) -> Script:
+        """Exceptions at every stage: one that has ended, one refused, one in force, one about
+        to end, and one waiting to be decided."""
+        clinic, enclave = c.SCOPE_CLINIC, c.SCOPE_ENCLAVE
+        clin, rc, it = (self.units[code] for code in ("CLIN", "RC", "IT"))
+        with self.db.read() as session:
+            refs = {
+                name: self._scope_named(session, name).ref
+                for name in (clinic["name"], enclave["name"])
+            }
+
+        def control(key: str, unit: int) -> str:
+            with self.db.read() as session:
+                return session.get(Control, self.controls[(key, unit)]).ref
+
+        yield self.ago(200)
+        logs = self._ask(
+            self.steward(rc), "logs",
+            {"scope": refs[enclave["name"]], "control": control("logging_monitoring", self.units["SEC"]),
+             "expires_on": self.day(-35)},
+        )  # fmt: skip
+        yield self.later(3, 5)
+        self._decide(self.cast["rc_dir"], logs, "logs")
+        yield self.ago(90)
+        patching = self._ask(
+            self.steward(it),
+            "patching",
+            {"control": control("patching", it), "expires_on": self.day(120)},
+        )
+        yield self.later(3, 5)
+        self._decide(self.cast["cio"], patching, "patching")
+        yield self.ago(60)
+        code = self._first_gap(enclave["name"], enclave["framework"][0], "03.10")
+        rooms = self._ask(
+            self.steward(rc), "rooms",
+            {"scope": refs[enclave["name"]], "expires_on": self.day(150),
+             "requirement": {"framework": enclave["framework"][0], "code": code}},
+        )  # fmt: skip
+        yield self.later(2, 4)
+        self._decide(self.cast["rc_dir"], rooms, "rooms")
+        yield self.ago(6)
+        leavers = self._ask(
+            self.steward(clin), "leavers",
+            {"scope": refs[clinic["name"]], "expires_on": self.day(21),
+             "control": control("access_removed_on_leaving", it)},
+        )  # fmt: skip
+        yield self.later(1, 2)
+        self._decide(self.cast["clinic_lead"], leavers, "leavers")
+        yield self.ago(2)
+        self._ask(
+            self.steward(clin), "training",
+            {"scope": refs[clinic["name"]], "expires_on": self.day(170),
+             "control": control("security_training", self.units["SEC"])},
+        )  # fmt: skip
+
     def _story_escalated(self) -> Script:
         """A lab's privacy risk raised to its department, with the reason."""
         lab = self.labs["PS"][0]
@@ -1555,6 +2133,7 @@ class Builder:
             for lab in labs:
                 self.schedule(self._lab_inventory(lab))
         self.schedule(self._links())
+        self.schedule(self._information())
         for unit, key, start, owner in self._plan_risks():
             self.schedule(self._risk(unit, key, start, owner))
         for story in (
@@ -1562,6 +2141,8 @@ class Builder:
             self._story_authority, self._story_costs, self._story_supplier,
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
+            self._story_agreement, self._story_scopes, self._story_assessment,
+            self._story_issues_later, self._story_exceptions_later,
         ):  # fmt: skip
             self.schedule(story())
         self.run()
@@ -1574,14 +2155,16 @@ class Builder:
         return Summary(self.seed, self.end.date(), dict(sorted(self.counts.items())), self.sample)
 
 
-def build(db: Database, *, seed: int = 1, today: date | None = None) -> Summary:
+def build(
+    db: Database, *, seed: int = 1, today: date | None = None, files: Path | None = None
+) -> Summary:
     """Build the demo organization in an empty, migrated database."""
     with db.read() as session:
         if settings.get(session, SETTING) is not None or units.all_units(session):
             raise RiskWrenError("This installation already has an organization in it.")
     from riskwren.core.clock import today as real_today
 
-    return Builder(db, seed=seed, today=today or real_today()).build()
+    return Builder(db, seed=seed, today=today or real_today(), files=files).build()
 
 
 def marker(session: Session) -> dict[str, Any] | None:
