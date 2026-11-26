@@ -12,6 +12,8 @@ The bell at the top right counts what has been assigned to you or decided for yo
 
 The figures above the list count the same things for everything you may see, and each opens the list it counts.
 
+![Home for a unit's steward: figures for the unit, then what is waiting on them, most urgent first](img/home-steward-light.webp)
+
 ## The inventory
 
 The inventory is what the organization has and depends on. It has four kinds of record:
@@ -26,6 +28,8 @@ The inventory is what the organization has and depends on. It has four kinds of 
 Every record has a name, a unit, a criticality, the most sensitive class of data it touches, and named owners. Systems also say how they are hosted and where they are in their life: planned, in service, being retired, or unsupported.
 
 The inventory is open to everyone signed in. A unit's steward or a manager adds records; owners and stewards keep them current.
+
+![A system's page: what it is, its criticality and data class, its owners, and what it relies on](img/system-light.webp)
 
 ### Links
 
@@ -47,6 +51,8 @@ A link is made once, from either end, and can be read from both. A lab can say t
 
 Every record has a **Connections** link beside its name. It opens a picture of everything joined to the record: its links in both directions, the risks that bear on it, the controls that reduce them, the scopes it is in, and the evidence, issues, and exceptions about it. A list beside the picture says the same in full. See [Connections](compliance.md#connections).
 
+![The connections of a system: what relies on it, the risks that bear on it, and the controls that reduce them](img/graph-system-light.webp)
+
 ### Known elsewhere as
 
 A record can carry what it is called in other systems: an asset tag, a contract number, a ticket, an entry in a configuration database. **Known elsewhere as → Edit** on the record. Search finds a record by any of them, and where the system has an address pattern they are links.
@@ -63,6 +69,8 @@ A steward or a manager can **Import** processes, systems, third parties, informa
 4. **Import**, once every row is good.
 
 Each row is added as if by hand, by the same rules, in your name. Nothing is added unless every row can be, and a file imported twice adds nothing the second time. A file exported from one installation imports into another with its references kept. A rating is never imported: what a file says of how a control works, or how much risk remains, is a judgment to be made here by a named person.
+
+![Importing systems from a spreadsheet: each column of the file matched to a field, before anything is checked or added](img/import-matched-light.webp)
 
 ### Owners
 
@@ -114,6 +122,8 @@ These are two different things, and RiskWren always shows them apart.
 
 A critical risk that is accepted is in order. A moderate one in a category with a low appetite, with no plan and no acceptance, is not.
 
+![A risk's page: its inherent, residual, and target ratings side by side, and its standing shown apart from them](img/risk-light.webp)
+
 ### Reviews
 
 Each risk has a next review date, sooner the more is at stake: by default every 3 months for critical, 6 for high, 12 for moderate, and 24 for low. A review is a new residual assessment, even when nothing has changed; say so in the reason. A risk past its date shows as overdue, on its page and on its owner's Home.
@@ -164,6 +174,8 @@ Once a risk has an inherent rating and linked controls, RiskWren shows the resid
 
 So a critical risk at likelihood 4 and impact 5, with one primary control that works, one that partly works, and impact controls adding up to one, is suggested at likelihood 3 and impact 4: high.
 
+![What the controls suggest for a risk: the residual rating they point to, with the working behind it](img/risk-suggested-light.webp)
+
 The suggestion is arithmetic and nothing more. The person assessing sees it, and then records their own judgment, which may agree or differ. If it differs, the reason says why, and both are kept.
 
 ### When the picture changes
@@ -185,6 +197,8 @@ A treatment plan says what will be achieved, who owns it, by when, and the ratin
 
 **Treatment plans** and **Actions** in the sidebar list them across everything you may see. Actions can be filtered to your own and to those overdue.
 
+![A risk's Treatment tab: its plan, the plan's actions with their owners and dates, and the rating it aims for](img/risk-treatment-light.webp)
+
 ### Accept a risk
 
 Accepting a risk is a decision by a named leader to live with what remains, for a stated reason, until a date. Three rules always hold:
@@ -195,6 +209,8 @@ Accepting a risk is a decision by a named leader to live with what remains, for 
 
 If you may not accept a risk, its page says why and what is needed. An acceptance can carry **conditions**, the things that must stay true while it runs.
 
+![A high risk that its unit's leader may not accept: the page says why, and what is needed](img/risk-beyond-limit-light.webp)
+
 An acceptance covers the rating that was accepted. If the residual rating later rises above it, or the acceptance expires or is withdrawn, the risk needs a decision again. **Acceptances** in the sidebar lists them, soonest to expire first, and can show only those expiring within 30 or 90 days.
 
 ## Seeing the whole
@@ -203,5 +219,7 @@ An acceptance covers the rating that was accepted. If the residual rating later 
 - **Heat map** places every rated risk on the matrix, for the residual, inherent, or target rating, for a unit and everything beneath it, or for one category. Each cell opens the risks in it.
 - **Reports → Risk** shows where the register stands, and **Reports → Compliance** how ready each scope is against what it is held to. Every figure opens the list it counts. See [Read the dashboards](running-the-program.md#read-the-dashboards).
 - **⌘K** (or Ctrl K) finds any record by name or reference.
+
+![The heat map: every rated risk placed by likelihood and impact, with the number of risks in each cell](img/heat-map-light.webp)
 
 What you see in all of these is what you are allowed to see. See [Who sees what](running-the-program.md#who-sees-what).

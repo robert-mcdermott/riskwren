@@ -19,6 +19,8 @@ A new installation has four, each built from its publisher's own machine-readabl
 
 Each shows its publisher, version, license, and where it came from. Anyone signed in can browse a framework's tree, search it, narrow it to a baseline, and read any requirement in full.
 
+![A framework's page: its tree of requirements, a search, and how many of them have a control](img/framework-light.webp)
+
 A heading is not a requirement. Families, functions, and sections that only introduce others are kept in the tree and cannot be mapped or tested. What can be is called **citable**.
 
 ### A framework of your own
@@ -37,6 +39,8 @@ A mapping says that a control helps to satisfy a requirement, **in full** or **i
 
 - From a control, open its **Requirements** tab: it lists what the control answers, in every framework, and adds more.
 - From a requirement, open it in its framework: it lists the controls that answer it, and adds one.
+
+![A control's Requirements tab: the requirements it answers in each framework, in full or in part](img/control-requirements-light.webp)
 
 A control started from the library of common controls arrives already mapped: 27 of the 56 carry suggested mappings to the built-in frameworks. A suggestion is marked as suggested and as answering in part, because a plain-words control rarely answers the whole of a requirement that has a dozen parts. Change one and it is yours.
 
@@ -69,6 +73,8 @@ Another scope then uses **Controls → Inherit a control**, and chooses how:
 
 People in the inheriting scope see whose control they rely on, where it stands, and how well it is known to work, without being able to open the provider's record. A provider cannot stop offering a control, or stop using it, while another scope inherits it.
 
+![A scope's Controls tab: controls shared with or inherited from the central scope, each with where it stands here and how well it is known to work](img/scope-controls-light.webp)
+
 ## Readiness
 
 For a scope and a framework, each requirement that applies is in exactly one state. It is worked out and never typed in.
@@ -83,6 +89,8 @@ For a scope and a framework, each requirement that applies is in exactly one sta
 | **Failing** | A test that still holds found a control that answers it partly effective or ineffective |
 
 A requirement is as ready as the weakest control that answers it. Each control in the list carries a sentence saying how it came to be where it is: "Tested effective on 2026-10-16, with evidence that still counts", or "In place, with no test result that still holds".
+
+![A scope's requirements narrowed to those failing: each names the inherited control a test found partly effective, and when](img/scope-failing-light.webp)
 
 Three things follow, and they are the point of the design:
 
@@ -105,6 +113,8 @@ The **Requirements** tab can be narrowed to any one state. A requirement that is
 | Evidence no longer counting | Evidence past the date it holds until |
 | Exceptions ending within a month | Approved exceptions whose last day is within 30 days |
 
+![The compliance dashboard: six figures, then each scope against the framework it is held to, in the six states](img/compliance-light.webp)
+
 Below them:
 
 - **Readiness by scope**: each scope against each framework it is held to, in the six states, with the share that is ready (in place or verified) and its open issues. Each count opens the scope's requirements in that state. A requirement that three scopes must meet is three things to make ready, and is counted once in each.
@@ -121,5 +131,7 @@ Every figure is the count of a list, and opens that list with the same filters. 
 Every record has a **Connections** link beside its name. It opens a picture of what the record is joined to: what it relies on and what relies on it, the risks that bear on it, the controls that reduce them, the scopes it sits in, and the evidence, issues, exceptions, and assessments about it.
 
 The button on a neighbor shows what lies beyond it without leaving the page, and choosing a neighbor puts it in the middle. A list beside the picture says the same in full, so nothing is told by the picture alone. Everything in it can be reached and opened with the keyboard.
+
+![How a scope is connected: the controls it uses, the records it covers, and its issues and exceptions, with one neighbor expanded](img/graph-expanded-light.webp)
 
 For a security lead this answers the questions that come up in an incident or a review: what does this system support, which scopes is it in, what controls stand in front of it, and what is already known to be wrong with them.

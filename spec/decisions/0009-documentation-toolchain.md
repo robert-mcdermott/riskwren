@@ -25,6 +25,7 @@ The application itself is Python managed with uv and has a strict dependency bud
 - Nothing to install, lock, or patch for the documentation tooling.
 - The Markdown renderer supports the subset the guides use; the guides are written within it.
 - Retaking every screenshot is one command and takes minutes, so it happens at every release.
+- The pictures the guides and the home page name are committed, as WebP, in both themes: about 7 MB. A picture nothing names is not kept, and a test says so.
 
 ## Alternatives
 

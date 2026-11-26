@@ -107,13 +107,17 @@ export async function openBrowser() {
       await waitFor(`document.querySelector("h1") && !document.querySelector("[aria-busy='true']")`, "the page to draw");
       await new Promise((resolve) => setTimeout(resolve, 250));
     },
-    async screenshot(file, { fullPage = false } = {}) {
+    /** A picture of the page. The file's ending chooses the format: .webp (smaller) or .png. */
+    async screenshot(file, { fullPage = false, quality = 82, scale = 1 } = {}) {
       let clip;
       if (fullPage) {
+        // A picture can be 16,383 pixels tall at most, and the screen is drawn at twice its size.
         const { cssContentSize } = await page("Page.getLayoutMetrics");
-        clip = { x: 0, y: 0, width: cssContentSize.width, height: cssContentSize.height, scale: 1 };
+        clip = { x: 0, y: 0, width: cssContentSize.width, height: Math.min(cssContentSize.height, Math.floor(8000 / scale)), scale };
       }
-      const { data } = await page("Page.captureScreenshot", { format: "png", clip, captureBeyondViewport: fullPage });
+      const format = file.endsWith(".webp") ? "webp" : "png";
+      const { data } = await page("Page.captureScreenshot", {
+        format, quality: format === "webp" ? quality : undefined, clip, captureBeyondViewport: fullPage });
       writeFileSync(file, Buffer.from(data, "base64"));
     },
     async close() {

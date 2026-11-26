@@ -22,6 +22,8 @@ export const SCENES = [
   { name: "risks", as: "cro", path: "/risks" },
   { name: "risk", as: "bio_mgr", path: risk("irreplaceable specimens from freezer") },
   { name: "risk-controls", as: "bio_mgr", path: risk("irreplaceable specimens from freezer", "controls") },
+  { name: "risk-suggested", as: "bio_mgr", path: risk("irreplaceable specimens from freezer", "controls"),
+    step: `(([...document.querySelectorAll(".card")].find((card) => card.textContent.includes("What the controls suggest"))) ?? (window.__sceneMissed = "What the controls suggest", document.body)).scrollIntoView({ block: "center" })` },
   { name: "risk-treatment", as: "bio_mgr", path: risk("irreplaceable specimens from freezer", "treatment") },
   { name: "risk-assessments", as: "bio_mgr", path: risk("irreplaceable specimens from freezer", "assessments") },
   { name: "risk-history", as: "cro", path: risk("irreplaceable specimens from freezer", "history") },
