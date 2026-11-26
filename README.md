@@ -60,7 +60,7 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.2.0 adds compliance to the register.
+Version 0.2.0 added compliance to the register. Version 0.2.1 adds nineteen security controls to the library of common controls, which now reach about three quarters of each built-in framework, and a documentation site.
 
 **Compliance, new in 0.2.0**
 

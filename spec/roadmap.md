@@ -63,7 +63,7 @@ Detail: [waves/wave-2.md](waves/wave-2.md) · Detail of the content: [content-pa
 
 ## Documentation site (between v0.2.0 and v0.3.0) ☑
 
-**Goal:** a product site that lets someone outside the project find RiskWren, see it, and try it.
+**Goal:** a product site that lets someone outside the project find RiskWren, see it, and try it. Released with v0.2.1, together with a wider library of common controls and a demo whose scopes show a program in working order.
 
 It waited until the main screens had settled; screenshots taken during wave 1 would have been stale within weeks. The Markdown in the repository is still the documentation, and the site is built from it unchanged.
 

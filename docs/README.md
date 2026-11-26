@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.2.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.2.1. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
@@ -55,7 +55,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.2.0 is the register and compliance: an inventory, risks, controls, and treatment; frameworks, scopes, evidence, tests, issues, and exceptions. It signs in with local accounts and sends no email: notices are in the app. Single sign-on, email, reminders, attestations, and scheduled jobs arrive in the next release, and until then dates are caught up when the register is read. Policies, supplier reviews, audits, and incidents follow in later ones. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.2.1 is the register and compliance: an inventory, risks, controls, and treatment; frameworks, scopes, evidence, tests, issues, and exceptions. It signs in with local accounts and sends no email: notices are in the app. Single sign-on, email, reminders, attestations, and scheduled jobs arrive in the next release, and until then dates are caught up when the register is read. Policies, supplier reviews, audits, and incidents follow in later ones. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

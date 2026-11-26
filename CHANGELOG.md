@@ -6,7 +6,13 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
-### Upgrading
+Nothing yet.
+
+## 0.2.1 (2026-11-26)
+
+The common controls reach the frameworks, and the documentation has a site with pictures.
+
+### Upgrading from 0.2.0
 
 Run `uv sync`, then `uv run riskwren db upgrade`. There are no migrations. The upgrade adds
 the new controls to the library of common controls and refreshes its suggested mappings.
