@@ -45,6 +45,15 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   none. Messages wait in an outbox in the database, so a mail server that is down is tried
   again, and turning email on does not send anyone their history. `riskwren mail test`
   and `doctor` check the settings.
+- **Questionnaires as data.** A questionnaire is a document of sections and questions that
+  can appear only when an earlier answer makes them relevant. Four are built in: control
+  attestation, risk self-assessment, a unit completeness check, and a system security
+  profile. Those who run the program edit them in the app, with the form as it will be asked
+  shown as they go.
+- **Versions that are never changed.** Saving changed questions publishes a new version, and
+  an answer is always read against the version it was given to, so it reads as it was asked.
+- **One condition language,** evaluated by the server and by the browser with the same
+  rules, held together by shared test cases. No expression is ever run as code.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
 

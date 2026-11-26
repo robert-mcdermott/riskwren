@@ -50,6 +50,14 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("POST", "/api/v1/mail/test"): Needs.ADMIN,
     ("GET", "/api/v1/session/preferences"): Needs.MEMBER,
     ("PUT", "/api/v1/session/preferences"): Needs.MEMBER,
+    # Questionnaires: anyone reads and answers; those who run the program change them.
+    ("GET", "/api/v1/questionnaires"): Needs.MEMBER,
+    ("POST", "/api/v1/questionnaires"): Needs.CONFIGURE,
+    ("POST", "/api/v1/questionnaires/check"): Needs.CONFIGURE,
+    ("GET", "/api/v1/questionnaires/{key}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/questionnaires/{key}"): Needs.CONFIGURE,
+    ("POST", "/api/v1/questionnaires/{key}/responses"): Needs.MEMBER,
+    ("GET", "/api/v1/responses/{response_id}"): Needs.MEMBER,
     # People
     ("GET", "/api/v1/accounts"): Needs.MEMBER,  # the people picker; members see names only
     ("POST", "/api/v1/accounts"): Needs.ADMIN,

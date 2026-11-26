@@ -130,6 +130,9 @@ Every route requires a signed-in account except those marked public. What a rout
 | `POST /session/password` | Change your own password |
 | `GET /sso/start` · `GET /sso/callback` | The single sign-on round trip, for a browser (public; 404 unless it is set up) |
 | `GET` · `PUT /session/preferences` | How you want notices by email, where email is set up |
+| `GET` · `POST /questionnaires` · `GET` · `PATCH /questionnaires/{key}` | Questionnaires and their versions; a changed document is published as a new version (changing them is for those who run the program) |
+| `POST /questionnaires/check` | Check a document without saving it, and see which questions given answers would show |
+| `POST /questionnaires/{key}/responses` · `GET /responses/{id}` | Answer a questionnaire, as a draft or in full; read answers as they were asked |
 | `GET /jobs` · `POST /jobs/{key}/run` · `PUT /jobs/{key}` | Scheduled work: how it is going, run one job now, pause or resume one (administrators) |
 | `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
 | `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |

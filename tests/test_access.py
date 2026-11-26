@@ -288,6 +288,13 @@ RECORD_PATHS = {
 }
 REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
+REACH[("GET", "/api/v1/questionnaires")] = EVERYONE
+REACH[("POST", "/api/v1/questionnaires")] = {"admin", "manager"}
+REACH[("POST", "/api/v1/questionnaires/check")] = {"admin", "manager"}
+REACH[("GET", "/api/v1/questionnaires/{key}")] = EVERYONE
+REACH[("PATCH", "/api/v1/questionnaires/{key}")] = {"admin", "manager"}
+REACH[("POST", "/api/v1/questionnaires/{key}/responses")] = EVERYONE
+REACH[("GET", "/api/v1/responses/{response_id}")] = EVERYONE
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):

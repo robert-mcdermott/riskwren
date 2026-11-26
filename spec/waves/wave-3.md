@@ -57,15 +57,17 @@ Local accounts stay the default and are never removed: an evaluation or a small 
 
 **Done:** four jobs run inside the server: the calendar, reminders, email, and housekeeping. A process claims a job's row before running it, with a lease that lapses if the process dies, so several workers, several servers, and `riskwren jobs run` from a scheduled task run each job once between them; what is due comes from the database and the clock, so a restart catches up. Runs that did something, and failures with their reason, are kept for ninety days. Admin → Scheduled work shows each job and can run or pause it; `riskwren jobs` does the same. Reminders look at everything with a date: actions, risk reviews, issues, evidence, acceptances, exceptions, and control tests. Whoever it waits on is told two weeks ahead and the day after; actions and issues that stay late go to the unit's steward after a week and its leader after three. Each stage is said once for a given date, moving the date starts again, and something found long overdue is told once at the stage it has reached. The three periods and the shorter cadence for key controls are in the program's cadences; a control shows when its next test is due. Email is optional: with `[mail]` set, notices go to an outbox in the database and are sent from there, each as it happens or as a daily summary by each person's choice, with retries and a limit, and nothing written before email was set up is ever sent. Editing the cadence table in the app waits for slice 7 with the other program editors. Acceptance tests are in `tests/test_schedule.py` (two connections to one database run a job once between them; an action reminds its owner, then the steward, then the leader) and `tests/test_mail.py`, which sends over real SMTP to a server inside the test (with no mail server, nothing is attempted and nothing is sent later).
 
-### Slice 3: Questionnaires ☐
+### Slice 3: Questionnaires ☑
 
 **Goal:** questions as data, asked the same way everywhere.
 
-- [ ] Questionnaires as versioned documents of sections and questions with conditions
-- [ ] One condition evaluator, in Python and in JavaScript, held together by shared test cases
-- [ ] Answers kept with the version they were given under
+- [x] Questionnaires as versioned documents of sections and questions with conditions
+- [x] One condition evaluator, in Python and in JavaScript, held together by shared test cases
+- [x] Answers kept with the version they were given under
 
 **Acceptance:** the same cases pass in both evaluators; an answer still reads as asked after the questionnaire changes.
+
+**Done:** the condition language of the engine document is `riskwren.core.conditions`: `all`, `any`, `not`, and thirteen comparisons over named fields, as plain data; a malformed condition is refused with what is wrong and where. Its twin in the browser is `js/core/conditions.js`, and both pass the 64 cases in `tests/fixtures/conditions-cases.json`. A questionnaire is a key, a purpose, and versions; a version is a document of sections and questions (yes or no, one or any of a list, text, a number, a date), each of which may carry a rule over earlier answers. A document is checked whole: keys, kinds, options, and that every rule is well formed and looks only backwards. Which questions show, and which answers count, is `showing`, on the server and in the browser, held together by 21 shared cases; an answer to a question that has become hidden is dropped. Saving a changed document publishes a new version and leaves the others alone; a response records its version and is read through it, as the questions and options stood then; a draft is finished under the version it was begun under. Four questionnaires are built in and loaded at `init` and on upgrade; one the organization has edited is left alone by later releases. Admin → Questionnaires lists them; each has a form to try that reacts as it is filled in, an outline with every rule in words, its versions, and a structured editor. The acceptance tests are `tests/test_conditions.py` with `tests/js/conditions.test.mjs`, and `tests/test_questionnaires.py::test_a_change_is_a_new_version_and_an_answer_reads_as_it_was_asked`. Who is asked what, by when, is the next slice: nothing sends a questionnaire to anyone yet.
 
 ### Slice 4: Campaigns ☐
 

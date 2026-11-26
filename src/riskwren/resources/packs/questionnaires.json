@@ -1,0 +1,697 @@
+{
+  "pack": {
+    "key": "questionnaires",
+    "kind": "questionnaires",
+    "title": "Built-in questionnaires",
+    "version": "1",
+    "pack_version": "0.3.0",
+    "publisher": "The RiskWren Authors",
+    "license": "Apache-2.0"
+  },
+  "questionnaires": [
+    {
+      "key": "control-attestation",
+      "title": "Control attestation",
+      "purpose": "attestation",
+      "summary": "A control's owner confirms that it still operates as described, or says what has changed. An attestation is the owner's word. It is not a test.",
+      "document": {
+        "sections": [
+          {
+            "key": "control",
+            "title": "The control",
+            "questions": [
+              {
+                "key": "operates",
+                "label": "Does this control still operate as its statement describes?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "yes",
+                    "label": "Yes"
+                  },
+                  {
+                    "key": "partly",
+                    "label": "Partly"
+                  },
+                  {
+                    "key": "no",
+                    "label": "No"
+                  }
+                ]
+              },
+              {
+                "key": "difference",
+                "label": "What is different from the statement?",
+                "type": "long_text",
+                "help": "Say what is done now, and since when.",
+                "required": true,
+                "show_when": {
+                  "field": "answers.operates",
+                  "op": "in",
+                  "value": [
+                    "partly",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "key": "statement_right",
+                "label": "Is the statement itself still the right description of what should be done?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "statement_change",
+                "label": "What should it say?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.statement_right",
+                  "op": "eq",
+                  "value": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "proof",
+            "title": "Proof",
+            "questions": [
+              {
+                "key": "evidence",
+                "label": "Is there evidence on record, still in date, that shows it?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "yes",
+                    "label": "Yes"
+                  },
+                  {
+                    "key": "out_of_date",
+                    "label": "There is, and it is out of date"
+                  },
+                  {
+                    "key": "none",
+                    "label": "None is kept"
+                  }
+                ]
+              },
+              {
+                "key": "evidence_plan",
+                "label": "Who will collect it, and by when?",
+                "type": "text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.evidence",
+                  "op": "in",
+                  "value": [
+                    "out_of_date",
+                    "none"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "people",
+            "title": "Who answers for it",
+            "questions": [
+              {
+                "key": "owner_right",
+                "label": "Are you still the right person to answer for this control?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "owner_instead",
+                "label": "Who should it be?",
+                "type": "text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.owner_right",
+                  "op": "eq",
+                  "value": false
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "risk-self-assessment",
+      "title": "Risk self-assessment",
+      "purpose": "self_assessment",
+      "summary": "A risk's owner looks at it again: whether it still stands, what has changed, and whether its rating and its plan are still right.",
+      "document": {
+        "sections": [
+          {
+            "key": "standing",
+            "title": "Does it still stand?",
+            "questions": [
+              {
+                "key": "relevant",
+                "label": "Could this still happen here?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "why_not",
+                "label": "Why not?",
+                "type": "long_text",
+                "help": "For example: the system was retired, or the work has stopped.",
+                "required": true,
+                "show_when": {
+                  "field": "answers.relevant",
+                  "op": "eq",
+                  "value": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "changes",
+            "title": "What has changed",
+            "show_when": {
+              "field": "answers.relevant",
+              "op": "eq",
+              "value": true
+            },
+            "questions": [
+              {
+                "key": "changed",
+                "label": "Since it was last assessed, what has changed?",
+                "type": "choices",
+                "required": true,
+                "options": [
+                  {
+                    "key": "cause",
+                    "label": "What could cause it"
+                  },
+                  {
+                    "key": "likelihood",
+                    "label": "How likely it is"
+                  },
+                  {
+                    "key": "impact",
+                    "label": "What it would cost"
+                  },
+                  {
+                    "key": "controls",
+                    "label": "The controls, or how well they work"
+                  },
+                  {
+                    "key": "nothing",
+                    "label": "Nothing"
+                  }
+                ]
+              },
+              {
+                "key": "what_changed",
+                "label": "Say what has changed.",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.changed",
+                  "op": "contains_any",
+                  "value": [
+                    "cause",
+                    "likelihood",
+                    "impact",
+                    "controls"
+                  ]
+                }
+              },
+              {
+                "key": "controls_working",
+                "label": "Are the controls linked to it working?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "yes",
+                    "label": "Yes"
+                  },
+                  {
+                    "key": "partly",
+                    "label": "Partly"
+                  },
+                  {
+                    "key": "no",
+                    "label": "No"
+                  },
+                  {
+                    "key": "unknown",
+                    "label": "I do not know"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "rating",
+            "title": "Rating and plan",
+            "show_when": {
+              "field": "answers.relevant",
+              "op": "eq",
+              "value": true
+            },
+            "questions": [
+              {
+                "key": "rating_right",
+                "label": "Is the residual rating on record still right?",
+                "type": "yes_no",
+                "help": "If it is not, assess the risk again after answering.",
+                "required": true
+              },
+              {
+                "key": "rating_note",
+                "label": "Should it be higher or lower, and why?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.rating_right",
+                  "op": "eq",
+                  "value": false
+                }
+              },
+              {
+                "key": "plan",
+                "label": "Is the treatment plan on track?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "yes",
+                    "label": "Yes"
+                  },
+                  {
+                    "key": "late",
+                    "label": "It is running late"
+                  },
+                  {
+                    "key": "none",
+                    "label": "There is no plan"
+                  }
+                ]
+              },
+              {
+                "key": "plan_note",
+                "label": "What is holding it up?",
+                "type": "long_text",
+                "show_when": {
+                  "field": "answers.plan",
+                  "op": "eq",
+                  "value": "late"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "unit-completeness",
+      "title": "Unit completeness check",
+      "purpose": "completeness",
+      "summary": "A unit's steward confirms that what the unit has and depends on is on record, and that the right people are named.",
+      "document": {
+        "sections": [
+          {
+            "key": "inventory",
+            "title": "What the unit has",
+            "questions": [
+              {
+                "key": "complete",
+                "label": "Are the unit's processes, systems, third parties, and information all on record?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "yes",
+                    "label": "Yes"
+                  },
+                  {
+                    "key": "mostly",
+                    "label": "Mostly"
+                  },
+                  {
+                    "key": "no",
+                    "label": "No"
+                  }
+                ]
+              },
+              {
+                "key": "missing",
+                "label": "What is missing?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.complete",
+                  "op": "in",
+                  "value": [
+                    "mostly",
+                    "no"
+                  ]
+                }
+              },
+              {
+                "key": "new_this_year",
+                "label": "In the past year, has the unit taken on a system, a supplier, or a body of sensitive data that is not yet on record?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "new_detail",
+                "label": "What, and who looks after it?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.new_this_year",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              {
+                "key": "retired",
+                "label": "Is anything on record that the unit no longer has?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "retired_detail",
+                "label": "What should be retired?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.retired",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "people",
+            "title": "Who answers for it",
+            "questions": [
+              {
+                "key": "owners_right",
+                "label": "Does every record name an owner who is still here and still the right person?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "owners_detail",
+                "label": "Which records need a new owner?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.owners_right",
+                  "op": "eq",
+                  "value": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "risks",
+            "title": "What could go wrong",
+            "questions": [
+              {
+                "key": "unrecorded",
+                "label": "Is there something that worries you about the unit's work that is not in the register?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "unrecorded_detail",
+                "label": "What is it?",
+                "type": "long_text",
+                "help": "A sentence is enough. Someone will follow up.",
+                "required": true,
+                "show_when": {
+                  "field": "answers.unrecorded",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "system-security-profile",
+      "title": "System security profile",
+      "purpose": "self_assessment",
+      "summary": "Whoever runs a system says how it is protected: what it holds, who can reach it, and who patches, backs up, and watches it.",
+      "document": {
+        "sections": [
+          {
+            "key": "exposure",
+            "title": "What it holds and who can reach it",
+            "questions": [
+              {
+                "key": "data",
+                "label": "What does the system hold or handle?",
+                "type": "choices",
+                "required": true,
+                "options": [
+                  {
+                    "key": "public",
+                    "label": "Only what is public"
+                  },
+                  {
+                    "key": "internal",
+                    "label": "Internal information"
+                  },
+                  {
+                    "key": "personal",
+                    "label": "Personal information"
+                  },
+                  {
+                    "key": "health",
+                    "label": "Health information"
+                  },
+                  {
+                    "key": "research",
+                    "label": "Controlled research data"
+                  },
+                  {
+                    "key": "financial",
+                    "label": "Financial or payment information"
+                  }
+                ]
+              },
+              {
+                "key": "internet",
+                "label": "Can it be reached from the internet?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "users",
+                "label": "About how many people can sign in to it?",
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "key": "access",
+            "title": "Signing in",
+            "questions": [
+              {
+                "key": "sign_in",
+                "label": "How do people sign in?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "sso",
+                    "label": "With the organization's single sign-on"
+                  },
+                  {
+                    "key": "own",
+                    "label": "With accounts the system keeps itself"
+                  },
+                  {
+                    "key": "shared",
+                    "label": "With an account that people share"
+                  }
+                ]
+              },
+              {
+                "key": "second_factor",
+                "label": "Is a second factor required?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "all",
+                    "label": "For everyone"
+                  },
+                  {
+                    "key": "admins",
+                    "label": "For administrators only"
+                  },
+                  {
+                    "key": "none",
+                    "label": "No"
+                  }
+                ]
+              },
+              {
+                "key": "second_factor_why",
+                "label": "Why is no second factor required for everyone?",
+                "type": "long_text",
+                "help": "It can be reached from the internet, or it holds sensitive information.",
+                "required": true,
+                "show_when": {
+                  "all": [
+                    {
+                      "field": "answers.second_factor",
+                      "op": "in",
+                      "value": [
+                        "admins",
+                        "none"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "field": "answers.internet",
+                          "op": "eq",
+                          "value": true
+                        },
+                        {
+                          "field": "answers.data",
+                          "op": "contains_any",
+                          "value": [
+                            "personal",
+                            "health",
+                            "research",
+                            "financial"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "leavers",
+                "label": "When someone leaves, how is their access removed?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "automatic",
+                    "label": "By itself, with their organization account"
+                  },
+                  {
+                    "key": "request",
+                    "label": "When someone asks"
+                  },
+                  {
+                    "key": "review",
+                    "label": "At a periodic review"
+                  },
+                  {
+                    "key": "unknown",
+                    "label": "I do not know"
+                  }
+                ]
+              },
+              {
+                "key": "admins",
+                "label": "How many people have administrative rights?",
+                "type": "number",
+                "required": true
+              }
+            ]
+          },
+          {
+            "key": "upkeep",
+            "title": "Keeping it sound",
+            "questions": [
+              {
+                "key": "supported",
+                "label": "Does its maker still supply security updates?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "unsupported_plan",
+                "label": "What is the plan for it?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.supported",
+                  "op": "eq",
+                  "value": false
+                }
+              },
+              {
+                "key": "patched_by",
+                "label": "Who applies updates?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "central",
+                    "label": "Central information technology"
+                  },
+                  {
+                    "key": "unit",
+                    "label": "The unit that runs it"
+                  },
+                  {
+                    "key": "supplier",
+                    "label": "Its supplier"
+                  },
+                  {
+                    "key": "nobody",
+                    "label": "Nobody, as far as I know"
+                  }
+                ]
+              },
+              {
+                "key": "backed_up",
+                "label": "Is it backed up, and has a restore been tried?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "tested",
+                    "label": "Backed up, and a restore has been tested"
+                  },
+                  {
+                    "key": "untested",
+                    "label": "Backed up, and a restore has not been tried"
+                  },
+                  {
+                    "key": "no",
+                    "label": "Not backed up"
+                  },
+                  {
+                    "key": "not_needed",
+                    "label": "It holds nothing that would need restoring"
+                  }
+                ]
+              },
+              {
+                "key": "logs",
+                "label": "Do its logs go to central security monitoring?",
+                "type": "yes_no",
+                "required": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

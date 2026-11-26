@@ -61,6 +61,7 @@ export const NAV = [
     heading: "Admin",
     items: [
       { href: "/admin/program", label: "Program", iconName: "program", when: "configure" },
+      { href: "/questionnaires", label: "Questionnaires", iconName: "file", when: "configure" },
       { href: "/admin/people", label: "People", iconName: "people", when: "admin" },
       { href: "/admin/units", label: "Units", iconName: "units", when: "admin" },
       { href: "/admin/appearance", label: "Appearance", iconName: "appearance", when: "admin" },

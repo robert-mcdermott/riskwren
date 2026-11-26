@@ -52,6 +52,7 @@ These two are written from the code, so they always match the version they ship 
 | How do I move to PostgreSQL? | [Use PostgreSQL](configuration.md#use-postgresql) |
 | How do I put it behind a proxy? | [Run behind a reverse proxy](configuration.md#run-behind-a-reverse-proxy) |
 | How do I send notices and reminders by email? | [Email](configuration.md#email) |
+| How do I change the questions people are asked, without changing what they already answered? | [Questionnaires](running-the-program.md#questionnaires) |
 | Who is reminded of what, and when does it go to their steward? | [Reminders](running-the-program.md#reminders) |
 | How do I let people sign in with Entra ID or another identity provider? | [Single sign-on](configuration.md#single-sign-on) |
 | Nobody can sign in. How do I get back in? | [`riskwren users`](cli.md#riskwren-users) |

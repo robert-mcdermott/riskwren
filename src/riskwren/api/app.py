@@ -23,6 +23,7 @@ from riskwren.api.routers import (
     issues,
     operations,
     people,
+    questionnaires,
     reporting,
     risks,
     scopes,
@@ -40,7 +41,7 @@ from riskwren.home import DataHome
 
 ROUTERS = (
     system, session, sso, people, branding, inventory, risks, controls, treatment, frameworks,
-    scopes, evidence, assessments, issues, exchange, reporting, operations,
+    scopes, evidence, assessments, issues, exchange, reporting, operations, questionnaires,
 )  # fmt: skip
 
 

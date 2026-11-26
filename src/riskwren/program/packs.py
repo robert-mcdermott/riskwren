@@ -70,7 +70,8 @@ def install(session: Session, *, frameworks: bool = True) -> dict[str, int]:
     adds what is missing and leaves what is there. ``frameworks`` loads the built-in
     public frameworks too."""
     pack = vocab.default_pack()
-    done = {"scoring_method": 0, "categories": 0, "library": 0, "controls": 0, "frameworks": 0}
+    done = {"scoring_method": 0, "categories": 0, "library": 0, "controls": 0, "frameworks": 0,
+            "questionnaires": 0}  # fmt: skip
     with audit.operation(session, "program.install"):
         if session.scalars(select(ScoringMethod.id)).first() is None:
             methods.publish(session, None, pack["scoring_method"])
@@ -80,6 +81,11 @@ def install(session: Session, *, frameworks: bool = True) -> dict[str, int]:
             done["library"] += library.load(session, builtin(name))
         for name in CONTROL_PACKS:
             done["controls"] += controls.load_library(session, builtin(name))
+        from riskwren.oversight import questionnaires
+
+        done["questionnaires"] = questionnaires.install(
+            session, builtin("questionnaires.json")["questionnaires"]
+        )
     if frameworks:
         from riskwren.compliance import packs as framework_packs
 

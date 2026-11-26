@@ -122,6 +122,38 @@ An import checks the whole pack first and reports every problem together. A scor
 
 A pack is also how one installation's program is copied to another, and how a program is kept under version control.
 
+## Questionnaires
+
+A questionnaire is a set of questions RiskWren asks people: to attest that a control still operates, to look again at a risk they own, to confirm that a unit's records are complete. **Admin → Questionnaires** lists them. Anyone signed in can read one and try it; those who run the program change them.
+
+A new installation has four, written for RiskWren:
+
+| Questionnaire | Asks |
+|---|---|
+| **Control attestation** | A control's owner: does it still operate as described, is there evidence in date, and are you still the right person to answer for it? |
+| **Risk self-assessment** | A risk's owner: does it still stand, what has changed, and are its rating and plan still right? |
+| **Unit completeness check** | A unit's steward: is everything the unit has on record, with the right owners, and is anything worrying not in the register? |
+| **System security profile** | Whoever runs a system: what it holds, who can reach it, how people sign in, and who patches, backs up, and watches it |
+
+### Questions that appear by condition
+
+A question, or a whole section, can be asked only when an earlier answer makes it relevant. "What is different from the statement?" is asked only of someone who said the control operates partly or not at all. So nobody answers what does not apply to them, and what is asked is short.
+
+- A rule looks only at questions asked before it, so showing and hiding can never run in a circle.
+- An answer to a question that an earlier answer has since hidden is dropped. It cannot go on deciding what else is asked.
+- The form reacts as it is filled in, and the server decides again when the answers are sent. The two use the same rules, held together by one file of test cases.
+
+### Versions
+
+**Edit** changes a questionnaire's sections, questions, their kinds and options, and when each is asked, with the form as it will be asked shown beneath. Saving changed questions **publishes a new version**. Earlier versions are never altered.
+
+- **An answer is read against the version it was given to.** Reword a question or remove one, and what people answered before still reads as it was asked then.
+- A draft begun under one version is finished under that version.
+- A built-in questionnaire you have edited is yours from then on, and a later release leaves it alone. One you have not touched is brought up to date, as a new version.
+- **Versions** lists every one, with who published it and what they said had changed. **Retiring** a questionnaire stops new answers and keeps the old.
+
+The **Try it** tab asks the questions and shows how the answers would be kept, without saving anything.
+
 ## Reminders
 
 Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, and the next test of each control.

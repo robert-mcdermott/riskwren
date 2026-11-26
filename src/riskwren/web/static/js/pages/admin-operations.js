@@ -32,7 +32,7 @@ function jobCard(job, reload) {
       const done = (await post(`/api/v1/jobs/${job.key}/run`, {})).data;
       toast(`${job.label}: ${done.summary}`);
     } catch (error) {
-      toast(error.message ?? "It could not be run.");
+      toast(error.detail ?? "It could not be run.");
     }
     reload();
   } });
@@ -85,7 +85,7 @@ function email(data) {
       const done = (await post("/api/v1/mail/test", {})).data;
       result.replaceChildren(alert("ok", icon("check"), h("div", {}, `The mail server accepted a message for ${done.sent_to}. Check that it arrives.`)));
     } catch (error) {
-      result.replaceChildren(alert("danger", icon("alert"), h("div", {}, h("strong", {}, "It could not be sent. "), error.message ?? "")));
+      result.replaceChildren(alert("danger", icon("alert"), h("div", {}, h("strong", {}, "It could not be sent. "), error.detail ?? error.message ?? "")));
     } finally {
       test.disabled = false;
     }

@@ -45,7 +45,7 @@ function connection(data) {
       result.replaceChildren(...found.steps.map((step) => alert(step.ok ? "ok" : "danger", icon(step.ok ? "check" : "alert"),
         h("div", {}, h("strong", {}, step.name), h("div", {}, step.detail)))));
     } catch (error) {
-      result.replaceChildren(alert("danger", icon("alert"), h("div", {}, error.message)));
+      result.replaceChildren(alert("danger", icon("alert"), h("div", {}, error.detail ?? error.message)));
     }
     check.disabled = false;
   });

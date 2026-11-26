@@ -144,6 +144,12 @@ export const SCENES = [
   { name: "appearance", as: "admin", path: "/admin/appearance" },
   { name: "admin-sso", as: "admin", path: "/admin/sso" },
   { name: "scheduled-work", as: "admin", path: "/admin/scheduled-work" },
+  { name: "questionnaires", as: "cro", path: "/questionnaires" },
+  { name: "questionnaire", as: "bio_mgr", path: "/questionnaires/control-attestation",
+    step: `(() => { const pick = (text) => { const label = [...document.querySelectorAll(".questionnaire label")].find((l) => l.textContent === text); if (label) label.click(); else window.__sceneMissed = "the option " + text; }; pick("Partly"); pick("No"); })()` },
+  { name: "questionnaire-questions", as: "auditor", path: "/questionnaires/system-security-profile?tab=questions" },
+  { name: "questionnaire-versions", as: "auditor", path: "/questionnaires/risk-self-assessment?tab=versions" },
+  { name: "questionnaire-edit", as: "cro", path: "/questionnaires/control-attestation?tab=edit" },
   { name: "account", as: "member", path: "/account" },
   { name: "auditor-risks", as: "auditor", path: "/risks" },
 ];

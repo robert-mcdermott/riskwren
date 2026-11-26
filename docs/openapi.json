@@ -198,6 +198,36 @@
         "title": "AddTestBody",
         "type": "object"
       },
+      "AnswersIn": {
+        "properties": {
+          "answers": {
+            "additionalProperties": true,
+            "title": "Answers",
+            "type": "object"
+          },
+          "complete": {
+            "default": true,
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "response_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Id"
+          }
+        },
+        "required": [
+          "answers"
+        ],
+        "title": "AnswersIn",
+        "type": "object"
+      },
       "BrandingBody": {
         "properties": {
           "accent": {
@@ -551,6 +581,25 @@
           "email"
         ],
         "title": "DemoSignIn",
+        "type": "object"
+      },
+      "DocumentIn": {
+        "properties": {
+          "answers": {
+            "additionalProperties": true,
+            "title": "Answers",
+            "type": "object"
+          },
+          "document": {
+            "additionalProperties": true,
+            "title": "Document",
+            "type": "object"
+          }
+        },
+        "required": [
+          "document"
+        ],
+        "title": "DocumentIn",
         "type": "object"
       },
       "DueBody": {
@@ -2012,6 +2061,134 @@
           }
         },
         "title": "ProcessBody",
+        "type": "object"
+      },
+      "QuestionnaireChange": {
+        "properties": {
+          "document": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "maxLength": 24,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "QuestionnaireChange",
+        "type": "object"
+      },
+      "QuestionnaireIn": {
+        "properties": {
+          "document": {
+            "additionalProperties": true,
+            "title": "Document",
+            "type": "object"
+          },
+          "key": {
+            "maxLength": 60,
+            "title": "Key",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "maxLength": 24,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "title": {
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title",
+          "document"
+        ],
+        "title": "QuestionnaireIn",
         "type": "object"
       },
       "RatingBody": {
@@ -11112,6 +11289,354 @@
         "summary": "How risks are rated: the method, the categories, and the rules",
         "tags": [
           "risks"
+        ]
+      }
+    },
+    "/api/v1/questionnaires": {
+      "get": {
+        "operationId": "list__api_v1_questionnaires_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "purpose",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Purpose"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List  Api V1 Questionnaires Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The questionnaires on record",
+        "tags": [
+          "questionnaires"
+        ]
+      },
+      "post": {
+        "operationId": "create_api_v1_questionnaires_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionnaireIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Api V1 Questionnaires Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a questionnaire",
+        "tags": [
+          "questionnaires"
+        ]
+      }
+    },
+    "/api/v1/questionnaires/check": {
+      "post": {
+        "description": "Says everything wrong with a document and, if nothing is, which questions the given\nanswers would show. Nothing is saved.",
+        "operationId": "check_api_v1_questionnaires_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Api V1 Questionnaires Check Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Check a questionnaire without saving it",
+        "tags": [
+          "questionnaires"
+        ]
+      }
+    },
+    "/api/v1/questionnaires/{key}": {
+      "get": {
+        "operationId": "show_api_v1_questionnaires__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Api V1 Questionnaires  Key  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One questionnaire, as it is or as it was",
+        "tags": [
+          "questionnaires"
+        ]
+      },
+      "patch": {
+        "description": "A changed document is published as a new version. Earlier versions, and the answers\ngiven to them, are left as they were.",
+        "operationId": "change_api_v1_questionnaires__key__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionnaireChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Change Api V1 Questionnaires  Key  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change a questionnaire",
+        "tags": [
+          "questionnaires"
+        ]
+      }
+    },
+    "/api/v1/questionnaires/{key}/responses": {
+      "post": {
+        "description": "With ``complete`` false the answers are kept as a draft. A draft is finished by sending\nits ``response_id`` again, and is answered under the version it was begun under.",
+        "operationId": "respond_api_v1_questionnaires__key__responses_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswersIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Respond Api V1 Questionnaires  Key  Responses Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer a questionnaire",
+        "tags": [
+          "questionnaires"
+        ]
+      }
+    },
+    "/api/v1/responses/{response_id}": {
+      "get": {
+        "operationId": "response_api_v1_responses__response_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "response_id",
+            "required": true,
+            "schema": {
+              "title": "Response Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Response Api V1 Responses  Response Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answers, as they were asked",
+        "tags": [
+          "questionnaires"
         ]
       }
     },
