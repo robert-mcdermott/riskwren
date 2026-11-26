@@ -199,7 +199,7 @@ def listing(
     total = session.execute(
         select(func.count()).select_from(Requirement).where(*conditions)
     ).scalar_one()
-    order = (Requirement.id,) if flat else (Requirement.position, Requirement.id)
+    order = (Requirement.sequence,) if flat else (Requirement.position, Requirement.id)
     rows = list(
         session.scalars(
             select(Requirement).where(*conditions).order_by(*order).limit(limit).offset(offset)
@@ -330,6 +330,26 @@ def update(
     return framework
 
 
+def _resequence(session: Session, framework: Framework) -> None:
+    """Number a framework's requirements in reading order, after its tree has changed."""
+    rows = session.scalars(
+        select(Requirement)
+        .where(Requirement.framework_id == framework.id)
+        .order_by(Requirement.position, Requirement.id)
+    ).all()
+    beneath: dict[int | None, list[Requirement]] = {}
+    for row in rows:
+        beneath.setdefault(row.parent_id, []).append(row)
+    place = 0
+    waiting = list(reversed(beneath.get(None, [])))
+    while waiting:
+        row = waiting.pop()
+        if row.sequence != place:
+            row.sequence = place
+        place += 1
+        waiting.extend(reversed(beneath.get(row.id, [])))
+
+
 def _recount(session: Session, framework: Framework) -> None:
     total, citable = session.execute(
         select(func.count(), func.coalesce(func.sum(func.cast(Requirement.is_citable, Integer)), 0))
@@ -338,6 +358,7 @@ def _recount(session: Session, framework: Framework) -> None:
     ).one()
     framework.requirement_count, framework.citable_count = int(total), int(citable)
     framework.updated_at = utc_now()
+    _resequence(session, framework)
     session.flush()
 
 

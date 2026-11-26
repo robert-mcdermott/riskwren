@@ -17,7 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from riskwren.db.base import Base
-from riskwren.db.models.inventory import one_of
+from riskwren.db.models.inventory import RECORD_STATUSES, RecordMixin, one_of
 from riskwren.db.types import UtcDateTime
 
 FRAMEWORK_KINDS = ("standard", "regulation", "agreement", "internal")
@@ -28,6 +28,8 @@ ORIGINS = ("pack", "local")
 FRAMEWORK_STATUSES = ("active", "retired")
 COVERAGE = ("full", "partial")
 MAPPING_SOURCES = ("pack", "person")
+IMPLEMENTATION_STATUSES = ("planned", "partly", "in_place", "not_applicable")
+INHERITANCE = ("none", "inherited", "shared")
 REQUIREMENT_STATUSES = ("active", "withdrawn")
 
 
@@ -92,6 +94,8 @@ class Requirement(Base):
     kind: Mapped[str | None] = mapped_column(String(40))
     position: Mapped[int] = mapped_column(Integer, default=0)
     depth: Mapped[int] = mapped_column(Integer, default=0)
+    # Its place in the document, reading from the top: what a flat list is ordered by.
+    sequence: Mapped[int] = mapped_column(Integer, default=0)
     # False for a heading that only groups others: a family, a function, a section.
     is_citable: Mapped[bool] = mapped_column(Boolean, default=True)
     status: Mapped[str] = mapped_column(String(16), default="active")
@@ -100,6 +104,7 @@ class Requirement(Base):
         UniqueConstraint("framework_id", "code", name="uq_requirement_framework_code"),
         CheckConstraint(one_of("status", REQUIREMENT_STATUSES), name="status"),
         Index("ix_requirement_parent", "framework_id", "parent_id", "position"),
+        Index("ix_requirement_sequence", "framework_id", "sequence"),
     )
 
 
@@ -156,4 +161,108 @@ class ControlRequirement(Base):
         CheckConstraint(one_of("coverage", COVERAGE), name="coverage"),
         CheckConstraint(one_of("source", MAPPING_SOURCES), name="source"),
         Index("ix_control_requirement_requirement_id", "requirement_id"),
+    )
+
+
+class Scope(RecordMixin, Base):
+    """A named boundary that must meet one or more frameworks: the clinical systems, a data
+    enclave, the whole organization."""
+
+    __tablename__ = "scope"
+    __subject__ = "scope"
+
+    boundary: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(24), default="active")
+    # A scope that offers its controls lets other scopes inherit them.
+    offers_controls: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
+        Index("ix_scope_org_unit_id", "org_unit_id"),
+    )
+
+
+class ScopeMember(Base):
+    """Something inside a scope's boundary: a unit, a process, a system, a body of
+    information, or a third party."""
+
+    __tablename__ = "scope_member"
+    __audit_parent__ = ("scope", "scope_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id", ondelete="CASCADE"))
+    subject_type: Mapped[str] = mapped_column(String(24))
+    subject_id: Mapped[int] = mapped_column(Integer)
+
+    __table_args__ = (
+        UniqueConstraint("scope_id", "subject_type", "subject_id", name="uq_scope_member"),
+        Index("ix_scope_member_subject", "subject_type", "subject_id"),
+    )
+
+
+class ScopeFramework(Base):
+    """A framework a scope must meet, and the baseline it starts from, if any."""
+
+    __tablename__ = "scope_framework"
+    __audit_parent__ = ("scope", "scope_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id", ondelete="CASCADE"))
+    framework_id: Mapped[int] = mapped_column(ForeignKey("framework.id"))
+    baseline_id: Mapped[int | None] = mapped_column(ForeignKey("baseline.id"))
+
+    __table_args__ = (
+        UniqueConstraint("scope_id", "framework_id", name="uq_scope_framework"),
+        Index("ix_scope_framework_framework_id", "framework_id"),
+    )
+
+
+class ScopeRequirement(Base):
+    """A decision that departs from the starting point: a requirement left out of a scope,
+    with the reason, or one brought in from outside its baseline."""
+
+    __tablename__ = "scope_requirement"
+    __audit_parent__ = ("scope", "scope_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id", ondelete="CASCADE"))
+    requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement.id", ondelete="CASCADE"))
+    applicable: Mapped[bool] = mapped_column(Boolean)
+    reason: Mapped[str | None] = mapped_column(Text)
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    decided_by_name: Mapped[str | None] = mapped_column(String(200))
+    decided_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("scope_id", "requirement_id", name="uq_scope_requirement"),
+        Index("ix_scope_requirement_requirement_id", "requirement_id"),
+    )
+
+
+class Implementation(Base):
+    """How one control is done within one scope: where it stands, who answers for it, and,
+    where another scope provides it, whose it is."""
+
+    __tablename__ = "implementation"
+    __audit_parent__ = ("scope", "scope_id")
+    __audit_skip__ = frozenset({"updated_at"})
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id", ondelete="CASCADE"))
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id"))
+    status: Mapped[str] = mapped_column(String(24), default="planned")
+    responsibility: Mapped[str | None] = mapped_column(String(200))
+    statement: Mapped[str | None] = mapped_column(Text)
+    inheritance: Mapped[str] = mapped_column(String(16), default="none")
+    inherits_from_id: Mapped[int | None] = mapped_column(ForeignKey("implementation.id"))
+    created_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    updated_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("scope_id", "control_id", name="uq_implementation_scope_control"),
+        CheckConstraint(one_of("status", IMPLEMENTATION_STATUSES), name="status"),
+        CheckConstraint(one_of("inheritance", INHERITANCE), name="inheritance"),
+        Index("ix_implementation_control_id", "control_id"),
+        Index("ix_implementation_inherits_from_id", "inherits_from_id"),
     )

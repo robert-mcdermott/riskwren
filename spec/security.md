@@ -92,7 +92,7 @@ RiskWren is designed **not** to hold the regulated data it describes. Records de
 
 ### Visibility
 
-**The inventory is open.** Processes, systems, and third parties are visible to everyone signed in, because a record can only be linked to what its author can see: a lab cannot say that its work relies on central storage if it cannot find central storage. What they describe is rarely sensitive, and what is can be marked restricted.
+**The inventory is open.** Processes, systems, information assets, and third parties are visible to everyone signed in, because a record can only be linked to what its author can see: a lab cannot say that its work relies on central storage if it cannot find central storage. What they describe is rarely sensitive, and what is can be marked restricted.
 
 **The register follows a setting.** A register of risks and controls is useful in proportion to how widely it is read and dangerous in proportion to how widely it is exposed. Organizations differ on where to draw the line, so for ordinary members it is a setting with three levels:
 
@@ -114,6 +114,8 @@ One function per record type decides what a principal may see. Single records, l
 | Read the inventory (unless restricted) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read risks and controls | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Read frameworks and their requirements (wave 2) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Read scopes (wave 2) | by setting | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Keep a scope: its boundary, frameworks, applicability, and implementations (wave 2) | | ✓ | ✓ | | | ✓ | | |
 | Add a record in a unit | | | ✓ | | | ✓ | | |
 | Edit a record; link and unlink; map a control to requirements (wave 2) | | ✓ | ✓ | | | ✓ | | |
 | Assess a risk; rate a control | | ✓ | ✓ | | ✓ | ✓ | | |

@@ -18,7 +18,14 @@ from riskwren.api.common import (
 )
 from riskwren.core.errors import Invalid
 from riskwren.inventory import access, history, links, records
-from riskwren.inventory.registry import PROCESS, SYSTEM, THIRD_PARTY, RecordType, find_any
+from riskwren.inventory.registry import (
+    INFORMATION,
+    PROCESS,
+    SYSTEM,
+    THIRD_PARTY,
+    RecordType,
+    find_any,
+)
 from riskwren.program import settings, vocab
 
 router = APIRouter(prefix="/api/v1", tags=["inventory"])
@@ -53,6 +60,12 @@ class SystemBody(ThingBody):
 class ThirdPartyBody(ThingBody):
     website: str | None = None
     notes: str | None = None
+
+
+class InformationBody(ThingBody):
+    held_in: str | None = Field(default=None, description="The systems and places it is kept")
+    shared_with: str | None = None
+    agreement: str | None = Field(default=None, description="What it is held or shared under")
 
 
 class OwnersBody(BaseModel):
@@ -409,3 +422,63 @@ def remove_third_party_link(request: Request, ref: str, link_id: int) -> dict[st
 @router.get("/third-parties/{ref}/history", summary="Everything that has happened to a third party")
 def third_party_history(request: Request, ref: str) -> dict[str, Any]:
     return record_history(request, THIRD_PARTY, ref)
+
+
+@router.get("/information", summary="Find information assets")
+def list_information(
+    request: Request,
+    q: str | None = Q,
+    unit: int | None = UNIT,
+    status: str | None = None,
+    kind: str | None = None,
+    criticality: str | None = None,
+    data_class: str | None = None,
+    owner: int | None = None,
+    mine: bool = MINE,
+    sort: str = SORT,
+    limit: int | None = LIMIT,
+    cursor: str | None = None,
+) -> dict[str, Any]:
+    filters = thing_filters(q, unit, status, kind, criticality, data_class, owner, mine)
+    return list_records(request, INFORMATION, filters, sort, limit, cursor)
+
+
+@router.post("/information", status_code=201, summary="Add an information asset")
+def create_information(request: Request, body: InformationBody) -> dict[str, Any]:
+    return create_record(request, INFORMATION, body)
+
+
+@router.get("/information/{ref}", summary="One information asset, with its owners and links")
+def show_information(request: Request, ref: str) -> dict[str, Any]:
+    return show_record(request, INFORMATION, ref)
+
+
+@router.patch("/information/{ref}", summary="Change an information asset")
+def update_information(request: Request, ref: str, body: InformationBody) -> dict[str, Any]:
+    return update_record(request, INFORMATION, ref, body)
+
+
+@router.put("/information/{ref}/owners", summary="Set a information asset's owners")
+def set_information_owners(request: Request, ref: str, body: OwnersBody) -> dict[str, Any]:
+    return set_record_owners(request, INFORMATION, ref, body)
+
+
+@router.post(
+    "/information/{ref}/links", status_code=201, summary="Link an information asset to a record"
+)
+def add_information_link(request: Request, ref: str, body: LinkBody) -> dict[str, Any]:
+    return add_record_link(request, INFORMATION, ref, body)
+
+
+@router.delete(
+    "/information/{ref}/links/{link_id}", summary="Remove a link from an information asset"
+)
+def remove_information_link(request: Request, ref: str, link_id: int) -> dict[str, Any]:
+    return remove_record_link(request, INFORMATION, ref, link_id)
+
+
+@router.get(
+    "/information/{ref}/history", summary="Everything that has happened to an information asset"
+)
+def information_history(request: Request, ref: str) -> dict[str, Any]:
+    return record_history(request, INFORMATION, ref)

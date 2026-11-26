@@ -33,6 +33,7 @@ export const NAV = [
     heading: "Compliance",
     items: [
       { href: "/frameworks", label: "Frameworks", iconName: "framework" },
+      { href: "/scopes", label: "Scopes", iconName: "scope" },
     ],
   },
   {
@@ -41,6 +42,7 @@ export const NAV = [
       { href: "/processes", label: "Processes", iconName: "process" },
       { href: "/systems", label: "Systems", iconName: "system" },
       { href: "/third-parties", label: "Third parties", iconName: "third_party" },
+      { href: "/information", label: "Information", iconName: "information" },
     ],
   },
   {

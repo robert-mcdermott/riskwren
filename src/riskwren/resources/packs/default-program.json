@@ -393,6 +393,53 @@
         "description": "Receives funds the organization passes through"
       }
     ],
+    "information_kinds": [
+      {
+        "key": "research_data",
+        "label": "Research data",
+        "description": "Data produced or collected by research"
+      },
+      {
+        "key": "participant_data",
+        "label": "Participant data",
+        "description": "About people who take part in research"
+      },
+      {
+        "key": "patient_records",
+        "label": "Patient records",
+        "description": "Records of care"
+      },
+      {
+        "key": "specimen_records",
+        "label": "Specimen records",
+        "description": "What is known about stored specimens"
+      },
+      {
+        "key": "controlled_data",
+        "label": "Controlled-access data",
+        "description": "Held under another party's terms"
+      },
+      {
+        "key": "personnel_records",
+        "label": "Personnel records",
+        "description": "About staff, students, and applicants"
+      },
+      {
+        "key": "financial_records",
+        "label": "Financial records",
+        "description": "Accounts, awards, payments, and donors"
+      },
+      {
+        "key": "intellectual_property",
+        "label": "Intellectual property",
+        "description": "Unpublished results and inventions"
+      },
+      {
+        "key": "operational",
+        "label": "Operational",
+        "description": "What the organization needs to run"
+      }
+    ],
     "link_kinds": [
       {
         "key": "relies_on",
@@ -423,6 +470,39 @@
         "between": [
           [
             "system",
+            "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "holds",
+        "label": "Holds",
+        "reverse": "Is held in",
+        "between": [
+          [
+            "system",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "uses",
+        "label": "Uses",
+        "reverse": "Is used by",
+        "between": [
+          [
+            "process",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "shared_with",
+        "label": "Is shared with",
+        "reverse": "Receives",
+        "between": [
+          [
+            "information",
             "third_party"
           ]
         ]

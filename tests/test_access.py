@@ -268,8 +268,10 @@ RECORD_PATHS = {
     "processes": "PRC",
     "systems": "SYS",
     "third-parties": "TP",
+    "information": "INF",
     "risks": "RSK",
     "controls": "CTL",
+    "scopes": "SCP",
 }
 REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
@@ -294,8 +296,14 @@ for _key, _needs in POLICIES.items():
     parts = ("control", "/treatment", "/response", "/plans", "/acceptances", "/actions")
     if any(part in _key[1] for part in parts) and _key not in REACH:
         REACH[_key] = {"leader"} if _needs is Needs.LEAD else EVERYONE
+for _key in POLICIES:
+    # Everything about a scope is reached by anyone and decided by the scope.
+    if _key[1].startswith("/api/v1/scopes/{ref}/") and _key not in REACH:
+        REACH[_key] = EVERYONE
 for _path in RECORD_PATHS:
-    for _method, _template in record_policies(_path, links=_path not in ("risks", "controls")):
+    for _method, _template in record_policies(
+        _path, links=_path not in ("risks", "controls", "scopes")
+    ):
         # Anyone may ask about a record, and the service decides what they may see and do.
         # Adding one is for a unit's steward or a manager.
         adding = _method == "POST" and _template == f"/api/v1/{_path}"
@@ -343,7 +351,7 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
             )
             path = path.replace("{kind}", "favicon").replace("{key}", "technology")
             path = path.replace("{control_ref}", "CTL-9999").replace("{acceptance_id}", "9999")
-            path = path.replace("{mapping_id}", "9999")
+            path = path.replace("{mapping_id}", "9999").replace("{implementation_id}", "9999")
             if template.startswith("/api/v1/plans/"):
                 path = path.replace("{ref}", "PLN-9999")
             if template.startswith("/api/v1/actions/"):
@@ -375,6 +383,14 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"accent": "#1f6f5c"}
             elif template.endswith("/controls/{ref}/requirements"):
                 body = {"framework": "nist-csf", "code": "GV.OC-01", "coverage": "full"}
+            elif template.endswith("/scopes/{ref}/frameworks"):
+                body = {"framework": "nist-csf"}
+            elif template.endswith("/scopes/{ref}/requirements"):
+                body = {"framework": "nist-csf", "code": "GV.OC-01", "applicable": True}
+            elif template.endswith("/scopes/{ref}/controls"):
+                body = {"control": "CTL-9999", "status": "planned"}
+            elif template.endswith("/controls/inherited"):
+                body = {"implementation": 9999, "inheritance": "inherited"}
             elif template.endswith("/ratings"):
                 body = {"design": "effective", "operation": "effective", "note": "x"}
             elif template.endswith("/risks/{ref}/controls"):

@@ -25,16 +25,17 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Grant, Principal
-from riskwren.compliance import crosswalk, frameworks
+from riskwren.compliance import crosswalk, frameworks, scopes
+from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
 from riskwren.controls.service import CONTROL
 from riskwren.core.clock import clock_set_to
 from riskwren.core.errors import PermissionDenied, RiskWrenError
 from riskwren.db.engine import Database
-from riskwren.db.models import Acceptance, Action, Control, Risk, TreatmentPlan
+from riskwren.db.models import Acceptance, Action, Control, Risk, Scope, TreatmentPlan
 from riskwren.demo import content as c
 from riskwren.inventory import access, links, records
-from riskwren.inventory.registry import PROCESS, SYSTEM, THIRD_PARTY, RecordType
+from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.people import accounts, units
 from riskwren.program import branding, packs, settings
 from riskwren.risk import categories, register
@@ -394,6 +395,33 @@ class Builder:
                 values = {"name": name, "kind": kind, "criticality": criticality,
                           "data_class": data_class, "summary": summary, "org_unit_id": unit}  # fmt: skip
                 self.add_thing(by, THIRD_PARTY, key, values, self.pick(unit))
+
+    def _information(self) -> Script:
+        """The bodies of information the institute holds, and where each is kept."""
+        yield self.start + timedelta(days=104)
+        for index, (
+            key,
+            name,
+            code,
+            kind,
+            criticality,
+            data_class,
+            held,
+            shared,
+            agreement,
+        ) in enumerate(c.INFORMATION):
+            if index % 4 == 3:
+                yield self.later(0.5, 4)
+            unit = self.units[code]
+            values = {"name": name, "kind": kind, "criticality": criticality, "data_class": data_class,
+                      "held_in": held, "shared_with": shared, "agreement": agreement, "org_unit_id": unit}  # fmt: skip
+            self.add_thing(self.steward(unit), INFORMATION, key, values, self.pick(unit))
+        yield self.later(2, 6)
+        for source, relation, target in c.INFORMATION_LINKS:
+            with self.db.read() as session:
+                record_type, record_id, _ = self.things[source]
+                unit = session.get(record_type.model, record_id).org_unit_id
+            self.link_things(self.steward(unit), source, relation, target)
 
     def _lab_inventory(self, lab: int) -> Script:
         yield self.later(10, 110)
@@ -1482,6 +1510,75 @@ class Builder:
                 )  # fmt: skip
             self.tally("requirements mapped by hand")
 
+    def _scope(self, by: int, spec: dict[str, Any]) -> int:
+        """A scope with its boundary and the framework it is held to."""
+        values = {"name": spec["name"], "org_unit_id": self.units[spec["unit"]],
+                  "summary": spec["summary"], "boundary": spec["boundary"]}  # fmt: skip
+        with self.act(by) as (session, who):
+            scope = records.create(session, who, SCOPE, values)
+            scopes.set_members(
+                session, who, scope, [self.things[key][2] for key in spec["members"]],
+                [self.units[code] for code in spec["units"]],
+            )  # fmt: skip
+            scopes.hold_to(session, who, scope, *spec["framework"])
+            self.tally("scopes")
+            return scope.id
+
+    def _standing(self, control_id: int) -> str:
+        """Where a control stands in its own scope, from what is known of how well it works."""
+        with self.db.read() as session:
+            state = controls.state_of(session, session.get(Control, control_id))
+        return "partly" if state in ("partly", "ineffective") else "in_place"
+
+    def _story_scopes(self) -> Script:
+        """Central IT provides controls; the clinic and the data enclave inherit them."""
+        lead = self.cast["risk2"]
+        yield self.ago(296)
+        provider = self._scope(lead, c.SCOPE_PROVIDER)
+        offered: dict[str, int] = {}
+        for key, unit, team in c.SCOPE_PROVIDER["controls"]:
+            control = self.control(key, self.units[unit])
+            with self.act(lead) as (session, who):
+                row = scopes.implement(
+                    session, who, session.get(Scope, provider), session.get(Control, control),
+                    status=self._standing(control), responsibility=team,
+                )  # fmt: skip
+                offered[key] = row.id
+        yield self.ago(288)
+        with self.act(lead) as (session, who):
+            scope = session.get(Scope, provider)
+            records.update(
+                session, who, SCOPE, scope, {"offers_controls": True}, version=scope.version
+            )
+        for days, spec in ((262, c.SCOPE_CLINIC), (231, c.SCOPE_ENCLAVE)):
+            yield self.ago(days)
+            made = self._scope(lead, spec)
+            framework = spec["framework"][0]
+            with self.act(lead) as (session, who):
+                scope = session.get(Scope, made)
+                for key in spec["inherited"]:
+                    scopes.inherit(session, who, scope, offered[key], inheritance="inherited")
+                for key, status, part in spec["shared"]:
+                    scopes.inherit(
+                        session, who, scope, offered[key], inheritance="shared", status=status,
+                        statement=part,
+                    )  # fmt: skip
+            yield self.ago(days - 6)
+            for key, status, team, how in spec["own"]:
+                control = self.control(key, self.units[spec["unit"]])
+                with self.act(lead) as (session, who):
+                    scopes.implement(
+                        session, who, session.get(Scope, made), session.get(Control, control),
+                        status=status, responsibility=team, statement=how,
+                    )  # fmt: skip
+            for codes, reason in spec["excluded"]:
+                with self.act(lead) as (session, who):
+                    for code in codes:
+                        scopes.decide(
+                            session, who, session.get(Scope, made), framework=framework, code=code,
+                            applicable=False, reason=reason,
+                        )  # fmt: skip
+
     def _story_escalated(self) -> Script:
         """A lab's privacy risk raised to its department, with the reason."""
         lab = self.labs["PS"][0]
@@ -1587,6 +1684,7 @@ class Builder:
             for lab in labs:
                 self.schedule(self._lab_inventory(lab))
         self.schedule(self._links())
+        self.schedule(self._information())
         for unit, key, start, owner in self._plan_risks():
             self.schedule(self._risk(unit, key, start, owner))
         for story in (
@@ -1594,7 +1692,7 @@ class Builder:
             self._story_authority, self._story_costs, self._story_supplier,
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
-            self._story_agreement,
+            self._story_agreement, self._story_scopes,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

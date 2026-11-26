@@ -227,7 +227,7 @@ For a scope and a framework, each applicable requirement is in exactly one state
 
 | State | Rule |
 |---|---|
-| **Gap** | No control is mapped to it, or a mapped control has no implementation in this scope |
+| **Gap** | No control mapped to it is used in this scope |
 | **Planned** | Controls are mapped, and at least one implementation is not yet in place |
 | **In place** | Every implementation is in place, but at least one lacks a current, counted test with current evidence |
 | **Verified** | Every implementation is in place and has a current test result of effective, with current evidence |

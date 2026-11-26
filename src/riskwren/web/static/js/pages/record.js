@@ -218,6 +218,10 @@ function overview(record, ctx) {
   const about = [record.summary ? card({ title: "About" }, prose(record.summary)) : null];
   if (record.type === "process" && record.purpose) about.push(card({ title: "Purpose" }, prose(record.purpose)));
   if (record.type === "third_party" && record.notes) about.push(card({ title: "Notes" }, prose(record.notes)));
+  if (record.type === "information" && (record.held_in || record.shared_with)) {
+    about.push(card({ title: "Where it is, and who has it" }, facts([["Held in", record.held_in ? prose(record.held_in) : null],
+      ["Shared with", record.shared_with ? prose(record.shared_with) : null], ["Under", record.agreement]])));
+  }
   const glance = [
     ["Kind", label(v, meta.kinds, record.kind)],
     ["Unit", unit?.name],

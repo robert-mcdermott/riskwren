@@ -88,6 +88,7 @@ def upgrade() -> None:
         sa.Column("kind", sa.String(length=40), nullable=True),
         sa.Column("position", sa.Integer(), nullable=False),
         sa.Column("depth", sa.Integer(), nullable=False),
+        sa.Column("sequence", sa.Integer(), nullable=False),
         sa.Column("is_citable", sa.Boolean(), nullable=False),
         sa.Column("status", sa.String(length=16), nullable=False),
         sa.CheckConstraint("status IN ('active', 'withdrawn')", name=op.f("ck_requirement_status")),
@@ -110,6 +111,7 @@ def upgrade() -> None:
         batch_op.create_index(
             "ix_requirement_parent", ["framework_id", "parent_id", "position"], unique=False
         )
+        batch_op.create_index("ix_requirement_sequence", ["framework_id", "sequence"], unique=False)
 
     op.create_table(
         "baseline_requirement",
@@ -143,6 +145,7 @@ def downgrade() -> None:
 
     op.drop_table("baseline_requirement")
     with op.batch_alter_table("requirement", schema=None) as batch_op:
+        batch_op.drop_index("ix_requirement_sequence")
         batch_op.drop_index("ix_requirement_parent")
 
     op.drop_table("requirement")

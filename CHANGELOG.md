@@ -23,6 +23,20 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   a control started from the library arrives mapped, and others are offered the suggestions.
   Each framework shows how many of its requirements have a control and lists those with
   none. Counts leave out controls their reader may not see (migration 0008).
+- **Scopes.** A scope is a boundary that must meet one or more frameworks. It lists the
+  units, processes, systems, information, and third parties inside it; starts from a
+  baseline or from every requirement; and decides applicability a requirement at a time,
+  with a reason required to leave one out. Each control it uses has an implementation:
+  where it stands, who answers for it, and how it is done there (migration 0009).
+- **Inherited controls.** A scope can offer its controls. Another scope inherits one whole,
+  and it then stands wherever the provider's does, or shares it and records its own part.
+  A provider cannot withdraw a control others rely on.
+- **Statement of applicability.** For a scope and a framework: every requirement that
+  applies, the controls that answer it there and where they stand, and every requirement
+  left out with its reason, who decided, and when. It prints as a document.
+- **Information assets.** A fourth kind of inventory record for a body of information:
+  what it is, its data class, where it is held, who it is shared with, and under what
+  agreement. Systems hold it, processes use it, and it is shared with third parties.
 - **Framework packs.** A framework is one JSON document, checked whole before anything is
   loaded and refused whole if anything is wrong. Each pack declares what text it may carry,
   and a test holds every built-in pack to it. `riskwren frameworks list`, `show`, and `load`.

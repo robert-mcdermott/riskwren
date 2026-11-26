@@ -107,6 +107,24 @@ class ThirdParty(ThingMixin, Base):
     )
 
 
+class Information(ThingMixin, Base):
+    """A body of information the organization holds: what it is, where it is kept, and who
+    it is shared with. It describes the information; it never contains it."""
+
+    __tablename__ = "information"
+    __subject__ = "information"
+
+    kind: Mapped[str] = mapped_column(String(40))
+    held_in: Mapped[str | None] = mapped_column(Text)
+    shared_with: Mapped[str | None] = mapped_column(Text)
+    agreement: Mapped[str | None] = mapped_column(String(300))
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
+        Index("ix_information_org_unit_id", "org_unit_id"),
+    )
+
+
 class RecordOwner(Base):
     """A person named on a record, and in what capacity."""
 

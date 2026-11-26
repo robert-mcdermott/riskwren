@@ -207,6 +207,26 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         # Starter controls arrive mapped, so the public frameworks are partly covered at once.
         assert crosswalk.coverage(session, reader, held["nist-csf"])["mapped"] >= 20
         assert crosswalk.coverage(session, reader, held["hipaa-security"])["mapped"] >= 15
+        from riskwren.compliance import scopes
+        from riskwren.db.models import Information, Scope
+
+        assert session.execute(select(func.count()).select_from(Information)).scalar_one() == 10
+        by_name = {scope.name: scope for scope in session.scalars(select(Scope))}
+        assert set(by_name) == {
+            "Central information technology", "Clinical systems", "Controlled-access data enclave",
+        }  # fmt: skip
+        assert by_name["Central information technology"].offers_controls
+        clinic = scopes.statement(session, reader, by_name["Clinical systems"], "hipaa-security")
+        assert clinic["counts"]["excluded"] == 7 and clinic["counts"]["in_place"] >= 5
+        assert clinic["counts"]["planned"] >= 1 and clinic["counts"]["gap"] >= 20
+        enclave = scopes.implementations(session, reader, by_name["Controlled-access data enclave"])
+        ways = {
+            c["control"]["name"]: (c["inheritance"], c["standing"]) for c in enclave["controls"]
+        }
+        assert ways["Second factor at sign-in"][0] == "inherited"
+        assert ways["Security events monitored"] == ("shared", "planned")
+        assert all(c["provider"]["scope"]["name"] == "Central information technology"
+                   for c in enclave["controls"] if c["provider"])  # fmt: skip
         closed = named("Loss of refrigerated medication from a failed pharmacy refrigerator")
         assert closed.status == "closed" and closed.closed_reason
         power = named("Emergency power cannot carry the freezer farm and animal facility")

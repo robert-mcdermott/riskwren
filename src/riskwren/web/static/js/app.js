@@ -58,13 +58,15 @@ async function boot() {
   route("/controls", page("controls", "controlLibrary"));
   route("/controls/:ref", page("control", "controlPage"));
   route("/frameworks", page("frameworks", "frameworkList"));
+  route("/scopes", page("scopes", "scopeList"));
+  route("/scopes/:ref", page("scopes", "scopePage"));
   route("/frameworks/:key", page("frameworks", "frameworkPage"));
   route("/plans", page("actions", "planList"));
   route("/acceptances", page("actions", "acceptanceList"));
   route("/actions", page("actions", "actionList"));
   route("/risks", page("risks", "riskRegister"));
   route("/risks/:ref", page("risk", "riskPage"));
-  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"]]) {
+  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"]]) {
     route(`/${path}`, page("records", "recordList", type));
     route(`/${path}/:ref`, page("record", "recordPage", type));
   }

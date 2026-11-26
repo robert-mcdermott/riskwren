@@ -51,18 +51,20 @@ The wave is done when, on a fresh checkout:
 
 **Done:** a control has a Requirements tab, framework by framework; a requirement shows its controls and how well each is known to work. Twenty-seven of the starter controls carry 156 suggested mappings to the four built-in frameworks, each code checked against the packs by a test. A control started from the library arrives mapped, and one adopted before its framework was loaded is offered the suggestions. Each framework shows how many of its requirements have a control, and the ones with none are a filter away.
 
-### Slice 3: Scopes and inheritance ☐
+### Slice 3: Scopes and inheritance ☑
 
 **Goal:** a boundary, what it must meet, and who does what inside it.
 
-- [ ] `scope` with members (units, processes, systems), frameworks and baselines, an owner; SCP references
-- [ ] Applicability per requirement with reasons; a baseline as the starting point
-- [ ] Implementations: status, responsibility, how it is done here
-- [ ] Offering and inheriting controls, fully or shared; the inheriting scope cannot rate what it inherits
-- [ ] The statement of applicability, printable
-- [ ] Information assets as a fourth kind of inventory record (INV-07)
+- [x] `scope` with members (units, processes, systems), frameworks and baselines, an owner; SCP references
+- [x] Applicability per requirement with reasons; a baseline as the starting point
+- [x] Implementations: status, responsibility, how it is done here
+- [x] Offering and inheriting controls, fully or shared; the inheriting scope cannot rate what it inherits
+- [x] The statement of applicability, printable
+- [x] Information assets as a fourth kind of inventory record (INV-07)
 
 **Acceptance:** the demo's enclave inherits identity and backup controls from central computing and shows their state; excluding a requirement without a reason is refused.
+
+**Done:** a scope is a record like any other, with owners, history, and the register's visibility. It lists what is inside it, is held to frameworks from a baseline or from every requirement, and decides applicability a requirement at a time; a reason is required to leave one out. Each control it uses has an implementation. A scope that offers its controls can be inherited from, whole or shared, and the inheriting scope sees whose control it is and how well it is known to work, even where it could not open the control itself. The Requirements tab is the statement of applicability and prints as one. Information assets are the fourth kind of inventory record, linked to the systems that hold them and the parties they are shared with. The demo has a provider, a clinic under the health security rule, and a data enclave.
 
 ### Slice 4: Evidence and files ☐
 
@@ -138,4 +140,10 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Coverage follows what its reader may see of controls.** A requirement's controls, and every count of them, leave out controls the reader could not open, and say how many were left out. A retired control answers nothing.
 - **Suggestions are offered, not applied behind anyone's back.** Upgrading does not map an organization's existing controls. A control that came from the library shows what the library suggests, and its keeper adds them or not.
 - **The demo is built once for the tests that only read it.** A build makes some fifty thousand small statements, which is seconds on SQLite and over a minute against a PostgreSQL container. The tests that only read the demo now share one build; those that are about building it still build their own.
+- **A gap is judged by the controls a scope uses.** The first rule called a requirement a gap if any control mapped to it had no implementation in the scope. Where several units each keep their own control for the same requirement, that would make every scope a gap for ever. A requirement is a gap when no control mapped to it is used in the scope; planned when one that is used is not yet in place; in place when all of them are. [engine.md](../engine.md) says so.
+- **A decision that matches the starting point is not kept.** Applicability is the baseline plus the decisions that depart from it. Putting a requirement back to where the scope started removes the decision; the history keeps that it was made and unmade.
+- **What is inherited whole has no standing of its own.** An inheriting scope cannot say that a control it inherits whole is in place: it stands where the provider's does, and slips the day theirs does. A shared control is as far along as the weaker half.
+- **A provider cannot quietly withdraw.** A scope cannot stop offering its controls, or stop using one, while another scope inherits it.
+- **Offering a control shows its name and state, and no more.** People in an inheriting scope see whose control they rely on and how well it is known to work without being able to open the provider's record.
+- **Requirements carry their place in the document.** Rows are written a level at a time, so the order they were written in is not reading order. Each requirement keeps a sequence number, and every flat list (a search, a baseline, a statement of applicability) is in the order of the source.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

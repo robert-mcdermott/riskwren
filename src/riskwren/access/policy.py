@@ -84,7 +84,7 @@ def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], N
     return found
 
 
-for _path in ("processes", "systems", "third-parties"):
+for _path in ("processes", "systems", "third-parties", "information"):
     POLICIES.update(record_policies(_path))
 
 # The risk register
@@ -146,6 +146,25 @@ POLICIES.update(
         ("GET", "/api/v1/frameworks/{key}/requirement"): Needs.MEMBER,
         ("PATCH", "/api/v1/frameworks/{key}/requirement"): Needs.CONFIGURE,
         ("DELETE", "/api/v1/frameworks/{key}/requirement"): Needs.CONFIGURE,
+    }
+)
+
+# Scopes. As with every record, any member may ask, and the service decides by the scope:
+# whose unit it is in, and who owns it.
+POLICIES.update(record_policies("scopes", links=False))
+POLICIES.update(
+    {
+        ("PUT", "/api/v1/scopes/{ref}/members"): Needs.MEMBER,
+        ("PUT", "/api/v1/scopes/{ref}/frameworks"): Needs.MEMBER,
+        ("DELETE", "/api/v1/scopes/{ref}/frameworks/{key}"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/requirements"): Needs.MEMBER,
+        ("PUT", "/api/v1/scopes/{ref}/requirements"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/controls"): Needs.MEMBER,
+        ("PUT", "/api/v1/scopes/{ref}/controls"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/controls/candidates"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/controls/offered"): Needs.MEMBER,
+        ("POST", "/api/v1/scopes/{ref}/controls/inherited"): Needs.MEMBER,
+        ("DELETE", "/api/v1/scopes/{ref}/controls/{implementation_id}"): Needs.MEMBER,
     }
 )
 

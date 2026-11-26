@@ -243,6 +243,18 @@ def test_an_agreement_is_entered_and_kept_as_a_framework_of_its_own(
             session, manager, made, {"code": "4.2", "text": "Access is limited.", "parent": "4"}
         )
         assert (row.depth, row.position) == (1, 1)
+        frameworks.add_requirement(session, manager, made, {"code": "5", "text": "Reporting."})
+        frameworks.add_requirement(
+            session, manager, made, {"code": "4.3", "text": "Copies are logged.", "parent": "4"}
+        )
+        in_order, _ = frameworks.listing(session, made, query="4.")
+        assert [item["code"] for item in in_order] == ["4.1", "4.2", "4.3"]
+        everything, _ = frameworks.listing(session, made, query="e")
+        assert [item["code"] for item in everything] == ["4", "4.1", "4.2", "4.3", "5"]
+        for code in ("5", "4.3"):
+            frameworks.remove_requirement(
+                session, manager, made, frameworks.find(session, made, code)
+            )
         assert (made.requirement_count, made.citable_count) == (3, 2)
         frameworks.update_requirement(
             session, manager, made, row, {"text": "Access is limited to named study staff."}
@@ -261,7 +273,11 @@ def test_an_agreement_is_entered_and_kept_as_a_framework_of_its_own(
     with db.read() as session:
         events = session.scalars(select(Event).where(Event.id > before).order_by(Event.id)).all()
         told = [e.action for e in events if e.action.startswith("requirement.")]
-        assert told == ["requirement.added"] * 3 + ["requirement.changed", "requirement.removed"]
+        assert told == (
+            ["requirement.added"] * 5
+            + ["requirement.removed"] * 2
+            + ["requirement.changed", "requirement.removed"]
+        )
         changed = next(e for e in events if e.action == "requirement.changed")
         assert changed.subject_type == "framework" and changed.changes["text"] == [
             "Access is limited.", "Access is limited to named study staff.",

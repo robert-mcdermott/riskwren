@@ -7,7 +7,12 @@ from riskwren.db.models.compliance import (
     BaselineRequirement,
     ControlRequirement,
     Framework,
+    Implementation,
     Requirement,
+    Scope,
+    ScopeFramework,
+    ScopeMember,
+    ScopeRequirement,
 )
 from riskwren.db.models.controls import (
     Acceptance,
@@ -18,7 +23,14 @@ from riskwren.db.models.controls import (
     RiskControl,
     TreatmentPlan,
 )
-from riskwren.db.models.inventory import Process, RecordLink, RecordOwner, System, ThirdParty
+from riskwren.db.models.inventory import (
+    Information,
+    Process,
+    RecordLink,
+    RecordOwner,
+    System,
+    ThirdParty,
+)
 from riskwren.db.models.people import (
     Account,
     Credential,
@@ -55,6 +67,8 @@ __all__ = [
     "Event",
     "FailedSignIn",
     "Framework",
+    "Implementation",
+    "Information",
     "Membership",
     "OrgUnit",
     "Process",
@@ -68,6 +82,10 @@ __all__ = [
     "RiskLibraryEntry",
     "RiskSubject",
     "RoleGrant",
+    "Scope",
+    "ScopeFramework",
+    "ScopeMember",
+    "ScopeRequirement",
     "ScoringMethod",
     "SessionToken",
     "Setting",

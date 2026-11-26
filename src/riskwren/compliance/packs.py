@@ -150,6 +150,7 @@ def _place(
     """Write the tree, a level at a time so that each row knows its parent."""
     rows: dict[str, Requirement] = {}
     citable = 0
+    order = {item["code"].strip(): place for place, (item, _) in enumerate(walk(items))}
     level: list[tuple[dict[str, Any], Requirement | None]] = [(item, None) for item in items]
     depth = 0
     while level:
@@ -169,6 +170,7 @@ def _place(
                 kind=item.get("kind") or None,
                 position=position,
                 depth=depth,
+                sequence=order[item["code"].strip()],
                 is_citable=not item.get("group"),
                 status="active",
             )

@@ -170,6 +170,17 @@ VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ("sponsor", "Sponsor or funder"),
         ("subrecipient", "Subrecipient", "Receives funds the organization passes through"),
     ),
+    "information_kinds": items(
+        ("research_data", "Research data", "Data produced or collected by research"),
+        ("participant_data", "Participant data", "About people who take part in research"),
+        ("patient_records", "Patient records", "Records of care"),
+        ("specimen_records", "Specimen records", "What is known about stored specimens"),
+        ("controlled_data", "Controlled-access data", "Held under another party's terms"),
+        ("personnel_records", "Personnel records", "About staff, students, and applicants"),
+        ("financial_records", "Financial records", "Accounts, awards, payments, and donors"),
+        ("intellectual_property", "Intellectual property", "Unpublished results and inventions"),
+        ("operational", "Operational", "What the organization needs to run"),
+    ),
 }
 
 # The named relationships between records. ``label`` reads from the first to the second;
@@ -192,6 +203,24 @@ LINK_KINDS: list[dict[str, Any]] = [
         "label": "Supplied by",
         "reverse": "Supplies",
         "between": [["system", "third_party"]],
+    },
+    {
+        "key": "holds",
+        "label": "Holds",
+        "reverse": "Is held in",
+        "between": [["system", "information"]],
+    },
+    {
+        "key": "uses",
+        "label": "Uses",
+        "reverse": "Is used by",
+        "between": [["process", "information"]],
+    },
+    {
+        "key": "shared_with",
+        "label": "Is shared with",
+        "reverse": "Receives",
+        "between": [["information", "third_party"]],
     },
     {
         "key": "depends_on",

@@ -652,3 +652,112 @@ AGREEMENT_CONTROLS = [
      "The plan names the privacy office; the seventy-two hours is in the checklist."),
     ("data_sharing_approved", "CMPL", "DUA-4.1", "full", None),
 ]  # fmt: skip
+
+# Bodies of information. key, name, unit, kind, criticality, data class, held in, shared with, agreement
+INFORMATION: list[tuple[str, str, str, str, str, str, str, str | None, str | None]] = [
+    ("info_cohort", "Cohort survey responses", "PS", "participant_data", "high", "restricted",
+     "The cohort database and the survey platform.", "Calder Bay University, under the shared cohort protocol.", "Consent form, version 4"),
+    ("info_specimens", "Specimen records", "BIO", "specimen_records", "critical", "restricted",
+     "The specimen tracking service.", None, "Repository consent and the material transfer agreements"),
+    ("info_patients", "Patient records", "CLIN", "patient_records", "critical", "restricted",
+     "The clinical record system and the laboratory information system.", "Lakeshore Reference Laboratory, for tests sent out.", None),
+    ("info_trials", "Trial participant data", "CR", "participant_data", "high", "restricted",
+     "Electronic data capture and the trial management system.", "Each trial's sponsor, as its protocol provides.", "Trial agreements"),
+    ("info_genomic", "Controlled-access genomic data", "RC", "controlled_data", "critical", "restricted",
+     "The data enclave, and nowhere else.", None, "The repository's data use certification"),
+    ("info_open_cohort", "Open Cohort Trust data", "PS", "controlled_data", "high", "restricted",
+     "Research storage, in the cohort project's own area.", None, "Data use agreement: Open Cohort Trust"),
+    ("info_people", "Personnel records", "HR", "personnel_records", "high", "restricted",
+     "The people system.", None, None),
+    ("info_awards", "Award and effort records", "SP", "financial_records", "high", "confidential",
+     "The grants management system and the finance system.", "Sponsors, in required reports.", None),
+    ("info_donors", "Donor records", "PHIL", "financial_records", "moderate", "confidential",
+     "The donor database.", None, None),
+    ("info_results", "Unpublished research results", "RES", "intellectual_property", "high", "confidential",
+     "Research storage and the electronic lab notebook.", None, None),
+]  # fmt: skip
+INFORMATION_LINKS: list[tuple[str, str, str]] = [
+    ("cohortdb", "holds", "info_cohort"), ("survey", "holds", "info_cohort"),
+    ("Cohort follow-up", "uses", "info_cohort"), ("info_cohort", "shared_with", "univ1"),
+    ("tracking", "holds", "info_specimens"), ("Specimen storage and retrieval", "uses", "info_specimens"),
+    ("record", "holds", "info_patients"), ("lis", "holds", "info_patients"),
+    ("Infusion therapy", "uses", "info_patients"), ("info_patients", "shared_with", "labref"),
+    ("edc", "holds", "info_trials"), ("ctms", "holds", "info_trials"),
+    ("Trial data management", "uses", "info_trials"), ("info_trials", "shared_with", "pharma1"),
+    ("enclave", "holds", "info_genomic"), ("Controlled-access data hosting", "uses", "info_genomic"),
+    ("storage", "holds", "info_open_cohort"), ("hris", "holds", "info_people"),
+    ("grants", "holds", "info_awards"), ("finance", "holds", "info_awards"),
+    ("donors", "holds", "info_donors"), ("storage", "holds", "info_results"), ("eln", "holds", "info_results"),
+]  # fmt: skip
+
+# Scopes. Central IT provides; the clinic and the enclave rely on it.
+SCOPE_PROVIDER = {
+    "name": "Central information technology",
+    "unit": "IT",
+    "summary": "The services Information Technology and Information Security run for the whole institute.",
+    "boundary": "Identity, the campus network, backup, the server platform, email, and endpoint "
+    "management, and the people who run them. Systems that units run for themselves are outside it.",
+    "members": ["identity", "network", "backup", "servers", "email", "endpoints", "siem", "scanner"],
+    "units": ["IT", "SEC"],
+    "framework": ("nist-csf", None),
+    # control (library key), the unit that runs it, who answers for it
+    "controls": [
+        ("second_factor", "IT", "Identity team"), ("privileged_access", "IT", "Identity team"),
+        ("access_removed_on_leaving", "IT", "Identity team"), ("backups_tested", "IT", "Infrastructure team"),
+        ("patching", "IT", "Infrastructure team"), ("network_segmentation", "IT", "Network team"),
+        ("encryption_at_rest", "IT", "Endpoint team"), ("change_review", "IT", "Change board"),
+        ("access_reviewed", "SEC", "Security operations"), ("malware_protection", "SEC", "Security operations"),
+        ("logging_monitoring", "SEC", "Security operations"), ("incident_response", "SEC", "Security operations"),
+        ("security_training", "SEC", "Security awareness lead"), ("supplier_assessed", "SEC", "Security assurance"),
+    ],
+}  # fmt: skip
+SCOPE_CLINIC = {
+    "name": "Clinical systems",
+    "unit": "CLIN",
+    "summary": "The systems that hold and use patient records in the research clinic.",
+    "boundary": "The clinical record system, the laboratory information system, dispensing "
+    "cabinets, infusion pumps, and scheduling, with the clinic staff who use them.",
+    "members": ["record", "lis", "cabinets", "pumps", "scheduling", "info_patients", "recordco"],
+    "units": ["CLIN"],
+    "framework": ("hipaa-security", None),
+    "inherited": ["second_factor", "backups_tested", "patching", "malware_protection",
+                  "logging_monitoring", "incident_response", "encryption_at_rest",
+                  "access_removed_on_leaving"],
+    # control, where the clinic's part stands, what the clinic does
+    "shared": [
+        ("access_reviewed", "in_place",
+         "Clinic managers review who can open the clinical record each quarter, and Security reviews the rest."),
+        ("security_training", "partly",
+         "The clinic adds a module on patient privacy. A third of agency staff have not yet taken it."),
+    ],
+    "own": [("downtime_procedures", "in_place", "Nurse managers",
+             "Each area keeps paper forms and a downtime box, and practices in spring and autumn.")],
+    "excluded": [
+        (["164.308(a)(4)(ii)(A)"], "Northmere is not, and does not include, a health care clearinghouse."),
+        (["164.314(b)(1)", "164.314(b)(2)", "164.314(b)(2)(i)", "164.314(b)(2)(ii)",
+          "164.314(b)(2)(iii)", "164.314(b)(2)(iv)"],
+         "These apply to group health plans. The clinic is a provider, not a plan."),
+    ],
+}  # fmt: skip
+SCOPE_ENCLAVE = {
+    "name": "Controlled-access data enclave",
+    "unit": "RC",
+    "summary": "Where genomic data obtained under a repository's certification is held and analysed.",
+    "boundary": "The enclave's hosts and storage in racks 4 to 6, its own network segment, and "
+    "the twelve approved users. Nothing leaves it except results a data steward has released.",
+    "members": ["enclave", "info_genomic", "genomevault", "Controlled-access data hosting"],
+    "units": [],
+    "framework": ("nist-800-171", None),
+    "inherited": ["second_factor", "network_segmentation", "malware_protection", "incident_response"],
+    "shared": [
+        ("patching", "in_place",
+         "Research Computing patches the enclave's own hosts on the institute's schedule; IT patches what is beneath them."),
+        ("logging_monitoring", "planned",
+         "The enclave's hosts do not yet send their logs to security monitoring. Due with the next storage refresh."),
+        ("backups_tested", "partly",
+         "The enclave is backed up to its own encrypted set. A full restore has not been tried."),
+    ],
+    "own": [("privileged_access", "in_place", "Enclave administrators",
+             "Two named administrators, separate accounts, and every session recorded.")],
+    "excluded": [],
+}  # fmt: skip

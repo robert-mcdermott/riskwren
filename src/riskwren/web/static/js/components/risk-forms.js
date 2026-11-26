@@ -210,7 +210,7 @@ export function editSubjects({ risk, onDone }) {
           results.replaceChildren();
           return;
         }
-        const pages = await Promise.all(["process", "system", "third_party"].map((type) =>
+        const pages = await Promise.all(["process", "system", "third_party", "information"].map((type) =>
           get(`/api/v1/${TYPES[type].path}`, { q: words, sort: "name", limit: 5, status: "active" }, { fresh: true })));
         if (mine !== latest) return;
         const offered = pages.flatMap((page) => page.data).filter((r) => !chosen.some((c) => c.ref === r.ref));

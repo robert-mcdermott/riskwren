@@ -70,7 +70,7 @@ def suggestions(session: Session, control: Control) -> list[Requirement]:
                 Requirement.code.in_(codes),
                 Requirement.is_citable.is_(True),
             )
-            .order_by(Requirement.id)
+            .order_by(Requirement.sequence)
         )
         found += [row for row in rows if row.id not in have]
     return found
@@ -106,7 +106,7 @@ def of_control(session: Session, principal: Principal, control: Control) -> dict
         .join(Requirement, Requirement.id == ControlRequirement.requirement_id)
         .join(Framework, Framework.id == Requirement.framework_id)
         .where(ControlRequirement.control_id == control.id)
-        .order_by(Framework.title, Requirement.id)
+        .order_by(Framework.title, Requirement.sequence)
     ).all()
     groups: dict[str, dict[str, Any]] = {}
     for mapping, requirement, framework in rows:
