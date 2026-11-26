@@ -1,0 +1,35 @@
+"""Generated documentation must match the code. Regenerate with ``UPDATE_DOCS=1 uv run pytest
+tests/test_docs.py``."""
+
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+from fastapi.testclient import TestClient
+
+from riskwren.cli import reference
+
+DOCS = Path(__file__).resolve().parent.parent / "docs"
+UPDATE = os.environ.get("UPDATE_DOCS") == "1"
+
+
+def _check(path: Path, fresh: str) -> None:
+    if UPDATE:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(fresh, encoding="utf-8")
+    assert path.is_file(), f"{path.name} is missing; run with UPDATE_DOCS=1"
+    assert path.read_text(encoding="utf-8") == fresh, (
+        f"{path.name} is out of date; run UPDATE_DOCS=1 uv run pytest tests/test_docs.py"
+    )
+
+
+def test_the_command_reference_is_current() -> None:
+    _check(DOCS / "cli.md", reference.render())
+
+
+def test_the_openapi_document_is_current(client: TestClient) -> None:
+    document = client.get("/api/openapi.json").json()
+    document["info"]["version"] = "current"  # the version changes every release
+    _check(DOCS / "openapi.json", json.dumps(document, indent=2, sort_keys=True) + "\n")
