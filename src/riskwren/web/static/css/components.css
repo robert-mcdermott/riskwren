@@ -578,3 +578,9 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
 .timeline-record { margin-top: 4px; }
 .filters-history .filter-date .input { width: auto; }
 .split-history { align-items: start; }
+/* On a narrow screen a bar's second figure goes beneath the first, so the bar keeps its room. */
+@media (max-width: 640px) {
+  .bar-row { grid-template-columns: minmax(96px, 40%) minmax(40px, 1fr) minmax(40px, 34%); }
+  .bar-value { white-space: normal; }
+  .bar-value .cell-sub { display: block; }
+}
