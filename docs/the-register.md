@@ -51,7 +51,7 @@ Every record has a **History** tab: who changed what, when, with each value befo
 
 ### Raise a risk
 
-**Register → New risk.** Start from the library when you can: it holds 57 common risks, written as a cause, an event, and a consequence, each with its category and the controls commonly used for it. Change the wording to fit; the library is a starting point, not a standard.
+**Register → New risk.** Start from the library when you can, by searching it at the top of the form: it holds 57 common risks, written as a cause, an event, and a consequence, each with its category and the controls commonly used for it. Change the wording to fit; the library is a starting point, not a standard.
 
 A risk needs a name, a category, and a unit. Say what it **concerns** by linking the processes, systems, and third parties involved, so that anyone looking at a system sees the risks that bear on it.
 
@@ -103,7 +103,7 @@ Close a risk when it no longer applies, with the reason. It leaves the open regi
 
 A control is something the organization does to make a risk less likely or less harmful. It has a statement of what is done, an owner, a unit, a kind (preventive, detective, corrective, or directive), and how often it happens.
 
-**Controls → Library** holds 56 common controls in plain words. Adopting one makes a control of your own that you then make specific: the library entry says "backups are tested"; yours says which systems, how often, and by whom.
+**Controls → Library** is your organization's own controls. **New control** can start from a set of 56 common controls in plain words: search it, choose one, and then make it specific. The starting text says "backups are tested"; yours says which systems, how often, and by whom.
 
 ### Rate a control
 
