@@ -28,7 +28,7 @@ export function dashboard(main) {
       const scope = board.unit ? { unit: board.unit } : {};
       const unitName = board.unit ? data.units.byId.get(board.unit)?.name : null;
       if (!t.open.count && !board.controls.total.count) {
-        return h("div", { class: "stack-lg" }, pageHeader({ eyebrow: "Reports", title: "Dashboard" }),
+        return h("div", { class: "stack-lg" }, pageHeader({ eyebrow: "Reports", title: "Risk" }),
           card({}, emptyState({ iconName: "risk", title: "Nothing to report yet", text: "Once risks are raised and assessed, this page shows where the register stands." })));
       }
       const tiles = h("div", { class: "tiles" },
@@ -47,7 +47,7 @@ export function dashboard(main) {
           h("td", {}, h("div", { class: "row-sm wrap" }, standingPill(risk.standing), flags(risk))))))))
         : h("p", { class: "muted" }, "No risk has a residual rating yet.");
       return sizeBars(h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Reports", title: "Dashboard",
+        pageHeader({ eyebrow: "Reports", title: "Risk",
           lede: unitName ? `Where the register stands for ${unitName} and everything beneath it.` : "Where the register stands, for everything you may see.",
           actions: filterSelect("unit", unitOptions(data.units.tree, { blank: "The whole organization" }), "Unit") }),
         tiles,

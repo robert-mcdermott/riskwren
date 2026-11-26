@@ -56,7 +56,9 @@ function summary(figures) {
     tile(figures.needs_decision, "Risks need a decision", "/risks", "danger"),
     tile(figures.above_appetite, "Risks above appetite", "/risks", ""),
     tile(figures.review_overdue, "Reviews overdue", "/risks", "warn"),
-    tile(figures.actions_overdue, "Actions overdue", "/actions", "danger"));
+    tile(figures.actions_overdue, "Actions overdue", "/actions", "danger"),
+    tile(figures.controls_failing, "Controls failing a test", "/controls", "danger"),
+    tile(figures.issues_overdue, "Issues overdue", "/issues", "danger"));
 }
 
 export function home(main, meta) {

@@ -254,6 +254,10 @@ POLICIES.update(
 POLICIES.update(
     {
         ("GET", "/api/v1/home"): Needs.MEMBER,
+        ("GET", "/api/v1/compliance"): Needs.MEMBER,
+        ("GET", "/api/v1/graph/{ref}"): Needs.MEMBER,
+        # Every change in one place is for those who may read everything.
+        ("GET", "/api/v1/history"): Needs.READ_ALL,
         ("GET", "/api/v1/heat-map"): Needs.MEMBER,
         ("GET", "/api/v1/dashboard"): Needs.MEMBER,
     }

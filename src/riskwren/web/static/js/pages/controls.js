@@ -32,6 +32,7 @@ export function controlLibrary(main) {
       const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
         filterSelect("kind", options(vocab, "control_kinds", { blank: "Any kind" }), "Kind"),
         filterSelect("state", stateOptions("Any effectiveness"), "Effectiveness"),
+        filterSelect("tested", [["", "Tested or not"], ["effective", "Tested, and effective"], ["failing", "Tested, and found wanting"], ["none", "No test that still holds"]], "What its rating rests on"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
         mineToggle());
       const body = rows.length

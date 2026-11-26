@@ -349,6 +349,7 @@ export function issueList(main) {
         filterSelect("severity", severityOptions(data.vocab, "Any severity"), "Severity"),
         filterSelect("source_kind", options(data.vocab, "issue_sources", { blank: "Found by anything" }), "What found it"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
+        filterSelect("age", [["", "Raised at any time"], ["0-30", "Under a month ago"], ["31-90", "1 to 3 months ago"], ["91-180", "3 to 6 months ago"], ["181+", "Over 6 months ago"]], "Age"),
         h("button", { type: "button", class: `btn${overdue ? " btn-primary" : ""}`, "aria-pressed": String(overdue), onclick: () => setQuery({ overdue: overdue ? null : "true", cursor: null }) }, "Overdue"),
         mineToggle());
       void reload;

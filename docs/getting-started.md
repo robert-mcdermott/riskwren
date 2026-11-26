@@ -121,7 +121,7 @@ uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0
 
 The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 220 processes, systems, and third parties, 180 risks, and 110 controls, with their assessments, ratings, plans, and acceptances. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.
 
-Its sign-in page offers nine sample people and asks for no password:
+Its sign-in page offers ten sample people and asks for no password:
 
 | Sign in as | To see |
 |---|---|
@@ -130,7 +130,8 @@ Its sign-in page offers nine sample people and asks for no password:
 | The unit leader | A leader whose limit is moderate, and a high risk they were not allowed to accept |
 | The division leader | Acceptances given, one of them expiring next month |
 | The executive | The one person who may accept a critical risk |
-| The assessor | Rating controls and assessing risks across the organization |
+| The security leader | The compliance dashboard, a critical finding from a penetration test, a closure to confirm, and exceptions to decide |
+| The assessor | An assessment in progress: tests to do, a result to review, and the issues the failed tests opened |
 | The auditor | Everything, read-only, with the full history |
 | The administrator | People, units, and appearance, and no part in the register's judgments |
 | A staff member | Home for someone with one action to finish, and only their own unit's part of the register |

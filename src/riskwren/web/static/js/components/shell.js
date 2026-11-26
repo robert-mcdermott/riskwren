@@ -52,7 +52,9 @@ export const NAV = [
   {
     heading: "Reports",
     items: [
-      { href: "/dashboard", label: "Dashboard", iconName: "chart" },
+      { href: "/compliance", label: "Compliance", iconName: "shield-check" },
+      { href: "/dashboard", label: "Risk", iconName: "chart" },
+      { href: "/history", label: "History", iconName: "history", when: "read_all" },
     ],
   },
   {

@@ -1855,7 +1855,7 @@ class Builder:
         yield self.ago(raised)
         issue = self._raise(by, key, owner, **more)
         if spec["actions"]:
-            yield self.later(2, 6)
+            yield self.later(0.3, 1) if spec.get("urgent") else self.later(2, 6)
             staff = self.staff[self.units[spec["unit"]]]
             # Whoever noticed it helps to put it right, if they work there.
             helper = (
@@ -1864,7 +1864,7 @@ class Builder:
                 else next((person for person in staff if person != owner), owner)
             )
             actions = self._issue_actions(owner, issue, spec["actions"], [helper, owner])
-            yield self.later(12, 25)
+            yield self.later(2, 4) if spec.get("urgent") else self.later(12, 25)
             self._finish(actions)
         if spec.get("withdrawn"):
             yield self.later(1, 3)
@@ -1923,6 +1923,12 @@ class Builder:
             self._issue_story("cabinets", 100, self.cast["risk2"], self.cast["pharm_mgr"])
         )
         fac, sp, it = (self.units[code] for code in ("FAC", "SP", "IT"))
+        walls = self.controls.get(("network_segmentation", it))
+        with self.db.read() as session:
+            about = [session.get(Control, walls).ref] if walls else []
+        self.schedule(
+            self._issue_story("pentest", 13, self.cast["assess1"], self.steward(it), subjects=about)
+        )
         self.schedule(self._issue_story("visitors", 230, self.pick(fac), self.steward(fac)))
         self.schedule(self._issue_story("letters", 170, self.cast["risk1"], self.steward(sp)))
         self.schedule(self._issue_story("duplicate", 6, self.pick(it), self.steward(it)))

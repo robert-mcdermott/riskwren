@@ -9,7 +9,7 @@ state underneath is back, without anyone doing anything. Carrying on needs a new
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from sqlalchemy import and_, exists, or_, select
@@ -279,6 +279,13 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
             approved,
             ExceptionRequest.starts_on <= today,
             ExceptionRequest.expires_on >= today,
+        ]
+    elif state == "expiring":
+        found += [
+            approved,
+            ExceptionRequest.starts_on <= today,
+            ExceptionRequest.expires_on >= today,
+            ExceptionRequest.expires_on <= today + timedelta(days=SOON),
         ]
     elif state == "expired":
         found += [approved, ExceptionRequest.expires_on < today]

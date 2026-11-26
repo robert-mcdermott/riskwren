@@ -82,7 +82,8 @@ CAST: list[tuple[str, str, str, str, list[tuple[str, str | None, str | None]]]] 
     ("auditor", "Greta Bergstrom", "Director of Internal Audit", "RISK", [("auditor", None, None)]),
     ("admin", "Tobias Larsen", "Systems Administrator", "IT", [("admin", None, None)]),
     ("cio", "Priya Chaudhry", "Chief Information Officer", "IT", [("leader", "IT", "high")]),
-    ("ciso", "Goran Dimitrov", "Chief Information Security Officer", "SEC", [("leader", "SEC", "high")]),
+    ("ciso", "Goran Dimitrov", "Chief Information Security Officer", "SEC",
+     [("leader", "SEC", "high"), ("assessor", None, None)]),
     ("cfo", "Odette Moreau", "Chief Financial Officer", "FIN", [("leader", "FIN", "high")]),
     ("cores_lead", "Soren Eriksen", "Director of Core Facilities", "CORES", [("leader", "CORES", "high")]),
     ("clinic_lead", "Farah Haddad", "Medical Director", "CLIN", [("leader", "CLIN", "high")]),
@@ -123,7 +124,12 @@ SAMPLE = [
     ("bio_dir", "Unit leader", "Leads a core; may accept only moderate risks"),
     ("cores_lead", "Division leader", "May accept risks rated high in Core Facilities"),
     ("president", "Executive", "May accept risks rated critical, anywhere"),
-    ("assess1", "Assessor", "Assesses risks and rates controls, everywhere"),
+    (
+        "ciso",
+        "Security leader",
+        "Leads Information Security: decides its exceptions, sees every scope",
+    ),
+    ("assess1", "Assessor", "Tests controls, reviews results, and confirms closures, everywhere"),
     ("auditor", "Auditor", "Reads everything and changes nothing"),
     ("admin", "Administrator", "Accounts, units, and appearance; not the register"),
     ("member", "Staff member", "Sees their own unit's risks and what they owe"),
@@ -807,6 +813,16 @@ ISSUES = {
         "the call list belonged to people who left in the spring. The third answered after forty minutes.",
         "actions": [("Rebuild the call list from this quarter's rota", -40, True),
                     ("Test the call-out at night, unannounced", -12, False)],
+    },
+    "pentest": {
+        "unit": "IT", "source": "security_test", "severity": "critical", "urgent": True,
+        "name": "Guest wireless can reach the instrument network",
+        "summary": "This year's external penetration test reached two instrument controllers from "
+        "the guest wireless network through a firewall rule left from the building move. The "
+        "testers stopped there, as agreed. The controllers run software that cannot be patched.",
+        "actions": [("Remove the rule, and confirm from guest wireless that the path is closed", -8, True),
+                    ("Review every rule added during the building move", 9, False),
+                    ("Ask the testers to try the path again", 16, False)],
     },
     "cabinets": {
         "unit": "PHARM", "source": "audit", "severity": "high",

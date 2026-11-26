@@ -5026,6 +5026,59 @@
         ]
       }
     },
+    "/api/v1/compliance": {
+      "get": {
+        "operationId": "compliance_board_api_v1_compliance_get",
+        "parameters": [
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Compliance Board Api V1 Compliance Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Where compliance stands: readiness by scope, issues, evidence, and exceptions",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/control-library": {
       "get": {
         "operationId": "show_library_api_v1_control_library_get",
@@ -5217,6 +5270,24 @@
               ],
               "description": "effective, partly, ineffective, or not_assessed",
               "title": "State"
+            }
+          },
+          {
+            "description": "By a test that still holds: effective, failing, or none (no such test)",
+            "in": "query",
+            "name": "tested",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "By a test that still holds: effective, failing, or none (no such test)",
+              "title": "Tested"
             }
           },
           {
@@ -7774,6 +7845,50 @@
         ]
       }
     },
+    "/api/v1/graph/{ref}": {
+      "get": {
+        "operationId": "graph_around_api_v1_graph__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Graph Around Api V1 Graph  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A record and what it is connected to, in groups",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/health/live": {
       "get": {
         "operationId": "live_api_v1_health_live_get",
@@ -7895,6 +8010,149 @@
           }
         },
         "summary": "Open risks counted by likelihood and impact",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/history": {
+      "get": {
+        "operationId": "whole_history_api_v1_history_get",
+        "parameters": [
+          {
+            "description": "An account's id",
+            "in": "query",
+            "name": "actor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "An account's id",
+              "title": "Actor"
+            }
+          },
+          {
+            "description": "A record's reference",
+            "in": "query",
+            "name": "about",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A record's reference",
+              "title": "About"
+            }
+          },
+          {
+            "description": "A kind of record, or other",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A kind of record, or other",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "From this date, year-month-day",
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "From this date, year-month-day",
+              "title": "Since"
+            }
+          },
+          {
+            "description": "Up to and including this date",
+            "in": "query",
+            "name": "until",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Up to and including this date",
+              "title": "Until"
+            }
+          },
+          {
+            "description": "The `next` of the page before",
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The `next` of the page before",
+              "title": "Before"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Whole History Api V1 History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Every change, newest first, for those who read everything",
         "tags": [
           "reporting"
         ]
@@ -8917,6 +9175,24 @@
               "default": false,
               "title": "Overdue",
               "type": "boolean"
+            }
+          },
+          {
+            "description": "Days since it was raised: 0-30, 31-90, 91-180, or 181+",
+            "in": "query",
+            "name": "age",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Days since it was raised: 0-30, 31-90, 91-180, or 181+",
+              "title": "Age"
             }
           },
           {

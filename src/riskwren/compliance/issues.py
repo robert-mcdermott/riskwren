@@ -51,6 +51,10 @@ from riskwren.treatment import service as treatment
 KEY = "issue"
 LIVE = ("open", "proposed")
 DUE_DAYS = {"critical": 30, "high": 90, "moderate": 180, "low": 365}
+# Bands of age, in days since an issue was raised: youngest and oldest, inclusive.
+AGES: dict[str, tuple[int, int | None]] = {
+    "0-30": (0, 30), "31-90": (31, 90), "91-180": (91, 180), "181+": (181, None),
+}  # fmt: skip
 # What an issue can be about. A requirement is not a record of its own, so it is named by
 # its framework and code.
 SUBJECTS: dict[str, RecordType] = {"control": CONTROL, "scope": SCOPE, "risk": RISK}
@@ -356,6 +360,14 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         found.append(Issue.status == status)
     if filters.get("overdue"):
         found += [Issue.status.in_(LIVE), Issue.due_on < utc_now().date()]
+    age = AGES.get(str(filters.get("age") or ""))
+    if age is not None:
+        # How long ago it was raised, in days: a band of the aging table.
+        today = utc_now()
+        youngest, oldest = age
+        found.append(Issue.created_at <= today - timedelta(days=youngest))
+        if oldest is not None:
+            found.append(Issue.created_at > today - timedelta(days=oldest + 1))
     if filters.get("about"):
         try:
             record_type, subject = find_any(session, str(filters["about"]))

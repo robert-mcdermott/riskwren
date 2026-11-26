@@ -4,6 +4,8 @@ RiskWren ships in **waves**. Each wave is a release (wave 1 → v0.1.0, wave 2 �
 
 The order follows how a program grows. Wave 1 gets the register right: what the organization has, what could go wrong, what is done about it, and who answers for it. Wave 2 adds what it must comply with, and the tests and evidence that prove it. Wave 3 keeps all of it current without a central team chasing. Waves 4 and 5 widen it to policy, obligations, and third parties. Wave 6 turns the record into answers for leadership. Waves 7 and 8 add audit and what happens when things go wrong. Waves 9 and 10 make it something another organization can adopt and connect. Wave 11, once adopters have seen it, makes it stable. Every wave ends with something that can be demonstrated on the demo organization.
 
+**Whose work comes first.** The first adopters are security teams (see [vision.md](vision.md)). Within every wave, what a chief information security officer and a security assurance team use is built first and polished most: frameworks, scopes, tests, evidence, issues, exceptions, and the compliance dashboard in wave 2; attestations, evidence renewal, and reminders in wave 3; supplier security reviews in wave 5. The order of the waves is unchanged.
+
 | Wave | Version | Theme | The demo at the end |
 |---|---|---|---|
 | 1 | v0.1.0 | **The register** | Install, sign in, and hold a risk register over an inventory of processes, systems, and third parties: rated, linked to controls of known effectiveness, treated or formally accepted, on a heat map that explains itself |
@@ -54,7 +56,7 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 | 5 | Assessments and tests | Assessments, the test queue, procedures and results with review, results flowing to controls, requirements, and risks; readiness in five states | ☑ |
 | 6 | Issues and exceptions | The issue register, severity clocks, action plans, validated closure, root cause, exceptions with compensating controls and expiry, the plan-of-action view; in-app notices | ☑ |
 | 7 | Import and export | Spreadsheet import with mapping and a dry run for every record type; CSV and JSON export of every list; external references | ☑ |
-| 8 | Dashboard, graph, and demo | Readiness by scope and framework, stale evidence, issues by age; the dependency graph around any record; an organization-wide history view; the demo's scopes, assessment, and issues | ☐ |
+| 8 | Dashboard, graph, and demo | Readiness by scope and framework, stale evidence, issues by age; the dependency graph around any record; an organization-wide history view; the demo's scopes, assessment, and issues | ☑ |
 | 9 | Release prep | Guides, changelog, dependency review, release | ☐ |
 
 Detail: [waves/wave-2.md](waves/wave-2.md) · Detail of the content: [content-packs.md](content-packs.md)

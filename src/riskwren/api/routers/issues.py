@@ -132,6 +132,9 @@ def list_issues(
     source_kind: str | None = None,
     about: str | None = Query(default=None, description="A control, scope, or risk reference"),
     overdue: bool = False,
+    age: str | None = Query(
+        default=None, description="Days since it was raised: 0-30, 31-90, 91-180, or 181+"
+    ),
     owner: int | None = None,
     mine: bool = MINE,
     sort: str = Query(default="due_on", description="A field name; prefix with - for descending"),
@@ -139,8 +142,8 @@ def list_issues(
     cursor: str | None = None,
 ) -> dict[str, Any]:
     filters = {"q": q, "unit": unit, "status": status, "severity": severity,
-               "source_kind": source_kind, "about": about, "overdue": overdue, "owner": owner,
-               "mine": mine}  # fmt: skip
+               "source_kind": source_kind, "about": about, "overdue": overdue, "age": age,
+               "owner": owner, "mine": mine}  # fmt: skip
     return list_records(request, ISSUE, filters, sort, limit, cursor)
 
 

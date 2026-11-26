@@ -572,6 +572,11 @@
         "description": "A requirement that nothing answers, or a control with no evidence"
       },
       {
+        "key": "security_test",
+        "label": "Security testing",
+        "description": "A penetration test, a scan, or an exercise found it"
+      },
+      {
         "key": "audit",
         "label": "Audit",
         "description": "A finding from an internal or external audit"

@@ -93,6 +93,21 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **External references.** A record can carry what it is called in other systems: an asset
   tag, a contract number, a ticket. It is found by them in search, and they are links
   where the system has an address pattern (migration 0013).
+- **Compliance dashboard.** Beside the risk dashboard: each scope against each framework it
+  is held to, open issues by severity and age, the longest overdue, what the controls'
+  ratings rest on, evidence that still counts and that does not, exceptions waiting, in
+  force, and ended, and assessments in progress, for the whole organization or one unit.
+  Every figure opens the list that makes it. Home shows controls failing a test and
+  issues overdue.
+- **Connections.** Every record has a picture of what it is joined to: what it relies on
+  and what relies on it, its risks, controls, scopes, evidence, issues, exceptions, and
+  assessments. A neighbor can be opened in place or put in the middle, by mouse or
+  keyboard, and a list beside the picture says the same in full.
+- **History of everything.** Those who may read everything can browse every change in one
+  place, narrowed by person, record, kind of record, and date.
+- **More to filter by.** Issues by how long ago they were raised, exceptions ending within a
+  month, and controls by what a test that still holds found. Issues can name security
+  testing as what found them.
 - **Safe file storage.** Files are stored by the SHA-256 of their content, outside anything
   the server serves. Their kind is judged by content, not name: PDF, common images, Word,
   Excel, and PowerPoint documents, and plain text, up to 25 MB; programs are refused. A file

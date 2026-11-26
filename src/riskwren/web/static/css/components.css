@@ -538,3 +538,43 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
 /* The plan of action: one issue to a row, its milestones beneath one another. */
 .milestones { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
 .milestones li { display: grid; gap: 1px; }
+
+/* The compliance dashboard. */
+.readiness-col { min-width: 260px; width: 38%; }
+.readiness-said { margin-top: 6px; }
+.list-row-wide { align-items: center; flex-wrap: wrap; }
+.assessment-progress { flex: 1 1 280px; max-width: 460px; }
+.connections-link { display: inline-flex; align-items: center; gap: 4px; }
+/* The picture of how a record is connected. */
+.graph-wrap { overflow-x: auto; }
+.graph { display: block; width: 100%; min-width: 760px; height: auto; font-family: var(--font-sans); }
+.gedge { fill: none; stroke: var(--control-border); stroke-width: 1.5; }
+.gnode > rect:first-child { fill: var(--surface-1); stroke: var(--control-border); stroke-width: 1.25; }
+.gnode[data-ring="0"] > rect:first-child { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.gnode text { fill: var(--text); font-size: 13px; font-weight: 550; }
+.gnode .gnode-ref, .gnode-beyond { fill: var(--text-muted); font-size: 10.5px; font-weight: 500; font-family: var(--font-mono); }
+.gnode-beyond { font-family: var(--font-sans); }
+.gnode-kind { fill: var(--text-muted); }
+.gnode[data-record="risk"] .gnode-kind { fill: var(--rec-risk); }
+.gnode[data-record="control"] .gnode-kind { fill: var(--rec-control); }
+.gnode[data-record="process"] .gnode-kind { fill: var(--rec-process); }
+.gnode[data-record="system"] .gnode-kind, .gnode[data-record="information"] .gnode-kind { fill: var(--rec-system); }
+.gnode[data-record="third_party"] .gnode-kind { fill: var(--rec-party); }
+.gnode[data-record="issue"] .gnode-kind { fill: var(--danger); }
+.gnode[data-record="scope"] .gnode-kind, .gnode[data-record="exception"] .gnode-kind, .gnode[data-record="assessment"] .gnode-kind, .gnode[data-record="evidence"] .gnode-kind { fill: var(--accent); }
+.gnode-more > rect { fill: var(--surface-2); stroke: var(--border); stroke-dasharray: 4 3; }
+.gnode-more text { fill: var(--text-muted); font-size: 12px; font-weight: 500; }
+.gnode[role="link"], .gexpand { cursor: pointer; }
+.gnode[role="link"]:hover > rect:first-child { fill: var(--surface-2); }
+.gexpand circle { fill: var(--surface-1); stroke: var(--control-border); stroke-width: 1.25; }
+.gexpand text { fill: var(--text); font-size: 15px; font-weight: 600; }
+.gexpand:hover circle { fill: var(--surface-3); }
+.gnode:focus-visible, .gexpand:focus-visible { outline: none; }
+.gnode:focus-visible > rect:first-child, .gexpand:focus-visible circle { stroke: var(--focus); stroke-width: 3; }
+.glabel { fill: var(--text-muted); font-size: 11px; font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase; }
+.glist { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.glist-more { margin: var(--space-2) 0 var(--space-2) var(--space-5); padding-left: var(--space-3); border-left: 2px solid var(--border); display: grid; gap: var(--space-2); }
+/* Every change in one place. */
+.timeline-record { margin-top: 4px; }
+.filters-history .filter-date .input { width: auto; }
+.split-history { align-items: start; }

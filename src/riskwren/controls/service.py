@@ -11,7 +11,7 @@ from collections.abc import Mapping
 from datetime import UTC, date, datetime
 from typing import Any
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
@@ -132,6 +132,26 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         found.append(Control.rated_at < datetime.combine(
             rules.add_months(utc_now().date(), -months), datetime.min.time(), tzinfo=UTC
         ))  # fmt: skip
+    tested = filters.get("tested")
+    if tested in ("effective", "failing", "none"):
+        # What stands behind the control's rating: a test that still holds, or not.
+        months = int(rules.get(session, "cadences").get("control_rating_months", 12))
+        since = datetime.combine(
+            rules.add_months(utc_now().date(), -months), datetime.min.time(), tzinfo=UTC
+        )
+        by_test = exists(
+            select(ControlRating.id).where(
+                ControlRating.control_id == Control.id,
+                ControlRating.superseded_by.is_(None),
+                ControlRating.basis == "test",
+                ControlRating.rated_at >= since,
+            )
+        )
+        fine = and_(Control.design == "effective", Control.operation == "effective")
+        if tested == "none":
+            found.append(~by_test)
+        else:
+            found += [by_test, fine if tested == "effective" else ~fine]
     if filters.get("is_key"):
         found.append(Control.is_key.is_(True))
     if filters.get("risk"):

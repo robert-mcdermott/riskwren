@@ -277,8 +277,9 @@ REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
-for _report in ("home", "heat-map", "dashboard"):
+for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
+REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():
     if _template.startswith("/api/v1/frameworks"):
@@ -368,6 +369,8 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
             path = template.replace("{account_id}", str(own)).replace(
                 "{unit_id}", str(people.units["HALE"])
             )
+            if template.startswith("/api/v1/graph"):
+                path = path.replace("{ref}", "SYS-9999")
             if template.startswith("/api/v1/exports"):
                 path = path.replace("{kind}", "processes")
             if template.startswith("/api/v1/imports/records"):

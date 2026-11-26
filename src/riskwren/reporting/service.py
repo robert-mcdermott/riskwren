@@ -458,4 +458,13 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             name: figures[name]
             for name in ("above_appetite", "needs_decision", "review_overdue", "actions_overdue")
         }
+        # And where compliance stands: what a test has found wanting, and what is late.
+        failing = {"status": "active", "tested": "failing"}
+        late = {"status": "live", "overdue": True}
+        summary["controls_failing"] = {
+            "count": count(session, principal, CONTROL, failing), "filters": failing,
+        }  # fmt: skip
+        summary["issues_overdue"] = {
+            "count": count(session, principal, issues.ISSUE, late), "filters": {"overdue": True},
+        }  # fmt: skip
     return {"items": items, "overdue": sum(item["overdue"] for item in items), "summary": summary}
