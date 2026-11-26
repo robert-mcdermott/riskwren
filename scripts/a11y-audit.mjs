@@ -148,7 +148,12 @@ try {
         await page.evaluate(`localStorage.setItem("riskwren.palette", ${JSON.stringify(palette)}); localStorage.removeItem("riskwren.mode")`);
         await page.goto(demo.base + (typeof scene.path === "function" ? await scene.path(page) : scene.path));
         await page.settled();
-        if (scene.step) { await page.evaluate(scene.step); await new Promise((r) => setTimeout(r, 400)); }
+        if (scene.step) {
+          await page.evaluate(scene.step);
+          await new Promise((r) => setTimeout(r, 400));
+          const missed = await page.evaluate("window.__sceneMissed || null");
+          if (missed) found.set(`step: ${missed}`, true);
+        }
         for (const finding of await page.evaluate(AUDIT)) {
           const key = `${finding.rule}: ${finding.detail}`;
           const where = finding.rule === "contrast" ? ` [${palette} ${mode}]` : "";

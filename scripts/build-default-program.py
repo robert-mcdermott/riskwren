@@ -379,11 +379,81 @@ SCORING_METHOD: dict[str, Any] = {
     },
 }
 
-# How often a risk is reviewed, by its residual rating; and how long a control's rating holds.
+# What wave 2 added. Severities are ordered from most to least: an issue's date follows from
+# its severity by the table in CADENCES.
+COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
+    "issue_severities": items(
+        (
+            "critical",
+            "Critical",
+            "Leaves people, patients, or regulated data exposed now, or breaks a legal obligation",
+        ),
+        (
+            "high",
+            "High",
+            "A control the organization relies on does not work, with nothing making up for it",
+        ),
+        (
+            "moderate",
+            "Moderate",
+            "A control works in part, or something else partly makes up for it",
+        ),
+        (
+            "low",
+            "Low",
+            "A weakness in how something is done or recorded that does not yet leave anything exposed",
+        ),
+    ),
+    # What can find an issue.
+    "issue_sources": items(
+        ("test", "Test", "A test in an assessment found a control wanting"),
+        ("gap", "Gap", "A requirement that nothing answers, or a control with no evidence"),
+        (
+            "security_test",
+            "Security testing",
+            "A penetration test, a scan, or an exercise found it",
+        ),
+        ("audit", "Audit", "A finding from an internal or external audit"),
+        ("incident", "Incident", "Something that went wrong showed it"),
+        ("review", "Review", "A review of a supplier, a system, or a process"),
+        ("observation", "Observation", "Somebody noticed it and said so"),
+    ),
+    # Why it happened, said when an issue is closed, so that causes can be counted.
+    "root_causes": items(
+        ("procedure", "Procedure", "There was no procedure, or it was unclear or out of date"),
+        ("people", "People and time", "Not enough people, time, or training to do it"),
+        (
+            "ownership",
+            "Ownership",
+            "Nobody was clearly responsible, or it changed hands and was dropped",
+        ),
+        ("technology", "Technology", "A system could not do what was needed, or failed"),
+        ("design", "Design", "The control was done as described and still did not meet the need"),
+        ("change", "Change", "A change elsewhere was not followed through here"),
+        ("third_party", "Third party", "A supplier or partner did not do its part"),
+        ("other", "Other", "None of these, or not known"),
+    ),
+    # The other systems a record can be known in. An entry may carry a ``url`` with ``{id}``
+    # in it, and identifiers in that system then become links.
+    "external_systems": items(
+        ("asset_tag", "Asset tag", "The number on the label, or in the asset register"),
+        ("contract", "Contract number", "As the contracts or purchasing system knows it"),
+        ("ticket", "Ticket", "A request or change in the service desk"),
+        ("configuration_item", "Configuration item", "Its entry in a configuration database"),
+        ("award", "Award number", "A grant or sponsored agreement"),
+        ("other", "Other", "An identifier in any other system"),
+    ),
+}
+
+# How often a risk is reviewed, by its residual rating; how long a control's rating, a test
+# result, and evidence hold; how long after it is raised an issue is due, by severity; and
+# the longest an exception may run.
 CADENCES: dict[str, Any] = {
     "risk_review_months": {"critical": 3, "high": 6, "moderate": 12, "low": 24},
     "unrated_risk_review_months": 3,
     "control_rating_months": 12,
+    "issue_due_days": {"critical": 30, "high": 90, "moderate": 180, "low": 365},
+    "exception_max_months": 12,
 }
 
 # Who may accept a risk above appetite, by its residual rating, and for how long.
@@ -495,7 +565,7 @@ PACK: dict[str, Any] = {
         "license": "Apache-2.0",
         "text_policy": "verbatim",
     },
-    "vocabularies": {**VOCABULARIES, "link_kinds": LINK_KINDS},
+    "vocabularies": {**VOCABULARIES, "link_kinds": LINK_KINDS, **COMPLIANCE_VOCABULARIES},
     "categories": CATEGORIES,
     "scoring_method": SCORING_METHOD,
     "cadences": CADENCES,

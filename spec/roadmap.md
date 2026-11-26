@@ -43,7 +43,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 
 Detail: [waves/wave-1.md](waves/wave-1.md)
 
-## Wave 2: Compliance (v0.2.0) ◐
+## Wave 2: Compliance (v0.2.0) ☑
 
 **Goal:** test once, satisfy many. One set of controls answers every framework the organization is held to, and readiness is worked out from tests and evidence, never typed in.
 
@@ -57,7 +57,7 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 | 6 | Issues and exceptions | The issue register, severity clocks, action plans, validated closure, root cause, exceptions with compensating controls and expiry, the plan-of-action view; in-app notices | ☑ |
 | 7 | Import and export | Spreadsheet import with mapping and a dry run for every record type; CSV and JSON export of every list; external references | ☑ |
 | 8 | Dashboard, graph, and demo | Readiness by scope and framework, stale evidence, issues by age; the dependency graph around any record; an organization-wide history view; the demo's scopes, assessment, and issues | ☑ |
-| 9 | Release prep | Guides, changelog, dependency review, release | ☐ |
+| 9 | Release prep | Guides, changelog, dependency review, release | ☑ |
 
 Detail: [waves/wave-2.md](waves/wave-2.md) · Detail of the content: [content-packs.md](content-packs.md)
 

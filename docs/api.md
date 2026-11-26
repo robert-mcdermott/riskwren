@@ -99,7 +99,7 @@ Every list route takes the same parameters:
 
 | Parameter | Meaning |
 |---|---|
-| `q` | Words to look for in the name, reference, or summary |
+| `q` | Words to look for in the name, reference, or summary, or in what the record is called in another system |
 | `unit` | A unit's id. Includes every unit beneath it |
 | `sort` | A field name. Start with `-` for descending. The default is `-updated_at` |
 | `limit` | How many to return: 50 by default, 200 at most |
@@ -143,12 +143,12 @@ Every route requires a signed-in account except those marked public. What a rout
 
 ### The inventory, risks, and controls
 
-`{records}` is one of `processes`, `systems`, `third-parties`, `risks`, or `controls`. A record is addressed by its reference, such as `SYS-0036`.
+`{records}` is one of `processes`, `systems`, `third-parties`, `information`, `risks`, or `controls`. A record is addressed by its reference, such as `SYS-0036`.
 
 | Route | What it does |
 |---|---|
 | `GET /{records}` · `POST /{records}` | List; add (a steward of the unit, or a manager) |
-| `GET` · `PATCH /{records}/{ref}` | One record with everything about it; change it |
+| `GET` · `PATCH /{records}/{ref}` | One record with everything about it; change it. `external_refs` sets what it is called in other systems |
 | `PUT /{records}/{ref}/owners` | Name its owners, delegates, and contacts |
 | `GET /{records}/{ref}/history` | Its history |
 | `POST /{records}/{ref}/links` · `DELETE /{records}/{ref}/links/{id}` | Link two inventory records; unlink them |
@@ -168,7 +168,9 @@ Every route requires a signed-in account except those marked public. What a rout
 | Route | What it does |
 |---|---|
 | `GET /control-library` | Common controls to start from |
-| `GET` · `POST /controls/{ref}/ratings` | What is known about a control; record a new rating |
+| `GET` · `POST /controls/{ref}/ratings` | What is known about a control; record a new rating. Refused while a test result still holds |
+| `GET` · `PUT /controls/{ref}/requirements` · `DELETE /controls/{ref}/requirements/{id}` | The requirements a control answers; map one, in full or in part; unmap one |
+| `POST /controls/{ref}/requirements/suggested` | Add the mappings the library suggests for it |
 
 ### Treatment
 
@@ -182,6 +184,64 @@ Every route requires a signed-in account except those marked public. What a rout
 | `POST /risks/{ref}/acceptances` | Accept the risk (a leader with the authority) |
 | `GET /acceptances` · `POST /acceptances/{id}/withdrawal` | List acceptances; withdraw one |
 
+### Frameworks and scopes
+
+A requirement is addressed by a query, since codes such as `164.308(a)(1)(ii)(A)` do not belong in a path: `/frameworks/{key}/requirement?code=…`.
+
+| Route | What it does |
+|---|---|
+| `GET /frameworks` · `POST /frameworks` | The frameworks on record; add one of your own (a manager for the whole organization, or an administrator) |
+| `GET` · `PATCH /frameworks/{key}` | One framework; change or retire one of your own |
+| `GET /frameworks/{key}/requirements` | One level of its tree with `parent`, or a search with `q` or `baseline` |
+| `GET` · `PATCH` · `DELETE /frameworks/{key}/requirement` | One requirement in full, with the controls that answer it; change or remove one of your own |
+| `POST /frameworks/{key}/requirements` · `POST …/requirements/paste` | Add a requirement; add many from pasted lines, with `dry_run` |
+| `GET /frameworks/{key}/coverage` | How many requirements have a control, and which have none |
+| `GET /scopes` · `POST /scopes` · `GET` · `PATCH /scopes/{ref}` | Scopes, as any other record, with `/owners` and `/history` |
+| `PUT /scopes/{ref}/members` | What is inside the boundary: units and inventory records |
+| `PUT /scopes/{ref}/frameworks` · `DELETE /scopes/{ref}/frameworks/{key}` | Hold it to a framework, from a baseline or from every requirement; release it |
+| `GET` · `PUT /scopes/{ref}/requirements` | The statement of applicability, with `framework`, `state`, and `q`; leave a requirement out or bring it back |
+| `GET` · `PUT /scopes/{ref}/controls` · `DELETE /scopes/{ref}/controls/{id}` | How each control is done in the scope; use one or say where it stands; stop using one |
+| `GET /scopes/{ref}/controls/candidates` · `GET …/offered` · `POST …/inherited` | Controls that answer its requirements; controls other scopes offer; inherit one, whole or shared |
+| `GET /scopes/{ref}/plan-of-action` | The open issues that bear on it, each with its actions |
+
+### Evidence, assessments, and tests
+
+| Route | What it does |
+|---|---|
+| `GET /evidence` · `POST /evidence` · `GET` · `PATCH /evidence/{ref}` | Evidence items, with `state` (`current`, `expiring`, `stale`), `/owners`, and `/history` |
+| `PUT /evidence/{ref}/subjects` | Say which controls and scopes it supports |
+| `POST` · `GET /evidence/{ref}/file` | Send its file as the request body; download it. A download is recorded |
+| `GET /evidence-for/{ref}` | The evidence attached to a control or a scope |
+| `GET /assessments` · `POST /assessments` · `GET` · `PATCH /assessments/{ref}` | Assessments; start one of a scope (an assessor or a manager); one with its tests |
+| `POST /assessments/{ref}/tests` · `PATCH` · `DELETE /tests/{id}` | Add a control to it; plan a test; take one out |
+| `POST /tests/{id}/results` | Record what a test found (not for a control you own) |
+| `POST /results/{id}/review` | Confirm a result, or return it (not your own result, nor for a control you own) |
+| `POST /assessments/{ref}/completion` · `POST …/cancellation` | Close it once every test counts; abandon it |
+
+### Issues, exceptions, and notices
+
+| Route | What it does |
+|---|---|
+| `GET /issues` · `POST /issues` · `GET` · `PATCH /issues/{ref}` | Issues, with `status` (or `live`), `severity`, `source_kind`, `about`, `age`, and `overdue`; raise one |
+| `PUT /issues/{ref}/subjects` · `POST /issues/{ref}/actions` | Say what it is about; add an action |
+| `POST /issues/{ref}/due-date` | Move its date, with the reason |
+| `POST /issues/{ref}/closure` | Propose closure: what was done, the root cause, and evidence |
+| `POST /issues/{ref}/validation` | Confirm the closure, or send it back (an assessor or a manager who does not own it) |
+| `POST /issues/{ref}/cancellation` · `POST /issues/{ref}/reopening` | Withdraw one raised in error; open a closed one again |
+| `GET /exceptions` · `POST /exceptions` · `GET` · `PATCH /exceptions/{ref}` | Exceptions, with `state`; ask for one to a control, or to a requirement within a scope |
+| `POST /exceptions/{ref}/decision` | Approve or refuse it (a leader or a manager who did not ask) |
+| `POST /exceptions/{ref}/withdrawal` | Take back a request, or end an exception early |
+| `GET /notices` · `GET /notices/count` · `POST /notices/read` | What has been assigned to you or decided for you; how many are unread; mark them read |
+
+### Import and export
+
+| Route | What it does |
+|---|---|
+| `GET /exports/{list}` | Any list as `format=csv` or `format=json`, with that list's own filters. `{list}` is a record list's name, or `actions`, `plans`, `acceptances`, `requirements` (with `framework`), or `statement` (with `scope` and `framework`). Recorded in the history |
+| `POST /imports/records/{records}/columns` | Send a CSV; the answer says which column is taken for which field |
+| `POST /imports/records/{records}` | Import processes, systems, third parties, information, risks, or controls from CSV, with `dry_run` (the default) and `mapping` |
+| `POST /imports/requirements/{key}/columns` · `POST /imports/requirements/{key}` | The same, for the requirements of one of your own frameworks |
+
 ### The program and reports
 
 | Route | What it does |
@@ -194,9 +254,14 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET /home` | What is waiting on you |
 | `GET /heat-map` | Risks by likelihood and impact, with `kind`, `unit`, and `category` |
 | `GET /dashboard` | Where the register stands, with `unit`. Each figure comes with the filters of the list it counts |
+| `GET /compliance` | Readiness by scope and framework, issues by severity and age, evidence, exceptions, and assessments in progress, with `unit` |
+| `GET /graph/{ref}` | A record and everything joined to it, in groups |
+| `GET /history` | Every change, newest first, with `actor`, `about`, `kind`, `since`, `until`, and `before` (managers, auditors, and administrators) |
 
 ## What the API will not do
 
 - It never returns a record you may not see, and never counts one.
-- It never edits an assessment, a control rating, or an acceptance. Each is superseded by a new one.
+- It never edits an assessment, a control rating, a test result, or an acceptance. Each is superseded by a new one.
+- It never lets a person record or confirm a test result for a control they own, confirm the closure of an issue they own, or decide an exception they asked for.
+- It never imports a rating. A file can say what a risk or a control is, and not how it has been judged.
 - It never changes the history. There is no route that does.

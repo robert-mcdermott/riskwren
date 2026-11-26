@@ -2,7 +2,7 @@
 
 **Goal:** test once, satisfy many. One set of controls answers every framework the organization is held to, and readiness against each is worked out from tests and evidence, never typed in. Wave 1 answered "what could go wrong, and what are we doing about it?" Wave 2 answers "what are we held to, and can we show that we meet it?" with the same controls.
 
-**Branch:** `wave-2` · **Target version:** `0.2.0` · **Status:** ◐ in progress
+**Branch:** `wave-2` · **Target version:** `0.2.0` · **Status:** ☑ released
 
 ## Exit criteria
 
@@ -129,12 +129,14 @@ The wave is done when, on a fresh checkout:
 
 **Done:** a compliance dashboard beside the risk dashboard, for the whole organization or one unit and those beneath it: each scope against each framework it is held to, in the same six states as its statement of applicability; open issues by severity and by how long ago they were raised; the longest overdue; what the controls' ratings rest on (a test that found them effective, one that found them wanting, or none); evidence that still counts and that does not; exceptions waiting, in force, and ended; and assessments in progress. Every figure is the count of a list and opens it; the lists gained the filters that needed (an issue's age, an exception ending soon, a control by what a test found). Every record has a Connections link to a picture of what it is joined to (links, risks, controls, scopes, evidence, issues, exceptions, assessments), with the same in a list beside it; a neighbor can be opened in place or put in the middle, by mouse or keyboard. Those who read everything have a History page of every change, narrowed by person, record, kind, and date. The demo gained a security leader to sign in as and a critical finding from a penetration test. The acceptance tests are in `tests/test_overview.py` and `tests/js/graph-layout.test.mjs`. `scripts/keyboard-check.mjs` drives the picture in a browser with the keyboard alone (opening a neighbor, closing it, putting one in the middle) and counts the list against the answer; it found, and now guards against, the focus being lost when the picture is redrawn. The accessibility audit walks the picture and its list in every palette and mode.
 
-### Slice 9: Release prep ☐
+### Slice 9: Release prep ☑
 
-- [ ] Guides: compliance (frameworks, scopes, readiness), evidence and testing, issues and exceptions; the existing guides brought up to date
-- [ ] The accessibility audit over every new screen
-- [ ] Upgrade from 0.1.0 checked: every row kept
-- [ ] Dependency review; version `0.2.0`; pull request, tag, release
+- [x] Guides: compliance (frameworks, scopes, readiness), evidence and testing, issues and exceptions; the existing guides brought up to date
+- [x] The accessibility audit over every new screen
+- [x] Upgrade from 0.1.0 checked: every row kept
+- [x] Dependency review; version `0.2.0`; pull request, tag, release
+
+**Done:** three new guides and the other six brought up to date, with every link and anchor between them checked. The upgrade was run from release 0.1.0's own code and data on SQLite and on PostgreSQL: each of that release's 29 tables kept every row unchanged, the history grew by the upgrade's own events and still verifies, the data home's files were untouched, and the upgraded installation served the new screens. The runtime dependencies are the same five as 0.1.0, and an audit of the locked versions found no known vulnerability. The accessibility audit passes over 98 scenes in three palettes and both modes.
 
 ## Notes
 
@@ -189,4 +191,6 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **The picture is two columns, not a web.** A ring of neighbors looked like a graph and could not hold their names without overlapping. Neighbors are in columns either side of the record, a group at a time, and a neighbor's own neighbors in a column beyond it. What does not fit is counted in the picture and listed in full beside it. The layout is a function of the data alone and has its own tests.
 - **The picture and the list are one answer.** Both are drawn from the same response, grouped the same way, so the list is complete by construction and the picture can leave things out without hiding them.
 - **The whole history leaves sign-ins out unless asked.** Every change is there, but the page opens on changes to records; sign-ins, exports, and settings are one choice away.
+- **The audit must not pass what it did not see.** A guide had called a button by a name the app never used, and the audit scene that pressed it found nothing and passed. A scene whose button is missing now fails, and the guides' links are checked against their headings before a release.
+- **What a script writes, the script must hold.** The default program is written by a script, and three slices changed the file and not the script. Nothing was lost, because nobody ran it; the additions are now in the script, which reproduces the file exactly, and a test fails if they part again.
 - **The terms check can allow a word in a named file.** A word on the private list that is also ordinary English appears once in a publisher's own text. The list, which is not in the repository, can now say that a term is allowed in particular files; it is refused everywhere else, including commit messages.

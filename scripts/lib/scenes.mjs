@@ -6,7 +6,10 @@
 
 const first = (api, pick = "(rows) => rows[0].ref") => async (page) => page.evaluate(
   `fetch(${JSON.stringify(api)}).then((r) => r.json()).then((body) => (${pick})(body.data))`);
-const click = (text) => `[...document.querySelectorAll("button, a")].find((el) => el.textContent.trim() === ${JSON.stringify(text)})?.click()`;
+// A step that presses the button of that name. If there is none it says so, and the audit
+// reports it, so that a renamed button fails and is not passed over in silence.
+const click = (text) => `(() => { const el = [...document.querySelectorAll("button, a")].find((each) => each.textContent.trim() === ${JSON.stringify(text)});
+  if (el) el.click(); else window.__sceneMissed = ${JSON.stringify(`there is no button called "${text}"`)}; })()`;
 const risk = (words, tab = "") => async (page) =>
   `/risks/${await first(`/api/v1/risks?q=${encodeURIComponent(words)}`)(page)}${tab ? `?tab=${tab}` : ""}`;
 
@@ -25,7 +28,7 @@ export const SCENES = [
   { name: "risk-assess", as: "bio_mgr", path: risk("irreplaceable specimens from freezer"), step: click("Assess") },
   { name: "risk-accepted", as: "cores_lead", path: risk("cryo-electron microscope", "treatment") },
   { name: "risk-beyond-limit", as: "bio_dir", path: risk("hosted specimen tracking", "treatment") },
-  { name: "risk-new", as: "bio_mgr", path: "/risks", step: click("New risk") },
+  { name: "risk-new", as: "bio_mgr", path: "/risks", step: click("Raise a risk") },
   { name: "plans", as: "cro", path: "/plans" },
   { name: "acceptances", as: "cro", path: "/acceptances" },
   { name: "actions", as: "cro", path: "/actions" },

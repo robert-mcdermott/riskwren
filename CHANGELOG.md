@@ -6,6 +6,22 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.2.0 (2026-11-26)
+
+Wave 2, *Compliance*: test once, satisfy many. Load a framework, see it mapped to the
+organization's controls, define the scope that must meet it, test each control once, hold
+the evidence, and follow what fails through an issue to a closure someone else confirms.
+Readiness against every framework is worked out from tests and evidence, never typed in.
+
+### Upgrading from 0.1.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0007 to 0013). Every row is
+kept. The upgrade loads the four public frameworks and the mappings the common controls
+carry to them. It does not map the controls you already have: each one that came from the
+library offers its mappings on its Requirements tab.
+
 ### Added
 
 - **Frameworks.** Four public frameworks load at installation, each built from its
@@ -53,9 +69,9 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   does the control, in every scope that inherits it, and in the suggested residual rating
   of every risk the control reduces. While a test result holds, a rating by judgment does
   not replace it.
-- **Readiness in five states.** Each applicable requirement of a scope is failing, a gap,
-  planned, in place, or verified, as weak as the weakest control that answers it, and each
-  control says in words why it is where it is. Verified takes a test found effective and
+- **Readiness worked out, never typed in.** Each applicable requirement of a scope is
+  failing, a gap, planned, excepted, in place, or verified, as weak as the weakest control
+  that answers it, and each control says in words why it is where it is. Verified takes a test found effective and
   evidence that still counts; when the evidence goes stale the requirement drops back by
   itself.
 - **Issues.** One register of what is wrong, whatever found it: a test, a gap, an audit, an
@@ -116,6 +132,30 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Framework packs.** A framework is one JSON document, checked whole before anything is
   loaded and refused whole if anything is wrong. Each pack declares what text it may carry,
   and a test holds every built-in pack to it. `riskwren frameworks list`, `show`, and `load`.
+
+### Changed
+
+- **Reports** has three pages: Compliance, Risk (the dashboard of 0.1.0), and, for those
+  who may read everything, History.
+- **A test outranks a judgment.** A control whose rating came from a confirmed test cannot
+  be re-rated by judgment until that result is out of date. `POST /controls/{ref}/ratings`
+  answers 409 meanwhile.
+- **Actions belong to a plan or an issue.** The list of actions shows both, and an action
+  in the API carries a `source` when it is an issue's.
+- **Search** also finds a record by what it is called in another system.
+- **The inventory is four kinds of record**, with information assets beside processes,
+  systems, and third parties, and three more kinds of link between them.
+- **Guides:** three new ones (Compliance, Evidence and testing, Issues and exceptions), and
+  the rest brought up to date. The register guide called two buttons by names the app does
+  not use; it now says Raise a risk and Add a control.
+
+### Fixed
+
+- The picture of a record's connections keeps the keyboard focus where it was when a
+  neighbor is opened or closed.
+- The accessibility audit now fails when a screen it means to open has no such button,
+  where before it passed over it.
+- The default program is written by a script, and a test now holds the shipped file to it.
 
 ## 0.1.0 (2026-11-25)
 

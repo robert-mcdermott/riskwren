@@ -1,6 +1,6 @@
 # Running the program
 
-This guide is for the risk and compliance team and for administrators. It covers roles and scope, who sees what, shaping the program, the dashboard, the history, and appearance.
+This guide is for the risk, compliance, and security assurance team and for administrators. It covers roles and scope, who sees what, shaping the program, the dashboards, the history, and appearance.
 
 ## Two kinds of authority
 
@@ -26,6 +26,19 @@ Four roles can be limited to a unit, and then cover that unit and everything ben
 | Record a response; run a treatment plan | | ✓ | ✓ | | | ✓ | | |
 | Accept a risk | | | | ✓ not their own, up to their limit | | | | |
 | Escalate a risk | | ✓ | ✓ | ✓ | | ✓ | | |
+| Map a control to requirements | | ✓ | ✓ | | | ✓ | | |
+| Add a scope; say what applies in it and how each control is done there | | ✓ | ✓ | | | ✓ | | |
+| Add evidence for a unit they work in | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| Attach evidence to a control or a scope | | ✓ | ✓ | | ✓ | ✓ | | |
+| Start an assessment; plan its tests | | | | | ✓ | ✓ | | |
+| Record a test result, or confirm one | | | | | ✓ not their own control or result | ✓ not their own control or result | | |
+| Raise an issue for a unit they work in | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| Work on an issue: actions, its date, proposing closure | | ✓ | ✓ | | | ✓ | | |
+| Confirm an issue's closure; withdraw or reopen one | | | | | ✓ not their own | ✓ not their own | | |
+| Ask for an exception | | ✓ of the scope or control | ✓ | | | ✓ | | |
+| Decide an exception | | | | ✓ not their own request | | ✓ not their own request | | |
+| Export a list they can see | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Import records from a spreadsheet | | | ✓ | | | ✓ | | |
 | Read the full history | | | | | | ✓ | ✓ | ✓ |
 | Shape the program; keep the organization's own frameworks | | | | | | ✓ | | ✓ |
 | Manage accounts, units, and appearance | | | | | | | | ✓ |
@@ -34,7 +47,7 @@ Roles are given under **Admin → People**, or with [`riskwren users roles`](cli
 
 ## Who sees what
 
-**The inventory is open.** Processes, systems, and third parties are visible to everyone signed in, because a record can only be linked to what its author can see.
+**The inventory is open.** Processes, systems, third parties, and information assets are visible to everyone signed in, because a record can only be linked to what its author can see. So are frameworks and their requirements.
 
 **The register follows a setting.** A register of risks and controls is useful in proportion to how widely it is read, and sensitive in proportion to how widely it is exposed. **Admin → Program → Who sees the register** sets what a person with no role sees:
 
@@ -47,6 +60,12 @@ Roles are given under **Admin → People**, or with [`riskwren users roles`](cli
 Whatever the setting, leaders and stewards see their unit and everything beneath it, and managers, assessors, auditors, and administrators see what their role covers.
 
 Any record can be marked **restricted**. It is then seen only by its owners, its unit's steward and leaders, managers, and auditors.
+
+**Evidence, issues, and exceptions are more closely held.** Each is known to whoever made it, those named on it, and those with a role over its unit. Working in the unit is not enough.
+
+- Evidence is also seen through something it is attached to that the person may see, unless it is restricted or of the most sensitive data class.
+- An issue is also seen by anyone with an action on it.
+- A control that a scope inherits is shown there by name and state to those who keep the scope, whoever may open the control itself.
 
 One rule decides what a person may see, and every list, count, chart, and search uses it. A figure on the dashboard never counts a record its reader could not open.
 
@@ -75,6 +94,18 @@ The table on the Program page shows, for each rating, how often a risk is review
 
 A leader's limit is set with the role. A sensible start: unit leaders at moderate, division leaders at high, and one or two executives at critical.
 
+### Clocks for issues and exceptions
+
+Two more rules are part of the program:
+
+| Rule | As shipped |
+|---|---|
+| How long after it is raised an issue is due, by severity | Critical 30 days, high 90, moderate 180, low 365 |
+| The longest an exception may run | 12 months |
+| How long a control's rating, a test result, and evidence hold | 12 months |
+
+They are in the program pack under `cadences`, as `issue_due_days`, `exception_max_months`, and `control_rating_months`. The meanings of the four severities, the root causes an issue is closed with, what can find an issue, and the other systems a record can be known in (each with an optional address pattern, so that an identifier becomes a link) are vocabularies in the same pack.
+
 ### Change the program with a pack
 
 The scoring method, cadences, the acceptance table, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
@@ -89,9 +120,9 @@ An import checks the whole pack first and reports every problem together. A scor
 
 A pack is also how one installation's program is copied to another, and how a program is kept under version control.
 
-## Read the dashboard
+## Read the dashboards
 
-**Reports → Dashboard** shows where the register stands, for the whole organization or for one unit and everything beneath it.
+There are two, each for the whole organization or for one unit and everything beneath it. **Reports → Compliance** shows how ready each scope is against what it is held to and what stands in the way; it is described in [The compliance dashboard](compliance.md#the-compliance-dashboard). **Reports → Risk** shows where the register stands:
 
 | Figure | Counts |
 |---|---|
@@ -104,7 +135,7 @@ A pack is also how one installation's program is copied to another, and how a pr
 
 Below them are the residual matrix, the highest risks, the register by standing, by rating, by category, and by unit, and what is known about the controls: how many are effective, partly effective, not assessed, or rated too long ago to rely on.
 
-Every figure is the count of a list, and opens that list with the same filters. The dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
+On both, every figure is the count of a list, and opens that list with the same filters. A dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
 
 Until scheduled jobs arrive in a later release, the calendar is caught up when the register is read: the first person to open it after an acceptance expires or a plan runs late causes the standing to be updated, and the history records that as done by the system.
 
@@ -113,10 +144,12 @@ Until scheduled jobs arrive in a later release, the calendar is caught up when t
 Every change to every record is written to an append-only history in the same transaction as the change: who, when, and each value before and after. Each event is hashed together with the one before it, and the database itself refuses updates and deletes on the history.
 
 - Each record's **History** tab shows its own events in plain words.
+- **Reports → History** shows every change in one place, for managers, auditors, and administrators: narrowed to a person, a record, a kind of record, or a span of dates. It opens on changes to records; sign-ins, exports, and settings are one choice away.
+- Reading is recorded where it matters: every download of an evidence file and every export of a list is an event, with who and what.
 - `uv run riskwren verify` recomputes the chain and reports the first event that has been altered, removed, or cut from the end.
 - `uv run riskwren doctor` checks that the database still refuses changes to the history.
 
-Assessments, control ratings, and acceptances are never edited. A new one supersedes the last, and all of them are kept.
+Assessments, control ratings, test results, and acceptances are never edited. A new one supersedes the last, and all of them are kept.
 
 ## Appearance
 
@@ -131,6 +164,6 @@ Each person chooses light, dark, or system mode and a palette for themselves, fr
 
 ## Back up and recover
 
-- Back up the data home, and the database as well if you use PostgreSQL.
+- Back up the data home, and the database as well if you use PostgreSQL. Evidence files are in the data home under `files/`, and the database refers to them.
 - `uv run riskwren program export` keeps a copy of the program you have shaped.
 - If nobody can sign in, [`riskwren users`](cli.md#riskwren-users) adds an administrator or resets a password from the server's own command line. Changes made there are recorded in the history as made at the command line.
