@@ -274,6 +274,8 @@ REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
+for _report in ("home", "heat-map", "dashboard"):
+    REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 REACH[("PATCH", "/api/v1/risk-categories/{key}")] = {"admin", "manager"}
 for _action in ("assessments", "subjects", "escalation"):

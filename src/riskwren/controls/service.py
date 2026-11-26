@@ -8,7 +8,7 @@ rating is suggested (see spec/engine.md).
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -117,6 +117,11 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
             found += [Control.design != "ineffective", Control.operation != "ineffective"]
             partly = or_(Control.design == "partly", Control.operation == "partly")
             found.append(partly if state == "partly" else ~partly)
+    if filters.get("stale"):
+        months = int(rules.get(session, "cadences").get("control_rating_months", 12))
+        found.append(Control.rated_at < datetime.combine(
+            rules.add_months(utc_now().date(), -months), datetime.min.time(), tzinfo=UTC
+        ))  # fmt: skip
     if filters.get("is_key"):
         found.append(Control.is_key.is_(True))
     if filters.get("risk"):

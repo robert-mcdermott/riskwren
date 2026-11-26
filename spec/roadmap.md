@@ -35,7 +35,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 | 4 | Inventory | Processes, systems, and third parties with owners, typed links, lists, detail pages, and history; the default program's vocabularies | ☑ |
 | 5 | Risk register | The taxonomy with appetite, the scoring method in Python and JavaScript, risks, assessments with reasons, standing, review dates, roll-up and escalation, the risk library | ☑ |
 | 6 | Controls and treatment | The control library and starter controls, effectiveness ratings, the suggested residual with its working, responses, treatment plans, actions, and acceptance under the authority table | ☑ |
-| 7 | Home, heat map, and dashboard | What each person owes; the heat map with the appetite boundary; the risk dashboard with every figure linked to its records | ☐ |
+| 7 | Home, heat map, and dashboard | What each person owes; the heat map with the appetite boundary; the risk dashboard with every figure linked to its records | ☑ |
 | 8 | Demo organization | The fictional institute, built through the services under a simulated clock, with storylines for every wave 1 screen | ☐ |
 | 9 | Release prep | Guides, quickstart, changelog, accessibility check, version, release | ☐ |
 

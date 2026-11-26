@@ -106,6 +106,19 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Standing.** A risk above appetite is *being treated* while a plan is on time, *accepted*
   while an acceptance covers it, and otherwise *needs a decision*.
 - **One list of actions**, with lists of treatment plans and of acceptances.
+- **Home.** Each person's home page is one list of what they owe, overdue first: risks to
+  assess or review, ratings in doubt, actions, controls to rate, and acceptances about to
+  expire. A leader also sees the risks in their units that need a decision; a steward sees
+  records nobody answers for.
+- **Heat map.** Every open risk the viewer may see, counted by likelihood and impact, for
+  the inherent, residual, or target rating, for the whole organization or one unit. Choosing
+  a category marks the cells above its appetite. Each cell opens its risks.
+- **Dashboard.** Open risks, how many are above appetite, need a decision, are overdue for
+  review, or have a rating in doubt; the highest risks; risks by standing, rating, category,
+  and unit; and what is known about the controls. Every figure opens the records behind it,
+  and counts only what the viewer may see.
+- **Grouping and printing.** The register can be grouped by category or unit, and any page
+  prints as the record without the application around it.
 
 ### Fixed
 

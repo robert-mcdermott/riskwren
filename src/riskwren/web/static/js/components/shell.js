@@ -17,6 +17,7 @@ export const NAV = [
     heading: "Risks",
     items: [
       { href: "/risks", label: "Register", iconName: "risk" },
+      { href: "/heat-map", label: "Heat map", iconName: "grid" },
       { href: "/plans", label: "Treatment plans", iconName: "plan" },
       { href: "/acceptances", label: "Acceptances", iconName: "accept" },
       { href: "/actions", label: "Actions", iconName: "check" },
@@ -34,6 +35,12 @@ export const NAV = [
       { href: "/processes", label: "Processes", iconName: "process" },
       { href: "/systems", label: "Systems", iconName: "system" },
       { href: "/third-parties", label: "Third parties", iconName: "third_party" },
+    ],
+  },
+  {
+    heading: "Reports",
+    items: [
+      { href: "/dashboard", label: "Dashboard", iconName: "chart" },
     ],
   },
   {

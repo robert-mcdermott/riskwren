@@ -2890,6 +2890,18 @@
             }
           },
           {
+            "description": "Rated, but too long ago to rely on",
+            "in": "query",
+            "name": "stale",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Rated, but too long ago to rely on",
+              "title": "Stale",
+              "type": "boolean"
+            }
+          },
+          {
             "description": "A risk's reference: the controls on it",
             "in": "query",
             "name": "risk",
@@ -3343,6 +3355,59 @@
         ]
       }
     },
+    "/api/v1/dashboard": {
+      "get": {
+        "operationId": "dashboard_api_v1_dashboard_get",
+        "parameters": [
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Dashboard Api V1 Dashboard Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Where the register stands, each figure with its list's filters",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/health/live": {
       "get": {
         "operationId": "live_api_v1_health_live_get",
@@ -3383,6 +3448,112 @@
         "summary": "Can the server do its work?",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/v1/heat-map": {
+      "get": {
+        "operationId": "heat_map_api_v1_heat_map_get",
+        "parameters": [
+          {
+            "description": "inherent, residual, or target",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "residual",
+              "description": "inherent, residual, or target",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "A category key; includes those beneath",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A category key; includes those beneath",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Heat Map Api V1 Heat Map Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open risks counted by likelihood and impact",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/home": {
+      "get": {
+        "operationId": "home_api_v1_home_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Home Api V1 Home Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "What the asker owes, overdue first",
+        "tags": [
+          "reporting"
         ]
       }
     },

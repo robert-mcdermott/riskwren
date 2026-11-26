@@ -15,12 +15,24 @@ import { clearFilters, filterSelect, isFiltering, keepSearchFocus, mineToggle, o
 
 const SORT = "-residual_rating";
 
+/** The rows of this page, under a heading for each category or unit when the list is grouped. */
+function grouped(rows, unitIndex) {
+  const by = query().get("group");
+  if (by !== "category" && by !== "unit") return rows;
+  const name = (risk) => (by === "unit" ? unitIndex.byId.get(risk.org_unit_id)?.name ?? "No unit"
+    : (risk.category_label ?? "").split(" · ")[0] || "No category");
+  const groups = new Map();
+  for (const risk of rows) groups.set(name(risk), [...(groups.get(name(risk)) ?? []), risk]);
+  return [...groups.keys()].sort((a, b) => a.localeCompare(b)).flatMap((heading) => [{ heading, count: groups.get(heading).length }, ...groups.get(heading)]);
+}
+
 export function riskRegister(main) {
   const meta = TYPES.risk;
   return show(main, {
     title: "Risk register",
     load: async () => {
       const params = { sort: SORT, ...Object.fromEntries(query()) };
+      delete params.group;
       const [page, programData, unitIndex] = await Promise.all([
         get("/api/v1/risks", params, { fresh: true }), loadProgram(), units()]);
       return { page, program: programData, units: unitIndex };
@@ -38,13 +50,15 @@ export function riskRegister(main) {
         filterSelect("residual_rating", ratingOptions(program, "Any residual rating"), "Residual rating"),
         filterSelect("standing", standingOptions("Any standing"), "Standing"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
+        filterSelect("group", [["", "Not grouped"], ["category", "Grouped by category"], ["unit", "Grouped by unit"]], "Grouping"),
         mineToggle());
       const head = (text, field) => sortHeader(text, field, SORT);
       const body = rows.length
         ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
           h("thead", {}, h("tr", {}, head("Risk", "name"), h("th", { scope: "col" }, "Unit"), h("th", { scope: "col" }, "Owner"),
             head("Inherent", "inherent_rating"), head("Residual", "residual_rating"), head("Standing", "standing"), head("Next review", "next_review_on"))),
-          h("tbody", {}, rows.map((r) => h("tr", {},
+          h("tbody", {}, grouped(rows, data.units).map((r) => (r.heading ? h("tr", { class: "group-row" },
+            h("th", { colspan: "7", scope: "colgroup" }, r.heading, h("span", { class: "muted" }, ` ${plural(r.count, "risk")}`))) : h("tr", {},
             h("td", {}, h("a", { class: "cell-main", href: hrefOf(r.ref) }, r.name),
               h("div", { class: "cell-sub" }, [r.ref, r.category_label, r.restricted ? "Restricted" : null].filter(Boolean).join(" · "))),
             h("td", {}, data.units.byId.get(r.org_unit_id)?.name ?? "",
@@ -53,7 +67,7 @@ export function riskRegister(main) {
             h("td", {}, rating(program, r.ratings.inherent.rating)),
             h("td", {}, rating(program, r.ratings.residual.rating)),
             h("td", {}, h("div", { class: "row-sm wrap" }, standingPill(r.standing), flags(r))),
-            h("td", { class: `nowrap${r.review_overdue ? " overdue" : " muted"}` }, r.next_review_on ? date(r.next_review_on) : ""))))))
+            h("td", { class: `nowrap${r.review_overdue ? " overdue" : " muted"}` }, r.next_review_on ? date(r.next_review_on) : "")))))))
         : emptyState(isFiltering()
           ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.",
             action: button("Clear filters", { onclick: clearFilters }) }

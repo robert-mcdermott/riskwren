@@ -53,6 +53,8 @@ async function boot() {
 
   route("/", page("home", "home", meta));
   route("/account", page("account", "account"));
+  route("/dashboard", page("dashboard", "dashboard"));
+  route("/heat-map", page("heat-map", "heatMap"));
   route("/controls", page("controls", "controlLibrary"));
   route("/controls/:ref", page("control", "controlPage"));
   route("/plans", page("actions", "planList"));

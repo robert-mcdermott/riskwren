@@ -88,6 +88,7 @@ def list_controls(
         default=None, description="effective, partly, ineffective, or not_assessed"
     ),
     is_key: bool = False,
+    stale: bool = Query(default=False, description="Rated, but too long ago to rely on"),
     risk: str | None = Query(default=None, description="A risk's reference: the controls on it"),
     owner: int | None = None,
     mine: bool = MINE,
@@ -97,7 +98,7 @@ def list_controls(
 ) -> dict[str, Any]:
     filters = {
         "q": q, "unit": unit, "status": status, "kind": kind, "nature": nature,
-        "frequency": frequency, "state": state, "is_key": is_key, "risk": risk,
+        "frequency": frequency, "state": state, "is_key": is_key, "stale": stale, "risk": risk,
         "owner": owner, "mine": mine,
     }  # fmt: skip
     return list_records(request, CONTROL, filters, sort, limit, cursor)

@@ -126,6 +126,15 @@ POLICIES.update(
     }
 )
 
+# Reporting: every figure counts only what the asker may see.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/home"): Needs.MEMBER,
+        ("GET", "/api/v1/heat-map"): Needs.MEMBER,
+        ("GET", "/api/v1/dashboard"): Needs.MEMBER,
+    }
+)
+
 
 def allowed(principal: Principal | None, needs: Needs) -> bool:
     if needs is Needs.PUBLIC:

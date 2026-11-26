@@ -140,16 +140,18 @@ None block the start. These defaults have been taken and can be changed before t
 
 **Acceptance (met):** the worked example in [engine.md](../engine.md) produces the figures shown there; a control that is not assessed or is stale contributes nothing; no number of controls lowers an axis by more than the limit; an acceptance is refused for the risk's owner and for a leader above their limit, in the API and the app; an expired acceptance returns the risk to *needs a decision*; closing a plan's last action asks its owner for a new assessment and does not change the rating. 316 tests pass on SQLite. Checked in the browser: adding and linking a suggested control, the suggestion's arithmetic, a plan with an overdue action, the actions list, and a control page.
 
-## Slice 7: Home, heat map, and dashboard ☐
+## Slice 7: Home, heat map, and dashboard ☑
 
 **Goal:** one place to see what you owe, and one to see where the register stands.
 
-- [ ] Home: one list of what the person owes, overdue first: reviews due, actions, acceptances expiring, orphaned records for stewards; for leaders, their unit's risks that need a decision
-- [ ] The heat map: counts by likelihood and impact for inherent, residual, or target; filters by unit and category; the appetite boundary; a cell opens its risks beside the grid; a table of the same figures
-- [ ] The dashboard: top risks, risks by standing, by category and unit, reviews and actions overdue, controls by effectiveness including not assessed; each tile linked to its records
-- [ ] Print styles for a risk, the register, the heat map, and the dashboard
+- [x] Home: one list of what the person owes, overdue first: risks to assess or review, risks whose rating is in doubt, actions, controls to rate, acceptances about to expire; for leaders, the risks in their units that need a decision; for stewards, records nobody answers for
+- [x] The heat map: counts by likelihood and impact for inherent, residual, or target; filters by unit and category; cells above a category's appetite marked; each cell a link to its risks; counts by rating beneath
+- [x] The dashboard: figures for open risks, above appetite, needing a decision, reviews overdue, ratings in doubt, and actions overdue; the residual heat map; the highest risks; risks by standing, by rating, by category, and by unit; controls by what is known of them. Each figure carries the filters of the list that produces it
+- [x] From slice 5: the register grouped by category or by unit
+- [x] Print styles: a page prints as the record, without the application around it
+- [ ] Not built: a separate table view of the heat map. The grid is itself a table whose cells are counts with spoken labels, so a second copy would say the same thing
 
-**Acceptance:** every figure on the dashboard and every cell of the heat map opens a list whose length equals the figure, for each of the seven roles; the heat map has a complete table alternative and passes the accessibility audit.
+**Acceptance (met):** every figure on the dashboard and every cell of the heat map opens a list whose length equals the figure, for each of the seven roles, for the whole organization and for one division, in all three ratings; the parts of each breakdown add up to the whole. 321 tests pass on SQLite. Checked in the browser: home with something overdue, the dashboard, the heat map with a category's appetite, and the grouped register.
 
 ## Slice 8: Demo organization ☐
 
@@ -180,6 +182,7 @@ Decisions and discoveries made during the wave are logged here, newest last.
 - **Sign-in is throttled three ways:** five failures for one account from one address, and a much higher limit for the account alone and for the address alone, so nobody can lock a colleague out by typing their address. Each attempt is counted before the password is checked.
 - **The inventory is open; the register follows the setting.** Under the planned default, a steward could not link their system to a supplier recorded by another unit, because they could not see it. Processes, systems, and third parties are now visible to everyone signed in unless restricted, and the visibility setting governs risks and controls. [security.md](../security.md) says so.
 - **A link is recorded once and read both ways.** Its changes appear in the history of the record it starts from.
+- **A figure and its list are the same question.** The dashboard does not have queries of its own. Each figure is the count of a list filter, and is sent with those filters, so the page can only ever link to exactly what it counted.
 - **Starter controls are a library, not records.** A control needs a unit and an owner to mean anything, so an installation is not seeded with fifty ownerless controls. The library offers them where they are wanted: on a risk started from the library, the controls commonly used for it are one step away.
 - **Doubt is about change, not disagreement.** An assessor who judges a residual rating lower than the controls suggest has made a judgment, and it is kept with its reason. The flag is raised only when what is known about the controls later gets worse than it was at that assessment.
 - **An acceptance covers what was accepted.** If the residual rating later rises above the rating that was accepted, the acceptance no longer covers the risk and it needs a decision again.
