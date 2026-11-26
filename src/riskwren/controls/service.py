@@ -104,8 +104,26 @@ def _cards(session: Session, rows: list[Control]) -> list[dict[str, Any]]:
     ]
 
 
+KEY_TEST_MONTHS = 6
+
+
+def next_test_on(session: Session, control: Control) -> date | None:
+    """When a control is next due to be tested: when what is known of it stops holding, or
+    sooner for a key control (AST-07). Never rated means there is no date yet."""
+    if control.rated_at is None:
+        return None
+    cadences = rules.get(session, "cadences")
+    months = int(cadences.get("control_rating_months", 12))
+    if control.is_key:
+        months = min(months, int(cadences.get("key_control_test_months", KEY_TEST_MONTHS)))
+    return rules.add_months(control.rated_at.date(), months)
+
+
 def _detail(session: Session, principal: Principal, control: Control) -> dict[str, Any]:
+    due = next_test_on(session, control) if control.status == "active" else None
     return {
+        "next_test_on": due,
+        "test_due": due is not None and due <= utc_now().date(),
         "library_key": control.library_key,
         "rating": next(iter(ratings(session, control)), None),
         "tested": current_test(session, control) is not None,

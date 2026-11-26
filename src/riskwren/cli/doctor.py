@@ -54,7 +54,53 @@ def run(config_path: str | None = None) -> list[Check]:
     checks += _database(config)
     # Single sign-on is optional. Without it, people sign in with local accounts.
     checks.append(_sso(config) if config.sso.enabled else Check("Sign-in", OK, "local accounts"))
+    # Email is optional as well. Without it, notices and reminders are read in the app.
+    checks.append(_mail(config) if config.mail.enabled else Check("Email", OK, "not set up"))
+    checks.append(_jobs(config))
     return checks
+
+
+def _mail(config: Config) -> Check:
+    """Can the mail server be reached and signed in to? Nothing is sent."""
+    from riskwren import mail
+
+    try:
+        mail.SmtpSender(config.mail).check()
+    except RiskWrenError as exc:
+        return Check("Email", FAIL, str(exc))
+    return Check(
+        "Email", OK, f"{config.mail.host}:{config.mail.port} as {config.mail.from_address}"
+    )
+
+
+def _jobs(config: Config) -> Check:
+    """Is scheduled work being done, by this server or by something else?"""
+    from datetime import timedelta
+
+    from sqlalchemy import select
+
+    from riskwren.core.clock import utc_now
+    from riskwren.db.models import Job
+
+    db = Database(config.database_url)
+    try:
+        with db.read() as session:
+            rows = list(session.scalars(select(Job)))
+    finally:
+        db.dispose()
+    failed = [row.key for row in rows if row.last_status == "failed"]
+    if failed:
+        return Check("Scheduled work", WARN, f"the last run of {', '.join(failed)} failed")
+    ran = [row.last_finished_at for row in rows if row.last_finished_at]
+    if not config.server.scheduler and (not ran or max(ran) < utc_now() - timedelta(days=2)):
+        return Check(
+            "Scheduled work",
+            WARN,
+            "the server's scheduler is off and nothing has run for two days: run "
+            "`riskwren jobs run` from a scheduled task, or turn the scheduler on",
+        )
+    how = "by the server" if config.server.scheduler else "by `riskwren jobs run`"
+    return Check("Scheduled work", OK, f"run {how}")
 
 
 def _sso(config: Config) -> Check:

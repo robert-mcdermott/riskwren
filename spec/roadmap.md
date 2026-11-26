@@ -83,7 +83,7 @@ Decision record: [ADR-0009](decisions/0009-documentation-toolchain.md)
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
 | 1 | Single sign-on | Optional, beside local accounts: OpenID Connect with discovery, PKCE, and verified tokens; works with Microsoft Entra ID; accounts created at first sign-in; application roles or groups mapped to roles and unit scopes | ☑ |
-| 2 | Schedules and email | The job scheduler, the cadence table for reviews, tests, attestations, and evidence, reminders and escalation, SMTP delivery, digests, preferences | ☐ |
+| 2 | Schedules and email | The job scheduler, the cadence table for reviews, tests, attestations, and evidence, reminders and escalation, optional SMTP delivery, digests, preferences | ☑ |
 | 3 | Questionnaires | Questionnaires as versioned data with conditional questions; the condition evaluator in Python and JavaScript | ☐ |
 | 4 | Campaigns | Risk and control self-assessment, control attestation, and unit completeness campaigns, with coverage by unit; attestation as a basis of assurance | ☐ |
 | 5 | Indicators | Indicators with thresholds, readings, and trends, linked to risks; breaches raise notices | ☐ |

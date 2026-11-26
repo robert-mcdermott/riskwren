@@ -6,6 +6,13 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
+### Changed
+
+- Risks are brought up to date with the calendar every hour by a scheduled job, as well as
+  when the register is read.
+- `riskwren doctor` reports how people sign in, whether email is set up, and whether
+  scheduled work is being done.
+
 ### Added
 
 - **Optional single sign-on with OpenID Connect,** beside local accounts. A new installation
@@ -22,6 +29,22 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   a password. Passwords can be kept for everyone, or for administrators only.
 - **Admin, Single sign-on** shows what is set up, the redirect address to give the provider,
   and a check that the provider answers. `riskwren doctor` makes the same check.
+- **Scheduled work.** The server brings risks up to date with the calendar, sends reminders,
+  and sends email, by itself. Each job is claimed in the database before it runs, so several
+  workers or servers run it once between them, and a server that was down catches up.
+  Admin, Scheduled work shows each job and its runs and can run or pause one;
+  `riskwren jobs` and `riskwren jobs run` do the same from the command line.
+- **Reminders and escalation.** Whoever an action, risk review, issue, piece of evidence,
+  acceptance, exception, or control test is waiting on is reminded two weeks before its date
+  and the day after. Actions and issues that stay late go to the unit's steward after a
+  week and its leader after three. Each is said once for a given date.
+- **Key controls are tested more often.** Each control shows when its next test is due:
+  twelve months after it was last rated, or six for a key control.
+- **Optional email.** Naming an SMTP server under `[mail]` sends notices to people's inboxes
+  as well as the bell. Each person chooses each notice as it happens, one summary a day, or
+  none. Messages wait in an outbox in the database, so a mail server that is down is tried
+  again, and turning email on does not send anyone their history. `riskwren mail test`
+  and `doctor` check the settings.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
 

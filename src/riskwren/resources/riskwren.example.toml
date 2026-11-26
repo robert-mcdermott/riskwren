@@ -27,6 +27,10 @@ base_url = ""
 session_idle_hours = 12
 session_max_days = 7
 
+# Run scheduled work (what is due, reminders, email) inside this server. Leave it on unless
+# you run `riskwren jobs run` from a scheduled task instead.
+scheduler = true
+
 [database]
 # Leave empty to use SQLite, in a single file inside the data home.
 # For PostgreSQL: "postgresql+psycopg://riskwren@db.example.org:5432/riskwren", with the
@@ -75,3 +79,27 @@ create_accounts = true
 # Keep the password form for everyone who has a password. With false, only administrators
 # may sign in with a password, so that there is always a way in.
 local_sign_in = true
+
+[mail]
+# Email is optional. Without it, notices and reminders are read in the app, under the bell.
+#
+# To send them by email as well, name an SMTP server and the address they come from. Each
+# person then chooses, under Your account, to get each notice as it happens, one summary a
+# day, or none.
+host = ""
+port = 587
+
+# "starttls" (the usual choice on port 587), "tls" (port 465), or "none".
+security = "starttls"
+
+# The account to sign in to the mail server with, if it needs one. The password is never
+# written in this file. Put it in the environment variable named here.
+username = ""
+password_env = "RISKWREN_MAIL_PASSWORD"
+
+# Who the messages come from.
+from_address = ""
+from_name = ""
+
+# The hour of the day, in UTC, after which daily summaries are sent.
+digest_hour = 7

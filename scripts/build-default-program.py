@@ -454,6 +454,11 @@ CADENCES: dict[str, Any] = {
     "control_rating_months": 12,
     "issue_due_days": {"critical": 30, "high": 90, "moderate": 180, "low": 365},
     "exception_max_months": 12,
+    # A key control is tested more often than what is known of a control otherwise holds.
+    "key_control_test_months": 6,
+    # When reminders go: so many days before a date, and how long something stays late
+    # before the unit's steward, and then its leader, is told.
+    "reminders": {"soon_days": 14, "steward_after_days": 7, "leader_after_days": 21},
 }
 
 # Who may accept a risk above appetite, by its residual rating, and for how long.

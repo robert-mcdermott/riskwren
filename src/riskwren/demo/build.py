@@ -26,6 +26,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from riskwren import reminders
 from riskwren.access.principal import Grant, Principal
 from riskwren.compliance import (
     assessments,
@@ -2163,6 +2164,10 @@ class Builder:
         ):  # fmt: skip
             self.schedule(story())
         self.run()
+        # The scheduler's turn, as it would take on a real server: whoever something is
+        # waiting on is reminded, and what has stayed late has gone up to a steward or leader.
+        with clock_set_to(lambda: self.end), self.db.bookkeeping() as session:
+            self.tally("reminders", sum(reminders.send(session).values()))
         with clock_set_to(lambda: self.end), self.db.write(ME.actor) as session:
             settings.put(
                 session, SETTING,

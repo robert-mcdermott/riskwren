@@ -29,7 +29,7 @@ Relative paths in the file are resolved against the file's own directory, not th
 
 ## Every section and key
 
-The file has four sections. Only the first three matter for a new installation; `[sso]` is optional. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
+The file has five sections. Only the first three matter for a new installation; `[sso]` and `[mail]` are optional. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
 
 ### `[server]`
 
@@ -41,6 +41,7 @@ The file has four sections. Only the first three matter for a new installation; 
 | `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Used for the single sign-on redirect address, and for links in messages RiskWren sends. Set it when you use single sign-on |
 | `session_idle_hours` | `12` | A sign-in ends after this long without activity |
 | `session_max_days` | `7` | A sign-in ends after this long in any case |
+| `scheduler` | `true` | Run scheduled work inside this server. See [Scheduled work](#scheduled-work) |
 
 `host`, `port`, and `workers` can also be given to `uv run riskwren serve` as `--host`, `--port`, and `--workers`, which take precedence for that run.
 
@@ -72,7 +73,22 @@ Single sign-on is optional and off until both `issuer` and `client_id` are set. 
 | `create_accounts` | `true` | Make an account the first time someone signs in. With `false`, only people who already have an account can sign in |
 | `local_sign_in` | `true` | Keep the password form for everyone who has a password. With `false`, only administrators may sign in with a password |
 
-RiskWren also gives advice that does not stop it running. `serve` and `doctor` warn when several workers share one SQLite file, and when `base_url` is `http://` on a host other than localhost.
+### `[mail]`
+
+Email is optional and off until both `host` and `from_address` are set. See [Email](#email).
+
+| Key | Default | Meaning |
+|---|---|---|
+| `host` | `""` | The SMTP server |
+| `port` | `587` | Its port |
+| `security` | `"starttls"` | `"starttls"` (usual on port 587), `"tls"` (port 465), or `"none"` |
+| `username` | `""` | The account to sign in to the mail server with, if it needs one |
+| `password_env` | `"RISKWREN_MAIL_PASSWORD"` | The name of the environment variable that holds the password. The password itself is refused in the file |
+| `from_address` | `""` | The address messages come from |
+| `from_name` | `""` | The name beside it. Empty means the product's name |
+| `digest_hour` | `7` | The hour of the day, in UTC, after which daily summaries are sent |
+
+RiskWren also gives advice that does not stop it running. `serve` and `doctor` warn when several workers share one SQLite file, when `base_url` is `http://` on a host other than localhost, and when email is set up without a `base_url` for its links.
 
 ## Environment overrides
 
@@ -210,6 +226,42 @@ uv run python scripts/dev_identity_provider.py
 ```
 
 Then set `issuer = "http://127.0.0.1:8099"`, `client_id = "riskwren-dev"`, and `trust_email = true` under `[sso]`, and start RiskWren with `RISKWREN_SSO_CLIENT_SECRET=dev-secret` in its environment.
+
+## Scheduled work
+
+RiskWren does four things by itself, so that nobody has to remember to.
+
+| Job | How often | What it does |
+|---|---|---|
+| The calendar | Hourly | Brings risks up to date when a plan passes its date or an acceptance ends |
+| Reminders | Hourly | Reminds people of what is nearly due, and tells stewards and leaders what stays late. See [Reminders](running-the-program.md#reminders) |
+| Email | Every minute | Queues notices and daily summaries and sends what is waiting, where [email](#email) is set up |
+| Housekeeping | Daily | Removes run records older than ninety days and sign-ins that were never finished |
+
+The server runs them while it is up. Nothing needs to be installed or scheduled.
+
+- **Each job runs once.** Before a process runs a job it claims the job in the database. With several workers, or several servers on one database, whichever claims it has it and the others leave it alone. A process that dies mid-job loses its claim after fifteen minutes.
+- **A restart loses nothing.** What is due is worked out from the database and the clock, so a server that was down catches up when it starts.
+- **Admin → Scheduled work** shows each job, when it last ran and what it did, and can run one now or pause it. A failed run is shown with its reason and tried again when next due.
+- `uv run riskwren jobs` lists the same from the command line, and `uv run riskwren jobs run` runs whatever is due.
+
+To run the jobs from the operating system's scheduler instead, set `scheduler = false` under `[server]` and run `uv run riskwren jobs run` every few minutes. `doctor` warns if the scheduler is off and nothing has run for two days.
+
+## Email
+
+**You do not need this to use RiskWren.** Notices and reminders are read in the app, under the bell at the top right, and on Home. Email sends the same notices to people's inboxes as well, for organizations that want that.
+
+1. Under `[mail]` in `riskwren.toml`, set `host` and `from_address`. If the mail server needs a sign-in, set `username`, and put the password in the `RISKWREN_MAIL_PASSWORD` environment variable.
+2. Set `base_url` under `[server]`, so that messages can link back.
+3. Restart RiskWren, and run `uv run riskwren doctor`: it connects and signs in to the mail server, and sends nothing.
+4. Send yourself a message from **Admin → Scheduled work**, or with `uv run riskwren mail test you@example.org`.
+
+Then each person chooses, under **Your account**: each notice as it happens, one summary a day, or no email. The choice appears only once email is set up.
+
+- **Nothing is sent from the request that caused it.** A notice is written to the database, the mailer turns it into a message in an outbox in the same database, and sends from there. A mail server that is down is tried again later, with longer waits, and given up on after six attempts.
+- **Turning email on does not send people their history.** Only notices written after it is set up are sent.
+- **A daily summary** gathers what a person has not yet read in the app, once a day after `digest_hour`.
+- Messages say what happened and link to it. They carry no record's contents beyond its name.
 
 ## Use PostgreSQL
 

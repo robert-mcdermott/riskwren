@@ -42,6 +42,7 @@ from riskwren.db.models.inventory import (
     System,
     ThirdParty,
 )
+from riskwren.db.models.jobs import Job, JobRun, OutboxMessage, Reminder
 from riskwren.db.models.people import (
     Account,
     Credential,
@@ -92,13 +93,17 @@ __all__ = [
     "Information",
     "Issue",
     "IssueSubject",
+    "Job",
+    "JobRun",
     "Membership",
     "Notice",
     "OrgUnit",
+    "OutboxMessage",
     "Process",
     "ProviderMapping",
     "RecordLink",
     "RecordOwner",
+    "Reminder",
     "Requirement",
     "Risk",
     "RiskAssessment",

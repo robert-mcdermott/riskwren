@@ -88,6 +88,7 @@ async function boot() {
     route("/admin/units", page("admin-units", "adminUnits"));
     route("/admin/appearance", page("admin-appearance", "adminAppearance"));
     route("/admin/sso", page("admin-sso", "adminSso"));
+    route("/admin/scheduled-work", page("admin-operations", "adminOperations"));
   }
   fallback(page("not-found", "notFound"));
 

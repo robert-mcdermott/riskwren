@@ -20,6 +20,7 @@ from riskwren.people import units
 
 EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 ACCEPT_LIMIT = re.compile(r"[a-z][a-z0-9_-]{0,39}")
+EMAIL_NOTICES = ("immediate", "digest", "none")
 
 
 def normalize_email(email: str) -> str:
@@ -346,6 +347,17 @@ def authenticate(session: Session, email: str, password: str) -> Account | None:
     if not passwords.verify_password(password, credential.password_hash):
         return None
     return account
+
+
+def set_email_notices(session: Session, account: Account, choice: str) -> None:
+    """A person's own choice of how notices reach them by email."""
+    if choice not in EMAIL_NOTICES:
+        raise Invalid(
+            "The choice was not saved.",
+            {"email_notices": f"Choose one of: {', '.join(EMAIL_NOTICES)}."},
+        )
+    account.email_notices = choice
+    session.flush()
 
 
 def note_sign_in(session: Session, account: Account, *, method: str) -> None:

@@ -97,10 +97,13 @@ def test_verify_reports_a_whole_and_a_broken_history(
 
 
 def test_doctor_on_a_healthy_installation(
-    instance: Instance, capsys: pytest.CaptureFixture[str]
+    instance: Instance, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    monkeypatch.setenv("RISKWREN_SERVER_SCHEDULER", "true")  # as a new installation has it
     assert run("doctor", config=instance.path) == 0
     out = capsys.readouterr().out
+    assert "Sign-in" in out and "local accounts" in out  # single sign-on and email are optional
+    assert "Email" in out and "not set up" in out and "Scheduled work" in out
     for name in (
         "Python",
         "Configuration",
@@ -318,3 +321,19 @@ def test_users_from_the_command_line(
     code, _, err = users("disable", "ghost@northmere.example")
     assert code == 1 and "no account for ghost@northmere.example" in err
     assert run("verify", config=instance.path) == 0
+
+
+def test_doctor_says_when_nothing_is_doing_the_scheduled_work(
+    instance: Instance, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """With the server's scheduler off, something else has to run the jobs."""
+    assert run("doctor", config=instance.path) == 0  # a warning, not a failure
+    assert "riskwren jobs run" in capsys.readouterr().out
+    assert run("jobs", "run", config=instance.path) == 0
+    ran = capsys.readouterr().out
+    assert "reminders: Nothing to do" in ran and "calendar:" in ran
+    assert run("doctor", config=instance.path) == 0
+    assert "Everything checks out." in capsys.readouterr().out
+    assert run("jobs", config=instance.path) == 0
+    assert "reminders" in capsys.readouterr().out
+    assert run("mail", "run", config=instance.path) == 1  # email is not set up

@@ -129,6 +129,9 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET` · `POST` · `DELETE /session` | Who is signed in; sign in; sign out |
 | `POST /session/password` | Change your own password |
 | `GET /sso/start` · `GET /sso/callback` | The single sign-on round trip, for a browser (public; 404 unless it is set up) |
+| `GET` · `PUT /session/preferences` | How you want notices by email, where email is set up |
+| `GET /jobs` · `POST /jobs/{key}/run` · `PUT /jobs/{key}` | Scheduled work: how it is going, run one job now, pause or resume one (administrators) |
+| `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
 | `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 
 ### People and units

@@ -42,6 +42,14 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/sso"): Needs.ADMIN,
     ("POST", "/api/v1/sso/check"): Needs.ADMIN,
     ("PUT", "/api/v1/sso/mappings"): Needs.ADMIN,
+    # Scheduled work and email, for whoever keeps the installation.
+    ("GET", "/api/v1/jobs"): Needs.ADMIN,
+    ("POST", "/api/v1/jobs/{key}/run"): Needs.ADMIN,
+    ("PUT", "/api/v1/jobs/{key}"): Needs.ADMIN,
+    ("GET", "/api/v1/mail"): Needs.ADMIN,
+    ("POST", "/api/v1/mail/test"): Needs.ADMIN,
+    ("GET", "/api/v1/session/preferences"): Needs.MEMBER,
+    ("PUT", "/api/v1/session/preferences"): Needs.MEMBER,
     # People
     ("GET", "/api/v1/accounts"): Needs.MEMBER,  # the people picker; members see names only
     ("POST", "/api/v1/accounts"): Needs.ADMIN,

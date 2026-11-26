@@ -1519,6 +1519,19 @@
         "title": "IssueBody",
         "type": "object"
       },
+      "JobSwitch": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "JobSwitch",
+        "type": "object"
+      },
       "MappingBody": {
         "properties": {
           "code": {
@@ -1840,6 +1853,20 @@
           "due_on"
         ],
         "title": "PlanBody",
+        "type": "object"
+      },
+      "Preferences": {
+        "properties": {
+          "email_notices": {
+            "maxLength": 16,
+            "title": "Email Notices",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_notices"
+        ],
+        "title": "Preferences",
         "type": "object"
       },
       "ProcessBody": {
@@ -9973,6 +10000,169 @@
         ]
       }
     },
+    "/api/v1/jobs": {
+      "get": {
+        "operationId": "jobs_status_api_v1_jobs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Jobs Status Api V1 Jobs Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Scheduled work, and how its recent runs went",
+        "tags": [
+          "operations"
+        ]
+      }
+    },
+    "/api/v1/jobs/{key}": {
+      "put": {
+        "operationId": "jobs_set_api_v1_jobs__key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobSwitch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Jobs Set Api V1 Jobs  Key  Put"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pause or resume one job",
+        "tags": [
+          "operations"
+        ]
+      }
+    },
+    "/api/v1/jobs/{key}/run": {
+      "post": {
+        "description": "Runs the job at once, whether or not it is due, and says what it did. If another\nprocess is running it at this moment, nothing is run and the answer says so.",
+        "operationId": "jobs_run_api_v1_jobs__key__run_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Jobs Run Api V1 Jobs  Key  Run Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run one job now",
+        "tags": [
+          "operations"
+        ]
+      }
+    },
+    "/api/v1/mail": {
+      "get": {
+        "operationId": "mail_status_api_v1_mail_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Mail Status Api V1 Mail Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "How email is set up, and how it is doing",
+        "tags": [
+          "operations"
+        ]
+      }
+    },
+    "/api/v1/mail/test": {
+      "post": {
+        "description": "Sends one message to your own address, now, and says whether the mail server took it.",
+        "operationId": "mail_test_api_v1_mail_test_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Mail Test Api V1 Mail Test Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Send yourself a test message",
+        "tags": [
+          "operations"
+        ]
+      }
+    },
     "/api/v1/meta": {
       "get": {
         "description": "What the web app needs before anyone signs in.",
@@ -13566,6 +13756,70 @@
         "summary": "Change your own password",
         "tags": [
           "session"
+        ]
+      }
+    },
+    "/api/v1/session/preferences": {
+      "get": {
+        "operationId": "preferences_api_v1_session_preferences_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Preferences Api V1 Session Preferences Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "How you want to be told",
+        "tags": [
+          "operations"
+        ]
+      },
+      "put": {
+        "operationId": "set_preferences_api_v1_session_preferences_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Preferences Api V1 Session Preferences Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say how you want to be told",
+        "tags": [
+          "operations"
         ]
       }
     },

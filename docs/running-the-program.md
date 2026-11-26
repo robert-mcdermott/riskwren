@@ -122,6 +122,28 @@ An import checks the whole pack first and reports every problem together. A scor
 
 A pack is also how one installation's program is copied to another, and how a program is kept under version control.
 
+## Reminders
+
+Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, and the next test of each control.
+
+| When | Who is told |
+|---|---|
+| 14 days before the date | Whoever it is waiting on |
+| The day after the date | The same people, as overdue. An overdue test also goes to the assessors, because an owner cannot test their own control |
+| Still late after 7 days | The steward of the unit |
+| Still late after 21 days | The unit's leader |
+
+- Each of these is said **once** for a given date. Moving the date starts again.
+- Actions and issues go up to the steward and the leader. The rest are for their owners: nobody else can renew a person's evidence or review their risk for them.
+- Something found already long overdue, as on the first day after an upgrade, is told once to whoever it has reached, and not to everyone below as well.
+- A reminder is a notice. It is read under the bell, and sent by email where [email is set up](configuration.md#email).
+
+The three periods are part of the program's cadences, with the others. **Admin → Scheduled work** shows them as they are set.
+
+### Key controls and the next test
+
+What is known about a control holds for twelve months. A control marked **key** is due to be tested again after six. Each control's page shows the date its next test is due, and its owners are reminded as it approaches. Marking a control key does not change what its last rating counts for; it brings the next test forward.
+
 ## Read the dashboards
 
 There are two, each for the whole organization or for one unit and everything beneath it. **Reports → Compliance** shows how ready each scope is against what it is held to and what stands in the way; it is described in [The compliance dashboard](compliance.md#the-compliance-dashboard). **Reports → Risk** shows where the register stands:
@@ -141,7 +163,7 @@ Below them are the residual matrix, the highest risks, the register by standing,
 
 On both, every figure is the count of a list, and opens that list with the same filters. A dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
 
-Until scheduled jobs arrive in a later release, the calendar is caught up when the register is read: the first person to open it after an acceptance expires or a plan runs late causes the standing to be updated, and the history records that as done by the system.
+The calendar is caught up every hour by [scheduled work](configuration.md#scheduled-work): when an acceptance expires or a plan runs late, the risk's standing is updated, and the history records that as done by the system. Reading the register catches it up as well, so a figure is never behind the date even where the scheduler is turned off.
 
 ## The history
 

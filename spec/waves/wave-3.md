@@ -44,16 +44,18 @@ Local accounts stay the default and are never removed: an evaluation or a small 
 
 **Done:** single sign-on is off in a new installation and nothing mentions it: `/meta` says nothing of it, the round trip answers 404, and the sign-in page is the password form it always was. Naming an issuer and a client under `[sso]` turns it on beside local accounts. The client reads the provider's discovery document and keys, remembers both for an hour, and fetches the keys again once when a token names one it has not seen. The round trip is the authorization-code flow with PKCE; its state is kept server-side as a hash, used once, dropped after ten minutes, and bound by a cookie to the browser that began it. The ID token is verified over the standard library alone: an RS256 signature by integer arithmetic against the published key, then issuer, audience, expiry, and nonce. A person is known by issuer and subject; joined to an existing account by an address the provider vouches for; created otherwise, unless that is turned off. Mappings are kept in the app and give a role for the whole organization or a unit, a leader's limit, or membership; mapped roles are replaced at every sign-in and marked as the provider's, hand-given roles are untouched, and the last administrator is kept. A missing claim takes mapped roles away, except where the provider says the list was too long to send. Passwords stay for everyone or for administrators only. Admin → Single sign-on shows the connection and checks it; `doctor` does the same. `tests/test_sso.py` holds the acceptance tests against a provider run inside the tests, which is also `scripts/dev_identity_provider.py` for trying it on a laptop. The whole flow was also walked in a real browser against that provider.
 
-### Slice 2: Schedules and email ☐
+### Slice 2: Schedules and email ☑
 
 **Goal:** the app knows what is due, and says so.
 
-- [ ] The job scheduler: daily jobs, each run by exactly one process, with what ran and what it did on record
-- [ ] Cadences as one table keyed by rating and criticality; key controls; the next test date on a control
-- [ ] Reminders, then escalation to the steward and the leader, on a schedule the program sets
-- [ ] SMTP delivery, off until set up; as it happens or a daily digest; each person's preferences
+- [x] The job scheduler: daily jobs, each run by exactly one process, with what ran and what it did on record
+- [x] Cadences as one table keyed by rating and criticality; key controls; the next test date on a control
+- [x] Reminders, then escalation to the steward and the leader, on a schedule the program sets
+- [x] SMTP delivery, off until set up; as it happens or a daily digest; each person's preferences
 
 **Acceptance:** two servers on one database run a job once between them; an overdue action reminds its owner and later their steward; with no mail server, nothing is attempted and nothing is lost.
+
+**Done:** four jobs run inside the server: the calendar, reminders, email, and housekeeping. A process claims a job's row before running it, with a lease that lapses if the process dies, so several workers, several servers, and `riskwren jobs run` from a scheduled task run each job once between them; what is due comes from the database and the clock, so a restart catches up. Runs that did something, and failures with their reason, are kept for ninety days. Admin → Scheduled work shows each job and can run or pause it; `riskwren jobs` does the same. Reminders look at everything with a date: actions, risk reviews, issues, evidence, acceptances, exceptions, and control tests. Whoever it waits on is told two weeks ahead and the day after; actions and issues that stay late go to the unit's steward after a week and its leader after three. Each stage is said once for a given date, moving the date starts again, and something found long overdue is told once at the stage it has reached. The three periods and the shorter cadence for key controls are in the program's cadences; a control shows when its next test is due. Email is optional: with `[mail]` set, notices go to an outbox in the database and are sent from there, each as it happens or as a daily summary by each person's choice, with retries and a limit, and nothing written before email was set up is ever sent. Editing the cadence table in the app waits for slice 7 with the other program editors. Acceptance tests are in `tests/test_schedule.py` (two connections to one database run a job once between them; an action reminds its owner, then the steward, then the leader) and `tests/test_mail.py`, which sends over real SMTP to a server inside the test (with no mail server, nothing is attempted and nothing is sent later).
 
 ### Slice 3: Questionnaires ☐
 

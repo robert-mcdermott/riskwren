@@ -7,7 +7,8 @@ import { navigate } from "../core/router.js";
 import { card, emptyState, pageHeader } from "../components/ui.js";
 import { show } from "./page.js";
 
-const ICONS = { issue: "issue", closure: "issue", action: "check", exception: "exception", test: "assessment" };
+const ICONS = { issue: "issue", closure: "issue", action: "check", exception: "exception", test: "assessment",
+  reminder: "bell", overdue: "alert", escalated: "alert" };
 
 /** Tell the top bar how many are left unread. */
 function announce(unread) {

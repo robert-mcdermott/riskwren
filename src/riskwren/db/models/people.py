@@ -57,6 +57,9 @@ class Account(Base):
     title: Mapped[str | None] = mapped_column(String(200))
     status: Mapped[str] = mapped_column(String(16), default="invited")
     time_zone: Mapped[str | None] = mapped_column(String(64))
+    # How notices reach this person by email, where email is set up: as they happen, in a
+    # daily summary, or not at all.
+    email_notices: Mapped[str] = mapped_column(String(16), default="immediate")
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
 
     __table_args__ = (CheckConstraint(_one_of("status", ACCOUNT_STATUSES), name="status"),)
