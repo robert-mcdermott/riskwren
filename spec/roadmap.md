@@ -41,7 +41,7 @@ Status key: ☐ planned · ◐ in progress · ☑ done
 
 Detail: [waves/wave-1.md](waves/wave-1.md)
 
-## Wave 2: Compliance (v0.2.0) ☐
+## Wave 2: Compliance (v0.2.0) ◐
 
 **Goal:** test once, satisfy many. One set of controls answers every framework the organization is held to, and readiness is worked out from tests and evidence, never typed in.
 
@@ -57,7 +57,7 @@ Detail: [waves/wave-1.md](waves/wave-1.md)
 | 8 | Dashboard, graph, and demo | Readiness by scope and framework, stale evidence, issues by age; the dependency graph around any record; an organization-wide history view; the demo's scopes, assessment, and issues | ☐ |
 | 9 | Release prep | Guides, changelog, dependency review, release | ☐ |
 
-Detail of the content: [content-packs.md](content-packs.md)
+Detail: [waves/wave-2.md](waves/wave-2.md) · Detail of the content: [content-packs.md](content-packs.md)
 
 ## Documentation site (between v0.2.0 and v0.3.0) ☐
 
