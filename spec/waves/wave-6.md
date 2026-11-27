@@ -55,9 +55,15 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `riskwren.insight.leadership` builds a report for a period, by default from the day after the last report ended (the first time, the last quarter) to today: the summary in the issuer's words; risks added and issues raised and closed in the period; the ten open risks with the highest residual rating, each marked new since the last report, joined the top, rose, fell, or unchanged, with those that left the top; appetite by family; posture by framework, with its change since the last report; the third parties in the two highest tiers; every measure against the last report (or the first time, the snapshot from the start of the period); and the most overdue issues, risk reviews, third-party reviews, and actions. Until it is issued it is worked out afresh each time. Issuing stores it in `leadership_report` (`LDR`) as plain JSON, with the SHA-256 of its canonical form; the body is left out of the history, which records the fingerprint with the issue, so the chain vouches for the fingerprint and the fingerprint for the body. Opening it hashes the body again and compares it with both. Reports are read by those who read everything and by those who lead the whole organization (a principal's new `leads_all`, worked out at sign-in, and the `reports` permission), and prepared and issued by managers for the whole organization. **Reports → Leadership reports** lists them, prepares the next with its period, title, and summary, and shows each with whether its fingerprint verifies and a print button. The demo's risk manager issues one each quarter. The acceptance test is `tests/test_leadership.py::test_a_report_reopens_as_it_was_issued_and_its_fingerprint_verifies`, with `::test_a_changed_report_no_longer_verifies`.
 
-### Slice 4: As of ☐
+### Slice 4: As of ☑
 
-- [ ] Any record, and the register, as it stood on a chosen date, rebuilt from the history
+**Goal:** the record as it was on any day, from the history alone.
+
+- [x] Any record, and the register, as it stood on a chosen date, rebuilt from the history
+
+**Acceptance:** a record and the register as they stood on a day show the values they had then, and rebuilding backwards from now agrees with folding the history forwards from each record's creation.
+
+**Done:** `riskwren.insight.as_of` takes the record as it is now and undoes every event about its own row after the end of the chosen day (UTC), newest first, using each change's before-value; an event that created it means it did not exist yet. Owners are rebuilt the same way from the events about its owner rows. A register (risks, controls, issues, exceptions, third parties) is rebuilt in one pass over the events after the day, shows what was open or in use then unless asked for everything, and says for each column what it was then and, where it has changed, what it is now; risks are ordered by their rating then. Values are named as the history names them. Visibility is the person's now. **Reports → As of a date** and an **As of a date** link on every record's header. The acceptance tests are `tests/test_as_of.py::test_a_record_and_the_register_as_they_stood` and `::test_rebuilding_backwards_agrees_with_the_history_forwards`, which compares the two directions on every day each risk changed.
 
 ### Slice 5: Dossier and open formats ☐
 
@@ -76,4 +82,5 @@ The wave is done when, on a fresh checkout:
 - A measure is defined once, in code, as the same condition a list uses, so a figure and the list behind it cannot disagree (RPT-04).
 - A snapshot records the organization's figure for each measure on a day. It is bookkeeping, not history: it is not in the hash chain, and it can be taken again.
 - An issued leadership report is history: its issue is in the hash chain with its fingerprint. Its figures are kept as counts, not as lists to open, because the lists move on and the report must not. A report is never edited or withdrawn; the next one corrects it.
+- As of is rebuilt backwards from the record as it is now rather than forwards from its creation: it needs only the events after the day, and it still gives the right answer for a field whose history began after the record did (one an upgrade added).
 - Those who lead the whole organization read the reports though they cannot read everything: the report is written for them. It may name restricted risks, which such a leader may already see.

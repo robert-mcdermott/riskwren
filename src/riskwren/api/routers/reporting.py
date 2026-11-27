@@ -213,3 +213,37 @@ def leadership_report(request: Request, ref: str) -> dict[str, Any]:
     principal = current(request)
     with reading(request) as session:
         return envelope(leadership.view(session, principal, ref.strip().upper()))
+
+
+# --- As of ------------------------------------------------------------------------------------
+
+ON_DAY = Query(default=None, alias="on", description="The day; today if left out")
+
+
+@router.get(
+    "/as-of", summary="A register as it stood at the end of a day, rebuilt from the history"
+)
+def register_as_of(
+    request: Request,
+    type_: str = Query(default="risk", alias="type", description="risk, control, issue, ..."),
+    on: date | None = ON_DAY,
+    live: bool = Query(default=True, description="Only what was open or in use then"),
+) -> dict[str, Any]:
+    from riskwren.insight import as_of
+
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(as_of.register(session, principal, type_, on, live_only=live))
+
+
+@router.get(
+    "/as-of/{ref}", summary="A record as it stood at the end of a day, beside how it is now"
+)
+def record_as_of(request: Request, ref: str, on: date | None = ON_DAY) -> dict[str, Any]:
+    from riskwren.insight import as_of
+    from riskwren.inventory.registry import find_any
+
+    principal = current(request)
+    with reading(request) as session:
+        record_type, _ = find_any(session, ref)
+        return envelope(as_of.record_view(session, principal, record_type, ref, on))

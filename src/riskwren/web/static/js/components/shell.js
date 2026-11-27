@@ -79,6 +79,7 @@ export const NAV = [
       { href: "/measures", label: "Measures", iconName: "chart", when: "read_all" },
       { href: "/portfolio", label: "Portfolio", iconName: "grid" },
       { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "reports" },
+      { href: "/as-of", label: "As of a date", iconName: "history" },
       { href: "/tidy", label: "Tidy", iconName: "check" },
       { href: "/sessions", label: "Committee sessions", iconName: "session" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },

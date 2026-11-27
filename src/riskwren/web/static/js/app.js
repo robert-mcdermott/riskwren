@@ -97,6 +97,8 @@ async function boot() {
   route("/leadership-reports", page("leadership", "leadershipList"));
   route("/leadership-reports/next", page("leadership", "leadershipNext"));
   route("/leadership-reports/:ref", page("leadership", "leadershipReport"));
+  route("/as-of", page("as-of", "asOfRegister"));
+  route("/as-of/:ref", page("as-of", "asOfRecord"));
   route("/reviews/:ref", page("reviews", "reviewPage"));
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   route("/search", page("find", "searchPage"));

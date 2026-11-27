@@ -24,6 +24,9 @@ Wave 6, *Insight*.
   history records too, and reopens exactly as it was; the page says whether the fingerprint
   still verifies. **Reports → Leadership reports**, read by those who read everything and
   those who lead the whole organization, and issued by managers.
+- **As of a date:** any record, and the register of risks, controls, issues, exceptions, or
+  third parties, as it stood at the end of a chosen day, rebuilt from the history, with what
+  has changed since. **Reports → As of a date**, and **As of a date** on every record.
 - **Lists cut to a period:** risks by when they were added, issues by when they were raised
   or closed, issues by root cause, and issues and exceptions about a framework's requirements.
 

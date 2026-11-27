@@ -449,6 +449,8 @@ for _template in ("/api/v1/leadership-reports", "/api/v1/leadership-reports/{ref
     REACH[("GET", _template)] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/leadership-reports/next")] = {"manager"}
 REACH[("POST", "/api/v1/leadership-reports")] = {"manager"}
+REACH[("GET", "/api/v1/as-of")] = EVERYONE
+REACH[("GET", "/api/v1/as-of/{ref}")] = EVERYONE
 REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():

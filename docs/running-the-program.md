@@ -391,6 +391,17 @@ Every change to every record is written to an append-only history in the same tr
 
 Assessments, control ratings, test results, and acceptances are never edited. A new one supersedes the last, and all of them are kept.
 
+### As of a date
+
+Because every change holds each value before and after, any record and any register can be seen as it stood at the end of a chosen day. Nothing is kept for this: the record as it is now has every later change undone, newest first, and a record added after that day did not exist yet.
+
+- **Reports → As of a date** shows a register (risks, controls, issues, exceptions, or third parties) as it stood: what existed then, each with its status, unit, and the fields that matter for its kind, such as a risk's category, residual rating, standing, and next review. Where something has changed since, the cell is marked and says what it is now. By default it shows only what was open or in use then.
+- Every record's page has **As of a date** beside **Connections**: the record's fields at the end of the day beside how they are now, what changed listed first, and who owned it then and now.
+
+![The register as it stood at the end of a day: each risk's rating and standing then, and where they have changed since, what they are now](img/as-of-light.webp)
+
+What is rebuilt is what the history holds: a record's own fields and its owners. A record's links, its assessments, and its other parts have their own records and history; a value the history keeps hidden is not shown. A field that an upgrade added has no history from before that upgrade, so for days before it, it shows the value it was given then. As everywhere, you see only the records you may see now.
+
 ## Appearance
 
 **Admin → Appearance** makes the product yours, with a live preview:

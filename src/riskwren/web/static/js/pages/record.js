@@ -354,7 +354,8 @@ export function recordHeader(record, { badges = [], actions = null } = {}) {
         h("div", { class: "row-sm wrap record-badges" }, badges,
           record.restricted ? h("span", { class: "pill" }, icon("lock"), "Restricted") : null,
           h("span", { class: "subtle" }, `Updated ${relative(record.updated_at)}`),
-          h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"))),
+          h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
+          h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"))),
       actions),
     missingNote(record),
   ];

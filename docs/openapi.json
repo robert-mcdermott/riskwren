@@ -8192,6 +8192,147 @@
         ]
       }
     },
+    "/api/v1/as-of": {
+      "get": {
+        "operationId": "register_as_of_api_v1_as_of_get",
+        "parameters": [
+          {
+            "description": "risk, control, issue, ...",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "default": "risk",
+              "description": "risk, control, issue, ...",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The day; today if left out",
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The day; today if left out",
+              "title": "On"
+            }
+          },
+          {
+            "description": "Only what was open or in use then",
+            "in": "query",
+            "name": "live",
+            "required": false,
+            "schema": {
+              "default": true,
+              "description": "Only what was open or in use then",
+              "title": "Live",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Register As Of Api V1 As Of Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A register as it stood at the end of a day, rebuilt from the history",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/as-of/{ref}": {
+      "get": {
+        "operationId": "record_as_of_api_v1_as_of__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The day; today if left out",
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The day; today if left out",
+              "title": "On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record As Of Api V1 As Of  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A record as it stood at the end of a day, beside how it is now",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/assessments": {
       "get": {
         "operationId": "list_assessments_api_v1_assessments_get",

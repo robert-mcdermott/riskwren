@@ -266,6 +266,9 @@ POLICIES.update(
         ("GET", "/api/v1/leadership-reports/next"): Needs.MANAGE,
         ("POST", "/api/v1/leadership-reports"): Needs.MANAGE,
         ("GET", "/api/v1/leadership-reports/{ref}"): Needs.MEMBER,
+        # As of a day: what each person may see, rebuilt from the history.
+        ("GET", "/api/v1/as-of"): Needs.MEMBER,
+        ("GET", "/api/v1/as-of/{ref}"): Needs.MEMBER,
         # The portfolio counts only what each person may see, as the dashboards do.
         ("GET", "/api/v1/portfolio"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/call-review"): Needs.MEMBER,

@@ -70,6 +70,7 @@ These two are written from the code, so they always match the version they ship 
 | Are we getting better? Which figures moved this quarter? | [Measures](running-the-program.md#measures) |
 | Which units, frameworks, or suppliers need attention, and why do issues happen? | [Portfolio](running-the-program.md#portfolio) |
 | What did we tell leadership last quarter, and has the report been changed since? | [Leadership reports](running-the-program.md#leadership-reports) |
+| What did the register say on the day of the audit? Who owned this risk in March? | [As of a date](running-the-program.md#as-of-a-date) |
 | How do I change appetite, the scales, or the review cadence? | [Shape the program](running-the-program.md#shape-the-program) |
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |
