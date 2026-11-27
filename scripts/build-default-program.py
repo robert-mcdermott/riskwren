@@ -649,6 +649,65 @@ TIERING: dict[str, Any] = {
     ],
 }
 
+# Which kinds of agreement information needs when it is shared with a third party (TPR-06).
+# Each rule is in the condition language over ``information`` (its kind and data class),
+# ``third_party`` (its kind and tier), and ``service`` (the kind of the service it is shared
+# through, if any). Where a rule holds and no agreement of one of its kinds with that third
+# party covers what is shared, the sharing is a stop. Written for the United States.
+HANDLES_FOR_US = ["service_provider", "contractor", "supplier"]
+SHARING: dict[str, Any] = {
+    "rules": [
+        {
+            "key": "health_information",
+            "reason": "Identifiable health information that a third party creates, receives, "
+            "keeps, or sends on the organization's behalf needs a business associate agreement "
+            "under HIPAA.",
+            "when": {
+                "all": [
+                    {"field": "information.kind", "op": "eq", "value": "patient_records"},
+                    {"field": "third_party.kind", "op": "in", "value": HANDLES_FOR_US},
+                ]
+            },
+            "kinds": ["business_associate"],
+        },
+        {
+            "key": "participant_data",
+            "reason": "Information about research participants shared with a collaborator, "
+            "sponsor, or subrecipient is shared under a data use agreement, or the terms of the "
+            "award or contract it is shared for.",
+            "when": {
+                "all": [
+                    {
+                        "field": "information.kind",
+                        "op": "in",
+                        "value": ["participant_data", "patient_records"],
+                    },
+                    {
+                        "field": "third_party.kind",
+                        "op": "in",
+                        "value": ["collaborator", "sponsor", "subrecipient"],
+                    },
+                ]
+            },
+            "kinds": ["data_use", "award", "contract"],
+        },
+        {
+            "key": "controlled_data",
+            "reason": "Data held under another party's terms is shared only as a data use "
+            "agreement allows.",
+            "when": {"field": "information.kind", "op": "eq", "value": "controlled_data"},
+            "kinds": ["data_use"],
+        },
+        {
+            "key": "restricted",
+            "reason": "Restricted information is shared only under an agreement that binds the "
+            "third party to protect it.",
+            "when": {"field": "information.data_class", "op": "eq", "value": "restricted"},
+            "kinds": ["contract", "confidentiality", "business_associate", "data_use", "award"],
+        },
+    ],
+}
+
 # --- The risk taxonomy ------------------------------------------------------------------
 
 
@@ -755,6 +814,7 @@ PACK: dict[str, Any] = {
     "cadences": CADENCES,
     "authority": AUTHORITY,
     "tiering": TIERING,
+    "sharing": SHARING,
 }
 
 # --- The risk library -------------------------------------------------------------------

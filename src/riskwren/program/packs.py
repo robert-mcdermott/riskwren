@@ -122,6 +122,7 @@ def export(session: Session) -> dict[str, Any]:
         "cadences": rules.get(session, "cadences"),
         "authority": rules.get(session, "authority"),
         "tiering": rules.get(session, "tiering"),
+        "sharing": rules.get(session, "sharing"),
     }
 
 
@@ -177,6 +178,10 @@ def problems(pack: Any) -> list[str]:
         from riskwren.thirdparty import tiering  # it reads the program's rules
 
         found += tiering.problems(pack["tiering"])
+    if "sharing" in pack:
+        from riskwren.thirdparty import coverage
+
+        found += coverage.problems(pack["sharing"])
     return found
 
 

@@ -234,6 +234,14 @@ export const SCENES = [
   { name: "third-party-assurance-add", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=quillon")(page)}?tab=assurance`,
     step: click("Add a report") },
   { name: "control-relied-on", as: "assess1", path: async (page) => `/controls/${await first("/api/v1/controls?q=second+factor")(page)}` },
+  { name: "coverage", as: "ciso", path: "/coverage" },
+  { name: "information-stop", as: "cro", path: async (page) => `/information/${await first("/api/v1/information?q=patient+records")(page)}` },
+  { name: "third-party-stop", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=meridian")(page)}` },
+  { name: "service-stop", as: "ciso", path: async (page) => `/services/${await first("/api/v1/services?q=dispensing")(page)}` },
+  { name: "agreement-parties", as: "cro", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=courier")(page)}`,
+    step: `(() => { const card = [...document.querySelectorAll(".card")].find((el) => (el.querySelector("h2")?.textContent ?? "").startsWith("Who it is with"));
+      const change = card && [...card.querySelectorAll("button")].find((each) => each.textContent.trim() === "Change");
+      if (change) change.click(); else window.__sceneMissed = "the Change button of Who it is with"; })()` },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

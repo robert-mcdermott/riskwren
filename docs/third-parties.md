@@ -2,7 +2,7 @@
 
 This guide is for whoever looks after the organization's suppliers, service providers, and partners: most often the security office, which asks how each handles the organization's information, and the units that rely on each.
 
-A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, what it says about itself when asked, and what independent reports say about it.
+A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, what it says about itself when asked, what independent reports say about it, and whether an agreement covers what is shared with it.
 
 ## Third parties and their services
 
@@ -117,3 +117,22 @@ A report says less than its cover suggests until someone reads it. **Review it**
 ![A supplier's SOC 2 report, relied on with gaps: the service it does not cover, the data centres carved out, the exceptions noted, and what it leaves to the institute, joined to the institute's controls](img/third-party-assurance-light.webp)
 
 Reviewing again keeps the earlier review, and the control pages follow the review in force.
+
+## Coverage
+
+Information is **shared** with a third party when it is linked as *shared with* it, or when one of its services *handles* it. The program says which kinds of agreement shared information needs. As shipped, written for the United States:
+
+| When | It needs |
+|---|---|
+| Patient records are handled by a service provider, contractor, or supplier | A business associate agreement, under HIPAA |
+| Participant data or patient records are shared with a collaborator, sponsor, or subrecipient | A data use agreement, or the terms of the award or contract it is shared for |
+| Controlled-access data is shared with anyone | A data use agreement |
+| Restricted information is shared with anyone | A contract, a confidentiality agreement, a business associate agreement, a data use agreement, or an award's terms |
+
+An agreement meets a rule when it is of one of the kinds the rule names, it is with that third party (**Who it is with**, on the agreement), it is open and in force (started, and not ended), and it covers the information, the service it is shared through, or a scope that holds the information.
+
+Where a rule applies and no agreement meets it, the sharing is a **stop**. It is shown at the top of the information's page, the third party's, and the service's, saying what is shared, through what, which kind of agreement it needs and why, and which agreements there already are with that third party that do not meet it. **Third parties → Coverage** gathers every stop, with the rules. A stop goes, everywhere, as soon as an agreement of the right kind with that third party covers what is shared; it comes back when that agreement ends or is closed.
+
+![A dispensing cabinet supplier that handles patient records with no business associate agreement: the stop at the top of its page](img/third-party-stop-light.webp)
+
+A third party's page lists the agreements it is party to, with how each stands. The rules are part of the program, written in the condition language over the information's kind and class and the third party's kind and tier, and travel with it when it is exported and imported.

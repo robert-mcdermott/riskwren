@@ -362,6 +362,9 @@ def _history_title(event: Any, lookups: Any) -> str | None:
     if event.subject_type == "agreement_coverage":
         what = context.get("what") or "a record"
         return f"Now covers {what}" if event.action == "created" else f"No longer covers {what}"
+    if event.subject_type == "agreement_party":
+        who = context.get("who") or "a third party"
+        return f"Now with {who}" if event.action == "created" else f"No longer with {who}"
     if op == "agreement.close":
         note = context.get("note")
         return f"Closed it: {note}" if note else "Closed it"

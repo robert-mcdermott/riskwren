@@ -3240,6 +3240,23 @@
         "title": "PairBody",
         "type": "object"
       },
+      "PartiesBody": {
+        "properties": {
+          "parties": {
+            "description": "The references of the third parties it is with",
+            "items": {
+              "type": "string"
+            },
+            "title": "Parties",
+            "type": "array"
+          }
+        },
+        "required": [
+          "parties"
+        ],
+        "title": "PartiesBody",
+        "type": "object"
+      },
       "PasswordChange": {
         "properties": {
           "current_password": {
@@ -7919,6 +7936,60 @@
         ]
       }
     },
+    "/api/v1/agreements/{ref}/parties": {
+      "put": {
+        "operationId": "set_agreement_parties_api_v1_agreements__ref__parties_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartiesBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Agreement Parties Api V1 Agreements  Ref  Parties Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say which third parties an agreement is with",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/agreements/{ref}/reopen": {
       "post": {
         "operationId": "reopen_agreement_api_v1_agreements__ref__reopen_post",
@@ -10007,6 +10078,29 @@
         "summary": "Take a requirement off a control",
         "tags": [
           "controls"
+        ]
+      }
+    },
+    "/api/v1/coverage": {
+      "get": {
+        "operationId": "show_coverage_api_v1_coverage_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Coverage Api V1 Coverage Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Where shared information needs an agreement and none covers it",
+        "tags": [
+          "third parties"
         ]
       }
     },

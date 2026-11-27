@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from riskwren.db.models.agreements import Agreement, AgreementCoverage
+from riskwren.db.models.agreements import Agreement, AgreementCoverage, AgreementParty
 from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
 from riskwren.db.models.compliance import (
     Assessment,
@@ -109,6 +109,7 @@ __all__ = [
     "Action",
     "Agreement",
     "AgreementCoverage",
+    "AgreementParty",
     "Assessment",
     "AssuranceResponsibility",
     "AssuranceReview",

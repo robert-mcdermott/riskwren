@@ -35,6 +35,15 @@ Wave 5, *Third parties*.
   is, its opinion, the services it covers and does not, what is carved out, each exception and
   whether it matters here, and each responsibility it leaves to the organization, joined to the
   control that does it, which lists it. A contact can send reports through the review's link.
+- **Who an agreement is with:** the third parties it binds, beside the words of its parties.
+  An agreement can cover services as well as systems, information, and scopes, and a third
+  party's page lists the agreements it is party to.
+- **The stop for uncovered sharing.** The program's rules say which kinds of agreement
+  information needs when it is shared with a third party (a business associate agreement for
+  patient records handled for the organization, a data use agreement for controlled-access
+  data, and so on). Where information is shared, directly or through a service, and no open
+  agreement of a required kind with that third party covers it, the information, the third
+  party, and the service each show the stop, and **Third parties → Coverage** gathers them.
 - **A Third parties menu,** with third parties, services, and due diligence, and a new guide,
   [Third parties](docs/third-parties.md).
 

@@ -17,7 +17,7 @@ from riskwren.access.principal import Principal
 from riskwren.db.models import ThirdParty
 from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import THIRD_PARTY
-from riskwren.thirdparty import contacts, reviews, services, tiering
+from riskwren.thirdparty import contacts, coverage, reviews, services, tiering
 
 UNTIERED = "none"
 
@@ -50,6 +50,7 @@ def _detail(session: Session, principal: Principal, third_party: ThirdParty) -> 
         if contacts.may_read(session, principal, third_party)
         else None,
         "reviews": reviews.of(session, principal, third_party),
+        "agreements": coverage.agreements_with(session, principal, third_party),
     }
 
 

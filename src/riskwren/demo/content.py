@@ -906,6 +906,46 @@ ASSURANCE: list[dict[str, object]] = [
      "kind": "pentest", "received": 38, "from": 70, "to": 60, "until": -320},
 ]  # fmt: skip
 
+# Who the institute's agreements are with, and the agreements with its suppliers that the
+# third-party program entered. Days are before the build (negative: after it). Three gaps are
+# left: the pharmacy cabinets' supplier handles patient records with no business associate
+# agreement; the shared cohort with Calder Bay University went on after its memorandum was
+# closed; and the courier's contract has ended and is still open.
+AGREEMENT_PARTIES = {
+    "cohort_dua": ["funder3"], "genomic_cert": ["genomevault"], "vault_baa": ["backupco"],
+    "imaging_mou": ["univ1"],
+}  # fmt: skip
+# What an existing agreement also covers, now that services are on record.
+AGREEMENT_SERVICES = {"vault_baa": ["svc_vault"], "genomic_cert": ["svc_genomes"]}
+SUPPLIER_AGREEMENTS: list[dict[str, object]] = [
+    {"name": "Business associate agreement: Pellham Clinical Systems", "kind": "business_associate",
+     "party": "recordco", "unit": "CLIN", "starts": 1100, "ends": -295, "notice": 90, "renews": True,
+     "covers": ["svc_record"]},
+    {"name": "Business associate agreement: Lakeshore Reference Laboratory", "kind": "business_associate",
+     "party": "labref", "unit": "CLAB", "starts": 820, "ends": None, "covers": ["info_patients"]},
+    {"name": "Master services agreement: Quillon Cloud", "kind": "contract", "party": "cloud",
+     "unit": "IT", "starts": 1300, "ends": -210, "notice": 60, "renews": True,
+     "covers": ["svc_identity", "svc_mail"]},
+    {"name": "Hosting agreement: Ledgerwell", "kind": "contract", "party": "financeco",
+     "unit": "FIN", "starts": 1500, "ends": -500, "notice": 120, "covers": ["svc_finance"]},
+    {"name": "Subscription agreement: Peoplebook", "kind": "contract", "party": "hrco",
+     "unit": "HR", "starts": 700, "ends": -30, "notice": 60, "renews": True, "covers": ["svc_people"]},
+    {"name": "Services agreement: Castellan Trial Systems", "kind": "contract", "party": "edcco",
+     "unit": "CR", "starts": 600, "ends": -400, "covers": ["svc_edc"]},
+    {"name": "Monitoring services agreement: Halden Research Partners", "kind": "contract",
+     "party": "cro", "unit": "CR", "starts": 420, "ends": -310, "covers": ["svc_monitoring"]},
+    {"name": "Clinical trial agreement: Verdance Therapeutics", "kind": "contract", "party": "pharma1",
+     "unit": "CR", "starts": 480, "ends": -700, "covers": ["info_trials"]},
+    {"name": "Subscription: Tallyfield Surveys", "kind": "contract", "party": "surveyco",
+     "unit": "PS", "starts": 350, "ends": -15, "renews": True, "notice": 30, "covers": ["svc_surveys"]},
+    {"name": "Subaward: Northfield Data Collaborative", "kind": "award", "party": "sub2",
+     "unit": "SP", "starts": 300, "ends": -430, "covers": ["svc_linkage"]},
+    {"name": "Hosting agreement: Specimen Ledger Systems", "kind": "contract", "party": "trackco",
+     "unit": "BIO", "starts": 900, "ends": -365, "covers": ["svc_tracking"]},
+    {"name": "Courier agreement: Swiftcold Logistics", "kind": "contract", "party": "courier",
+     "unit": "BIO", "starts": 760, "ends": 25, "covers": ["svc_courier"]},
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

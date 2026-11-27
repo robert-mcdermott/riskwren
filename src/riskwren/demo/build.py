@@ -1883,6 +1883,48 @@ class Builder:
                         "responsibilities": duties, "reliance": spec["reliance"], "note": spec.get("note"),
                     })  # fmt: skip
 
+    def _story_coverage(self) -> Script:
+        """Who the institute's agreements are with, and the agreements with its suppliers
+        entered when the third-party program began: enough to cover most of what is shared,
+        and not all of it."""
+        from riskwren.thirdparty import coverage
+
+        lead = self.cast["risk2"]
+        yield self._on(96)
+        for key, parties in c.AGREEMENT_PARTIES.items():
+            with self.act(lead) as (session, who):
+                agreement = records.load(session, who, AGREEMENT, self._agreement_refs[key])
+                if agreement.status == "active":  # a closed one is with nobody any more
+                    coverage.set_parties(session, who, agreement,
+                                         [self.things[p][2] for p in parties])  # fmt: skip
+        for key, services in c.AGREEMENT_SERVICES.items():
+            with self.act(lead) as (session, who):
+                agreement = records.load(session, who, AGREEMENT, self._agreement_refs[key])
+                have = [row["ref"] for row in agreements.covers(session, who, agreement)["records"]]
+                agreements.set_coverage(session, who, agreement,
+                                        have + [self.things[s][2] for s in services])  # fmt: skip
+        yield self._on(92)
+        for spec in c.SUPPLIER_AGREEMENTS:
+            unit = self.units[str(spec["unit"])]
+            with self.act(lead) as (session, who):
+                party = self.things[str(spec["party"])]
+                values = {
+                    "name": spec["name"], "kind": spec["kind"],
+                    "parties": session.get(ThirdParty, party[1]).name, "org_unit_id": unit,
+                    "starts_on": self.day(-float(spec["starts"])).isoformat(),  # type: ignore[arg-type]
+                    "ends_on": self.day(-float(spec["ends"])).isoformat()  # type: ignore[arg-type]
+                    if spec.get("ends") is not None else None,
+                    "notice_days": spec.get("notice"), "renews": bool(spec.get("renews")),
+                }  # fmt: skip
+                made = records.create(session, who, AGREEMENT, values)
+                records.set_owners(session, who, AGREEMENT, made,
+                                   [{"account_id": self.steward(unit), "kind": "owner"}])  # fmt: skip
+                coverage.set_parties(session, who, made, [party[2]])
+                agreements.set_coverage(
+                    session, who, made, [self.things[k][2] for k in spec["covers"]]
+                )  # type: ignore[attr-defined]
+            self.tally("agreements")
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3133,7 +3175,7 @@ class Builder:
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
             self._story_governance, self._story_third_parties, self._story_due_diligence,
-            self._story_assurance,
+            self._story_assurance, self._story_coverage,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

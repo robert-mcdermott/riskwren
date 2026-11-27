@@ -365,6 +365,14 @@ export function tabBar(tabs, current) {
     "aria-selected": String(current === key), onclick: () => setQuery({ tab: key === tabs[0][0] ? null : key }, { replace: false }) }, text)));
 }
 
+/** Where information is shared and no agreement covers it: fetched only when there is any. */
+export function stopsOf(record) {
+  if (!record.stops?.length) return null;
+  const holder = h("div");
+  import("../components/stops.js").then(({ stopsBanner }) => holder.append(stopsBanner(record.stops)));
+  return holder;
+}
+
 export function recordPage(main, type, params) {
   const meta = TYPES[type];
   const tab = query().get("tab") === "history" ? "history" : "overview";
@@ -386,6 +394,7 @@ export function recordPage(main, type, params) {
         editRecord(type, { record, vocab: data.vocab, units: data.units, onDone: reload }) }) : null;
       return h("div", { class: "stack" },
         recordHeader(record, { badges: [statusPill(record.status), criticality(data.vocab, record.criticality)], actions: edit }),
+        stopsOf(record),
         tabBar([["overview", "Overview"], ["history", "History"]], tab),
         tab === "history" ? card({ flush: true }, timeline(data.history)) : overview(record, ctx));
     },

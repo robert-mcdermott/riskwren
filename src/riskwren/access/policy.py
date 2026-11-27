@@ -257,6 +257,8 @@ POLICIES.update(
         ("PUT", "/api/v1/respond"): Needs.PUBLIC,
         ("POST", "/api/v1/respond/submit"): Needs.PUBLIC,
         ("POST", "/api/v1/respond/files"): Needs.PUBLIC,
+        ("GET", "/api/v1/coverage"): Needs.MEMBER,
+        ("PUT", "/api/v1/agreements/{ref}/parties"): Needs.MEMBER,
         ("GET", "/api/v1/assurance-kinds"): Needs.MEMBER,
         ("GET", "/api/v1/third-parties/{ref}/assurance"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/assurance"): Needs.MEMBER,

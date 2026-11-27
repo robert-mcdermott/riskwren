@@ -408,6 +408,7 @@ for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
                ("POST", "/api/v1/respond/submit"), ("POST", "/api/v1/respond/files")):  # fmt: skip
     REACH[_route] = EVERYONE | {"nobody"}
 for _route in (
+    ("GET", "/api/v1/coverage"), ("PUT", "/api/v1/agreements/{ref}/parties"),
     ("GET", "/api/v1/assurance-kinds"), ("GET", "/api/v1/third-parties/{ref}/assurance"),
     ("POST", "/api/v1/third-parties/{ref}/assurance"),
     ("POST", "/api/v1/third-parties/{ref}/assurance/{document}/reviews"),

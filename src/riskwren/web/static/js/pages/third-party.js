@@ -9,7 +9,7 @@ import { query } from "../core/router.js";
 import { criticality, recordChip, statusPill } from "../components/record.js";
 import { card, emptyState, pill } from "../components/ui.js";
 import { show } from "./page.js";
-import { facts, linksCard, outside, ownersCard, prose, recordHeader, risksCard, tabBar, timeline } from "./record.js";
+import { facts, linksCard, outside, ownersCard, prose, recordHeader, risksCard, stopsOf, tabBar, timeline } from "./record.js";
 
 // The forms are fetched when someone first asks for them.
 const editRecord = async (...args) => (await import("../components/record-forms.js")).editRecord(...args);
@@ -56,6 +56,17 @@ function servicesCard(record, ctx) {
       : h("p", { class: "muted" }, "What it provides is not on record. A service says which systems it reaches and which information it handles."));
 }
 
+const AGREEMENT_STATES = { in_force: ["In force", "ok"], notice: ["Notice due", "warn"], ending: ["Ending", "warn"], ended: ["Ended, still open", "danger"],
+  upcoming: ["Not yet started", "info"], closed: ["Closed", ""] };
+
+function agreementsCard(record) {
+  const rows = record.agreements ?? [];
+  return card({ title: "Agreements" },
+    rows.length ? h("ul", { class: "plain-list stack-sm" }, rows.map((row) => h("li", { class: "row wrap" },
+      h("span", { class: "grow" }, recordChip(row)), pill(...(AGREEMENT_STATES[row.state] ?? [row.state, ""])))))
+      : h("p", { class: "muted" }, "No agreement on record names it. An agreement says who it is with on its own page."));
+}
+
 function overview(record, ctx) {
   const v = ctx.vocab;
   const unit = ctx.units.byId.get(record.org_unit_id);
@@ -71,7 +82,7 @@ function overview(record, ctx) {
     h("div", { class: "stack-lg" },
       record.summary ? card({ title: "About" }, prose(record.summary)) : null,
       record.notes ? card({ title: "Notes" }, prose(record.notes)) : null,
-      tierCard(record, ctx), servicesCard(record, ctx), risksCard(ctx), linksCard(record, ctx)),
+      tierCard(record, ctx), servicesCard(record, ctx), agreementsCard(record), risksCard(ctx), linksCard(record, ctx)),
     h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), ownersCard(record, ctx)));
 }
 
@@ -121,7 +132,7 @@ export function thirdPartyPage(main, params) {
         dueDiligenceTab(record, ctx).then((node) => body.append(node));
       }
       else body = overview(record, ctx);
-      return h("div", { class: "stack" }, recordHeader(record, { badges, actions: edit }), tabBar(TABS, tab), body);
+      return h("div", { class: "stack" }, recordHeader(record, { badges, actions: edit }), stopsOf(record), tabBar(TABS, tab), body);
     },
   });
 }

@@ -131,11 +131,31 @@ export function agreementList(main) {
 
 // --- One agreement ---------------------------------------------------------------------------
 
+function partiesForm(record, reload) {
+  openOverlay({ title: "Who it is with", subtitle: "The third parties it binds. What it covers is shared with them under it.",
+    render: (body, footer, close) => {
+      const chosen = (record.with ?? []).map((each) => ({ ...each, type: "third_party" }));
+      const picker = recordPicker({ types: ["third_party"], chosen, label: "Add a third party", placeholder: "Search third parties", empty: "Nobody yet." });
+      const problem = banner();
+      const save = button("Save", { kind: "btn-primary" });
+      save.addEventListener("click", async () => {
+        const done = await submit({ button: save, banner: problem, run: () => put(`/api/v1/agreements/${record.ref}/parties`, { parties: chosen.map((each) => each.ref) }) });
+        if (!done) return;
+        close();
+        toast("Saved.");
+        reload();
+      });
+      body.append(h("div", { class: "stack-lg" }, problem, picker));
+      footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
 function coversForm(record, reload) {
-  openOverlay({ title: "What it covers", subtitle: "The systems, information, and scopes it binds. Every scope that holds one of them, or is one, is held to its terms.",
+  openOverlay({ title: "What it covers", subtitle: "The systems, information, services, and scopes it binds. Every scope that holds one of them, or is one, is held to its terms.",
     render: (body, footer, close) => {
       const chosen = record.covered.records.map((each) => ({ ...each }));
-      const picker = recordPicker({ types: ["system", "information", "scope"], chosen, label: "Add a system, information, or a scope",
+      const picker = recordPicker({ types: ["system", "information", "service", "scope"], chosen, label: "Add a system, information, a service, or a scope",
         placeholder: "Search by name or reference", empty: "Nothing yet." });
       const problem = banner();
       const save = button("Save", { kind: "btn-primary" });
@@ -186,10 +206,13 @@ function overview(record, data, reload) {
     h("div", { class: "stack-lg" },
       notes[state] ? alert(state === "ended" ? "danger" : state === "closed" || state === "upcoming" ? "info" : "warn", icon(state === "closed" || state === "upcoming" ? "info" : "alert"), h("div", {}, notes[state])) : null,
       record.summary ? card({ title: "What it is for" }, prose(record.summary)) : null,
+      card({ title: "Who it is with", actions: record.can.edit ? button("Change", { kind: "btn-sm", onclick: () => partiesForm(record, reload) }) : null },
+        record.with?.length ? h("ul", { class: "plain-list stack-sm" }, record.with.map((each) => h("li", {}, recordChip(each))))
+          : h("p", { class: "muted" }, "No third party is named. Until one is, it covers nothing shared with anyone.")),
       card({ title: covered.records.length ? `What it covers (${covered.records.length})` : "What it covers",
         actions: record.can.edit ? button("Change", { kind: "btn-sm", onclick: () => coversForm(record, reload) }) : null },
       covered.records.length ? h("ul", { class: "plain-list stack-sm" }, covered.records.map((each) => h("li", {}, recordChip(each))))
-        : h("p", { class: "muted" }, "Nothing yet. Name the systems, information, and scopes it binds."),
+        : h("p", { class: "muted" }, "Nothing yet. Name the systems, information, services, and scopes it binds."),
       covered.hidden ? h("p", { class: "subtle" }, `And ${covered.hidden} more that you do not have access to.`) : null),
       card({ title: "What it imposes" },
         record.terms ? h("div", { class: "stack" },

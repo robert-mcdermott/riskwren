@@ -38,7 +38,15 @@ from riskwren.core.errors import NotFound, PermissionDenied
 from riskwren.db.models import ThirdParty
 from riskwren.inventory import access, records
 from riskwren.inventory.registry import THIRD_PARTY
-from riskwren.thirdparty import assurance, contacts, respondent, reviews, services, tiering
+from riskwren.thirdparty import (
+    assurance,
+    contacts,
+    coverage,
+    respondent,
+    reviews,
+    services,
+    tiering,
+)
 from riskwren.thirdparty.reviews import REVIEW
 from riskwren.thirdparty.services import SERVICE
 
@@ -521,3 +529,29 @@ async def respond_file(
         return JSONResponse(jsonable_encoder(envelope(done)), status_code=201, headers=NO_STORE)
 
     return await run_in_threadpool(keep)
+
+
+# --- Coverage -------------------------------------------------------------------------------
+
+
+class PartiesBody(BaseModel):
+    parties: list[str] = Field(description="The references of the third parties it is with")
+
+
+@router.get("/coverage", summary="Where shared information needs an agreement and none covers it")
+def show_coverage(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope({"stops": coverage.all_stops(session, principal),
+                         "rules": coverage.requirements(session)})  # fmt: skip
+
+
+@router.put("/agreements/{ref}/parties", summary="Say which third parties an agreement is with")
+def set_agreement_parties(request: Request, ref: str, body: PartiesBody) -> dict[str, Any]:
+    from riskwren.compliance.agreements import AGREEMENT
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        agreement = records.load(session, principal, AGREEMENT, ref)
+        coverage.set_parties(session, principal, agreement, body.parties)
+        return envelope(records.detail(session, principal, AGREEMENT, agreement))
