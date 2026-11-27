@@ -99,7 +99,17 @@ def test_who_someone_is(db: Database, people: People) -> None:
     assert admin.is_admin and admin.reads_all and admin.configures
     assert not admin.edits_all and not admin.assesses and not admin.manages
     assert member.permissions() == dict.fromkeys(
-        ["admin", "manage", "configure", "read_all", "edit_all", "assess", "steward", "lead"],
+        [
+            "admin",
+            "manage",
+            "configure",
+            "read_all",
+            "edit_all",
+            "assess",
+            "steward",
+            "lead",
+            "reports",
+        ],
         False,
     )
     assert member.units_for("steward", "leader") == frozenset()
