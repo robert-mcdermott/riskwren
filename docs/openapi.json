@@ -17004,6 +17004,29 @@
         ]
       }
     },
+    "/api/v1/measures": {
+      "get": {
+        "operationId": "show_measures_api_v1_measures_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Measures Api V1 Measures Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Every defined measure: what it counts, its figure, and its trend",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/meta": {
       "get": {
         "description": "What the web app needs before anyone signs in.",

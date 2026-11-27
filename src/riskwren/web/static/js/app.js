@@ -92,6 +92,7 @@ async function boot() {
   route("/third-parties/:ref", page("third-party", "thirdPartyPage"));
   route("/reviews", page("reviews", "reviewList"));
   route("/coverage", page("coverage", "coveragePage"));
+  route("/measures", page("measures", "measuresPage"));
   route("/reviews/:ref", page("reviews", "reviewPage"));
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   route("/search", page("find", "searchPage"));

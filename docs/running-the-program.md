@@ -317,6 +317,25 @@ Below them are the residual matrix, the highest risks, the register by standing,
 
 On both, every figure is the count of a list, and opens that list with the same filters. A dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
 
+### Measures
+
+**Reports → Measures** (managers, auditors, and administrators) lists the program's defined measures, grouped as risk, treatment, compliance, issues and exceptions, and third parties. Each says what it counts and among which records, its figure as you may see it, and whether fewer is better. As on the dashboards, a figure opens the list it counts, with the same filters.
+
+| Measure | Counts |
+|---|---|
+| Open risks, risks above appetite, risks needing a decision, risk reviews overdue, ratings in doubt | As on the risk dashboard |
+| Actions overdue | Open actions, from plans and issues, past their date |
+| Controls failing a test, controls not assessed | Controls in use whose test, still in date, found them less than effective (as on the compliance dashboard); those whose design or operation nobody has assessed |
+| Evidence past its date | Items of evidence in use past the date they hold until |
+| Open issues, issues overdue, critical issues open | Issues not closed or cancelled; those past their date; those of critical severity |
+| Exceptions in force | Approved exceptions between their start and their end |
+| Third parties not tiered, third-party reviews overdue | Third parties in use with no tier, or past their next review date |
+| Sharing no agreement covers | The stops on Third parties → Coverage |
+
+Each measure has a **trend**: the organization's figure from a snapshot the scheduler takes each day, over the last quarter, with how far it has moved. A snapshot is bookkeeping, not history: it is kept outside the hash chain, and one taken again the same day replaces the earlier one.
+
+![Measures: each figure with what it counts, its trend over the quarter, and how far it moved](img/measures-light.webp)
+
 The calendar is caught up every hour by [scheduled work](configuration.md#scheduled-work): when an acceptance expires or a plan runs late, the risk's standing is updated, and the history records that as done by the system. Reading the register catches it up as well, so a figure is never behind the date even where the scheduler is turned off.
 
 ## The history

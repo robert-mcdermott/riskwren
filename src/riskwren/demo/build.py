@@ -1987,6 +1987,17 @@ class Builder:
                 lifecycle.call_review(session, who, session.get(ThirdParty, party_id),
                                       str(called["event"]), str(called["note"]))  # fmt: skip
 
+    def _story_measures(self) -> Script:
+        """A snapshot of every measure each week of the last half year, taken as the history
+        happened, so that each has a trend; and one on the day the demo is built."""
+        from riskwren.insight import measures
+
+        for days in range(182, 0, -7):
+            yield self._on(days, hour=17)
+            with self.db.bookkeeping() as session:
+                measures.snapshot(session, self.today)
+            self.tally("measure snapshots")
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3238,9 +3249,15 @@ class Builder:
             self._story_documents, self._story_agreements, self._story_framework_update,
             self._story_governance, self._story_third_parties, self._story_due_diligence,
             self._story_assurance, self._story_coverage, self._story_lifecycle,
+            self._story_measures,
         ):  # fmt: skip
             self.schedule(story())
         self.run()
+        # The day's snapshot of every measure, as the scheduler takes it.
+        from riskwren.insight import measures
+
+        with clock_set_to(lambda: self.end), self.db.bookkeeping() as session:
+            measures.snapshot(session)
         # The scheduler's turn, as it would take on a real server: whoever something is
         # waiting on is reminded, and what has stayed late has gone up to a steward or leader.
         with clock_set_to(lambda: self.end), self.db.bookkeeping() as session:

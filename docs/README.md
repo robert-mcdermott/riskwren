@@ -67,6 +67,7 @@ These two are written from the code, so they always match the version they ship 
 | Who holds our patient records without a business associate agreement? | [Coverage](third-parties.md#coverage) |
 | A supplier told us of a breach. How do we review it again now? | [Review again](third-parties.md#review-again) |
 | How do we end a supplier relationship properly? | [Ending a relationship](third-parties.md#ending-a-relationship) |
+| Are we getting better? Which figures moved this quarter? | [Measures](running-the-program.md#measures) |
 | How do I change appetite, the scales, or the review cadence? | [Shape the program](running-the-program.md#shape-the-program) |
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |

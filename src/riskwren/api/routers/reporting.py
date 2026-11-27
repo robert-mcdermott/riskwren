@@ -113,3 +113,12 @@ def dashboard(request: Request, unit: int | None = UNIT) -> dict[str, Any]:
     treatment.catch_up(request.app.state.db)
     with reading(request) as session:
         return envelope(reporting.dashboard(session, principal, unit=unit))
+
+
+@router.get("/measures", summary="Every defined measure: what it counts, its figure, and its trend")
+def show_measures(request: Request) -> dict[str, Any]:
+    from riskwren.insight import measures
+
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(measures.overview(session, principal))

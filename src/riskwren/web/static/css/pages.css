@@ -227,3 +227,10 @@
 .respond-main h1 { margin: 0; }
 .respond-actions { padding-top: var(--space-3); }
 .repeat { border: 1px solid var(--border); border-radius: var(--radius-m); padding: var(--space-4); margin: 0; }
+.ok-text { color: var(--ok); }
+.measure-value { font-size: var(--text-xl); font-weight: 650; }
+.measure-spark { width: 160px; height: 36px; }
+.measure-table { table-layout: fixed; }
+.measure-table th:nth-child(2), .measure-table td:nth-child(2) { width: 6.5rem; }
+.measure-table th:nth-child(3), .measure-table td:nth-child(3) { width: 12rem; }
+.measure-table th:nth-child(4), .measure-table td:nth-child(4) { width: 12rem; }

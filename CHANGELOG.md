@@ -4,6 +4,18 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.6.0 (unreleased)
+
+Wave 6, *Insight*.
+
+### Added
+
+- **Measures:** a catalog of defined measures of risk, treatment, compliance, issues, and third
+  parties, each saying what it counts and among which records, with its figure as the reader
+  may see it, opening the list it counts. A daily snapshot, taken by the scheduler, gives each
+  a trend over the last quarter. **Reports → Measures**, for managers, auditors, and
+  administrators.
+
 ## 0.5.0 (2026-11-27)
 
 Wave 5, *Third parties*: who the organization depends on, what each can reach, and whether

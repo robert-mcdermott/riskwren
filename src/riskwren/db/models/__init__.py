@@ -53,6 +53,7 @@ from riskwren.db.models.governance import (
     RiskObjective,
 )
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
+from riskwren.db.models.insight import MeasureSnapshot
 from riskwren.db.models.inventory import (
     ExternalRef,
     Information,
@@ -149,6 +150,7 @@ __all__ = [
     "IssueSubject",
     "Job",
     "JobRun",
+    "MeasureSnapshot",
     "Membership",
     "NotDuplicate",
     "Notice",

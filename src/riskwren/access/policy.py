@@ -258,6 +258,8 @@ POLICIES.update(
         ("POST", "/api/v1/respond/submit"): Needs.PUBLIC,
         ("POST", "/api/v1/respond/files"): Needs.PUBLIC,
         ("GET", "/api/v1/coverage"): Needs.MEMBER,
+        # Measures carry the organization's trend, so they are for those who read everything.
+        ("GET", "/api/v1/measures"): Needs.READ_ALL,
         ("POST", "/api/v1/third-parties/{ref}/call-review"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/offboarding"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/offboarding/steps/{step}"): Needs.MEMBER,
