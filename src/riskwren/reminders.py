@@ -181,7 +181,9 @@ def _campaign_items(session: Session, horizon: date) -> Iterator[Due]:
             item.id,
             campaign.due_on,
             f"{campaign.name}: {about}",
-            f"/campaign-items/{item.id}",
+            f"/library/{item.subject_ref}"
+            if campaign.kind == "acknowledgment"
+            else f"/campaign-items/{item.id}",
             (item.account_id,),
             item.org_unit_id,
         )

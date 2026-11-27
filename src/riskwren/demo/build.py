@@ -68,7 +68,7 @@ from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.oversight import campaigns
 from riskwren.people import accounts, handover, units
-from riskwren.policy import documents
+from riskwren.policy import documents, library
 from riskwren.program import branding, packs, settings
 from riskwren.risk import analysis, categories, indicators, register
 from riskwren.risk.indicators import INDICATOR
@@ -1879,6 +1879,9 @@ class Builder:
         steps: list[tuple[float, int, int, Callable[[Session, Principal], None]]] = []
         made: dict[str, int] = {}
         order = 0
+        # Who reads what, and when, is chosen apart from the dice the other stories use.
+        readers = random.Random(self.seed + 4241)
+        everyone = sorted(self.names)
 
         def who_is(key: str) -> int:
             return self.steward(self.units[key]) if key in self.units else self.cast[key]
@@ -1923,11 +1926,18 @@ class Builder:
                     "org_unit_id": self.units[spec["unit"]],
                     "parent": self._doc_refs.get(spec.get("parent", "")),
                     "review_months": spec.get("review_months"),
+                    "acknowledge": "acknowledge" in spec,
                     **content(spec, text),
                 }
                 document = documents.create(session, by, values)
                 made[spec["key"]] = document.id
                 self._doc_refs[spec["key"]] = document.ref
+                if spec.get("audience"):
+                    chosen = spec["audience"]
+                    library.set_audience(
+                        session, by, document, False,
+                        [self.units[code] for code in chosen["units"]], chosen["roles"],
+                    )  # fmt: skip
                 if spec.get("file"):
                     if self.files is not None:
                         documents.attach_file(
@@ -1991,6 +2001,51 @@ class Builder:
                     self.tally("document versions published")
 
                 step(ago, author, go)
+                asking = spec.get("acknowledge")
+                if asking:
+                    following = (
+                        spec["versions"][index + 1][0] if index + 1 < len(spec["versions"]) else 0
+                    )
+                    latest = index + 1 == len(spec["versions"])
+                    for person in everyone:
+                        if readers.random() >= asking["shares"][index]:
+                            continue
+                        if latest and person == self.cast["member"]:
+                            continue  # the guides show them with it still to do
+                        # Most read it within a fortnight of being told; a few take longer.
+                        late = min(1 + readers.expovariate(1 / 9), ago - following - 1)
+                        if late < 1:
+                            continue
+
+                        def read(session: Session, by: Principal, key: str = spec["key"]) -> None:
+                            document = doc(session, key)
+                            if library.applies(session, document, by):
+                                library.acknowledge(session, by, document)
+                                self.tally("acknowledgments")
+
+                        step(ago - late, person, read)
+                    if latest and asking.get("campaign"):
+                        chase = asking["campaign"]
+
+                        def launch(
+                            session: Session,
+                            by: Principal,
+                            key: str = spec["key"],
+                            chase: dict[str, Any] = chase,
+                        ) -> None:
+                            campaigns.launch(
+                                session,
+                                by,
+                                {
+                                    "kind": "acknowledgment",
+                                    "name": chase["name"],
+                                    "document": doc(session, key).ref,
+                                    "due_on": self.day(chase["due"]).isoformat(),
+                                },
+                            )
+                            self.tally("campaigns")
+
+                        step(chase["ago"], self.cast[chase["by"]], launch)
             for ago, said in spec.get("reviews", []):
 
                 def keep(
@@ -2047,6 +2102,8 @@ class Builder:
 
         for ago, _order, actor, act in sorted(steps, key=lambda each: (-each[0], each[1])):
             yield self._on(ago, hour=10)
+            if actor in self.departed:
+                continue  # they left before they got to it
             with self.act(actor) as (session, who):
                 act(session, who)
 

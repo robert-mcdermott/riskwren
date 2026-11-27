@@ -2,11 +2,11 @@
 
 This guide is for whoever writes, approves, or keeps the organization's policies, standards, procedures, and guidelines: most often the security office and the compliance office, and the leaders who approve what they write.
 
-RiskWren holds each document with its versions, who approved each one, and when it is next looked at. The words can be written here, or stay where the organization already keeps them; either way the lifecycle is tracked here.
+RiskWren holds each document with its versions, who approved each one, and when it is next looked at. The words can be written here, or stay where the organization already keeps them; either way the lifecycle is tracked here. Everyone reads what applies to them in the [policy library](#the-policy-library), and says they have where a document asks them to.
 
 ## Documents
 
-**Policies → Documents** lists them all, broadest first. A document is one of four kinds:
+**Policies → Documents** lists them all, broadest first. It is in the menu of stewards, leaders, assessors, managers, and those who read everything; anyone named an owner of a document reaches it from the document in the library. A document is one of four kinds:
 
 | Kind | What it is |
 |---|---|
@@ -62,3 +62,40 @@ When a review comes due it shows on the document, on its owners' Home, and in th
 - **Start a new version**, and send it for approval as above. Publishing it sets the next review.
 
 A document no longer needed is **retired**, with the reason. Its versions and history stay on record, and it can be put back in use. A document that others still implement is not retired until they are moved or retired first.
+
+## Who it applies to
+
+A document applies to **everyone**, as shipped, or to the people chosen under **Who it applies to** on its page:
+
+- **those who work in chosen units**, and in the units beneath them, and
+- **those who hold chosen roles**, wherever they hold them: every steward, say, or every manager.
+
+Someone in a chosen unit or holding a chosen role is one person, counted once. An account that is disabled is no longer counted. Who it applies to decides what each person finds in their library and who is asked to acknowledge it; it does not decide who may read it, which follows the document's unit and restriction like any record.
+
+## The policy library
+
+**Policies → Policy library** is where everyone reads the documents in force: the published version of each document that applies to them, broadest first, with what they still have to acknowledge at the top. **Everything published** shows every document they may read, whether or not it applies to them. The search finds a word in a title, a summary, or the text.
+
+![The policy library for a member of staff: the acceptable use policy at the top, still to be acknowledged, then the policies and standards that apply to them](img/library-light.webp)
+
+A document opens to read as it is in force: its version, when it came into force, who approved it, what changed in it, and the documents above and beneath it. Drafts, approvals, and earlier versions are not shown here; they are on the document's own page, under **Policies → Documents**, which those who write and keep documents use. The library is laid out to be read on a phone.
+
+## Acknowledgment
+
+A document can ask the people it applies to to say they have read it: tick **Ask those it applies to to say they have read it** when adding or editing it. Then:
+
+- **Each version that is published asks again.** Those it applies to are told, and it stays on their Home until they have. At the end of the document they press **I have read it and understand it**. What they acknowledged, and when, is kept with the version.
+- **A change that does not alter what anyone must do need not ask again.** Untick **Everyone must acknowledge this version again** on the next version, for a correction or a broken link: what people said of the version before still counts. Every version asks again unless its author says otherwise.
+- **An acknowledgment cannot be taken back,** and a person who no longer works where the document applies keeps theirs on record.
+
+![The acceptable use policy as a member of staff reads it: version 3 changed enough that everyone is asked again, and the button is at the end](img/library-reading-light.webp)
+
+### Who has acknowledged it
+
+The document's **Acknowledgments** tab shows everyone it applies to, split by whether they have acknowledged the version they must: as a count, by unit with the units that have most still to do first, and person by person. Someone who acknowledged an earlier version that no longer counts is shown with it. The tab is for the document's owners and editors, assessors of its unit, and those who read everything.
+
+![Who has acknowledged the incident response procedure: 51 of 67, by unit, with the button to ask the rest](img/document-acknowledgments-light.webp)
+
+### Asking for it by a date
+
+**Ask for acknowledgment** on that tab (an assessor or a manager) starts an **acknowledgment campaign**: those it applies to, or only those in one unit and beneath it, are asked by a date. Those who have already acknowledged the version they must are counted as answered from the start. Everyone else finds it on their Home with the date, is reminded as it approaches, and answers by acknowledging it in the library; the campaign's page shows coverage by unit as they do. The same campaign can be started from **Compliance → Campaigns** ([Running the program](running-the-program.md#campaigns)).

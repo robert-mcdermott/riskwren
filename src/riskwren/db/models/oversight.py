@@ -91,7 +91,9 @@ class Response(Base):
     )
 
 
-CAMPAIGN_KINDS = ("attestation", "self_assessment", "completeness", "profile", "evidence")
+CAMPAIGN_KINDS = (
+    "attestation", "self_assessment", "completeness", "profile", "evidence", "acknowledgment",
+)  # fmt: skip
 
 
 class Campaign(Base):
@@ -111,6 +113,8 @@ class Campaign(Base):
     org_unit_id: Mapped[int | None] = mapped_column(ForeignKey("org_unit.id"))
     scope_id: Mapped[int | None] = mapped_column(ForeignKey("scope.id"))
     wanted: Mapped[str | None] = mapped_column(Text)  # for evidence: what is asked for
+    # For an acknowledgment: the document people are asked to say they have read.
+    document_id: Mapped[int | None] = mapped_column(ForeignKey("policy_document.id"))
     due_on: Mapped[date] = mapped_column(Date)
     status: Mapped[str] = mapped_column(String(16), default="open")
     created_by: Mapped[int | None] = mapped_column(Integer)
@@ -122,7 +126,8 @@ class Campaign(Base):
     __table_args__ = (
         CheckConstraint("status IN ('open', 'closed', 'cancelled')", name="status"),
         CheckConstraint(
-            "kind IN ('attestation', 'self_assessment', 'completeness', 'profile', 'evidence')",
+            "kind IN ('attestation', 'self_assessment', 'completeness', 'profile', 'evidence', "
+            "'acknowledgment')",
             name="kind",
         ),
     )
@@ -154,6 +159,8 @@ class CampaignItem(Base):
 
     __table_args__ = (
         CheckConstraint("status IN ('pending', 'done', 'excused')", name="status"),
-        UniqueConstraint("campaign_id", "subject_type", "subject_id"),
+        # One item for each thing asked about, and for each person: an acknowledgment asks
+        # everyone about the same document.
+        UniqueConstraint("campaign_id", "subject_type", "subject_id", "account_id"),
         Index("ix_campaign_item_account_id", "account_id", "status"),
     )

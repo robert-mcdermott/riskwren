@@ -327,6 +327,24 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert privacy.escalated_to_unit_id is not None and privacy.escalation_reason
         gone = session.scalars(select(Account).where(Account.status == "disabled")).one()
         assert gone.title == "Principal Investigator"
+        # Everyone is asked to acknowledge the acceptable use policy; most have read its third
+        # version, a campaign chases the rest, and the sample staff member has still to.
+        from riskwren.db.models import Campaign, PolicyDocument
+        from riskwren.policy import library
+
+        papers = {row.name: row for row in session.scalars(select(PolicyDocument))}
+        aup = library.standing(session, papers["Acceptable use policy"])
+        active = select(func.count()).select_from(Account).where(Account.status == "active")
+        assert aup["required"]["number"] == 3 and aup["people"] == session.scalar(active)
+        assert 0.4 < aup["acknowledged"] / aup["people"] < 0.8
+        staff = next(p["name"] for p in built.sample_accounts if p["role"] == "Staff member")
+        member = next(row for row in aup["rows"] if row["name"] == staff)
+        assert (member["acknowledged"], member["version"]) == (False, 2)
+        chase = session.scalars(select(Campaign).where(Campaign.kind == "acknowledgment")).one()
+        assert chase.status == "open" and chase.document_id == papers["Acceptable use policy"].id
+        incident = library.standing(session, papers["Incident response procedure"])
+        assert 10 < incident["people"] < aup["people"] / 2
+        assert incident["acknowledged"] / incident["people"] > 0.6
     assert built.counts["acceptances refused"] == 1
 
 

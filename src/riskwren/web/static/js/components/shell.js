@@ -48,7 +48,8 @@ export const NAV = [
   {
     heading: "Policies",
     items: [
-      { href: "/documents", label: "Documents", iconName: "document" },
+      { href: "/library", label: "Policy library", iconName: "document" },
+      { href: "/documents", label: "Documents", iconName: "edit", when: ["steward", "lead", "assess", "read_all"] },
     ],
   },
   {

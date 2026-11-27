@@ -56,6 +56,10 @@ MOST_TEXT = 200_000
 MOST_APPROVERS = 10
 SOON = 30  # days before its date at which a review is said to be due
 MONTHS = (1, 120)
+ROLE_WORDS = {
+    "admin": "an administrator", "manager": "a manager", "assessor": "an assessor",
+    "auditor": "an auditor", "leader": "a leader", "steward": "a steward",
+}  # fmt: skip
 
 
 # --- Who may do what ------------------------------------------------------------------------
@@ -151,6 +155,8 @@ def _apply(
                 errors.add("parent", "A document cannot implement itself.")
             else:
                 document.parent_id = parent.id
+    if values.get("acknowledge") is not None:
+        document.acknowledge = bool(values["acknowledge"])
     if "review_months" in values:
         months = values.get("review_months")
         if months in (None, ""):
@@ -316,6 +322,7 @@ def version_view(
         "file": _file(session, version) if version.form == "file" else None,
         "fingerprint": version.fingerprint,
         "change_note": version.change_note,
+        "ask_again": version.ask_again,
         "created_by": version.created_by_name,
         "created_at": version.created_at,
         "updated_at": version.updated_at,
@@ -378,12 +385,32 @@ def _detail(session: Session, principal: Principal, document: PolicyDocument) ->
         "working": version_view(session, principal, document, working) if seen_working else None,
         "working_status": working.status if working is not None else None,
         "versions": [version_view(session, principal, document, row, words=False) for row in every],
+        "acknowledge": document.acknowledge,
+        **_audience_and_standing(session, principal, document),
         "can": {
             "edit": editable,
             "draft": editable and working is None and document.status == "active",
             "review": editable and in_force is not None and document.status == "active",
         },
     }
+
+
+def _audience_and_standing(
+    session: Session, principal: Principal, document: PolicyDocument
+) -> dict[str, Any]:
+    """Who it applies to; whether it applies to the reader; and, for those who look after
+    it, how many of those it applies to have acknowledged it."""
+    from riskwren.policy import library  # it builds on this module
+
+    out: dict[str, Any] = {
+        "audience": library.audience_of(session, document),
+        "applies_to_me": library.applies(session, document, principal),
+    }
+    if document.acknowledge and library.may_see_standing(session, principal, document):
+        found = library.standing(session, document)
+        kept = ("required", "people", "acknowledged", "outstanding")
+        out["acknowledgments"] = {key: found[key] for key in kept}
+    return out
 
 
 def _conditions(session: Session, principal: Principal, filters: Mapping[str, Any]) -> list[Any]:
@@ -419,6 +446,8 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
             model.next_review_on <= date.fromordinal(today.toordinal() + SOON),
             model.status == "active",
         ]
+    if filters.get("acknowledge"):
+        found += [model.acknowledge.is_(True), model.published_version_id.is_not(None)]
     if filters.get("parent"):
         above = select(PolicyDocument.id).where(
             PolicyDocument.ref == str(filters["parent"]).strip().upper()
@@ -489,6 +518,17 @@ def _history_title(event: Any, lookups: Any) -> str | None:
         return f"Retired it: {note}" if note else "Retired it"
     if op == "document.reinstate":
         return "Put it back in use"
+    if event.subject_type == "policy_audience":
+        if now("role"):
+            what = f"everyone who is {ROLE_WORDS.get(now('role'), now('role'))}"
+        else:
+            unit = lookups.name("unit", now("org_unit_id")) or "a unit"
+            what = f"{unit} and the units beneath it"
+        return (
+            f"Now applies to {what}"
+            if event.action == "created"
+            else f"No longer applies to {what}"
+        )
     return None
 
 
@@ -551,6 +591,8 @@ DOCUMENT: RecordType = register(
             "history_title": _history_title,
             "history_value": _history_value,
             "history_keeps_titled": True,
+            # Each acknowledgment is on the document's Acknowledgments tab, not its history.
+            "history_hidden": ("policy_acknowledgment",),
             "history_labels": {
                 "kind": "Kind",
                 "parent_id": "Implements",
@@ -559,6 +601,9 @@ DOCUMENT: RecordType = register(
                 "url": "Where it is kept",
                 "file_name": "File",
                 "form": "Held as",
+                "acknowledge": "Asks people to acknowledge it",
+                "for_everyone": "Applies to everyone",
+                "ask_again": "Must be acknowledged again",
             },
             "history_quiet": (
                 "published_version_id",
@@ -616,6 +661,8 @@ def _content(
             version.body = body.strip("\n") or None
     if "url" in values:
         version.url = records.url(values.get("url"), "url", errors, max_length=500)
+    if values.get("ask_again") is not None:
+        version.ask_again = bool(values["ask_again"])
     if "change_note" in values:
         note = records.text(values.get("change_note"))
         if note and len(note) > 4000:
@@ -903,10 +950,16 @@ def publish(session: Session, principal: Principal, document: PolicyDocument) ->
         document.next_review_on = next_review(session, document)
         session.flush()
     notices.tell_all(
-        session, _owners(session, document), "document",
+        session,
+        _owners(session, document),
+        "document",
         f"Version {number} of {document.ref} {document.name} is published.",
-        _href(document), by=principal,
-    )  # fmt: skip
+        _href(document),
+        by=principal,
+    )
+    from riskwren.policy import library  # it builds on this module
+
+    library.tell_to_acknowledge(session, principal, document, version)  # fmt: skip
     return version
 
 

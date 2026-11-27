@@ -22,12 +22,24 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Review dates.** Each document is reviewed on the program's cadence (12 months as
   shipped) or its own. A review that is due shows on the document, on its owners' Home, and
   in the reminders; it is recorded as kept, or a new version is started.
+- **Who a document applies to:** everyone, or the people in chosen units and those who
+  hold chosen roles.
+- **The policy library.** Everyone reads the published documents that apply to them, or
+  every one they may read, found by their words, and laid out for a phone.
+- **Acknowledgment.** A document can ask the people it applies to to say they have read it.
+  Each acknowledgment is of a version; a new version asks everyone again unless its author
+  says the change does not need it. Its page shows who has and who has not, by unit and by
+  person, and what someone still has to acknowledge is on their Home.
+- **Acknowledgment campaigns** ask those who have not acknowledged a document by a date, with
+  reminders and coverage by unit.
 - **A new guide, [Policies](docs/policies.md).**
 
 ### Changed
 
 - A rule a later release adds to the program's cadences is taken from the default program
   until the organization sets it, so a table saved earlier still has it.
+- The **Policies** menu has **Policy library** for everyone, and **Documents** for those who
+  write and keep them.
 
 ## 0.3.0 (2026-11-26)
 

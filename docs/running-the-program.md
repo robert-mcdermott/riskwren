@@ -213,6 +213,7 @@ A campaign asks a set of people for one thing by a date, and shows who has answe
 | **Unit completeness check** | The stewards of units | Is everything the unit has on record, with the right owners? |
 | **System security profile** | The owners of systems | What each system holds, who can reach it, and who patches, backs up, and watches it |
 | **Evidence request** | The owners of controls | A named piece of evidence for each control |
+| **Acknowledgment** | The people a document applies to | Read the version in force, and say they have |
 
 Choose what to ask, give it a name and a date, and say what it is about: everything in a unit and beneath it, or, for controls, only those a compliance scope uses. Before it starts, the form says how many people would be asked about how many things. Each person is told once, with a count, and finds each thing on their **Home**.
 
@@ -220,6 +221,7 @@ Choose what to ask, give it a name and a date, and say what it is about: everyth
 - Any owner of a control, risk, or system may answer for it, not only the one who was asked. An answer can be saved and finished later.
 - **Something with nobody to ask is still listed**, and shown as such, so that a control whose only owner has left does not pass unnoticed. Name an owner, or **excuse** it with a reason.
 - **An evidence request closes by itself** when evidence collected since the request is attached to the control.
+- **An acknowledgment campaign is answered in the library,** by acknowledging the document. Those who already have are counted as answered when it starts ([Policies](policies.md#asking-for-it-by-a-date)).
 
 ### Following one
 

@@ -27,8 +27,9 @@ from riskwren.api.routers.inventory import (
     update_record,
     values_of,
 )
+from riskwren.core.errors import PermissionDenied
 from riskwren.inventory import records
-from riskwren.policy import documents
+from riskwren.policy import documents, library
 from riskwren.policy.documents import DOCUMENT
 
 router = APIRouter(prefix="/api/v1", tags=["documents"])
@@ -50,6 +51,15 @@ class DocumentBody(BaseModel):
     form: str | None = Field(default=None, description="text, link, or file")
     body: str | None = Field(default=None, description="Its text, in a simple Markdown")
     url: str | None = Field(default=None, description="Where it is kept, if not here")
+    acknowledge: bool | None = Field(
+        default=None, description="Whether the people it applies to are asked to acknowledge it"
+    )
+
+
+class AudienceBody(BaseModel):
+    everyone: bool = Field(description="Whether it applies to everyone")
+    units: list[int] = Field(default=[], description="Units, with those beneath them")
+    roles: list[str] = Field(default=[], description="Roles, wherever they are held")
 
 
 class DraftBody(BaseModel):
@@ -59,6 +69,9 @@ class DraftBody(BaseModel):
     body: str | None = Field(default=None, description="Its text, in a simple Markdown")
     url: str | None = Field(default=None, description="Where it is kept, if not here")
     change_note: str | None = Field(default=None, description="What changed, and why")
+    ask_again: bool | None = Field(
+        default=None, description="Whether those who acknowledged earlier must do so again"
+    )
 
 
 class SubmitBody(BaseModel):
@@ -96,6 +109,7 @@ def list_documents(
     ),
     parent: str | None = Query(default=None, description="Those that implement this one"),
     awaiting_me: bool = Query(default=False, description="Waiting for my approval"),
+    acknowledge: bool = Query(default=False, description="Those that ask to be acknowledged"),
     owner: int | None = None,
     mine: bool = MINE,
     sort: str = SORT,
@@ -103,8 +117,8 @@ def list_documents(
     cursor: str | None = None,
 ) -> dict[str, Any]:
     filters = {"q": q, "unit": unit, "kind": kind, "status": status, "state": state,
-               "parent": parent, "awaiting_me": awaiting_me, "owner": owner,
-               "mine": mine}  # fmt: skip
+               "parent": parent, "awaiting_me": awaiting_me, "acknowledge": acknowledge,
+               "owner": owner, "mine": mine}  # fmt: skip
     return list_records(request, DOCUMENT, filters, sort, limit, cursor)
 
 
@@ -250,3 +264,58 @@ def download_file(request: Request, ref: str, version_id: int) -> Response:
         media_type=media_type if media_type in INERT else "application/octet-stream",
         headers={**DOWNLOAD_HEADERS, "Content-Disposition": disposition},
     )
+
+
+@router.put("/documents/{ref}/audience", summary="Say who a document applies to")
+def set_audience(request: Request, ref: str, body: AudienceBody) -> dict[str, Any]:
+    """Everyone, or the people who work in the units named (and those beneath them) and those
+    who hold the roles named."""
+    return _detail(
+        request, ref,
+        lambda s, p, d: library.set_audience(s, p, d, body.everyone, body.units, body.roles),
+    )  # fmt: skip
+
+
+@router.get("/documents/{ref}/acknowledgments", summary="Who has acknowledged a document")
+def acknowledgments(request: Request, ref: str) -> dict[str, Any]:
+    """Everyone the document applies to, split by whether they have acknowledged the version
+    they must, and by unit. For those who look after it, assessors, and those who read
+    everything."""
+    principal = current(request)
+    with reading(request) as session:
+        document = records.load(session, principal, DOCUMENT, ref)
+        if not library.may_see_standing(session, principal, document):
+            raise PermissionDenied(
+                "Who has acknowledged a document is for those who look after it."
+            )
+        return envelope(library.standing(session, document))
+
+
+@router.get("/library", summary="The published documents that apply to you")
+def show_library(
+    request: Request,
+    q: str | None = Query(default=None, description="Words in the title, summary, or text"),
+    everything: bool = Query(default=False, alias="all", description="Every published document"),
+) -> dict[str, Any]:
+    """Those you have still to acknowledge come first, then the broadest kind first."""
+    principal = current(request)
+    with reading(request) as session:
+        found = library.library(session, principal, words=q, everything=everything)
+        return envelope(found, total=len(found))
+
+
+@router.get("/library/{ref}", summary="A published document, to read")
+def read_document(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        document = records.load(session, principal, DOCUMENT, ref)
+        return envelope(library.reading(session, principal, document))
+
+
+@router.post("/library/{ref}/acknowledge", summary="Say you have read the version in force")
+def acknowledge(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        document = records.load(session, principal, DOCUMENT, ref)
+        library.acknowledge(session, principal, document)
+        return envelope(library.reading(session, principal, document))

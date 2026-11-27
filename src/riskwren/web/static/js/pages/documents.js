@@ -2,15 +2,16 @@
 // shows the version in force; the draft tab is where the next one is written, sent to named
 // people, approved, and published.
 
-import { del, get, patch, post, upload } from "../core/api.js";
+import { del, get, patch, post, put, upload } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date, dateTime, plural, relative } from "../core/format.js";
 import { unitOptions, units, vocabularies } from "../core/lookups.js";
 import { navigate, query } from "../core/router.js";
 import { can } from "../core/session.js";
+import { segments } from "../components/charts.js";
 import { comparison, DECISIONS, documentText, KIND_HINTS, KINDS, kindPill, reviewPill, WORKING, workingPill } from "../components/document.js";
 import { exportButton } from "../components/exchange.js";
-import { banner, field, section, select, submit } from "../components/form.js";
+import { banner, checkbox, field, section, select, submit } from "../components/form.js";
 import { closeOverlay, confirmAction, openOverlay } from "../components/overlay.js";
 import { peoplePicker } from "../components/people-picker.js";
 import { statusPill } from "../components/record.js";
@@ -49,11 +50,13 @@ function documentForm({ record = null, unitIndex, choices, onDone }) {
       const summary = field("What it is for", { type: "textarea", rows: 2, value: record?.summary ?? "" });
       const months = field("Reviewed every", { type: "number", min: 1, max: 120, value: record?.review_months ?? "", inputmode: "numeric",
         hint: record ? `Months. Leave empty for the program's ${record.review_every === 1 ? "month" : `${record.review_every} months`}.` : "Months. Leave empty for the program's cadence." });
+      const asks = checkbox("Ask those it applies to to say they have read it", { checked: record?.acknowledge ?? false,
+        hint: "They are told when a version is published, and it stays on their Home until they have." });
       const problem = banner();
       const save = button(record ? "Save" : "Add", { kind: "btn-primary" });
       const values = () => ({ name: name.input.value, kind: kind.input.value || null, parent: parent.input.value || null,
         org_unit_id: unit.input.value ? Number(unit.input.value) : null, summary: summary.input.value,
-        review_months: months.input.value === "" ? null : Number(months.input.value) });
+        review_months: months.input.value === "" ? null : Number(months.input.value), acknowledge: asks.input.checked });
       save.addEventListener("click", async () => {
         const done = await submit({ button: save, fields: { name, kind, parent, org_unit_id: unit, summary, review_months: months }, banner: problem,
           run: () => (record ? patch(`/api/v1/documents/${record.ref}`, { ...values(), version: record.version }) : post("/api/v1/documents", values())) });
@@ -70,6 +73,7 @@ function documentForm({ record = null, unitIndex, choices, onDone }) {
       body.append(h("div", { class: "stack-lg" }, problem,
         section("What it is", name.node, similarHint("document", name.input, { unit: () => unit.input.value, apartFrom: record?.ref }),
           h("div", { class: "grid-2" }, kind.node, unit.node), kindHint, parent.node, summary.node),
+        section("Reading it", asks.node),
         section("Review", months.node)));
       footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
       footer.hidden = false;
@@ -205,6 +209,9 @@ function draftEditor(record, version, reload) {
     h("div", { class: "hint" }, version.form === "file" && version.file ? `Now: ${version.file.name}. Choosing another replaces it.` : "A PDF or Word document, up to 25 MB."));
   const note = field("What changed, and why", { type: "textarea", rows: 3, value: version.change_note ?? "",
     hint: record.published ? "Needed before it is sent. It is shown with the version once published." : "Optional for a first version." });
+  const again = record.acknowledge && record.published ? checkbox("Everyone must acknowledge this version again", { checked: version.ask_again,
+    hint: "Untick it for a change that does not alter what anyone must do: what they said of the earlier version still counts." }) : null;
+  const asking = () => (again ? { ask_again: again.input.checked } : {});
   const preview = h("div", { class: "doc-preview", hidden: true });
   const showPreview = button("Preview", { kind: "btn-sm", "aria-pressed": "false", onclick: () => {
     const on = preview.hidden;
@@ -223,7 +230,7 @@ function draftEditor(record, version, reload) {
       form === "text" ? h("div", { class: "stack-sm" }, h("div", { class: "row" }, h("span", { class: "grow" }), showPreview), text.node, preview) : null,
       form === "link" ? url.node : null,
       form === "file" ? fileField : null,
-      note.node);
+      note.node, again?.node ?? null);
   };
   draw();
   save.addEventListener("click", async () => {
@@ -231,9 +238,9 @@ function draftEditor(record, version, reload) {
       if (form === "file" && fileInput.files?.length) {
         const file = fileInput.files[0];
         await upload(`/api/v1/documents/${record.ref}/draft/file`, file, { name: file.name });
-        return patch(`/api/v1/documents/${record.ref}/draft`, { change_note: note.input.value });
+        return patch(`/api/v1/documents/${record.ref}/draft`, { change_note: note.input.value, ...asking() });
       }
-      return patch(`/api/v1/documents/${record.ref}/draft`, { form, change_note: note.input.value,
+      return patch(`/api/v1/documents/${record.ref}/draft`, { form, change_note: note.input.value, ...asking(),
         ...(form === "text" ? { body: text.input.value } : {}), ...(form === "link" ? { url: url.input.value } : {}) });
     } });
     if (!done) return;
@@ -397,15 +404,126 @@ function glance(record, data) {
   ]));
 }
 
+const ROLE_NAMES = { admin: "Administrators", manager: "Managers", assessor: "Assessors", auditor: "Auditors", leader: "Leaders", steward: "Stewards" };
+
+function listed(words) {
+  return words.length < 2 ? words.join("") : `${words.slice(0, -1).join(", ")}${words.length > 2 ? "," : ""} or ${words.at(-1)}`;
+}
+
+function audienceWords(audience) {
+  if (audience.everyone) return "Everyone who can sign in.";
+  const parts = [
+    audience.units.length ? `those who work in ${listed(audience.units.map((unit) => unit.name))}, or in a unit beneath` : null,
+    audience.roles.length ? `${listed(audience.roles.map((role) => (ROLE_NAMES[role] ?? role).toLowerCase()))}, wherever they are` : null,
+  ].filter(Boolean);
+  const said = parts.join("; and ");
+  return `${said.charAt(0).toUpperCase()}${said.slice(1)}.`;
+}
+
+function audienceForm(record, unitIndex, reload) {
+  openOverlay({ title: "Who it applies to", subtitle: "Those it applies to find it in their library, and are asked to acknowledge it when it asks.",
+    render: (body, footer, close) => {
+      const everyone = checkbox("Everyone", { checked: record.audience.everyone, hint: "Everyone who can sign in." });
+      const chosenUnits = new Set(record.audience.units.map((unit) => unit.id));
+      const unitBoxes = [];
+      const walk = (nodes, depth) => nodes.flatMap((node) => {
+        const box = checkbox(node.name, { checked: chosenUnits.has(node.id), value: String(node.id) });
+        box.node.dataset.depth = String(Math.min(depth, 4));
+        unitBoxes.push(box);
+        return [box.node, ...walk(node.children ?? [], depth + 1)];
+      });
+      const unitsNode = h("fieldset", { class: "stack-sm" }, h("legend", {}, "Those who work in these units, and the units beneath them"),
+        h("div", { class: "stack-sm unit-checks" }, walk(unitIndex.tree, 0)));
+      const roleBoxes = Object.entries(ROLE_NAMES).map(([key, text]) => checkbox(text, { checked: record.audience.roles.includes(key), value: key }));
+      const rolesNode = h("fieldset", { class: "stack-sm" }, h("legend", {}, "And those who hold these roles, wherever they hold them"),
+        h("div", { class: "stack-sm" }, roleBoxes.map((box) => box.node)));
+      const sync = () => { unitsNode.hidden = everyone.input.checked; rolesNode.hidden = everyone.input.checked; };
+      everyone.input.addEventListener("change", sync);
+      sync();
+      const problem = banner();
+      const save = button("Save", { kind: "btn-primary" });
+      save.addEventListener("click", async () => {
+        const done = await submit({ button: save, banner: problem, run: () => put(`/api/v1/documents/${record.ref}/audience`, {
+          everyone: everyone.input.checked,
+          units: unitBoxes.filter((box) => box.input.checked).map((box) => Number(box.input.value)),
+          roles: roleBoxes.filter((box) => box.input.checked).map((box) => box.input.value) }) });
+        if (!done) return;
+        close();
+        toast("Saved.");
+        reload();
+      });
+      body.append(h("div", { class: "stack-lg" }, problem, everyone.node, unitsNode, rolesNode));
+      footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
+function audienceCard(record, data, reload) {
+  const counts = record.acknowledgments;
+  return card({ title: "Who it applies to", actions: record.can.edit ? button("Change", { kind: "btn-sm", onclick: () => audienceForm(record, data.units, reload) }) : null },
+    h("div", { class: "stack-sm" }, h("p", {}, audienceWords(record.audience)),
+      record.acknowledge ? h("p", { class: "muted" }, "Each is asked to say they have read it.") : null,
+      counts && counts.required ? h("p", {}, h("a", { href: `/documents/${record.ref}?tab=acknowledgments` },
+        `${counts.acknowledged} of ${plural(counts.people, "person", "people")} have acknowledged it`)) : null,
+      record.published ? h("p", {}, h("a", { href: `/library/${record.ref}` }, "Read it as they do")) : null));
+}
+
+function askForAcknowledgment(record, unitIndex) {
+  openOverlay({ title: "Ask for acknowledgment", subtitle: "A campaign asks those who have not yet said they read it, by a date, with reminders and a count by unit.",
+    render: (body, footer, close) => {
+      const name = field("Name", { value: `${record.name}, version ${record.acknowledgments.required.number}`, required: true });
+      const due = field("Due", { type: "date", required: true });
+      const unit = select("Only those in", unitOptions(unitIndex.tree, { blank: "Everyone it applies to" }));
+      const problem = banner();
+      const go = button("Start, and tell those asked", { kind: "btn-primary" });
+      go.addEventListener("click", async () => {
+        const done = await submit({ button: go, fields: { name, due_on: due, org_unit_id: unit }, banner: problem,
+          run: () => post("/api/v1/campaigns", { kind: "acknowledgment", document: record.ref, name: name.input.value, due_on: due.input.value,
+            org_unit_id: unit.input.value ? Number(unit.input.value) : null }) });
+        if (!done) return;
+        close();
+        toast(`${done.data.ref} is started.`);
+        navigate(`/campaigns/${done.data.ref}`);
+      });
+      body.append(h("div", { class: "stack" }, problem, name.node, due.node, unit.node,
+        h("p", { class: "muted" }, "Those who have already acknowledged the version they must are counted as done from the start.")));
+      footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
+function acknowledgmentsTab(record, data) {
+  const found = data.standing;
+  const required = found.required;
+  const said = (row) => row.acknowledged ? `Version ${row.version}, ${date(row.at)}`
+    : row.version ? pill(`Only version ${row.version}`, "warn") : pill("Not yet", "warn");
+  return h("div", { class: "stack-lg" },
+    card({ title: "Who has acknowledged it", actions: can("assess") && required ? button("Ask for acknowledgment", { kind: "btn-sm", onclick: () => askForAcknowledgment(record, data.units) }) : null },
+      h("div", { class: "stack" },
+        h("p", {}, required ? `Everyone it applies to is asked to have acknowledged version ${required.number} or later.` : "Nothing is published yet."),
+        segments([{ label: "have", value: found.acknowledged, tone: "ok" }, { label: "have not yet", value: found.outstanding, tone: "gap" }],
+          { label: `${found.acknowledged} of ${found.people} have acknowledged it` }))),
+    found.by_unit.length ? card({ title: "By unit", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Unit"), h("th", { scope: "col", class: "numeric" }, "People"), h("th", { scope: "col", class: "numeric" }, "Have acknowledged"))),
+      h("tbody", {}, found.by_unit.map((row) => h("tr", {}, h("td", {}, row.unit.name), h("td", { class: "numeric" }, String(row.people)),
+        h("td", { class: "numeric" }, `${row.acknowledged} (${row.share}%)`))))))) : null,
+    card({ title: plural(found.people, "person", "people"), flush: true }, found.rows.length
+      ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
+        h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Person"), h("th", { scope: "col" }, "Unit"), h("th", { scope: "col" }, "Acknowledged"))),
+        h("tbody", {}, found.rows.slice(0, 500).map((row) => h("tr", {}, h("td", {}, row.name), h("td", {}, row.unit), h("td", {}, said(row)))))))
+      : emptyState({ iconName: "people", title: "It applies to no one", text: "Change who it applies to." })));
+}
+
 export function documentPage(main, params) {
-  const tab = ["draft", "versions", "history"].includes(query().get("tab")) ? query().get("tab") : "document";
+  const tab = ["draft", "versions", "acknowledgments", "history"].includes(query().get("tab")) ? query().get("tab") : "document";
   return show(main, {
     title: params.ref,
     load: async () => {
       const base = `/api/v1/documents/${params.ref}`;
       const [record, unitIndex, vocab, entries] = await Promise.all([get(base, null, { fresh: true }), units(), vocabularies(),
         tab === "history" ? get(`${base}/history`, null, { fresh: true }) : null]);
-      return { record: record.data, units: unitIndex, vocab, history: entries?.data ?? [] };
+      const standing = tab === "acknowledgments" && record.data.acknowledgments ? (await get(`${base}/acknowledgments`, null, { fresh: true })).data : null;
+      return { record: record.data, units: unitIndex, vocab, history: entries?.data ?? [], standing };
     },
     view: (data, reload) => {
       const record = data.record;
@@ -416,8 +534,9 @@ export function documentPage(main, params) {
         : button("Retire", { kind: "btn-ghost", onclick: () => retireBox(record, reload) })) : null;
       const review = record.can.review ? button("Review and keep", { onclick: () => reviewBox(record, reload) }) : null;
       const tabs = [["document", "Document"], ["draft", record.working_status ? `Next version · ${WORKING[record.working_status][0]}` : "Next version"],
-        ["versions", "Versions"], ["history", "History"]];
+        ["versions", "Versions"], ...(record.acknowledgments ? [["acknowledgments", "Acknowledgments"]] : []), ["history", "History"]];
       const body = tab === "draft" ? draftTab(record, reload) : tab === "versions" ? versionsTab(record)
+        : tab === "acknowledgments" && data.standing ? acknowledgmentsTab(record, data)
         : tab === "history" ? card({ flush: true }, timeline(data.history)) : inForceTab(record);
       return h("div", { class: "stack" },
         recordHeader(record, { badges: [kindPill(record.kind), record.status === "retired" ? statusPill("retired") : null,
@@ -425,7 +544,7 @@ export function documentPage(main, params) {
         actions: h("div", { class: "row-sm wrap" }, review, edit, more) }),
         tabBar(tabs, tab),
         h("div", { class: "split" }, h("div", { class: "stack-lg" }, body),
-          h("div", { class: "stack-lg" }, glance(record, data), ownersCard(record, { vocab: data.vocab, units: data.units, reload }),
+          h("div", { class: "stack-lg" }, glance(record, data), audienceCard(record, data, reload), ownersCard(record, { vocab: data.vocab, units: data.units, reload }),
             record.children.length ? card({ title: "Implemented by" }, h("ul", { class: "plain-list stack-sm" }, record.children.map((child) => h("li", {},
               h("a", { href: `/documents/${child.ref}` }, child.name), h("span", { class: "cell-sub" }, ` ${KINDS[child.kind]} · ${child.ref}`))))) : null)));
     },

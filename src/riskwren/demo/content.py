@@ -1009,6 +1009,13 @@ AUP_V2 = [
     ),
 ]
 
+AUP_V3 = [
+    (
+        "- Store restricted information on a personal device or an unapproved service.",
+        "- Store restricted information on a personal device or an unapproved service.\n- Use a personal email or file-sharing account for Northmere's work.",
+    ),
+]
+
 ACCESS_V1 = """# Access control standard
 
 This standard puts the information security policy into practice for access to systems.
@@ -1223,7 +1230,18 @@ DOCUMENTS = [
                 AUP_V2,
                 "Generative tools: only approved ones, and never with restricted information.",
             ),
+            (
+                40,
+                AUP_V3,
+                "Work stays in Northmere's own accounts: no personal email or file sharing.",
+            ),
         ],
+        # Everyone is asked to say they have read each version; most have read the newest,
+        # and a campaign has just started to chase the rest. The sample staff member has still to.
+        "acknowledge": {
+            "shares": [0.97, 0.94, 0.62],
+            "campaign": {"ago": 2, "due": 12, "by": "assess1", "name": "Acceptable use, version 3"},
+        },
     },
     {
         "key": "access",
@@ -1303,6 +1321,10 @@ DOCUMENTS = [
         "approvers": ["cio", "cro"],
         "review_months": 6,
         "summary": "What to do when a security incident is suspected, and how the response runs.",
+        # Those who act in an incident: IT, Information Security, Research Computing, and
+        # every steward, who is often the first to hear of one.
+        "audience": {"units": ["IT", "SEC", "RC"], "roles": ["steward"]},
+        "acknowledge": {"shares": [0.96, 0.92, 0.81]},
         "versions": [
             (560, INCIDENT_V1, None),
             (

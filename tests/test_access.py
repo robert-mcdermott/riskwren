@@ -345,6 +345,11 @@ for _route in (
     ("GET", "/api/v1/documents/{ref}/versions/{version_id}"),
     ("GET", "/api/v1/documents/{ref}/compare"),
     ("GET", "/api/v1/documents/{ref}/versions/{version_id}/file"),
+    ("PUT", "/api/v1/documents/{ref}/audience"),
+    ("GET", "/api/v1/documents/{ref}/acknowledgments"),
+    ("GET", "/api/v1/library"),
+    ("GET", "/api/v1/library/{ref}"),
+    ("POST", "/api/v1/library/{ref}/acknowledge"),
 ):
     REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}

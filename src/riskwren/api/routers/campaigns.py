@@ -22,6 +22,7 @@ class CampaignIn(BaseModel):
     scope: str | None = Field(default=None, max_length=24)
     due_on: str = Field(default="", max_length=10)
     wanted: str | None = Field(default=None, max_length=2000)
+    document: str | None = Field(default=None, max_length=24, description="For acknowledgment")
 
 
 class AnswersIn(BaseModel):

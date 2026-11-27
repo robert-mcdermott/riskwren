@@ -86,6 +86,8 @@ async function boot() {
   route("/search", page("find", "searchPage"));
   route("/tidy", page("find", "tidyPage"));
   route("/handover/:id", page("find", "handoverPage"));
+  route("/library", page("library", "libraryList"));
+  route("/library/:ref", page("library", "libraryReading"));
   route("/documents", page("documents", "documentList"));
   route("/documents/:ref", page("documents", "documentPage"));
   route("/documents/:ref/versions/:id", page("documents", "documentVersion"));

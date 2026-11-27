@@ -140,6 +140,8 @@ Every route requires a signed-in account except those marked public. What a rout
 | `POST /documents/{ref}/draft/submit` · `/decision` · `/withdraw` · `/publish` | Send it to named people to approve; approve it or return it; take it back; publish it |
 | `POST /documents/{ref}/review` · `/retire` · `/reinstate` | Review it and keep it as it is; take it out of use; put it back |
 | `GET /documents/{ref}/versions/{id}` · `GET …/versions/{id}/file` · `GET /documents/{ref}/compare?from=&to=` | One version; its file; two versions side by side |
+| `PUT /documents/{ref}/audience` · `GET /documents/{ref}/acknowledgments` | Who it applies to (everyone, or units and roles); who has acknowledged the version they must, by unit and person (for those who keep it, assessors, and those who read everything) |
+| `GET /library?q=&all=` · `GET /library/{ref}` · `POST /library/{ref}/acknowledge` | The published documents that apply to you, or every one you may read, found by their words; one as it is in force; say you have read it |
 | `POST /program/preview` · `POST /program/publish` | Which open risks a change to the scoring method, appetite, or cadences would move; make the change (those who run the program) |
 | `POST /risk-categories` · `PATCH /risk-categories/{key}` | Add a risk category; rename, describe, retire, or move one |
 | `GET /admin/vocabularies` · `PUT /vocabularies/{name}` | Every vocabulary with what may be changed in it; rename, reorder, add to, or retire its values |

@@ -193,7 +193,10 @@ def for_record(
         .limit(limit)
     ).all()
     lookups = Lookups(session, record_type)
-    story = [entry(event, record_type, lookups) for event in events]
+    hidden = record_type.extra.get("history_hidden", ())
+    story = [
+        entry(event, record_type, lookups) for event in events if event.subject_type not in hidden
+    ]
     # A change that only copied what another entry already says (a rating onto its control,
     # an assessment onto its risk) is not told twice, unless the type says its own titled
     # changes are each worth telling (a result confirmed, in an assessment).

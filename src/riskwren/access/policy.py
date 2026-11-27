@@ -92,6 +92,11 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/documents/{ref}/versions/{version_id}"): Needs.MEMBER,
     ("GET", "/api/v1/documents/{ref}/compare"): Needs.MEMBER,
     ("GET", "/api/v1/documents/{ref}/versions/{version_id}/file"): Needs.MEMBER,
+    ("PUT", "/api/v1/documents/{ref}/audience"): Needs.MEMBER,
+    ("GET", "/api/v1/documents/{ref}/acknowledgments"): Needs.MEMBER,
+    ("GET", "/api/v1/library"): Needs.MEMBER,
+    ("GET", "/api/v1/library/{ref}"): Needs.MEMBER,
+    ("POST", "/api/v1/library/{ref}/acknowledge"): Needs.MEMBER,
     # Risk analyses are records like any other: who may start, work through, or read one
     # is decided where it is read or written.
     ("GET", "/api/v1/risk-analyses"): Needs.MEMBER,

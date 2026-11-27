@@ -34,7 +34,13 @@ from riskwren.db.models.controls import (
     RiskControl,
     TreatmentPlan,
 )
-from riskwren.db.models.documents import PolicyApproval, PolicyDocument, PolicyVersion
+from riskwren.db.models.documents import (
+    PolicyAcknowledgment,
+    PolicyApproval,
+    PolicyAudience,
+    PolicyDocument,
+    PolicyVersion,
+)
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.inventory import (
     ExternalRef,
@@ -117,7 +123,9 @@ __all__ = [
     "Notice",
     "OrgUnit",
     "OutboxMessage",
+    "PolicyAcknowledgment",
     "PolicyApproval",
+    "PolicyAudience",
     "PolicyDocument",
     "PolicyVersion",
     "Process",

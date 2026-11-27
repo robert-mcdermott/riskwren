@@ -398,12 +398,14 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
         verb = {
             "attestation": "Attest", "self_assessment": "Look again at",
             "completeness": "Check the records of", "profile": "Describe the security of",
-            "evidence": "Provide evidence for",
+            "evidence": "Provide evidence for", "acknowledgment": "Read and acknowledge",
         }[campaign.kind]  # fmt: skip
-        add(
-            "campaign", f"{verb} {about}", f"{campaign.ref} · {campaign.name}",
-            f"/campaign-items/{item.id}", campaign.due_on, ref=campaign.ref,
+        href = (
+            f"/library/{item.subject_ref}" if campaign.kind == "acknowledgment"
+            else f"/campaign-items/{item.id}"
         )  # fmt: skip
+        add("campaign", f"{verb} {about}", f"{campaign.ref} · {campaign.name}", href,
+            campaign.due_on, ref=campaign.ref)  # fmt: skip
 
     # An analysis the person leads that still has questions without an answer.
     from riskwren.risk.analysis import ANALYSIS
@@ -430,6 +432,17 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             "approve", f"Approve the new version of {document.name}",
             f"{document.ref} · sent by {version.submitted_by_name}",
             f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+        )  # fmt: skip
+    from riskwren.policy import library as policy_library
+
+    asked = policy_library.asked_by_campaign(session, principal)
+    for document in policy_library.outstanding(session, principal):
+        if document.id in asked:
+            continue  # the campaign that asks for it is on the list already
+        add(
+            "acknowledge", f"Read and acknowledge {document.name}",
+            f"{document.ref} · {policy_documents.KIND_LABELS[document.kind].lower()}",
+            f"/library/{document.ref}", None, ref=document.ref,
         )  # fmt: skip
     soon = date.fromordinal(today.toordinal() + policy_documents.SOON)
     for document in policy_documents.owned(session, principal):

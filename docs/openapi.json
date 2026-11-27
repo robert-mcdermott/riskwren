@@ -322,6 +322,38 @@
         "title": "AnswerBody",
         "type": "object"
       },
+      "AudienceBody": {
+        "properties": {
+          "everyone": {
+            "description": "Whether it applies to everyone",
+            "title": "Everyone",
+            "type": "boolean"
+          },
+          "roles": {
+            "default": [],
+            "description": "Roles, wherever they are held",
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "units": {
+            "default": [],
+            "description": "Units, with those beneath them",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Units",
+            "type": "array"
+          }
+        },
+        "required": [
+          "everyone"
+        ],
+        "title": "AudienceBody",
+        "type": "object"
+      },
       "BrandingBody": {
         "properties": {
           "accent": {
@@ -367,6 +399,19 @@
       },
       "CampaignIn": {
         "properties": {
+          "document": {
+            "anyOf": [
+              {
+                "maxLength": 24,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For acknowledgment",
+            "title": "Document"
+          },
           "due_on": {
             "default": "",
             "maxLength": 10,
@@ -783,6 +828,18 @@
       "DocumentBody": {
         "description": "A document. On a change, send only what changes, with the ``version`` you had. On\nadding one, its first draft may be given as well.",
         "properties": {
+          "acknowledge": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the people it applies to are asked to acknowledge it",
+            "title": "Acknowledge"
+          },
           "body": {
             "anyOf": [
               {
@@ -953,6 +1010,18 @@
       "DraftBody": {
         "description": "The draft's content. Send only what changes.",
         "properties": {
+          "ask_again": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether those who acknowledged earlier must do so again",
+            "title": "Ask Again"
+          },
           "body": {
             "anyOf": [
               {
@@ -8081,6 +8150,18 @@
             }
           },
           {
+            "description": "Those that ask to be acknowledged",
+            "in": "query",
+            "name": "acknowledge",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Those that ask to be acknowledged",
+              "title": "Acknowledge",
+              "type": "boolean"
+            }
+          },
+          {
             "in": "query",
             "name": "owner",
             "required": false,
@@ -8317,6 +8398,106 @@
           }
         },
         "summary": "Change what a document is, or where it sits",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/documents/{ref}/acknowledgments": {
+      "get": {
+        "description": "Everyone the document applies to, split by whether they have acknowledged the version\nthey must, and by unit. For those who look after it, assessors, and those who read\neverything.",
+        "operationId": "acknowledgments_api_v1_documents__ref__acknowledgments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Acknowledgments Api V1 Documents  Ref  Acknowledgments Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Who has acknowledged a document",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/documents/{ref}/audience": {
+      "put": {
+        "description": "Everyone, or the people who work in the units named (and those beneath them) and those\nwho hold the roles named.",
+        "operationId": "set_audience_api_v1_documents__ref__audience_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudienceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Audience Api V1 Documents  Ref  Audience Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say who a document applies to",
         "tags": [
           "documents"
         ]
@@ -13698,6 +13879,160 @@
         "summary": "Run one job now",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/library": {
+      "get": {
+        "description": "Those you have still to acknowledge come first, then the broadest kind first.",
+        "operationId": "show_library_api_v1_library_get",
+        "parameters": [
+          {
+            "description": "Words in the title, summary, or text",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words in the title, summary, or text",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "Every published document",
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Every published document",
+              "title": "All",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Library Api V1 Library Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The published documents that apply to you",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/library/{ref}": {
+      "get": {
+        "operationId": "read_document_api_v1_library__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Read Document Api V1 Library  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A published document, to read",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/library/{ref}/acknowledge": {
+      "post": {
+        "operationId": "acknowledge_api_v1_library__ref__acknowledge_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Acknowledge Api V1 Library  Ref  Acknowledge Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say you have read the version in force",
+        "tags": [
+          "documents"
         ]
       }
     },

@@ -6,6 +6,7 @@ from __future__ import annotations
 from datetime import date, datetime
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Date,
     ForeignKey,
@@ -44,6 +45,10 @@ class PolicyDocument(RecordMixin, Base):
     published_version_id: Mapped[int | None] = mapped_column(Integer)
     last_reviewed_on: Mapped[date | None] = mapped_column(Date)
     next_review_on: Mapped[date | None] = mapped_column(Date)
+    # Who it applies to: everyone, or the units and roles listed in policy_audience.
+    for_everyone: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Whether the people it applies to are asked to say they have read it.
+    acknowledge: Mapped[bool] = mapped_column(Boolean, default=False)
 
     __table_args__ = (
         CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
@@ -75,6 +80,8 @@ class PolicyVersion(Base):
     file_name: Mapped[str | None] = mapped_column(String(200))
     fingerprint: Mapped[str | None] = mapped_column(String(64))
     change_note: Mapped[str | None] = mapped_column(Text)
+    # Whether those who acknowledged an earlier version must acknowledge this one.
+    ask_again: Mapped[bool] = mapped_column(Boolean, default=True)
     review_round: Mapped[int] = mapped_column(Integer, default=0)
     created_by: Mapped[int | None] = mapped_column(Integer)
     created_by_name: Mapped[str] = mapped_column(String(200))
@@ -117,4 +124,40 @@ class PolicyApproval(Base):
         CheckConstraint(one_of("decision", APPROVAL_DECISIONS), name="decision"),
         UniqueConstraint("version_id", "review_round", "account_id"),
         Index("ix_policy_approval_account_id", "account_id"),
+    )
+
+
+class PolicyAudience(Base):
+    """A unit, with everything beneath it, or a role, that a document applies to."""
+
+    __tablename__ = "policy_audience"
+    __audit_parent__ = ("document", "document_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("policy_document.id"))
+    org_unit_id: Mapped[int | None] = mapped_column(ForeignKey("org_unit.id"))
+    role: Mapped[str | None] = mapped_column(String(24))
+
+    __table_args__ = (
+        CheckConstraint("(org_unit_id IS NULL) != (role IS NULL)", name="one_of_them"),
+        Index("ix_policy_audience_document_id", "document_id"),
+    )
+
+
+class PolicyAcknowledgment(Base):
+    """That a person said they have read a version of a document."""
+
+    __tablename__ = "policy_acknowledgment"
+    __audit_parent__ = ("document", "document_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("policy_document.id"))
+    version_id: Mapped[int] = mapped_column(ForeignKey("policy_version.id"))
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"))
+    account_name: Mapped[str] = mapped_column(String(200))
+    acknowledged_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("version_id", "account_id"),
+        Index("ix_policy_acknowledgment_account", "account_id", "document_id"),
     )
