@@ -448,9 +448,13 @@ REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/measures")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/portfolio")] = EVERYONE
 # Leadership reports are read by those who read everything (and those who lead all of it,
-# whom this organization does not have), and prepared and issued by managers.
+# whom this organization does not have), and, by default, anyone whose role covers the whole
+# organization, as the assessor's does; they are prepared and issued by managers. Who else
+# reads them is chosen by those who configure the program.
 for _template in ("/api/v1/leadership-reports", "/api/v1/leadership-reports/{ref}"):
-    REACH[("GET", _template)] = {"admin", "manager", "auditor"}
+    REACH[("GET", _template)] = {"admin", "manager", "auditor", "assessor"}
+for _method in ("GET", "PUT"):
+    REACH[(_method, "/api/v1/admin/leadership-readers")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/leadership-reports/next")] = {"manager"}
 REACH[("POST", "/api/v1/leadership-reports")] = {"manager"}
 REACH[("GET", "/api/v1/as-of")] = EVERYONE
@@ -678,6 +682,8 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"unit_id": None}
             elif template == "/api/v1/admin/visibility":
                 body = {"visibility": "unit"}
+            elif template == "/api/v1/admin/leadership-readers":
+                body = {"reach": "organization", "people": []}
             elif template.endswith("/owners"):
                 body = {"owners": []}
             elif template.endswith("/links"):

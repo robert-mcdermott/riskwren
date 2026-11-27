@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable, Sequence
+from dataclasses import replace
 from typing import Any
 
 from sqlalchemy import func, select
@@ -16,6 +17,7 @@ from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
 from riskwren.db.models import Account, Credential, Membership, OrgUnit, RoleGrant, SessionToken
 from riskwren.events import audit
+from riskwren.insight import readers
 from riskwren.people import units
 
 EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -97,7 +99,7 @@ def principal_for(
     leads_all = roles.LEADER in coverage and (
         leading is None or set(session.scalars(select(OrgUnit.id))) <= leading
     )
-    return Principal(
+    principal = Principal(
         account_id=account.id,
         name=account.display_name,
         email=account.email,
@@ -109,6 +111,7 @@ def principal_for(
         session_id=token.id if token else None,
         leads_all=leads_all,
     )
+    return replace(principal, report_reader=readers.reaches(principal, readers.current(session)))
 
 
 def create(

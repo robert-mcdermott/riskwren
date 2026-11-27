@@ -15,6 +15,18 @@ Wave 8, *Incidents and resilience*.
   needs), what each system and service can deliver and what that rests on, and every shortfall
   between them. A process's **Business impact** tab, a system's or service's **Recovery** tab,
   and **Reports → Resilience**.
+- **Who reads the leadership reports is the program's choice,** under **Admin → Program → Who
+  sees what**: only those who lead the whole organization, anyone whose role covers the whole
+  organization (the default), or every leader and manager, with named readers on top. A reader
+  who may not see a record a report names sees where it stands but not what it is.
+
+### Changed
+
+- **A security leader who assesses everywhere now reads the leadership reports,** as does
+  anyone else whose role covers the whole organization. Choose **Nobody else** under
+  **Admin → Program → Who sees what** to keep them to those who lead the whole organization.
+- In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),
+  and `leadership` says whether the person reads the leadership reports.
 
 ## 0.7.0 (2026-11-27)
 

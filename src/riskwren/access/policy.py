@@ -206,6 +206,8 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/vocabularies"): Needs.MEMBER,
     ("GET", "/api/v1/admin/visibility"): Needs.CONFIGURE,
     ("PUT", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+    ("GET", "/api/v1/admin/leadership-readers"): Needs.CONFIGURE,
+    ("PUT", "/api/v1/admin/leadership-readers"): Needs.CONFIGURE,
     ("GET", "/api/v1/admin/vocabularies"): Needs.CONFIGURE,
     ("PUT", "/api/v1/vocabularies/{name}"): Needs.CONFIGURE,
     ("POST", "/api/v1/risk-categories"): Needs.CONFIGURE,

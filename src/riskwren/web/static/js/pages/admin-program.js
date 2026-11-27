@@ -9,6 +9,7 @@ import { query } from "../core/router.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { matrixGrid } from "../components/matrix.js";
 import { closeOverlay, openOverlay } from "../components/overlay.js";
+import { peoplePicker } from "../components/people-picker.js";
 import { rating, STANDING } from "../components/risk.js";
 import { toast } from "../components/toast.js";
 import { alert, card, pageHeader, pill } from "../components/ui.js";
@@ -387,6 +388,44 @@ function visibilityTab(seen) {
       h("p", { class: "subtle" }, "Leaders and stewards always see their unit and everything beneath it; managers, auditors, and assessors see what their role covers. A record marked restricted is seen only by its owners, its unit's steward and leaders, managers, and auditors. The inventory of processes, systems, and third parties is open to everyone signed in.")));
 }
 
+function readersTab(seen) {
+  let reach = seen.reach;
+  let people = seen.people.map((person) => ({ ...person }));
+  const node = h("select", { class: "select", id: "leadership-reach" },
+    Object.entries(seen.choices).map(([key, text]) => h("option", { value: key, selected: key === reach }, text)));
+  const list = h("ul", { class: "plain-list stack-sm", "aria-label": "People named as readers" });
+  const save = async (next) => {
+    try {
+      const saved = (await put("/api/v1/admin/leadership-readers", { reach: next.reach, people: next.people.map((person) => person.account_id) })).data;
+      reach = saved.reach;
+      people = saved.people;
+      toast("Saved. It applies from each person's next page.");
+    } catch (error) {
+      toast(said(error));
+    }
+    node.value = reach;
+    draw();
+  };
+  const draw = () => list.replaceChildren(...(people.length ? people.map((person) => h("li", { class: "row" },
+    h("span", { class: "grow" }, h("span", { class: "cell-main" }, person.name), h("span", { class: "cell-sub" }, ` ${person.email}`)),
+    button("Remove", { kind: "btn-ghost btn-sm", "aria-label": `Stop ${person.name} reading the reports`,
+      onclick: () => save({ reach, people: people.filter((other) => other.account_id !== person.account_id) }) })))
+    : [h("li", { class: "subtle" }, "Nobody is named.")]));
+  node.addEventListener("change", () => save({ reach: node.value, people }));
+  const picker = peoplePicker({ label: "Name someone who reads them", exclude: (account) => people.some((person) => person.account_id === account.id),
+    onPick: (account) => save({ reach, people: [...people, { account_id: account.id, name: account.display_name, email: account.email }] }) });
+  draw();
+  return card({ title: "Who reads the leadership reports" },
+    h("div", { class: "stack-sm" },
+      h("p", { class: "subtle" }, "Managers for the whole organization, administrators, auditors, and those who lead the whole organization always read them. Choose how much further they reach: in a smaller organization the security leader, or those who run the program, may be the most senior people who use it."),
+      h("label", { class: "label", for: "leadership-reach" }, "Who else reads them"),
+      node,
+      h("h3", {}, "Named readers"),
+      h("p", { class: "subtle" }, "Anyone named here reads them whatever the choice above."),
+      list, picker,
+      h("p", { class: "subtle" }, "A reader who may not see a record a report names sees where it stands, but not what it is.")));
+}
+
 function rules(program) {
   const months = (count) => (count == null ? "" : plural(count, "month"));
   return card({ title: "What follows from a rating", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
@@ -407,7 +446,8 @@ export function adminProgram(main) {
     load: async () => {
       const [program, unitIndex, extra] = await Promise.all([loadProgram({ fresh: true }), units(),
         tab === "vocabularies" ? get("/api/v1/admin/vocabularies", undefined, { fresh: true })
-          : tab === "visibility" ? get("/api/v1/admin/visibility", undefined, { fresh: true })
+          : tab === "visibility" ? Promise.all([get("/api/v1/admin/visibility", undefined, { fresh: true }), get("/api/v1/admin/leadership-readers", undefined, { fresh: true })])
+            .then(([seen, readers]) => ({ data: { seen: seen.data, readers: readers.data } }))
             : tab === "cadences" ? get("/api/v1/vocabularies", undefined, { fresh: true }) : null]);
       return { program, unitIndex, extra: extra?.data };
     },
@@ -417,7 +457,7 @@ export function adminProgram(main) {
       const body = tab === "method" ? methodTab(data.program, ctx)
         : tab === "cadences" ? cadencesTab(data.program, ctx, data.extra)
           : tab === "vocabularies" ? vocabulariesTab(data.extra, reload)
-            : tab === "visibility" ? visibilityTab(data.extra)
+            : tab === "visibility" ? [visibilityTab(data.extra.seen), readersTab(data.extra.readers)]
               : [categoriesTab(data.program, ctx), rules(data.program)];
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Admin", title: "Program",

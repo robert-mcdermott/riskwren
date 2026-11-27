@@ -69,7 +69,7 @@ WORK_UNDER_WAY = ("planned", "planning", "fieldwork", "reporting")
 
 
 def may_read(principal: Principal) -> bool:
-    return principal.reads_reports
+    return principal.reads_oversight
 
 
 def may_work(principal: Principal) -> bool:

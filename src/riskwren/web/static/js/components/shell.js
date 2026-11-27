@@ -79,7 +79,7 @@ export const NAV = [
       { href: "/dashboard", label: "Risk", iconName: "chart" },
       { href: "/measures", label: "Measures", iconName: "chart", when: "read_all" },
       { href: "/portfolio", label: "Portfolio", iconName: "grid" },
-      { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "reports" },
+      { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "leadership" },
       { href: "/resilience", label: "Resilience", iconName: "process" },
       { href: "/as-of", label: "As of a date", iconName: "history" },
       { href: "/check-dossier", label: "Check a dossier", iconName: "check" },
@@ -91,9 +91,9 @@ export const NAV = [
   {
     heading: "Audit",
     items: [
-      { href: "/audit/universe", label: "Universe", iconName: "grid", when: "reports" },
-      { href: "/audit/plans", label: "Plans", iconName: "file", when: "reports" },
-      { href: "/audit/outside", label: "Outside access", iconName: "key", when: "reports" },
+      { href: "/audit/universe", label: "Universe", iconName: "grid", when: "oversight" },
+      { href: "/audit/plans", label: "Plans", iconName: "file", when: "oversight" },
+      { href: "/audit/outside", label: "Outside access", iconName: "key", when: "oversight" },
     ],
   },
   {

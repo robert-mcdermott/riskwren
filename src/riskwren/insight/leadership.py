@@ -9,11 +9,14 @@ same fingerprint. Whatever happens to the register afterwards, the report reopen
 and anyone may check that it is the report that was given.
 
 Reports are the organization's: they are prepared and issued by managers for the whole
-organization, and read by those who read everything and those who lead all of it.
+organization, and read by those who read everything, those who lead all of it, and whomever
+else the program chooses (see ``readers``). A reader who may not see a record the report
+names sees that it is there, but not its name.
 """
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from datetime import date, datetime, timedelta
@@ -22,6 +25,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from riskwren.access import roles
 from riskwren.access.principal import Principal
 from riskwren.compliance.issues import ISSUE
 from riskwren.core import scoring
@@ -31,8 +35,8 @@ from riskwren.db.models import Event, LeadershipReport, MeasureSnapshot, OrgUnit
 from riskwren.db.refs import next_ref
 from riskwren.events import audit
 from riskwren.insight import measures, portfolio
-from riskwren.inventory import records
-from riskwren.inventory.registry import THIRD_PARTY
+from riskwren.inventory import access, records
+from riskwren.inventory.registry import THIRD_PARTY, find_any
 from riskwren.inventory.registry import find as find_record
 from riskwren.reporting.service import count
 from riskwren.risk import method as methods
@@ -46,7 +50,7 @@ DEFAULT_DAYS = 92  # a first report covers the last quarter
 
 
 def may_read(principal: Principal) -> bool:
-    return principal.reads_reports
+    return principal.reads_leadership
 
 
 def may_issue(principal: Principal) -> bool:
@@ -56,8 +60,8 @@ def may_issue(principal: Principal) -> bool:
 def _require_read(principal: Principal) -> None:
     if not may_read(principal):
         raise PermissionDenied(
-            "Leadership reports are read by those who read everything and those who lead the "
-            "whole organization."
+            "You are not among those who read the leadership reports. Who reads them is chosen "
+            "under Admin, Program, Who sees what."
         )
 
 
@@ -508,12 +512,52 @@ def listing(session: Session, principal: Principal) -> dict[str, Any]:
 
 def view(session: Session, principal: Principal, ref: str) -> dict[str, Any]:
     report = find(session, principal, ref)
+    body, withheld = withhold(session, principal, report.body)
     return {
         "ref": report.ref,
         "title": report.title,
         "issued": True,
         "issued_at": report.issued_at,
         "issued_by": report.issued_by_name,
-        "body": report.body,
+        "body": body,
+        "withheld": withheld,
         "check": verify(session, report),
     }
+
+
+def withhold(
+    session: Session, principal: Principal, body: dict[str, Any]
+) -> tuple[dict[str, Any], int]:
+    """The report as this reader may read it: a record they may not see keeps its place and
+    its rating, but not its reference, name, unit, or owners, since they may not know that it
+    exists. The report itself is unchanged, and its fingerprint is checked against what was
+    issued, not against this copy."""
+    if principal.reads_all or principal.everywhere(roles.LEADER):
+        return body, 0
+    body = copy.deepcopy(body)
+    known: dict[str, bool] = {}
+
+    def visible(ref: str) -> bool:
+        if ref not in known:
+            if ref.startswith("ACT-"):
+                found, _ = treatment.search_actions(session, principal, {"q": ref}, limit=5)
+                known[ref] = any(item.get("ref") == ref for item in found)
+            else:
+                try:
+                    record_type, record = find_any(session, ref)
+                except NotFound:
+                    known[ref] = True  # gone since: the report is all there is of it
+                else:
+                    known[ref] = access.can_see(session, principal, record_type, record)
+        return known[ref]
+
+    count = 0
+    rows = [*body.get("top_risks", []), *body.get("left_top", [])]
+    rows += [item for group in body.get("overdue", []) for item in group.get("items", [])]
+    for row in rows:
+        ref = row.get("ref")
+        if ref and not visible(ref):
+            row.update(ref=None, name=None, unit=None, category=None, owners=[], of=None)
+            row["withheld"] = True
+            count += 1
+    return body, count

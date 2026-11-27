@@ -263,6 +263,7 @@ export const SCENES = [
   { name: "leadership-report", as: "president", path: "/leadership-reports/LDR-0002" },
   { name: "leadership-next", as: "cro", path: "/leadership-reports/next" },
   { name: "leadership-first", as: "auditor", path: "/leadership-reports/LDR-0001" },
+  { name: "leadership-security", as: "ciso", path: "/leadership-reports/LDR-0002" },
   { name: "as-of", as: "cro", path: `/as-of?on=${daysAgo(90)}` },
   { name: "as-of-record", as: "cro",
     path: async (page) => `/as-of/${await first("/api/v1/risks?q=ransomware")(page)}?on=${daysAgo(120)}` },

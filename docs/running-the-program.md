@@ -81,7 +81,7 @@ One consequence is worth knowing. Under the default setting a steward cannot lin
 | Scales and matrix | What each level of likelihood and impact means, the ratings, and the matrix that combines them |
 | Cadences | How often risks are reviewed and key controls tested, how long a rating stands, how long an issue is given, and when reminders go |
 | Vocabularies | The lists records choose from: kinds of system, data classes, root causes, and the rest |
-| Who sees what | How much of the register a person with no role sees |
+| Who sees what | How much of the register a person with no role sees, and who reads the [leadership reports](#leadership-reports) |
 
 ![Admin, Program: the categories with their appetite, the matrix, and the written definition of every level](img/program-light.webp)
 
@@ -373,7 +373,17 @@ Until a report is issued nothing of it is kept: it is worked out afresh each tim
 
 An issued report carries a **fingerprint**: the SHA-256 of what it says, written canonically (keys sorted, no spaces, UTF-8). The history records the issue with the same fingerprint, in its hash chain. Whenever the report is opened, what it says is hashed again and compared with both, and **The fingerprint verifies** means it is the report that was given. A report changed afterwards no longer matches, and the page says so. A report is never edited or withdrawn: the next report is the place to correct one. **Print** prints it without the application around it.
 
-Leadership reports are the organization's. Those who read everything (managers, auditors, and administrators) and those who lead the whole organization read them; only managers for the whole organization prepare and issue them.
+Leadership reports are the organization's, and only managers for the whole organization prepare and issue them. Who reads them depends on the organization's size, so **Admin → Program → Who sees what** chooses it. Those who read everything (managers for the whole organization, auditors, and administrators) and those who lead the whole organization always read them. Beyond them:
+
+| Who else reads them | For |
+| --- | --- |
+| Nobody else | A large organization, whose executives are the reports' audience |
+| Anyone whose role covers the whole organization (the default) | Most organizations: a security leader who assesses everywhere, as a CISO usually does, reads them, and so does anyone else who assesses, stewards, or leads across the whole organization |
+| Every leader and every manager, of any unit | A smaller organization, where the people who run the program day to day are its most senior users |
+
+People can also be named as readers, whatever the choice: a CISO who leads only the security unit, say, or a GRC director. A change applies from each person's next page, and is in the history.
+
+A reader who may not see a record that a report names (a restricted risk, say) sees where it stands, its rating and how it moved, but not its reference, name, unit, or owners; the page says how many entries are withheld. The report itself is unchanged, and its fingerprint is checked against it as it was issued.
 
 ![A leadership report as it was issued: the fingerprint verifies, then the summary, what happened in the period, and the top risks with how each moved](img/leadership-report-light.webp)
 

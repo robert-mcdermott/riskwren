@@ -2965,6 +2965,28 @@
         "title": "JobSwitch",
         "type": "object"
       },
+      "LeadershipReadersBody": {
+        "properties": {
+          "people": {
+            "description": "Accounts named as readers",
+            "items": {
+              "type": "integer"
+            },
+            "title": "People",
+            "type": "array"
+          },
+          "reach": {
+            "description": "executives, organization, or leaders",
+            "title": "Reach",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reach"
+        ],
+        "title": "LeadershipReadersBody",
+        "type": "object"
+      },
       "LeadershipReportBody": {
         "properties": {
           "from": {
@@ -8217,6 +8239,70 @@
         "summary": "Upload a logo or tab icon",
         "tags": [
           "branding"
+        ]
+      }
+    },
+    "/api/v1/admin/leadership-readers": {
+      "get": {
+        "operationId": "show_leadership_readers_api_v1_admin_leadership_readers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Leadership Readers Api V1 Admin Leadership Readers Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Who reads the leadership reports",
+        "tags": [
+          "reporting"
+        ]
+      },
+      "put": {
+        "operationId": "save_leadership_readers_api_v1_admin_leadership_readers_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadershipReadersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Leadership Readers Api V1 Admin Leadership Readers Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change who reads the leadership reports",
+        "tags": [
+          "reporting"
         ]
       }
     },

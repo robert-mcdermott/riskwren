@@ -13,6 +13,7 @@ import { show } from "./page.js";
 
 const LEDE = "A report given to leadership once: the top risks and how they moved, appetite, posture by framework, the third parties with most at stake, the measures against the last report, and what is overdue. Issued, it is frozen with a fingerprint, and reopens exactly as it was.";
 const MOVES = { added: "New since the last report", entered: "Joined the top", same: "Unchanged" };
+const UNSEEN = { issues: "An issue", risk_reviews: "A risk", third_party_reviews: "A third party", actions: "An action" };
 
 function period(body) {
   return `${date(body.from)} to ${date(body.to)}`;
@@ -27,6 +28,11 @@ function table(caption, columns, rows) {
 
 function link(ref, path) {
   return h("a", { class: "mono", href: `/${path}/${ref}` }, ref);
+}
+
+/** A record named in the report, or, for one the reader may not see, that it is there. */
+function named(row, path, unseen) {
+  return row.withheld ? h("span", { class: "subtle" }, `${unseen} you may not see`) : [link(row.ref, path), " ", row.name];
 }
 
 function movement(row) {
@@ -46,14 +52,14 @@ function change(value, better, unit = "") {
 
 function topRisks(body) {
   const rows = body.top_risks.map((row) => h("tr", {},
-    h("td", {}, h("div", { class: "cell-main" }, link(row.ref, "risks"), " ", row.name),
+    h("td", {}, h("div", { class: "cell-main" }, named(row, "risks", "A risk")),
       h("div", { class: "cell-sub" }, [row.unit, row.category].filter(Boolean).join(" · "))),
     h("td", {}, ratingBadge(rampLevel(row.place, row.places), row.rating_label)),
     h("td", {}, titleCase(row.standing)),
     h("td", {}, movement(row)),
-    h("td", {}, row.owners.join(", ") || h("span", { class: "subtle" }, "Nobody"))));
+    h("td", {}, row.withheld ? h("span", { class: "subtle" }, "Withheld") : row.owners.join(", ") || h("span", { class: "subtle" }, "Nobody"))));
   const left = body.left_top.length ? h("div", { class: "card-body stack" }, h("h3", {}, "No longer among the top"),
-    h("ul", { class: "plain-list" }, body.left_top.map((row) => h("li", {}, link(row.ref, "risks"), " ", row.name, h("span", { class: "subtle" },
+    h("ul", { class: "plain-list" }, body.left_top.map((row) => h("li", {}, named(row, "risks", "A risk"), h("span", { class: "subtle" },
       row.status === "open" ? ` — was ${row.was}, now ${row.rating_label ?? "not rated"}` : ` — was ${row.was}, now ${row.status}`))))) : null;
   return card({ title: "Top risks", flush: true },
     rows.length ? table("The open risks rated highest", [["Risk"], ["Residual rating"], ["Standing"], ["Since the last report"], ["Owners"]], rows)
@@ -118,8 +124,9 @@ function overdue(body) {
   return card({ title: "Overdue" }, h("div", { class: "grid-2" }, body.overdue.map((kind) => h("div", { class: "stack" },
     h("h3", {}, `${kind.label}: ${kind.total}`),
     kind.items.length ? h("ul", { class: "plain-list" }, kind.items.map((item) => h("li", {},
-      item.ref ? link(item.ref, kind.key === "issues" ? "issues" : kind.key === "risk_reviews" ? "risks" : kind.key === "actions" ? "actions" : "third-parties") : null,
-      " ", item.name, item.days != null ? h("span", { class: "subtle" }, ` — ${plural(item.days, "day")} late`) : null)))
+      item.withheld ? named(item, "", UNSEEN[kind.key] ?? "A record")
+        : [item.ref ? link(item.ref, kind.key === "issues" ? "issues" : kind.key === "risk_reviews" ? "risks" : kind.key === "actions" ? "actions" : "third-parties") : null, " ", item.name],
+      item.days != null ? h("span", { class: "subtle" }, ` — ${plural(item.days, "day")} late`) : null)))
       : h("p", { class: "subtle" }, "Nothing."),
     kind.total > kind.items.length ? h("p", { class: "subtle" }, `And ${kind.total - kind.items.length} more.`) : null))));
 }
@@ -202,6 +209,8 @@ export function leadershipReport(main, { ref }) {
           lede: `${period(data.body)}. Issued by ${data.issued_by} on ${date(data.issued_at)}.`,
           actions: button("Print", { kind: "btn-secondary", iconName: "file", onclick: () => window.print() }) }),
         verdict,
+        data.withheld ? alert("info", h("strong", {}, `${plural(data.withheld, "entry", "entries")} withheld. `),
+          "The report names records you may not see, so you see where each stands but not what it is. The report itself is unchanged, and its fingerprint is checked against it as it was issued.") : null,
         h("p", { class: "subtle" }, "Fingerprint (SHA-256): ", h("code", { class: "fingerprint" }, check.fingerprint)),
         data.body.previous ? h("p", { class: "subtle" }, "The report before it: ", h("a", { href: `/leadership-reports/${data.body.previous.ref}` }, data.body.previous.title), ".") : null,
         reportBody(data.body));

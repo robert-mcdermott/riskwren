@@ -217,6 +217,28 @@ def leadership_report(request: Request, ref: str) -> dict[str, Any]:
         return envelope(leadership.view(session, principal, ref.strip().upper()))
 
 
+class LeadershipReadersBody(BaseModel):
+    reach: str = Field(description="executives, organization, or leaders")
+    people: list[int] = Field(default_factory=list, description="Accounts named as readers")
+
+
+@router.get("/admin/leadership-readers", summary="Who reads the leadership reports")
+def show_leadership_readers(request: Request) -> dict[str, Any]:
+    from riskwren.insight import readers
+
+    with reading(request) as session:
+        return envelope(readers.view(session))
+
+
+@router.put("/admin/leadership-readers", summary="Change who reads the leadership reports")
+def save_leadership_readers(request: Request, body: LeadershipReadersBody) -> dict[str, Any]:
+    from riskwren.insight import readers
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        return envelope(readers.save(session, principal, body.reach, body.people))
+
+
 # --- As of ------------------------------------------------------------------------------------
 
 ON_DAY = Query(default=None, alias="on", description="The day; today if left out")
