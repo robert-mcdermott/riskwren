@@ -30,7 +30,7 @@ The wave is done when, on a fresh checkout:
 - [ ] Reporting without a name, where the organization opens it, with a code to follow up (INC-02)
 - [ ] Triage: category, severity, the records it concerns, and who handles it (INC-03)
 
-**Acceptance:** a report takes one form; it is seen by its reporter, those who triage, its handlers, and those who read everything, and by nobody else; triage gives it a category, a severity, its records, and an owner, and is in the history.
+**Acceptance:** a report takes one form; it is seen by its reporter, those who triage, its handlers, its unit's leaders and stewards, and those who read everything, and by nobody else; triage gives it a category, a severity, its records, and an owner, and is in the history.
 
 ### Slice 2: Cases ☐
 
@@ -61,14 +61,14 @@ The wave is done when, on a fresh checkout:
 
 - [ ] Guides, changelog, upgrade from 0.7.0 on both databases, audits, release, and the site republished
 
-## Proposed decisions, for review before slices 1 and 2 are built
+## Decisions
 
-These are sensitive, and were drafted unattended. Each is a proposal, not yet settled.
+Settled on 2026-11-27, before slices 1 and 2 were built.
 
-- **Who sees an incident.** Its reporter, the people handling it (its owners), those who triage (managers, and assessors for its unit), and those who read everything. Not the stewards and leaders of its unit by default, since an incident may concern people in that unit; a handler may add them.
+- **Who sees an incident.** Its reporter, the people handling it (its owners), those who triage (managers, and assessors for its unit), the leaders and stewards of its unit and the units above it, and those who read everything. An incident that concerns people in its own unit is made a restricted case (slice 2), which its unit's leaders and stewards do not see unless they are named on it.
 - **Who triages.** Managers, and assessors for the incident's unit, which includes a security team whose assessors work across the organization. Triage sets the category, the severity (on the issue scale), the unit, the records it concerns, and the owner who handles it.
-- **Reporting without a name is off until an administrator opens it.** When it is open, a report through the link keeps no account, no name, and no address: unlike the other links, failed follow-up codes are not counted against the address that sent them, so nothing ties a report to where it came from. The follow-up code is shown once and kept only as a digest. Whether the server's own access log may keep addresses is the operator's to decide, and the guide will say so.
-- **Categories** are a vocabulary of the program (security, privacy, safety, research integrity, conduct, operations, other), editable like the others.
+- **Reporting without a name is off until an administrator opens it.** When it is open, a report through the link keeps no account, no name, and no address. The follow-up code is shown once, kept only as a digest, and long enough that guessing it is hopeless, so, unlike the other links, failed codes are not counted against the address that sent them, and nothing ties a report to where it came from. Whether the server's own access log may keep addresses is the operator's to decide, and the guide will say so.
+- **Categories** are a vocabulary of the program, editable like the others, starting as security, privacy, safety, conduct, compliance, operations, and other.
 
 ## Notes
 
