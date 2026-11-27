@@ -47,12 +47,12 @@ def _leaves(condition: dict | None) -> list[dict]:
     shutil.which("node") is None, reason="needs Node to run the browser's evaluator"
 )
 def test_the_browser_agrees_on_every_case() -> None:
-    files = sorted(
-        str(path.relative_to(ROOT)) for path in (ROOT / "tests" / "js").glob("*.test.mjs")
-    )
+    """The browser's evaluator against the same cases. Only this file: every JavaScript
+    test is run together, with the time zone the date tests need, by ``tests/test_scoring.py``."""
     result = subprocess.run(
-        ["node", "--test", *files], cwd=ROOT, capture_output=True, text=True, timeout=120
-    )
+        ["node", "--test", "tests/js/conditions.test.mjs"],
+        cwd=ROOT, capture_output=True, text=True, timeout=120,
+    )  # fmt: skip
     assert result.returncode == 0, result.stdout[-3000:] + result.stderr[-2000:]
 
 
