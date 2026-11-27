@@ -466,6 +466,22 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert leaving.status == "open" and sum(bool(s["done_at"]) for s in leaving.steps) == 2
         called = session.scalars(select(ThirdParty).where(ThirdParty.review_called.is_not(None)))
         assert [row.name for row in called] == ["Stonebridge Data Vaulting"]
+        # Insight: half a year of weekly snapshots; two leadership reports that verify, the
+        # second against the first; estimates, one superseded; two scenarios, one concluded.
+        from riskwren.db.models import LeadershipReport, MeasureSnapshot, RiskEstimate, Scenario
+        from riskwren.insight import leadership
+
+        days = set(session.scalars(select(MeasureSnapshot.day)))
+        assert len(days) >= 26
+        reports = session.scalars(select(LeadershipReport).order_by(LeadershipReport.id)).all()
+        assert len(reports) == 2 and reports[1].previous_id == reports[0].id
+        assert all(leadership.verify(session, report)["verified"] for report in reports)
+        assert reports[1].body["previous"]["ref"] == reports[0].ref
+        estimates = session.scalars(select(RiskEstimate)).all()
+        assert len(estimates) == 3 and sum(row.superseded_by is not None for row in estimates) == 1
+        scenarios = {row.name: row for row in session.scalars(select(Scenario))}
+        assert len(scenarios) == 2
+        assert [row.status for row in scenarios.values()].count("concluded") == 1
     assert built.counts["acceptances refused"] == 1
 
 

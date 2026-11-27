@@ -124,7 +124,7 @@ Detail: [waves/wave-4.md](waves/wave-4.md)
 
 Detail: [waves/wave-5.md](waves/wave-5.md)
 
-## Wave 6: Insight (v0.6.0) ☐
+## Wave 6: Insight (v0.6.0) ☑
 
 **Goal:** answer leadership's questions from the record, with figures that explain themselves.
 
@@ -136,7 +136,7 @@ Detail: [waves/wave-5.md](waves/wave-5.md)
 | 4 | As of | Any record, and the register, as it stood on a chosen date | ☑ |
 | 5 | Dossier and open formats | A complete, verifiable package for a scope, risk, or third party; export in the open assessment language; the security plan document | ☑ |
 | 6 | Scenarios and ranges | Scenarios; estimates in ranges with simulation; the bow-tie view | ☑ |
-| 7 | Release prep | Guides, changelog, release | ☐ |
+| 7 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-6.md](waves/wave-6.md)
 

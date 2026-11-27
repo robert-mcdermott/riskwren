@@ -2,7 +2,7 @@
 
 **Goal:** answer leadership's questions from the record, with figures that explain themselves. Waves 1 to 5 made a record of what could go wrong, what must be complied with, what the organization has said and promised, and who it depends on. Wave 6 reads that record back: defined measures with a history, views across the portfolio, a report that can be reopened exactly as it was given, the register as it stood on any date, and packages an auditor or a sponsor can verify.
 
-**Branch:** `wave-6` · **Target version:** `0.6.0` · **Status:** ☐ in progress
+**Branch:** `wave-6` · **Target version:** `0.6.0` · **Status:** ☑ released
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security leader, insight means being able to say, with a date and a definition, how many critical findings are open and for how long, how much of each framework is verified rather than merely in place, which suppliers hold restricted information without a current review or a covering agreement, and whether those figures are getting better; and to hand an auditor a package that proves itself.
 
@@ -91,9 +91,11 @@ Not done, and said so: an assessment's tests as OSCAL assessment results, and re
 
 **Done:** `scenario` (`SCN`) is a record of its own, kept by its unit's stewards and leaders and by assessors and managers, with what it assumes, what was concluded and when, and `scenario_subject` rows for the risks and processes it touches. `risk_estimate` holds a risk's frequency and loss as low, likely, and high values with what they assume; a new one supersedes the last. `riskwren.risk.simulation` plays out 10,000 years (PERT for the rate and each loss, Poisson for the count) from a seed made of what is simulated, so the figures can be checked, and returns them with its assumptions in words; a scenario simulates its risks' current estimates together, in one currency. `riskwren.risk.bowtie` reads a risk's cause, event, and consequence, split at lines and semicolons, and its controls in use by what each reduces. A risk's **Bow-tie** and **In numbers** tabs, **Risks → Scenarios**, and the demo's estimates and two scenarios worked through by the security team. The acceptance tests are in `tests/test_scenarios.py`.
 
-### Slice 7: Release prep ☐
+### Slice 7: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.5.0 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.5.0 on both databases, audits, release, and the site republished
+
+**Done:** each guide gained its sections as the slices landed (Running the program: Measures, Portfolio, Leadership reports, As of a date, Dossiers; Compliance: The security plan and OSCAL; The register: The bow-tie, Estimates in ranges, Scenarios), with their pictures; the README, the guides' index, and the site's home page describe 0.6.0, and the changelog has its upgrade notes. The upgrade from 0.5.0 was run from that release's own code with its demo organization on both databases: migrations 0032 to 0034 applied, every row of every table kept unchanged, the history still verifies, every wave 6 feature run over the old data (a snapshot, every portfolio view, a leadership report issued and reopened, five registers and a risk as of half a year before, dossiers of a scope, a risk, and a third party checked, the OSCAL plan and plan of action, a scenario, an estimate, and a bow-tie), `riskwren verify` passing with the report, and a second upgrade changing nothing. The demo's storyline test checks the wave's stories.
 
 ## Notes
 

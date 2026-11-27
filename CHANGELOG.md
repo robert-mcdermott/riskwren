@@ -4,9 +4,33 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## 0.6.0 (unreleased)
+## 0.6.0 (2026-11-27)
 
-Wave 6, *Insight*.
+Wave 6, *Insight*: the record read back to those who answer for it. Measures say what they
+count and open the list behind each figure, with a trend from a daily snapshot. The portfolio
+cuts risk and compliance by unit, family, framework, and third party over a period. A
+leadership report is frozen when issued, with a fingerprint the history records, and reopens
+exactly as it was. Any record, and the register, can be seen as it stood on a chosen day. A
+scope, a risk, or a third party is packed as a dossier whose manifest proves nothing was
+changed, and a scope's security plan prints in the customary order and is written in OSCAL.
+Scenarios, estimates in ranges with a simulation, and the bow-tie put a risk in a story, in
+numbers, and in a picture.
+
+### Upgrading from 0.5.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0032 to 0034). Every row is
+kept, and the history still verifies. A few things look different afterwards:
+
+- **The scheduler has a new job, Measures,** which takes the organization's figure for each
+  measure every six hours, keeping one a day. Their trends start on the day of the upgrade.
+- **Reports has five new pages:** Measures, Portfolio, Leadership reports, As of a date, and
+  Check a dossier; and **Risks** has Scenarios. Leadership reports are read by those who read
+  everything and by those who lead the whole organization; a unit's leader does not see them.
+- **Every record's page has As of a date,** and scopes, risks, and third parties have
+  **Dossier**. A risk has two new tabs, **Bow-tie** and **In numbers**, and a scope's
+  Requirements tab downloads its **security plan** and its plan in **OSCAL**.
+- `riskwren verify` checks leadership reports as well as documents, and there is a new
+  command, `riskwren check-dossier`.
 
 ### Added
 
