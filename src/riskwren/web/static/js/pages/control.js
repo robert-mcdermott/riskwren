@@ -6,6 +6,7 @@ import { date, plural } from "../core/format.js";
 import { label, program as loadProgram, units, vocabularies } from "../core/lookups.js";
 import { query } from "../core/router.js";
 import { editControl, rateControl, ratedLine, reducesLabel, statePill } from "../components/control.js";
+import { KINDS } from "../components/document.js";
 import { coveragePill, mapCrosswalk } from "../components/crosswalk.js";
 import { evidenceCard } from "../components/evidence.js";
 import { confirmAction } from "../components/overlay.js";
@@ -52,7 +53,18 @@ function overview(control, ctx) {
         ["Attested by its owner", control.attested ? `${{ yes: "Operates as described", partly: "Operates only partly", no: "Does not operate" }[control.attested.operates] ?? control.attested.operates}, ${control.attested.by}, ${date(control.attested.at)}. An attestation is not a test.` : null],
         ["Next test due", control.next_test_on ? h("span", { class: control.test_due ? "text-danger" : null }, date(control.next_test_on), control.test_due ? " (overdue)" : "") : null],
       ])),
+      directedBy(control),
       ownersCard(control, ctx)));
+}
+
+function directedBy(control) {
+  const found = control.directed_by;
+  return card({ title: "Directed by" },
+    found.documents.length ? h("ul", { class: "plain-list stack-sm" }, found.documents.map((doc) => h("li", {},
+      h("a", { class: "cell-main", href: `/documents/${doc.ref}` }, doc.name),
+      h("div", { class: "cell-sub" }, [`${KINDS[doc.kind]} · ${doc.ref}`, doc.status === "retired" ? "retired" : doc.number ? `version ${doc.number} in force` : "not yet published", doc.note].filter(Boolean).join(" · ")))))
+      : h("p", { class: "muted" }, "No document says it directs this control. A policy, standard, or procedure says so on its What it governs tab."),
+    found.hidden ? h("p", { class: "subtle" }, `And ${found.hidden} more that you do not have access to.`) : null);
 }
 
 /** What the control helps to satisfy, framework by framework. Test it once; it counts in each. */

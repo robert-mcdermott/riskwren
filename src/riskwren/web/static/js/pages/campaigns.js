@@ -52,25 +52,35 @@ export function campaignList(main) {
 
 function startOne(kinds) {
   openOverlay({ title: "Start a campaign", render: async (body) => {
-    const [unitIndex, scopes] = await Promise.all([units(), get("/api/v1/scopes", { limit: 200 })]);
+    const [unitIndex, scopes, asking] = await Promise.all([units(), get("/api/v1/scopes", { limit: 200 }),
+      get("/api/v1/documents", { acknowledge: true, status: "active", limit: 200 })]);
     const kind = select("What to ask", kinds.map((each) => [each.key, `${each.label}: ${each.asks.toLowerCase()}`]));
     const name = field("Name", { required: true, hint: "As people will see it, such as “Control attestation, spring 2027”." });
     const due = field("Answers due", { type: "date", required: true });
     const unit = select("About what lies in", unitOptions(unitIndex.tree, { blank: "The whole organization" }), { hint: "The unit and everything beneath it." });
     const scope = select("Or only the controls a scope uses", [["", "Not limited to a scope"], ...scopes.data.map((each) => [each.ref, `${each.name} (${each.ref})`])]);
+    const doc = select("Which document", [["", asking.data.length ? "Choose…" : "No published document asks to be acknowledged"],
+      ...asking.data.map((each) => [each.ref, `${each.name} (${each.ref}), version ${each.number}`])],
+      { required: true, hint: "Only the people it applies to are asked, and those who have acknowledged it already are counted as done." });
     const wanted = field("What evidence is wanted", { type: "textarea", rows: 2, required: true, hint: "Each owner is asked for this. Their request closes when evidence is attached to the control." });
     const summary = field("A note to those asked", { type: "textarea", rows: 2 });
     const who = h("p", { class: "muted", "aria-live": "polite" });
     const problem = banner();
     const save = button("Start, and tell those asked", { kind: "btn-primary", type: "submit" });
     const values = () => ({ kind: kind.input.value, name: name.input.value, due_on: due.input.value, summary: summary.input.value || null,
-      org_unit_id: scope.input.value ? null : Number(unit.input.value) || null, scope: scope.input.value || null, wanted: wanted.input.value || null });
+      org_unit_id: scope.input.value ? null : Number(unit.input.value) || null, scope: scope.input.value || null, wanted: wanted.input.value || null,
+      document: doc.input.value || null });
     const sync = async () => {
       const chosen = kinds.find((each) => each.key === kind.input.value);
       scope.node.hidden = !chosen.by_scope;
       if (!chosen.by_scope) scope.input.value = "";
       unit.node.hidden = Boolean(scope.input.value);
       wanted.node.hidden = chosen.key !== "evidence";
+      doc.node.hidden = chosen.key !== "acknowledgment";
+      if (chosen.key === "acknowledgment" && !doc.input.value) {
+        who.textContent = "Choose the document.";
+        return;
+      }
       try {
         const found = (await post("/api/v1/campaigns/preview", { ...values(), name: "preview", due_on: "2999-01-01", wanted: "preview" })).data;
         who.textContent = found.items ? `This would ask ${plural(found.people, "person", "people")} about ${plural(found.items, "thing")} in ${plural(found.units, "unit")}.`
@@ -80,17 +90,17 @@ function startOne(kinds) {
         who.textContent = error.detail ?? "";
       }
     };
-    for (const each of [kind, unit, scope]) each.input.addEventListener("change", sync);
+    for (const each of [kind, unit, scope, doc]) each.input.addEventListener("change", sync);
     body.append(h("form", { class: "stack", novalidate: true, onsubmit: async (event) => {
       event.preventDefault();
-      const done = await submit({ button: save, fields: { kind, name, due_on: due, org_unit_id: unit, scope, wanted }, banner: problem,
+      const done = await submit({ button: save, fields: { kind, name, due_on: due, org_unit_id: unit, scope, wanted, document: doc }, banner: problem,
         run: () => post("/api/v1/campaigns", values()) });
       if (done) {
         closeOverlay();
         toast(`${done.data.ref} is started.`);
         navigate(`/campaigns/${done.data.ref}`);
       }
-    } }, problem, kind.node, name.node, due.node, unit.node, scope.node, wanted.node, summary.node, who, h("div", {}, save)));
+    } }, problem, kind.node, doc.node, name.node, due.node, unit.node, scope.node, wanted.node, summary.node, who, h("div", {}, save)));
     await sync();
   } });
 }
@@ -136,13 +146,14 @@ export function campaignPage(main, params) {
         h("div", { class: "row-sm wrap" }, statusPill(campaign), h("span", { class: "muted" },
           `${campaign.asks} · due ${date(campaign.due_on)} · started by ${campaign.started_by} on ${date(campaign.started_at)}`,
           campaign.scope ? ` · the controls of ${campaign.scope.name}` : campaign.unit ? ` · ${campaign.unit.name} and beneath` : " · the whole organization",
+          campaign.document ? [" · ", h("a", { href: `/documents/${campaign.document.ref}?tab=acknowledgments` }, `${campaign.document.ref} ${campaign.document.name}`)] : "",
           campaign.questionnaire ? [" · asks ", h("a", { href: `/questionnaires/${campaign.questionnaire.key}?tab=questions&version=${campaign.questionnaire.version}` }, `${campaign.questionnaire.title}, version ${campaign.questionnaire.version}`)] : "")),
         campaign.nobody_to_ask ? alert("warn", icon("alert"), h("div", {}, h("strong", {}, `${plural(campaign.nobody_to_ask, "thing")} ${campaign.nobody_to_ask === 1 ? "has" : "have"} nobody to ask. `),
           "Name an owner on each, or excuse it from the campaign.")) : null,
         card({ title: `${campaign.answered}% answered` }, h("div", { class: "stack" },
           segments([{ label: "answered", value: campaign.counts.done, tone: "ok" }, { label: "waiting", value: campaign.counts.pending, tone: "warn" },
             { label: "excused", value: campaign.counts.excused, tone: "none" }], { label: `${campaign.counts.done} of ${campaign.counts.asked} answered` }),
-          Object.keys(campaign.outcomes).length ? h("p", { class: "muted" }, "Of those answered: ",
+          Object.keys(campaign.outcomes).length && campaign.kind !== "acknowledgment" ? h("p", { class: "muted" }, "Of those answered: ",
             Object.entries(campaign.outcomes).map(([key, count]) => `${count} ${(OUTCOMES[key] ?? key).toLowerCase()}`).join(", "), ".") : null)),
         card({ title: "Coverage by unit", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table table-compact" },
           h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Unit"), h("th", { scope: "col" }, "Asked"), h("th", { scope: "col" }, "Answered"), h("th", { scope: "col" }, "Coverage"))),
@@ -167,6 +178,10 @@ export function campaignItem(main, params) {
     load: async () => (await get(`/api/v1/campaign-items/${params.id}`, null, { fresh: true })).data,
     view: (item, reload) => {
       const campaign = item.campaign;
+      if (campaign.kind === "acknowledgment" && item.subject.ref) {
+        navigate(`/library/${item.subject.ref}`, { replace: true });
+        return h("p", { class: "muted" }, "Opening the document…");
+      }
       const about = card({ title: item.subject.name, actions: item.subject.href ? h("a", { class: "btn btn-sm", href: item.subject.href }, "Open it") : null },
         h("div", { class: "stack-sm" }, item.subject.ref ? h("div", { class: "mono subtle" }, item.subject.ref) : null,
           item.about.statement ? h("p", {}, item.about.statement) : null));

@@ -137,7 +137,14 @@ def _detail(session: Session, principal: Principal, control: Control) -> dict[st
         "rating": next(iter(ratings(session, control)), None),
         "tested": current_test(session, control) is not None,
         "reduces": risks_of(session, principal, control),
+        "directed_by": _directed_by(session, principal, control),
     }
+
+
+def _directed_by(session: Session, principal: Principal, control: Control) -> dict[str, Any]:
+    from riskwren.policy import governs  # it builds on this module
+
+    return governs.of_control(session, principal, control)
 
 
 def _conditions(session: Session, principal: Principal, filters: Mapping[str, Any]) -> list[Any]:

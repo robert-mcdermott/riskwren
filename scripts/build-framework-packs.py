@@ -64,6 +64,22 @@ SOURCES: dict[str, tuple[str, str]] = {
         f"{OSCAL}/SP800-53/rev5/json/NIST_SP-800-53_rev5_PRIVACY-baseline_profile.json",
         "c0e3d54d9f474bc6c33338a8e524bc52ad070f94f9274db7ec48242242fecacc",
     ),
+    "NIST_SP-800-53_rev4_catalog.json": (
+        f"{OSCAL}/SP800-53/rev4/json/NIST_SP-800-53_rev4_catalog.json",
+        "9324021d5d88aeb4ba8f52dd225321bbc64ccc52af0270f9c1b26f1be18ed8ea",
+    ),
+    "NIST_SP-800-53_rev4_LOW-baseline_profile.json": (
+        f"{OSCAL}/SP800-53/rev4/json/NIST_SP-800-53_rev4_LOW-baseline_profile.json",
+        "621ef9eb1016ab6dab8e4b57a77bfcf09905e4d3dd6a5d0cb1a1c4f988c400b6",
+    ),
+    "NIST_SP-800-53_rev4_MODERATE-baseline_profile.json": (
+        f"{OSCAL}/SP800-53/rev4/json/NIST_SP-800-53_rev4_MODERATE-baseline_profile.json",
+        "c04c9a49b34ce892c9bb29490af3b30e8fb4fb74dee665b63d9473346e6d517d",
+    ),
+    "NIST_SP-800-53_rev4_HIGH-baseline_profile.json": (
+        f"{OSCAL}/SP800-53/rev4/json/NIST_SP-800-53_rev4_HIGH-baseline_profile.json",
+        "b2dce874f9d65572bb90956c89c5ed0fd82cd829c1b4000ee4bc41ca41b35d4c",
+    ),
     "title-45-part-164-subpart-C.xml": (
         f"https://www.ecfr.gov/api/versioner/v1/full/{ECFR_DATE}/title-45.xml?part=164&subpart=C",
         "0cd78cafe337e87719da3966e4bfa59e2cb3e322165692c320baf1f64d7cdd1c",
@@ -103,6 +119,7 @@ def fetch(name: str, *, offline: bool) -> bytes:
 
 # --- Reading the publisher's catalogs -------------------------------------------------------
 
+SP_800_53 = re.compile(r"^([A-Z]{2})-0*(\d+)(?:\(0*(\d+)\))?$")
 INSERT = re.compile(r"\{\{\s*insert:\s*param,\s*([^\s}]+)\s*\}\}")
 HOW_MANY = {"one-or-more": "Selection (one or more)", "one": "Selection"}
 
@@ -201,8 +218,75 @@ def header(key: str, title: str, version: str, **more: Any) -> dict[str, Any]:
 # --- NIST SP 800-53 -------------------------------------------------------------------------
 
 
-def build_800_53(offline: bool) -> dict[str, Any]:
-    catalog = json.loads(fetch("NIST_SP-800-53_rev5_catalog.json", offline=offline))["catalog"]
+REVISIONS = {
+    "rev5": {
+        "key": "nist-800-53", "title": "NIST SP 800-53 Rev. 5: Security and Privacy Controls",
+        "baselines": (("low", "Low-impact baseline"), ("moderate", "Moderate-impact baseline"),
+                      ("high", "High-impact baseline"), ("privacy", "Privacy baseline")),
+        "source_url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+        "summary": "The federal catalog of security and privacy controls, with the Low, Moderate, "
+        "High, and Privacy baselines of SP 800-53B. Withdrawn controls are left out; where each "
+        "went is carried, so that a scope on Rev. 4 can be moved across.",
+        "follows": "nist-800-53-r4",
+    },
+    "rev4": {
+        "key": "nist-800-53-r4", "title": "NIST SP 800-53 Rev. 4: Security and Privacy Controls",
+        "baselines": (("low", "Low-impact baseline"), ("moderate", "Moderate-impact baseline"),
+                      ("high", "High-impact baseline")),
+        "source_url": "https://csrc.nist.gov/pubs/sp/800/53/r4/upd3/final",
+        "summary": "The earlier revision of the federal catalog, with its Low, Moderate, and High "
+        "baselines, for programs and agreements that still name it. Withdrawn controls are left "
+        "out.",
+        "follows": None,
+    },
+}  # fmt: skip
+
+
+def code_of(catalog: dict[str, Any]) -> dict[str, str]:
+    """Every control's id → the code people cite, withdrawn ones too."""
+    found: dict[str, str] = {}
+
+    def visit(items: list[dict[str, Any]]) -> None:
+        for item in items:
+            label = prop(item, "label", plain=True)
+            if label:
+                found[item["id"]] = label
+            visit(item.get("controls", []))
+
+    for group in catalog["groups"]:
+        visit(group["controls"])
+    return found
+
+
+def moves(catalog: dict[str, Any]) -> list[list[str]]:
+    """Where each withdrawn control went, as the publisher records it: moved to another, or
+    incorporated into one (or into part of one, which is that control)."""
+    codes = code_of(catalog)
+    found: list[list[str]] = []
+
+    def visit(items: list[dict[str, Any]]) -> None:
+        for item in items:
+            if withdrawn(item) and item["id"] in codes:
+                for link in item.get("links", []):
+                    relation = {
+                        "moved-to": "moved_to",
+                        "incorporated-into": "incorporated_into",
+                    }.get(link.get("rel", ""))
+                    target = link.get("href", "").lstrip("#").split("_", 1)[0]
+                    if relation and target in codes and codes[target] != codes[item["id"]]:
+                        pair = [codes[item["id"]], relation, codes[target]]
+                        if pair not in found:
+                            found.append(pair)
+            visit(item.get("controls", []))
+
+    for group in catalog["groups"]:
+        visit(group["controls"])
+    return found
+
+
+def build_800_53(offline: bool, rev: str = "rev5") -> dict[str, Any]:
+    spec = REVISIONS[rev]
+    catalog = json.loads(fetch(f"NIST_SP-800-53_{rev}_catalog.json", offline=offline))["catalog"]
     params = Parameters()
     codes: dict[str, str] = {}  # the catalog's id → the code people cite
 
@@ -240,13 +324,8 @@ def build_800_53(offline: bool) -> dict[str, Any]:
         )
 
     baselines = []
-    for key, title in (
-        ("low", "Low-impact baseline"),
-        ("moderate", "Moderate-impact baseline"),
-        ("high", "High-impact baseline"),
-        ("privacy", "Privacy baseline"),
-    ):
-        name = f"NIST_SP-800-53_rev5_{key.upper()}-baseline_profile.json"
+    for key, title in spec["baselines"]:
+        name = f"NIST_SP-800-53_{rev}_{key.upper()}-baseline_profile.json"
         profile = json.loads(fetch(name, offline=offline))["profile"]
         chosen = [
             codes[identifier]
@@ -255,23 +334,26 @@ def build_800_53(offline: bool) -> dict[str, Any]:
             for identifier in include.get("with-ids", [])
             if identifier in codes
         ]
-        baselines.append({"key": key, "title": title, "codes": chosen})
+        baselines.append({"key": key, "title": title, "codes": list(dict.fromkeys(chosen))})
 
     version = catalog["metadata"]["version"]
-    return {
-        "pack": header(
-            "nist-800-53",
-            "NIST SP 800-53 Rev. 5: Security and Privacy Controls",
-            f"Rev. 5, release {version}",
-            source_url="https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
-            built_from=f"{OSCAL_RELEASE}: NIST_SP-800-53_rev5_catalog.json and the SP 800-53B "
-            "baseline profiles",
-            summary="The federal catalog of security and privacy controls, with the Low, "
-            "Moderate, High, and Privacy baselines of SP 800-53B. Withdrawn controls are left out.",
-        ),
-        "requirements": families,
-        "baselines": baselines,
-    }
+    shown = f"Rev. 5, release {version}" if rev == "rev5" else f"Rev. 4, as of {version}"
+    head = header(
+        spec["key"], spec["title"], shown,
+        source_url=spec["source_url"],
+        built_from=f"{OSCAL_RELEASE}: NIST_SP-800-53_{rev}_catalog.json and its baseline profiles",
+        summary=spec["summary"],
+    )  # fmt: skip
+    pack: dict[str, Any] = {"pack": head, "requirements": families, "baselines": baselines}
+    if spec["follows"]:
+        head["follows"] = spec["follows"]
+        # Codes that went away, said in the earlier version's terms, and where each went here.
+        pack["moved"] = [pair for pair in moves(catalog) if pair[2] in codes.values()]
+    return pack
+
+
+def build_800_53_r4(offline: bool) -> dict[str, Any]:
+    return build_800_53(offline, "rev4")
 
 
 # --- NIST SP 800-171 ------------------------------------------------------------------------
@@ -285,12 +367,29 @@ def build_800_171(offline: bool) -> dict[str, Any]:
         last = (prop(part, "label") or "").rsplit(".", 1)[-1]
         return f"{int(last)}." if last.isdigit() else f"{last}."
 
+    resources = {
+        entry["uuid"]: str(entry.get("title", ""))
+        for entry in catalog.get("back-matter", {}).get("resources", [])
+    }
+    derived: list[list[str]] = []
     families = []
     for group in catalog["groups"]:
         requirements = []
         for item in group["controls"]:
             if withdrawn(item):
                 continue
+            code = prop(item, "sort-id") or item["id"]
+            for link in item.get("links", []):
+                if link.get("rel") != "reference":
+                    continue
+                source = SP_800_53.match(resources.get(link["href"].lstrip("#"), ""))
+                if source:
+                    family, number, enhancement = source.groups()
+                    cited = f"{family}-{int(number)}" + (
+                        f"({int(enhancement)})" if enhancement else ""
+                    )
+                    if [code, cited] not in derived:
+                        derived.append([code, cited])
             params.learn(item)
             requirements.append(
                 node(
@@ -321,6 +420,11 @@ def build_800_171(offline: bool) -> dict[str, Any]:
             "in nonfederal systems and organizations. Withdrawn requirements are left out.",
         ),
         "requirements": families,
+        # The publisher's own account of where each requirement comes from: the SP 800-53
+        # controls it was derived from. Used to suggest crosswalks between the two.
+        "mappings": [
+            {"framework": "nist-800-53", "relation": "derived_from", "pairs": derived},
+        ],
     }
 
 
@@ -520,7 +624,7 @@ def main() -> int:
     parser.add_argument("--offline", action="store_true", help="use only files already fetched")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-    for build in (build_csf, build_800_53, build_800_171, build_hipaa):
+    for build in (build_csf, build_800_53, build_800_53_r4, build_800_171, build_hipaa):
         pack = build(args.offline)
         path = OUT / f"{pack['pack']['key']}.json"
         path.write_text(json.dumps(pack, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")

@@ -126,6 +126,7 @@ Every word in the method can be changed: the name and meaning of each level of l
 | How long a control's rating, a test result, and evidence hold | 12 months |
 | How often a key control is tested | 6 months |
 | The longest an exception may run | 12 months |
+| How often a policy, standard, procedure, or guideline is reviewed | 12 months, unless the document sets its own |
 | How long an issue is given, by severity | Critical 30 days, high 90, moderate 180, low 365 |
 | Reminders | 14 days before; the steward 7 days late; the leader 21 days late |
 
@@ -212,6 +213,7 @@ A campaign asks a set of people for one thing by a date, and shows who has answe
 | **Unit completeness check** | The stewards of units | Is everything the unit has on record, with the right owners? |
 | **System security profile** | The owners of systems | What each system holds, who can reach it, and who patches, backs up, and watches it |
 | **Evidence request** | The owners of controls | A named piece of evidence for each control |
+| **Acknowledgment** | The people a document applies to | Read the version in force, and say they have |
 
 Choose what to ask, give it a name and a date, and say what it is about: everything in a unit and beneath it, or, for controls, only those a compliance scope uses. Before it starts, the form says how many people would be asked about how many things. Each person is told once, with a count, and finds each thing on their **Home**.
 
@@ -219,6 +221,7 @@ Choose what to ask, give it a name and a date, and say what it is about: everyth
 - Any owner of a control, risk, or system may answer for it, not only the one who was asked. An answer can be saved and finished later.
 - **Something with nobody to ask is still listed**, and shown as such, so that a control whose only owner has left does not pass unnoticed. Name an owner, or **excuse** it with a reason.
 - **An evidence request closes by itself** when evidence collected since the request is attached to the control.
+- **An acknowledgment campaign is answered in the library,** by acknowledging the document. Those who already have are counted as answered when it starts ([Policies](policies.md#asking-for-it-by-a-date)).
 
 ### Following one
 
@@ -242,6 +245,18 @@ Answers are kept as given, and some need someone else to act. Those people are t
 
 An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
 
+## Committee sessions
+
+**Reports → Committee sessions** holds the meetings of the risk and compliance committees. A unit's leaders, or a manager, plan one: its committee, the day it meets, and the unit it answers to. Whoever plans it is its owner, and sees it on Home in the fortnight before it meets.
+
+- **The agenda** is drawn from the register: a risk, an issue, an exception, a control, a document, an agreement, a scope, an objective, or an assessment, each with what the committee is asked; or a topic of its own. Items are put in order, and taken off until something is decided about them.
+- **A decision** is recorded on each item: noted, approved, declined, or deferred, with what was decided. It **shows on the record it was about**, under **Committee decisions**, and that record's owners are told. A decided item stays on the agenda, and a session where anything was decided cannot be cancelled.
+- **The minutes** say who was present and what else was said, in the same simple Markdown as documents. The decisions are not repeated there: they are kept with their items.
+
+![A held session: the agenda drawn from the register, and the decision recorded on each item](img/session-held-light.webp)
+
+The register's records and their sessions are joined both ways in the **Connections** picture, and the list of sessions can be cut to those that discussed a record.
+
 ## When someone leaves
 
 Disable the account under **Admin → People**, or with [`riskwren users disable`](cli.md#riskwren-users-disable). The person is signed out and cannot sign in. Everything they did stays in the history under their name.
@@ -262,7 +277,7 @@ Letting a person sign in again does not give anything back. Accounts disabled be
 
 ## Reminders
 
-Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, what a campaign has asked, and the next reading of each indicator.
+Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, what a campaign has asked, the next reading of each indicator, document reviews, and agreements.
 
 | When | Who is told |
 |---|---|
@@ -272,6 +287,7 @@ Everything with a date reminds whoever it is waiting on: actions, risk reviews, 
 | Still late after 21 days | The unit's leader |
 
 - Each of these is said **once** for a given date. Moving the date starts again.
+- An agreement is told of further ahead: 30 days before the last day to give notice, and 60 days before it ends, because a renewal takes longer to arrange than an action takes to finish ([Agreements](compliance.md#dates-and-warnings)).
 - Actions, issues, and what a campaign has asked go up to the steward and the leader. An indicator's reading is reminded only as it falls due, not two weeks ahead. The rest are for their owners: nobody else can renew a person's evidence or review their risk for them.
 - Something found already long overdue, as on the first day after an upgrade, is told once to whoever it has reached, and not to everyone below as well.
 - A reminder is a notice. It is read under the bell, and sent by email where [email is set up](configuration.md#email).

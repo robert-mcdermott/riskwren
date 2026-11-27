@@ -28,7 +28,11 @@ TEXT_POLICIES = ("verbatim", "attributed", "identifiers", "summary", "own")
 ORIGINS = ("pack", "local")
 FRAMEWORK_STATUSES = ("active", "retired")
 COVERAGE = ("full", "partial")
-MAPPING_SOURCES = ("pack", "person")
+# Suggested by a pack; said or confirmed by a person; or carried across from the version of a
+# framework a scope moved on from.
+MAPPING_SOURCES = ("pack", "person", "carried")
+# How a requirement of one framework stands to another's, as a publisher says.
+MAPPING_RELATIONS = ("derived_from", "moved_to", "incorporated_into")
 IMPLEMENTATION_STATUSES = ("planned", "partly", "in_place", "not_applicable")
 INHERITANCE = ("none", "inherited", "shared")
 EVIDENCE_KINDS = ("file", "link", "note", "attestation")
@@ -40,7 +44,7 @@ REQUIREMENT_STATUSES = ("active", "withdrawn")
 SEVERITIES = ("critical", "high", "moderate", "low")
 ISSUE_STATUSES = ("open", "proposed", "closed", "cancelled")
 EXCEPTION_STATUSES = ("requested", "approved", "refused", "withdrawn")
-EXCEPTION_SUBJECTS = ("control", "requirement")
+EXCEPTION_SUBJECTS = ("control", "requirement", "document")
 
 
 class Framework(Base):
@@ -70,6 +74,8 @@ class Framework(Base):
     requirement_count: Mapped[int] = mapped_column(Integer, default=0)
     citable_count: Mapped[int] = mapped_column(Integer, default=0)
     digest: Mapped[str | None] = mapped_column(String(64))  # of a pack's requirements
+    # The key of the earlier version this one follows: SP 800-53 Rev. 5 follows Rev. 4.
+    follows: Mapped[str | None] = mapped_column(String(80))
     created_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
     updated_at: Mapped[datetime] = mapped_column(UtcDateTime)
@@ -174,6 +180,43 @@ class ControlRequirement(Base):
     )
 
 
+class FrameworkMapping(Base):
+    """A publisher's word on how a requirement of one framework stands to another's: an
+    SP 800-171 requirement derived from an SP 800-53 control, or a control of an earlier
+    version moved to, or incorporated into, one of the next. Held by key and code, so that
+    it holds whichever of the two frameworks is loaded first."""
+
+    __tablename__ = "framework_mapping"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    from_key: Mapped[str] = mapped_column(String(80))
+    from_code: Mapped[str] = mapped_column(String(120))
+    relation: Mapped[str] = mapped_column(String(24))
+    to_key: Mapped[str] = mapped_column(String(80))
+    to_code: Mapped[str] = mapped_column(String(120))
+    pack_key: Mapped[str] = mapped_column(String(80))  # the pack that said so
+
+    __table_args__ = (
+        UniqueConstraint("from_key", "from_code", "relation", "to_key", "to_code"),
+        CheckConstraint(one_of("relation", MAPPING_RELATIONS), name="relation"),
+        Index("ix_framework_mapping_to", "to_key", "to_code"),
+    )
+
+
+class SuggestionSetAside(Base):
+    """A suggested crosswalk a person said does not hold, so it is not suggested again."""
+
+    __tablename__ = "suggestion_set_aside"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id"))
+    requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement.id"))
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    set_aside_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (UniqueConstraint("control_id", "requirement_id"),)
+
+
 class Scope(RecordMixin, Base):
     """A named boundary that must meet one or more frameworks: the clinical systems, a data
     enclave, the whole organization."""
@@ -220,6 +263,8 @@ class ScopeFramework(Base):
     scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id", ondelete="CASCADE"))
     framework_id: Mapped[int] = mapped_column(ForeignKey("framework.id"))
     baseline_id: Mapped[int | None] = mapped_column(ForeignKey("baseline.id"))
+    # Held because an agreement covers what the scope holds, and imposes the framework.
+    agreement_id: Mapped[int | None] = mapped_column(ForeignKey("agreement.id"))
 
     __table_args__ = (
         UniqueConstraint("scope_id", "framework_id", name="uq_scope_framework"),

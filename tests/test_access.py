@@ -324,6 +324,69 @@ for _route in (
     ("POST", "/api/v1/risk-analyses/{ref}/reopen"),
 ):
     REACH[_route] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/documents"),
+    ("POST", "/api/v1/documents"),
+    ("GET", "/api/v1/documents/{ref}"),
+    ("PATCH", "/api/v1/documents/{ref}"),
+    ("PUT", "/api/v1/documents/{ref}/owners"),
+    ("GET", "/api/v1/documents/{ref}/history"),
+    ("POST", "/api/v1/documents/{ref}/draft"),
+    ("PATCH", "/api/v1/documents/{ref}/draft"),
+    ("DELETE", "/api/v1/documents/{ref}/draft"),
+    ("POST", "/api/v1/documents/{ref}/draft/file"),
+    ("POST", "/api/v1/documents/{ref}/draft/submit"),
+    ("POST", "/api/v1/documents/{ref}/draft/decision"),
+    ("POST", "/api/v1/documents/{ref}/draft/withdraw"),
+    ("POST", "/api/v1/documents/{ref}/draft/publish"),
+    ("POST", "/api/v1/documents/{ref}/review"),
+    ("POST", "/api/v1/documents/{ref}/retire"),
+    ("POST", "/api/v1/documents/{ref}/reinstate"),
+    ("GET", "/api/v1/documents/{ref}/versions/{version_id}"),
+    ("GET", "/api/v1/documents/{ref}/compare"),
+    ("GET", "/api/v1/documents/{ref}/versions/{version_id}/file"),
+    ("PUT", "/api/v1/documents/{ref}/audience"),
+    ("GET", "/api/v1/documents/{ref}/acknowledgments"),
+    ("GET", "/api/v1/documents/{ref}/governs"),
+    ("GET", "/api/v1/agreements"),
+    ("POST", "/api/v1/agreements"),
+    ("GET", "/api/v1/agreements/{ref}"),
+    ("PATCH", "/api/v1/agreements/{ref}"),
+    ("PUT", "/api/v1/agreements/{ref}/owners"),
+    ("GET", "/api/v1/agreements/{ref}/history"),
+    ("PUT", "/api/v1/agreements/{ref}/covers"),
+    ("POST", "/api/v1/agreements/{ref}/close"),
+    ("POST", "/api/v1/agreements/{ref}/reopen"),
+    ("GET", "/api/v1/framework-packs"),
+    ("GET", "/api/v1/objectives"),
+    ("POST", "/api/v1/objectives"),
+    ("GET", "/api/v1/objectives/{ref}"),
+    ("PATCH", "/api/v1/objectives/{ref}"),
+    ("PUT", "/api/v1/objectives/{ref}/owners"),
+    ("GET", "/api/v1/objectives/{ref}/history"),
+    ("PUT", "/api/v1/risks/{ref}/objectives"),
+    ("GET", "/api/v1/sessions"),
+    ("POST", "/api/v1/sessions"),
+    ("GET", "/api/v1/sessions/{ref}"),
+    ("PATCH", "/api/v1/sessions/{ref}"),
+    ("PUT", "/api/v1/sessions/{ref}/owners"),
+    ("GET", "/api/v1/sessions/{ref}/history"),
+    ("POST", "/api/v1/sessions/{ref}/items"),
+    ("PATCH", "/api/v1/sessions/{ref}/items/{item_id}"),
+    ("DELETE", "/api/v1/sessions/{ref}/items/{item_id}"),
+    ("POST", "/api/v1/sessions/{ref}/items/{item_id}/move"),
+    ("POST", "/api/v1/sessions/{ref}/items/{item_id}/decision"),
+    ("POST", "/api/v1/sessions/{ref}/held"),
+    ("POST", "/api/v1/sessions/{ref}/cancel"),
+    ("PUT", "/api/v1/documents/{ref}/controls"),
+    ("DELETE", "/api/v1/documents/{ref}/controls/{link_id}"),
+    ("PUT", "/api/v1/documents/{ref}/requirements"),
+    ("DELETE", "/api/v1/documents/{ref}/requirements/{link_id}"),
+    ("GET", "/api/v1/library"),
+    ("GET", "/api/v1/library/{ref}"),
+    ("POST", "/api/v1/library/{ref}/acknowledge"),
+):
+    REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}
 REACH[("GET", "/api/v1/campaigns")] = EVERYONE
 REACH[("POST", "/api/v1/campaigns")] = RUNNERS
@@ -346,6 +409,7 @@ REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
+REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():
     if _template.startswith("/api/v1/frameworks"):

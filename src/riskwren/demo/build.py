@@ -16,7 +16,7 @@ from __future__ import annotations
 import heapq
 import random
 import unicodedata
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
@@ -29,6 +29,7 @@ from sqlalchemy.orm import Session
 from riskwren import reminders
 from riskwren.access.principal import Grant, Principal
 from riskwren.compliance import (
+    agreements,
     assessments,
     crosswalk,
     evidence,
@@ -37,6 +38,8 @@ from riskwren.compliance import (
     issues,
     scopes,
 )
+from riskwren.compliance import packs as framework_packs
+from riskwren.compliance.agreements import AGREEMENT
 from riskwren.compliance.evidence import EVIDENCE
 from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
@@ -47,8 +50,11 @@ from riskwren.db.engine import Database
 from riskwren.db.models import (
     Acceptance,
     Action,
+    Agreement,
     Campaign,
     CampaignItem,
+    CommitteeItem,
+    CommitteeSession,
     Control,
     ControlTest,
     Evidence,
@@ -56,9 +62,11 @@ from riskwren.db.models import (
     ExceptionRequest,
     Indicator,
     Issue,
+    PolicyDocument,
     Risk,
     RiskAnalysis,
     RiskAnalysisItem,
+    RiskCategory,
     Scope,
     TreatmentPlan,
 )
@@ -66,10 +74,15 @@ from riskwren.demo import content as c
 from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.oversight import campaigns
+from riskwren.oversight import sessions as sessions_service
+from riskwren.oversight.sessions import SESSION
 from riskwren.people import accounts, handover, units
+from riskwren.policy import documents, governs, library
 from riskwren.program import branding, packs, settings
 from riskwren.risk import analysis, categories, indicators, register
+from riskwren.risk import objectives as risk_objectives
 from riskwren.risk.indicators import INDICATOR
+from riskwren.risk.objectives import OBJECTIVE
 from riskwren.risk.register import RISK
 from riskwren.treatment import service as treatment
 
@@ -105,6 +118,8 @@ class Builder:
     def __init__(self, db: Database, *, seed: int, today: date, files: Path | None = None) -> None:
         self.db = db
         self.files = files  # where evidence files are kept; without it, items have none
+        self._doc_refs: dict[str, str] = {}  # the reference each demo document was given
+        self._agreement_refs: dict[str, str] = {}  # and each demo agreement
         self.seed = seed
         self.rng = random.Random(seed)
         # A second stream for details added later, so that they do not shift the first.
@@ -1603,6 +1618,211 @@ class Builder:
                 )  # fmt: skip
             self.tally("requirements mapped by hand")
 
+    def _story_agreements(self) -> Script:
+        """The agreements themselves, with their dates, owners, and what they cover. What one
+        covers binds the scopes that hold it to its terms."""
+        lead = self.cast["risk2"]
+        for spec in sorted(c.AGREEMENTS, key=lambda each: -each["made"]):
+            yield self._on(spec["made"])
+            owner = self.cast.get(spec["owner"]) or self.steward(self.units[spec["owner"]])
+            with self.act(lead) as (session, who):
+                values = {
+                    "name": spec["name"], "kind": spec["kind"], "parties": spec["parties"],
+                    "reference": spec.get("reference"), "summary": spec["summary"],
+                    "org_unit_id": self.units[spec["unit"]],
+                    "starts_on": self.day(spec["starts"]).isoformat(),
+                    "ends_on": self.day(spec["ends"]).isoformat(),
+                    "notice_days": spec.get("notice_days"), "renews": spec["renews"],
+                    "framework": (
+                        frameworks.slug(c.AGREEMENT["title"])
+                        if spec.get("terms") == "own"
+                        else spec.get("terms")
+                    ),
+                }  # fmt: skip
+                agreement = records.create(session, who, AGREEMENT, values)
+                records.set_owners(
+                    session, who, AGREEMENT, agreement, [{"account_id": owner, "kind": "owner"}]
+                )
+                refs = [self.things[key][2] for key in spec["covers"]]
+                refs += [self._scope_named(session, name).ref for name in spec.get("scopes", [])]
+                if refs:
+                    agreements.set_coverage(session, who, agreement, refs)
+                self._agreement_refs[spec["key"]] = agreement.ref
+            self.tally("agreements")
+        for spec in c.AGREEMENTS:
+            if spec.get("closed"):
+                days, why = spec["closed"]
+                yield self._on(days)
+                owner = self.cast.get(spec["owner"]) or self.steward(self.units[spec["owner"]])
+                with self.act(owner) as (session, who):
+                    agreement = records.load(
+                        session, who, AGREEMENT, self._agreement_refs[spec["key"]]
+                    )
+                    agreements.close(session, who, agreement, why)
+
+    def _story_governance(self) -> Script:
+        """The strategic plan's objectives, named by the risks that threaten them; and the risk
+        and compliance committee: two sessions held, with decisions and minutes, and the next
+        one coming up with its agenda half built."""
+        spec = c.GOVERNANCE
+        president, cro = self.cast["president"], self.cast["cro"]
+        yield self._on(spec["adopted"])
+        made: dict[str, str] = {}
+        with self.act(president) as (session, who):
+            for objective in c.OBJECTIVES:
+                record = records.create(
+                    session, who, OBJECTIVE,
+                    {"name": objective["name"], "summary": objective["summary"],
+                     "measure": objective["measure"], "period": spec["period"],
+                     "org_unit_id": self.units["NMI"]},
+                )  # fmt: skip
+                made[objective["name"]] = record.ref
+                self.tally("objectives")
+        yield self._on(spec["named"])
+        with self.act(cro) as (session, who):
+            keys = {
+                row.id: (row.key, row.parent_id) for row in session.scalars(select(RiskCategory))
+            }
+            for risk in session.scalars(
+                select(Risk).where(Risk.status == "open").order_by(Risk.id)
+            ).all():
+                own, parent = keys.get(risk.category_id, (None, None))
+                both = {own, keys.get(parent, (None, None))[0]}
+                wanted = [
+                    made[objective["name"]]
+                    for objective in c.OBJECTIVES
+                    if both & set(objective["categories"])
+                ]
+                if wanted:
+                    risk_objectives.set_objectives(session, who, risk, wanted)
+                    self.tally("risks that name an objective")
+        discussed: set[int] = set()
+        for spec_session in c.SESSIONS:
+            yield self._on(spec_session["planned"])
+            meets = self.day(spec_session["meets"])
+            with self.act(cro) as (session, who):
+                meeting = records.create(
+                    session, who, SESSION,
+                    {"name": f"{spec['committee']}, {meets:%B %Y}", "committee": spec["committee"],
+                     "held_on": meets.isoformat(), "org_unit_id": self.units["NMI"],
+                     "summary": "The quarterly meeting of the institute's risk and compliance "
+                     "committee."},
+                )  # fmt: skip
+                meeting_id = meeting.id
+                self.tally("committee sessions")
+                ranked = session.scalars(
+                    select(Risk)
+                    .where(Risk.status == "open", Risk.residual_rating.in_(("critical", "high")))
+                    .order_by(Risk.residual_rating != "critical", Risk.id)
+                ).all()
+                chosen = [risk for risk in ranked if risk.id not in discussed][
+                    : spec_session["risks"]
+                ]
+                for risk in chosen:
+                    discussed.add(risk.id)
+                    sessions_service.add_item(
+                        session, who, meeting,
+                        {"record": risk.ref, "note": "Above appetite. Accept it, or fund what "
+                         "would bring it down?"},
+                    )  # fmt: skip
+                for kind, name, note, _decided in spec_session["items"]:
+                    self._agenda_item(session, who, meeting, kind, name, note)
+            if spec_session.get("later"):
+                days, extra = spec_session["later"]
+                yield self._on(days)
+                with self.act(cro) as (session, who):
+                    meeting = session.get(CommitteeSession, meeting_id)
+                    for kind, name, note, _decided in extra:
+                        self._agenda_item(session, who, meeting, kind, name, note)
+            if not spec_session["held"]:
+                continue
+            yield self._on(-spec_session["meets"])
+            with self.act(cro) as (session, who):
+                meeting = session.get(CommitteeSession, meeting_id)
+                items = session.scalars(
+                    select(CommitteeItem)
+                    .where(CommitteeItem.session_id == meeting.id)
+                    .order_by(CommitteeItem.position)
+                ).all()
+                named = {name: decided for _kind, name, _note, decided in spec_session["items"]}
+                turn = 0
+                for item in items:
+                    decided = next(
+                        (value for name, value in named.items() if item.title.endswith(name)),
+                        None,
+                    )
+                    if decided is None and item.subject_type == "risk":
+                        decided = c.RISK_DECISIONS[turn % len(c.RISK_DECISIONS)]
+                        turn += 1
+                    if decided is not None:
+                        sessions_service.decide(session, who, meeting, item.id, *decided)
+                        self.tally("committee decisions")
+                sessions_service.mark_held(session, who, meeting)
+                records.update(
+                    session,
+                    who,
+                    SESSION,
+                    meeting,
+                    {"attendees": spec["attendees"], "minutes": spec_session["minutes"]},
+                    version=meeting.version,
+                )
+
+    def _agenda_item(
+        self, session: Session, who: Principal, meeting: Any, kind: str, name: str,
+        note: str | None,
+    ) -> None:  # fmt: skip
+        """An item on a session's agenda: a record found by its name, or a topic."""
+        models = {"agreement": Agreement, "document": PolicyDocument,
+                  "exception": ExceptionRequest}  # fmt: skip
+        if kind == "topic":
+            sessions_service.add_item(session, who, meeting, {"title": name, "note": note})
+            return
+        record = session.scalars(select(models[kind]).where(models[kind].name == name)).first()
+        if record is not None:
+            sessions_service.add_item(session, who, meeting, {"record": record.ref, "note": note})
+
+    def _story_framework_update(self) -> Script:
+        """The trial data platform was set up on SP 800-53 Rev. 4, loaded beside Rev. 5 for
+        it. It has not moved yet. Crosswalks the publisher's mapping between SP 800-171 and
+        SP 800-53 suggests are being worked through: some mapped, one set aside."""
+        lead = self.cast["risk2"]
+        spec = c.SCOPE_TRIALS
+        yield self._on(spec["loaded"])
+        with self.act(lead) as (session, who):
+            framework_packs.load(
+                session, framework_packs.builtin("nist-800-53-r4"), account_id=who.account_id
+            )
+        self.tally("frameworks loaded beside another version")
+        yield self._on(spec["made"])
+        made = self._scope(lead, spec)
+        with self.act(lead) as (session, who):
+            scope = session.get(Scope, made)
+            for code, applicable, reason in spec["decisions"]:
+                scopes.decide(
+                    session, who, scope, framework=spec["framework"][0], code=code,
+                    applicable=applicable, reason=reason,
+                )  # fmt: skip
+            for key, unit, code in spec["mapped"]:
+                found = self.controls.get((key, self.units[unit]))
+                if found is not None:
+                    crosswalk.map_(
+                        session, who, session.get(Control, found),
+                        framework=spec["framework"][0], code=code, coverage="partial",
+                    )  # fmt: skip
+                    self.tally("requirements mapped by hand")
+        yield self._on(spec["reviewed"])
+        with self.act(lead) as (session, who):
+            sp53 = frameworks.by_key(session, "nist-800-53")
+            found = crosswalk.publisher_suggestions(session, who, sp53)
+            for group in found["controls"][:4]:
+                control = records.load(session, who, CONTROL, group["control"]["ref"])
+                first, *rest = group["suggestions"]
+                crosswalk.confirm_suggestion(session, who, sp53, control, first["code"])
+                self.tally("suggested crosswalks confirmed")
+                if rest:
+                    crosswalk.set_aside(session, who, sp53, control, rest[-1]["code"])
+                    self.tally("suggested crosswalks set aside")
+
     def _scope(self, by: int, spec: dict[str, Any]) -> int:
         """A scope with its boundary and the framework it is held to."""
         values = {"name": spec["name"], "org_unit_id": self.units[spec["unit"]],
@@ -1865,6 +2085,302 @@ class Builder:
                 indicators.set_risks(session, self.principal(self.manager()), row, risks)
                 self.tally("indicators")
                 made[index] = (row.id, keeper)
+
+    # --- Policy documents -------------------------------------------------------------------
+
+    def _story_documents(self) -> Script:
+        """The information security policy and the documents beneath it, written, approved,
+        published, and revised over two years. Now: a new version of the policy waits for
+        the president's approval, a guideline has been sent back to its author, and the
+        access control standard is overdue for review."""
+        steps: list[tuple[float, int, int, Callable[[Session, Principal], None]]] = []
+        made: dict[str, int] = {}
+        order = 0
+        # Who reads what, and when, is chosen apart from the dice the other stories use.
+        readers = random.Random(self.seed + 4241)
+        everyone = sorted(self.names)
+
+        def who_is(key: str) -> int:
+            return self.steward(self.units[key]) if key in self.units else self.cast[key]
+
+        def step(ago: float, actor: int, act: Callable[[Session, Principal], None]) -> None:
+            nonlocal order
+            order += 1
+            steps.append((ago, order, actor, act))
+
+        def doc(session: Session, key: str) -> PolicyDocument:
+            return session.get(PolicyDocument, made[key])
+
+        def content(spec: dict[str, Any], text: str | None) -> dict[str, Any]:
+            if spec.get("link"):
+                return {"form": "link", "url": spec["link"]}
+            return {"form": "text", "body": text}
+
+        for spec in c.DOCUMENTS:
+            author = who_is(spec["by"])
+            approvers = [self.cast[key] for key in spec["approvers"]]
+            texts: list[str | None] = []
+            text: str | None = None
+            for _ago, body, _note in spec["versions"]:
+                if isinstance(body, list):
+                    for old, new in body:
+                        text = (text or "").replace(old, new)
+                else:
+                    text = body
+                texts.append(text)
+            first = spec["versions"][0][0] if spec["versions"] else spec["draft"]["since"] + 4
+
+            def create(
+                session: Session,
+                by: Principal,
+                spec: dict[str, Any] = spec,
+                text: str | None = texts[0] if texts else spec.get("draft", {}).get("body"),
+            ) -> None:
+                values = {
+                    "name": spec["name"],
+                    "kind": spec["kind"],
+                    "summary": spec["summary"],
+                    "org_unit_id": self.units[spec["unit"]],
+                    "parent": self._doc_refs.get(spec.get("parent", "")),
+                    "review_months": spec.get("review_months"),
+                    "acknowledge": "acknowledge" in spec,
+                    **content(spec, text),
+                }
+                document = documents.create(session, by, values)
+                made[spec["key"]] = document.id
+                self._doc_refs[spec["key"]] = document.ref
+                if spec.get("audience"):
+                    chosen = spec["audience"]
+                    library.set_audience(
+                        session, by, document, False,
+                        [self.units[code] for code in chosen["units"]], chosen["roles"],
+                    )  # fmt: skip
+                if spec.get("file"):
+                    if self.files is not None:
+                        documents.attach_file(
+                            session,
+                            by,
+                            document,
+                            self.files,
+                            _pdf(spec["file"]),
+                            f"{spec['name']}.pdf",
+                        )
+                    else:
+                        documents.save_draft(
+                            session,
+                            by,
+                            document,
+                            {
+                                "form": "link",
+                                "url": f"https://intranet.{c.DOMAIN}/policies/{spec['key']}.pdf",
+                            },
+                        )
+                self.tally("documents")
+
+            step(first + 21, author, create)
+            for index, (ago, _body, note) in enumerate(spec["versions"]):
+                if index:
+
+                    def redraft(
+                        session: Session,
+                        by: Principal,
+                        key: str = spec["key"],
+                        text: str | None = texts[index],
+                        note: str | None = note,
+                        spec: dict[str, Any] = spec,
+                    ) -> None:
+                        document = doc(session, key)
+                        documents.start_draft(session, by, document)
+                        documents.save_draft(
+                            session, by, document, {**content(spec, text), "change_note": note}
+                        )
+
+                    step(ago + 14, author, redraft)
+
+                def send(
+                    session: Session,
+                    by: Principal,
+                    key: str = spec["key"],
+                    approvers: list[int] = approvers,
+                ) -> None:
+                    documents.submit(session, by, doc(session, key), approvers)
+
+                step(ago + 9, author, send)
+                for place, approver in enumerate(approvers):
+
+                    def approve(session: Session, by: Principal, key: str = spec["key"]) -> None:
+                        documents.decide(session, by, doc(session, key), "approved", None)
+
+                    step(ago + 6 - place, approver, approve)
+
+                def go(session: Session, by: Principal, key: str = spec["key"]) -> None:
+                    documents.publish(session, by, doc(session, key))
+                    self.tally("document versions published")
+
+                step(ago, author, go)
+                asking = spec.get("acknowledge")
+                if asking:
+                    following = (
+                        spec["versions"][index + 1][0] if index + 1 < len(spec["versions"]) else 0
+                    )
+                    latest = index + 1 == len(spec["versions"])
+                    for person in everyone:
+                        if readers.random() >= asking["shares"][index]:
+                            continue
+                        if latest and person == self.cast["member"]:
+                            continue  # the guides show them with it still to do
+                        # Most read it within a fortnight of being told; a few take longer.
+                        late = min(1 + readers.expovariate(1 / 9), ago - following - 1)
+                        if late < 1:
+                            continue
+
+                        def read(session: Session, by: Principal, key: str = spec["key"]) -> None:
+                            document = doc(session, key)
+                            if library.applies(session, document, by):
+                                library.acknowledge(session, by, document)
+                                self.tally("acknowledgments")
+
+                        step(ago - late, person, read)
+                    if latest and asking.get("campaign"):
+                        chase = asking["campaign"]
+
+                        def launch(
+                            session: Session,
+                            by: Principal,
+                            key: str = spec["key"],
+                            chase: dict[str, Any] = chase,
+                        ) -> None:
+                            campaigns.launch(
+                                session,
+                                by,
+                                {
+                                    "kind": "acknowledgment",
+                                    "name": chase["name"],
+                                    "document": doc(session, key).ref,
+                                    "due_on": self.day(chase["due"]).isoformat(),
+                                },
+                            )
+                            self.tally("campaigns")
+
+                        step(chase["ago"], self.cast[chase["by"]], launch)
+            for ago, said in spec.get("reviews", []):
+
+                def keep(
+                    session: Session, by: Principal, key: str = spec["key"], said: str = said
+                ) -> None:
+                    documents.review(session, by, doc(session, key), said)
+
+                step(ago, author, keep)
+            working = spec.get("draft")
+            if working is None:
+                continue
+            since = working["since"]
+            if spec["versions"]:
+
+                def begin(
+                    session: Session,
+                    by: Principal,
+                    key: str = spec["key"],
+                    working: dict[str, Any] = working,
+                    text: str | None = texts[-1],
+                ) -> None:
+                    document = doc(session, key)
+                    documents.start_draft(session, by, document)
+                    for old, new in working["edits"]:
+                        text = (text or "").replace(old, new)
+                    documents.save_draft(
+                        session, by, document, {"body": text, "change_note": working["note"]}
+                    )
+
+                step(since + 6, author, begin)
+            asked = [self.cast[key] for key in working["approvers"]]
+
+            def ask(
+                session: Session, by: Principal, key: str = spec["key"], asked: list[int] = asked
+            ) -> None:
+                documents.submit(session, by, doc(session, key), asked)
+
+            step(since, author, ask)
+            for place, key in enumerate(working.get("approved", [])):
+
+                def agree(session: Session, by: Principal, doc_key: str = spec["key"]) -> None:
+                    documents.decide(session, by, doc(session, doc_key), "approved", "Agreed.")
+
+                step(since - 3 - place, self.cast[key], agree)
+            if working.get("returned"):
+                back, why = working["returned"]
+
+                def refuse(
+                    session: Session, by: Principal, key: str = spec["key"], why: str = why
+                ) -> None:
+                    documents.decide(session, by, doc(session, key), "returned", why)
+
+                step(since - 4, self.cast[back], refuse)
+
+        # Later, once the central controls are on record, each document's author says what it
+        # governs; and departures from two of them are asked for.
+        for key, (directed, answered) in c.GOVERNS.items():
+            spec = next(each for each in c.DOCUMENTS if each["key"] == key)
+
+            def tie(
+                session: Session,
+                by: Principal,
+                key: str = key,
+                directed: list[tuple[str, str]] = directed,
+                answered: list[tuple[str, str]] = answered,
+            ) -> None:
+                document = doc(session, key)
+                for control_key, unit in directed:
+                    found = self.controls.get((control_key, self.units[unit]))
+                    if found is not None:
+                        ref = session.get(Control, found).ref
+                        governs.direct(session, by, document, ref)
+                        self.tally("controls a document directs")
+                for framework, code in answered:
+                    governs.answer(session, by, document, framework=framework, code=code)
+                    self.tally("requirements a document answers")
+
+            step(250, who_is(spec["by"]), tie)
+        for asked in c.DOCUMENT_EXCEPTIONS:
+            made_ref: dict[str, str] = {}
+
+            def ask(
+                session: Session,
+                by: Principal,
+                asked: dict[str, Any] = asked,
+                made_ref: dict[str, str] = made_ref,
+            ) -> None:
+                item = exceptions.request(
+                    session, by,
+                    {"document": doc(session, asked["document"]).ref, "name": asked["name"],
+                     "justification": asked["justification"],
+                     "compensating": asked["compensating"],
+                     "expires_on": self.day(asked["until"]).isoformat()},
+                )  # fmt: skip
+                made_ref["ref"] = item.ref
+                self.tally("exceptions to documents")
+
+            step(asked["ago"], self.steward(self.units[asked["unit"]]), ask)
+            if asked.get("decided"):
+                decided = asked["decided"]
+
+                def agree(
+                    session: Session,
+                    by: Principal,
+                    decided: dict[str, Any] = decided,
+                    made_ref: dict[str, str] = made_ref,
+                ) -> None:
+                    item = records.load(session, by, exceptions.EXCEPTION, made_ref["ref"])
+                    exceptions.decide(session, by, item, approve=True, note=decided["note"])
+
+                step(decided["ago"], self.cast[decided["by"]], agree)
+
+        for ago, _order, actor, act in sorted(steps, key=lambda each: (-each[0], each[1])):
+            yield self._on(ago, hour=10)
+            if actor in self.departed:
+                continue  # they left before they got to it
+            with self.act(actor) as (session, who):
+                act(session, who)
 
     # --- Campaigns ------------------------------------------------------------------------
 
@@ -2392,6 +2908,8 @@ class Builder:
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
+            self._story_documents, self._story_agreements, self._story_framework_update,
+            self._story_governance,
         ):  # fmt: skip
             self.schedule(story())
         self.run()
@@ -2424,3 +2942,35 @@ def marker(session: Session) -> dict[str, Any] | None:
     """What says this installation is a demo, or None if it is not."""
     value = settings.get(session, SETTING)
     return value if isinstance(value, dict) else None
+
+
+def _pdf(lines: list[str]) -> bytes:
+    """A one-page PDF of plain lines, for a document the demo keeps as a file."""
+
+    def escaped(line: str) -> str:
+        return line.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+    text = (
+        "BT /F1 11 Tf 15 TL 72 740 Td " + " ".join(f"({escaped(line)}) '" for line in lines) + " ET"
+    )
+    objects = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+        "/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        f"<< /Length {len(text)} >>\nstream\n{text}\nendstream",
+    ]
+    out = b"%PDF-1.4\n"
+    offsets = []
+    for number, body in enumerate(objects, 1):
+        offsets.append(len(out))
+        out += f"{number} 0 obj\n{body}\nendobj\n".encode("latin-1")
+    table = len(out)
+    out += f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode()
+    for offset in offsets:
+        out += f"{offset:010d} 00000 n \n".encode()
+    out += (
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{table}\n%%EOF\n".encode()
+    )
+    return out

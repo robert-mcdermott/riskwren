@@ -1,7 +1,8 @@
 """Reminders and escalation: what is nearly due or late, and who is told (OVS-03).
 
 One pass looks at everything with a date on it: actions, risk reviews, issues, evidence,
-acceptances, exceptions, and the next test of each control. Whoever a thing is waiting on is
+acceptances, exceptions, the next test of each control, and the review of each document.
+Whoever a thing is waiting on is
 reminded shortly before its date and again when it passes. If it stays late, the steward of
 its unit is told, and later the unit's leader. Each of those is said once for a given date;
 moving the date starts again.
@@ -26,6 +27,7 @@ from riskwren.core.clock import utc_now
 from riskwren.db.models import (
     Acceptance,
     Action,
+    Agreement,
     Campaign,
     CampaignItem,
     Control,
@@ -33,6 +35,7 @@ from riskwren.db.models import (
     ExceptionRequest,
     Indicator,
     Issue,
+    PolicyDocument,
     Reminder,
     Risk,
     Scope,
@@ -58,6 +61,7 @@ class Due:
     unit_id: int | None
     escalates: bool = True
     late: str = "Overdue"  # how being past the date is said
+    lead_days: int | None = None  # how far ahead to warn, where not the program's usual
 
 
 def schedule(session: Session) -> dict[str, int]:
@@ -179,10 +183,63 @@ def _campaign_items(session: Session, horizon: date) -> Iterator[Due]:
             item.id,
             campaign.due_on,
             f"{campaign.name}: {about}",
-            f"/campaign-items/{item.id}",
+            f"/library/{item.subject_ref}"
+            if campaign.kind == "acknowledgment"
+            else f"/campaign-items/{item.id}",
             (item.account_id,),
             item.org_unit_id,
         )
+
+
+def _documents(session: Session, horizon: date) -> Iterator[Due]:
+    """Documents in force that are due to be looked at again."""
+    for document in session.scalars(
+        select(PolicyDocument).where(
+            PolicyDocument.status == "active",
+            PolicyDocument.next_review_on.is_not(None),
+            PolicyDocument.next_review_on <= horizon,
+        )
+    ):
+        assert document.next_review_on is not None
+        yield Due(
+            "document_review",
+            document.id,
+            document.next_review_on,
+            f"review of {document.ref} {document.name}",
+            f"/documents/{document.ref}",
+            tuple(notices.owners(session, "document", document.id)),
+            document.org_unit_id,
+            late="Review overdue",
+        )
+
+
+def _agreements(session: Session, today: date) -> Iterator[Due]:
+    """Open agreements whose notice date or end draws near. Each is warned of further ahead
+    than most things: a renewal takes longer to arrange than an action takes to finish."""
+    from riskwren.compliance import agreements
+
+    for agreement in session.scalars(select(Agreement).where(Agreement.status == "active")):
+        owners = tuple(notices.owners(session, "agreement", agreement.id))
+        href = f"/agreements/{agreement.ref}"
+        notice = agreements.notice_on(agreement)
+        if (
+            notice is not None
+            and today <= notice + timedelta(days=1)
+            and notice <= today + timedelta(days=agreements.NOTICE_SOON)
+        ):
+            yield Due(
+                    "agreement_notice", agreement.id, notice,
+                    f"the last day to give notice on {agreement.ref} {agreement.name}", href,
+                    owners, agreement.org_unit_id, escalates=False,
+                    late="Notice date passed", lead_days=agreements.NOTICE_SOON,
+                )  # fmt: skip
+        ends = agreement.ends_on
+        if ends is not None and ends <= today + timedelta(days=agreements.ENDING_SOON):
+            yield Due(
+                "agreement_end", agreement.id, ends, f"the end of {agreement.ref} {agreement.name}",
+                href, owners, agreement.org_unit_id, late="Ended, and still open",
+                lead_days=agreements.ENDING_SOON,
+            )  # fmt: skip
 
 
 def _readings(session: Session, horizon: date) -> Iterator[Due]:
@@ -223,7 +280,8 @@ def stage_of(due: Due, today: date, plan: dict[str, int]) -> str | None:
     """How far along the reminders for this are: the furthest stage it has reached."""
     late = (today - due.due_on).days
     if late < 1:
-        return "soon" if (due.due_on - today).days <= plan["soon_days"] else None
+        ahead = due.lead_days if due.lead_days is not None else plan["soon_days"]
+        return "soon" if (due.due_on - today).days <= ahead else None
     if due.escalates and late >= plan["leader_after_days"]:
         return "leader"
     if due.escalates and late >= plan["steward_after_days"]:
@@ -250,6 +308,8 @@ def send(session: Session, *, today: date | None = None) -> dict[str, int]:
         *due_items(session, today, horizon),
         *_campaign_items(session, horizon),
         *_readings(session, horizon),
+        *_documents(session, horizon),
+        *_agreements(session, today),
     ]
     for due in everything:
         stage = stage_of(due, today, plan)

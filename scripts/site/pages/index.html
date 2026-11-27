@@ -150,12 +150,67 @@
   {{shot:analysis|A finished risk analysis of a clinic's systems: eighty questions answered, three risks raised, and each thing it looked at}}
 </section>
 
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">Policies</p>
+    <h2 id="approved-and-never-altered">Approved by named people, and never altered</h2>
+    <p>A policy, standard, procedure, or guideline is written here, linked to where it is kept, or attached as a file. A new version goes to the people who must approve it, none of whom wrote it, and is published once every one of them has.</p>
+    <p>A published version is never changed. Its fingerprint is in the history, and <code>riskwren verify</code> checks it. Any two versions compare side by side, and each document comes up for review on a cadence.</p>
+    <p><a class="more" href="policies.html">Policies</a></p>
+  </div>
+  {{shot:document-draft-approve|The president is asked to approve a new version of the information security policy: approve it, or return it with what needs to change}}
+</section>
+
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Acknowledgment</p>
+    <h2 id="read-and-acknowledged">Read by the people it applies to, and acknowledged</h2>
+    <p>Everyone has a library of the documents that apply to them, readable on a phone. A document that asks to be acknowledged stays on each person's Home until they have; a new version asks again, unless its author says the change does not need it.</p>
+    <p>Who has and who has not is shown by unit and by person, and a campaign chases the rest by a date.</p>
+    <p><a class="more" href="policies.html#acknowledgment">Acknowledgment</a></p>
+  </div>
+  {{shot:document-acknowledgments|Who has acknowledged the incident response procedure: most of those it applies to, by unit, with the button to ask the rest}}
+</section>
+
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">Agreements</p>
+    <h2 id="what-you-promised">What you promised others, with its dates</h2>
+    <p>An award, a data use agreement, a business associate agreement: each with its parties, its dates, and its notice period. The terms it imposes reach every scope that holds what it covers, which says why it holds them.</p>
+    <p>Its owners are told before the last day to give notice and before it ends. One that has ended stays open until it is renewed or closed.</p>
+    <p><a class="more" href="compliance.html#agreements">Agreements</a></p>
+  </div>
+  {{shot:agreement|An agreement: what it covers, the framework it imposes, and the scope held to that framework because the agreement covers what the scope holds}}
+</section>
+
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Framework updates</p>
+    <h2 id="a-new-version-beside-the-old">A new version beside the old, and what changed</h2>
+    <p>A framework's new version is loaded beside the one in use, and nothing that uses the old one changes. What changed is listed by code, with the words that differ, and where the publisher says each withdrawn requirement went.</p>
+    <p>A scope moves when its keepers say so, taking its decisions and exceptions with it where the code is unchanged.</p>
+    <p><a class="more" href="compliance.html#a-new-version-of-a-framework">Framework versions</a></p>
+  </div>
+  {{shot:framework-changes|What changed from SP 800-53 Rev. 4 to Rev. 5: requirements changed, added, and withdrawn, and the scope still on Rev. 4 with the button to move it}}
+</section>
+
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">Committees</p>
+    <h2 id="decisions-on-the-record">A committee's decision, on the record it was about</h2>
+    <p>A session's agenda is drawn from the register: the risks above appetite, an exception, a policy waiting for approval. The decision on each item is recorded with it, shows on the record it was about, and is told to that record's owners.</p>
+    <p>Strategic objectives connect the register to the plan: each lists exactly the risks that threaten it.</p>
+    <p><a class="more" href="running-the-program.html#committee-sessions">Committee sessions</a></p>
+  </div>
+  {{shot:session-held|A held session: the agenda drawn from the register, and the decision recorded on each item}}
+</section>
+
 <section class="section">
   <h2 id="also-in-it">Also in it</h2>
   <div class="rest">
     <div>
       <h3 id="frameworks-as-published">Frameworks as published</h3>
-      <p>NIST CSF 2.0, SP 800-53 Rev. 5 with its baselines, SP 800-171 Rev. 3, and the HIPAA Security Rule arrive loaded. An agreement or an internal standard is entered as a framework of your own.</p>
+      <p>NIST CSF 2.0, SP 800-53 Rev. 5 with its baselines, SP 800-171 Rev. 3, and the HIPAA Security Rule arrive loaded, and SP 800-53 Rev. 4 is there for programs that still name it. An agreement's terms or an internal standard is entered as a framework of your own.</p>
     </div>
     <div>
       <h3 id="inherited-controls">Inherited controls</h3>
@@ -206,7 +261,7 @@
 
 <section class="section">
   <h2 id="try-it">Try it</h2>
-  <p>You need <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, which provides the right Python. Clone the repository and build the demo organization: a fictional research institute with a clinic, two years of history, three scopes held to frameworks, an assessment in progress, evidence going stale, and issues and exceptions at every stage.</p>
+  <p>You need <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, which provides the right Python. Clone the repository and build the demo organization: a fictional research institute with a clinic, two years of history, four scopes held to frameworks, an assessment in progress, evidence going stale, issues and exceptions at every stage, policies being read and acknowledged, agreements with their dates, and a risk committee.</p>
   <div class="code"><pre><code class="language-bash">git clone https://github.com/robert-mcdermott/riskwren.git
 cd riskwren
 uv sync

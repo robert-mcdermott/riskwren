@@ -456,6 +456,8 @@ CADENCES: dict[str, Any] = {
     "exception_max_months": 12,
     # A key control is tested more often than what is known of a control otherwise holds.
     "key_control_test_months": 6,
+    # How long a policy, standard, procedure, or guideline goes before it is looked at again.
+    "document_review_months": 12,
     # When reminders go: so many days before a date, and how long something stays late
     # before the unit's steward, and then its leader, is told.
     "reminders": {"soon_days": 14, "steward_after_days": 7, "leader_after_days": 21},

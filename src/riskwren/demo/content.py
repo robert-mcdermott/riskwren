@@ -912,6 +912,782 @@ ANALYSIS_NOTES = {
     ],
 }
 
+# Policy documents. Each has its words, who adds it ("by": a cast key, or a unit's steward
+# when "by" names a unit), who approves its versions, and its history: the days ago each
+# version was published, with a list of changes from the one before; reviews that kept it as
+# it was; and what is being written now. All of it is invented.
+INFOSEC_V1 = """# Information security policy
+
+## Purpose
+
+Northmere holds information that patients, research participants, funders, and partners have trusted it with. This policy says how that information, and the systems that hold it, are protected.
+
+## Who it applies to
+
+Everyone who works at Northmere or studies here, contractors and visiting researchers, and anyone else who uses Northmere's systems or handles its information.
+
+## What we require
+
+- Information is classified, and protected according to its class (see the data classification standard).
+- Access is given for a purpose, to named people, and removed when the purpose ends.
+- Restricted information is kept only in systems approved for it.
+- Systems are kept up to date, and weaknesses are found and fixed.
+- Anyone who suspects an incident reports it at once to the Information Security office.
+
+## Roles
+
+| Role | Responsibility |
+|---|---|
+| Chief Information Security Officer | Keeps this policy and the standards beneath it, and reports on them to leadership |
+| System owners | Make sure their systems meet the standards |
+| Everyone | Follows this policy, and reports what looks wrong |
+
+## Exceptions
+
+An exception to this policy, or to a standard beneath it, is asked for in writing, says what makes up for it, and ends on a date. Exceptions are decided by the Chief Information Security Officer.
+
+## Review
+
+This policy is reviewed every year, and sooner if the law or the organization changes.
+"""
+
+INFOSEC_V2 = [
+    (
+        "- Systems are kept up to date, and weaknesses are found and fixed.",
+        "- Systems are kept up to date, and weaknesses are found and fixed in the times the vulnerability management standard sets.",
+    ),
+    (
+        "- Anyone who suspects an incident reports it at once to the Information Security office.",
+        "- Anyone who suspects an incident reports it at once to the Information Security office, and does not try to investigate it alone.\n- Suppliers who hold Northmere's information agree to protect it as this policy does.",
+    ),
+]
+INFOSEC_V3 = [
+    (
+        "Exceptions are decided by the Chief Information Security Officer.",
+        "Exceptions are decided by the Chief Information Security Officer, and those that bear on patient or participant information also by the privacy officer.",
+    ),
+    (
+        "## Review\n",
+        "## Training\n\nEveryone completes security awareness training when they join and every year after.\n\n## Review\n",
+    ),
+]
+
+AUP_V1 = """# Acceptable use policy
+
+## Purpose
+
+Northmere's computers, networks, and accounts are provided for its work. This policy says what using them well looks like.
+
+## You may
+
+- Use Northmere systems for your work, and for occasional personal use that does not get in its way.
+- Use approved collaboration tools to work with colleagues and partners.
+
+## You must not
+
+- Share your account, or use anyone else's.
+- Store restricted information on a personal device or an unapproved service.
+- Install software that has not been approved for your role.
+- Try to get around a security control.
+
+## Monitoring
+
+Northmere may monitor the use of its systems to keep them secure, within the law and its privacy notice.
+
+## If something goes wrong
+
+Report a lost device, a suspicious message, or anything that looks wrong to the help desk at once.
+"""
+AUP_V2 = [
+    (
+        "- Use approved collaboration tools to work with colleagues and partners.",
+        "- Use approved collaboration tools to work with colleagues and partners.\n- Use generative tools that Northmere has approved, and never paste restricted information into one that it has not.",
+    ),
+    (
+        "Report a lost device, a suspicious message, or anything that looks wrong to the help desk at once.",
+        "Report a lost device, a suspicious message, or anything that looks wrong to the help desk at once. Reporting a mistake is never held against you.",
+    ),
+]
+
+AUP_V3 = [
+    (
+        "- Store restricted information on a personal device or an unapproved service.",
+        "- Store restricted information on a personal device or an unapproved service.\n- Use a personal email or file-sharing account for Northmere's work.",
+    ),
+]
+
+ACCESS_V1 = """# Access control standard
+
+This standard puts the information security policy into practice for access to systems.
+
+## Accounts
+
+1. Every account belongs to one named person.
+2. Accounts are created only when a manager asks, for a stated purpose.
+3. Shared and generic accounts are not allowed, except service accounts with a named owner.
+
+## Privileges
+
+- Access is the least a person needs for their work.
+- Administrator rights are held in a separate account, used only for administration.
+- Privileged access is reviewed every quarter by the system owner.
+
+## Leavers and movers
+
+- Access is removed within two working days of someone leaving.
+- When someone changes role, access they no longer need is removed within ten working days.
+
+## Reviews
+
+System owners review who has access to their systems at least twice a year, and keep the record.
+"""
+
+PASSWORDS_V1 = """# Password and authentication standard
+
+## Passwords
+
+- At least 12 characters, with no forced complexity rules.
+- Checked against lists of known breached passwords when set.
+- Changed only when there is reason to think it is known to someone else.
+
+## Second factor
+
+- Required for remote access and for email.
+- Required for every administrator account.
+
+## Service accounts
+
+Service accounts use long random secrets, kept in the approved vault and changed when someone who knew them leaves.
+"""
+PASSWORDS_V2 = [
+    (
+        "- Required for remote access and for email.",
+        "- Required for every account that can be reached from outside Northmere's network.",
+    ),
+    (
+        "- Required for every administrator account.",
+        "- Required for every administrator account, using a phishing-resistant method.\n- Codes sent by text message are no longer accepted for new enrolments.",
+    ),
+]
+
+CLASSIFICATION_V1 = """# Data classification standard
+
+Every body of information at Northmere has one of four classes. Its owner says which.
+
+| Class | What it is | Examples |
+|---|---|---|
+| Public | Meant to be shared | Published papers, the public website |
+| Internal | For Northmere's work, harmless if seen | Meeting notes, internal procedures |
+| Confidential | Would cause harm if seen by the wrong people | Unpublished results, contracts, staff records |
+| Restricted | Protected by law or agreement | Patient records, identifiable participant data, controlled-access genomic data |
+
+## Handling
+
+- Restricted information is kept only in systems approved for it, encrypted in storage and in transit.
+- Confidential information is shared only with those who need it.
+- When in doubt, treat information as the higher class and ask the privacy office.
+"""
+
+ENCRYPTION_V1 = """# Encryption standard
+
+## In storage
+
+- Laptops and portable media are encrypted with the approved full-disk encryption.
+- Restricted information in databases and file shares is encrypted at rest.
+
+## In transit
+
+- Restricted and confidential information is sent only over encrypted connections.
+- Email holding restricted information is sent with the approved secure-mail option.
+
+## Keys
+
+Keys are kept apart from the information they protect, by the system's administrators, and are rotated at least every two years.
+"""
+
+VULN_V1 = """# Vulnerability management standard
+
+## Finding weaknesses
+
+- Systems on Northmere's network are scanned at least monthly.
+- Systems reachable from the internet are scanned weekly and tested by an outside firm each year.
+
+## Fixing them
+
+| Severity | Fixed within |
+|---|---|
+| Critical | 15 days |
+| High | 30 days |
+| Medium | 90 days |
+| Low | At the next planned change |
+
+A weakness that cannot be fixed in time needs an exception, with what makes up for it until it is.
+"""
+
+INCIDENT_V1 = """# Incident response procedure
+
+## When you suspect an incident
+
+1. Stop, and do not try to investigate on your own.
+2. Call the help desk, and say it may be a security incident.
+3. Write down what you saw, and when.
+
+## The response team
+
+The Information Security office leads the response, with IT and, when personal information may be involved, the privacy office.
+
+## Steps
+
+1. Contain: isolate what is affected.
+2. Assess: what happened, what was reached, whose information.
+3. Recover: restore from clean backups.
+4. Learn: a review within two weeks, with actions and owners.
+"""
+INCIDENT_V2 = [
+    (
+        "1. Contain: isolate what is affected.",
+        "1. Contain: isolate what is affected, and keep its logs.",
+    ),
+    (
+        "The Information Security office leads the response, with IT and, when personal information may be involved, the privacy office.",
+        "The Information Security office leads the response, with IT and, when personal information may be involved, the privacy office. Out of hours, the on-call security engineer is reached through the help desk.",
+    ),
+]
+INCIDENT_V3 = [
+    (
+        "2. Assess: what happened, what was reached, whose information.",
+        "2. Assess: what happened, what was reached, whose information.\n3. Decide whether anyone must be told: the privacy office decides within 24 hours of learning that personal information may be involved.",
+    ),
+    ("3. Recover: restore from clean backups.", "4. Recover: restore from clean backups."),
+    (
+        "4. Learn: a review within two weeks, with actions and owners.",
+        "5. Learn: a review within two weeks, with actions and owners, recorded as issues in RiskWren.",
+    ),
+]
+
+REMOTE_V1 = """# Working away from the office
+
+Some advice for working securely at home and when travelling.
+
+- Use the VPN before reaching internal systems.
+- Lock your screen when you step away, even at home.
+- Keep work on Northmere devices; do not print restricted information at home.
+- On a shared network, assume someone else can see what is not encrypted.
+"""
+
+RDM_LINES = [
+    "Research data management policy",
+    "",
+    "1. Every research project names a data steward when it begins.",
+    "2. Research data is kept in Research Computing's managed storage, never only on",
+    "   a laptop or an instrument computer.",
+    "3. Identifiable participant data is kept in the controlled-access enclave.",
+    "4. Data is kept for at least seven years after publication, or longer if the",
+    "   funder or the agreement under which it was received requires.",
+    "5. Data shared outside Northmere is shared under a data use agreement.",
+    "",
+    "Approved by the Chief Scientific Officer.",
+]
+
+DOCUMENTS = [
+    {
+        "key": "infosec",
+        "name": "Information security policy",
+        "kind": "policy",
+        "unit": "SEC",
+        "by": "ciso",
+        "approvers": ["president"],
+        "summary": "What Northmere requires to protect the information it holds, and who does what.",
+        "versions": [
+            (720, INFOSEC_V1, None),
+            (
+                340,
+                INFOSEC_V2,
+                "Patching follows the vulnerability standard's times; suppliers are bound by the policy.",
+            ),
+        ],
+        "draft": {
+            "since": 18,
+            "edits": INFOSEC_V3,
+            "note": "Privacy decides exceptions that touch personal information; yearly training is required.",
+            "approvers": ["president", "cro"],
+            "approved": ["cro"],
+        },
+    },
+    {
+        "key": "aup",
+        "name": "Acceptable use policy",
+        "kind": "policy",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["coo"],
+        "summary": "What using Northmere's computers, networks, and accounts well looks like.",
+        "versions": [
+            (690, AUP_V1, None),
+            (
+                300,
+                AUP_V2,
+                "Generative tools: only approved ones, and never with restricted information.",
+            ),
+            (
+                40,
+                AUP_V3,
+                "Work stays in Northmere's own accounts: no personal email or file sharing.",
+            ),
+        ],
+        # Everyone is asked to say they have read each version; most have read the newest,
+        # and a campaign has just started to chase the rest. The sample staff member has still to.
+        "acknowledge": {
+            "shares": [0.97, 0.94, 0.62],
+            "campaign": {"ago": 2, "due": 12, "by": "assess1", "name": "Acceptable use, version 3"},
+        },
+    },
+    {
+        "key": "access",
+        "name": "Access control standard",
+        "kind": "standard",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "Who gets access to what, how it is given, reviewed, and taken away.",
+        "versions": [(400, ACCESS_V1, None)],
+    },
+    {
+        "key": "passwords",
+        "name": "Password and authentication standard",
+        "kind": "standard",
+        "unit": "IT",
+        "parent": "infosec",
+        "by": "cio",
+        "approvers": ["ciso"],
+        "summary": "How people prove who they are: passwords, second factors, and service accounts.",
+        "versions": [
+            (500, PASSWORDS_V1, None),
+            (
+                120,
+                PASSWORDS_V2,
+                "A second factor wherever an account can be reached from outside; no more text-message codes for new enrolments.",
+            ),
+        ],
+    },
+    {
+        "key": "classification",
+        "name": "Data classification standard",
+        "kind": "standard",
+        "unit": "CMPL",
+        "parent": "infosec",
+        "by": "CMPL",
+        "approvers": ["ciso", "cro"],
+        "summary": "The four classes of information, and how each is handled.",
+        "versions": [(600, CLASSIFICATION_V1, None)],
+        "reviews": [
+            (
+                240,
+                "Checked against the new genomic data sharing terms; the restricted class already covers them.",
+            )
+        ],
+    },
+    {
+        "key": "encryption",
+        "name": "Encryption standard",
+        "kind": "standard",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "What is encrypted, in storage and in transit, and how keys are kept.",
+        "versions": [(345, ENCRYPTION_V1, None)],
+    },
+    {
+        "key": "vuln",
+        "name": "Vulnerability management standard",
+        "kind": "standard",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "How weaknesses are found, and how quickly each is fixed.",
+        "versions": [(260, VULN_V1, None)],
+    },
+    {
+        "key": "incident",
+        "name": "Incident response procedure",
+        "kind": "procedure",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio", "cro"],
+        "review_months": 6,
+        "summary": "What to do when a security incident is suspected, and how the response runs.",
+        # Those who act in an incident: IT, Information Security, Research Computing, and
+        # every steward, who is often the first to hear of one.
+        "audience": {"units": ["IT", "SEC", "RC"], "roles": ["steward"]},
+        "acknowledge": {"shares": [0.96, 0.92, 0.81]},
+        "versions": [
+            (560, INCIDENT_V1, None),
+            (
+                230,
+                INCIDENT_V2,
+                "After the spring exercise: keep logs when containing, and how to reach us out of hours.",
+            ),
+            (
+                60,
+                INCIDENT_V3,
+                "The privacy office decides within 24 hours whether anyone must be told.",
+            ),
+        ],
+    },
+    {
+        "key": "backup",
+        "name": "Backup and restore procedure",
+        "kind": "procedure",
+        "unit": "IT",
+        "parent": "infosec",
+        "by": "cio",
+        "approvers": ["ciso"],
+        "summary": "How systems are backed up and restored. Kept on the IT intranet, where the runbooks live.",
+        "link": "https://intranet.northmere.example/it/runbooks/backup-and-restore",
+        "versions": [(280, None, None)],
+    },
+    {
+        "key": "remote",
+        "name": "Working away from the office",
+        "kind": "guideline",
+        "unit": "SEC",
+        "parent": "aup",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "Advice for working securely at home and when travelling.",
+        "versions": [],
+        "draft": {
+            "since": 26,
+            "body": REMOTE_V1,
+            "approvers": ["cio"],
+            "returned": (
+                "cio",
+                "The VPN is not needed for the systems we moved to single sign-on last year; say which ones still need it.",
+            ),
+        },
+    },
+    {
+        "key": "rdm",
+        "name": "Research data management policy",
+        "kind": "policy",
+        "unit": "RES",
+        "by": "cso",
+        "approvers": ["president"],
+        "summary": "Where research data is kept, for how long, and how it is shared. Kept as the signed PDF.",
+        "file": RDM_LINES,
+        "versions": [(450, None, None)],
+    },
+]
+
+# What each document governs: the controls it directs and the requirements it answers, said
+# by its author once the central controls were on record. The research data policy says
+# nothing yet, so that one document shows what is missing.
+GOVERNS = {
+    "infosec": (
+        [("security_policy", "SEC"), ("security_roles", "SEC"), ("security_oversight", "SEC")],
+        [("nist-csf", "GV.PO-01"), ("nist-csf", "GV.PO-02"), ("nist-csf", "GV.RR-02"),
+         ("nist-800-53", "PL-1"), ("nist-800-53", "PM-1"), ("hipaa-security", "164.316(a)"),
+         ("hipaa-security", "164.308(a)(1)(i)"), ("nist-800-171", "03.15.01")],
+    ),
+    "aup": (
+        [("security_training", "SEC")],
+        [("nist-800-53", "PL-4"), ("nist-csf", "PR.AT-01"), ("hipaa-security", "164.308(a)(5)(i)")],
+    ),
+    "access": (
+        [("access_approved", "IT"), ("access_reviewed", "SEC"), ("access_removed_on_leaving", "IT"),
+         ("unique_accounts", "IT"), ("privileged_access", "IT")],
+        [("nist-800-53", "AC-1"), ("nist-800-53", "AC-2"), ("nist-csf", "PR.AA-05"),
+         ("hipaa-security", "164.308(a)(4)(i)")],
+    ),
+    "passwords": (
+        [("second_factor", "IT"), ("unique_accounts", "IT")],
+        [("nist-800-53", "IA-5"), ("nist-csf", "PR.AA-01")],
+    ),
+    "classification": (
+        [("data_classified", "CMPL")],
+        [("nist-800-53", "RA-2"), ("nist-csf", "ID.AM-07")],
+    ),
+    "encryption": (
+        [("encryption_at_rest", "IT"), ("encryption_in_transit", "IT")],
+        [("nist-800-53", "SC-13"), ("nist-800-53", "SC-28"), ("nist-csf", "PR.DS-01"),
+         ("nist-csf", "PR.DS-02"), ("hipaa-security", "164.312(a)(2)(iv)"),
+         ("hipaa-security", "164.312(e)(2)(ii)")],
+    ),
+    "vuln": (
+        [("vulnerability_scanning", "SEC"), ("patching", "IT")],
+        [("nist-800-53", "RA-5"), ("nist-800-53", "SI-2"), ("nist-csf", "ID.RA-01"),
+         ("nist-csf", "PR.PS-02")],
+    ),
+    "incident": (
+        [("incident_response", "SEC"), ("incident_reporting", "SEC")],
+        [("nist-800-53", "IR-1"), ("nist-800-53", "IR-8"), ("nist-csf", "RS.MA-01"),
+         ("hipaa-security", "164.308(a)(6)(i)"), ("hipaa-security", "164.308(a)(6)(ii)")],
+    ),
+    "backup": (
+        [("backups_tested", "IT"), ("disaster_recovery", "IT")],
+        [("nist-800-53", "CP-9"), ("nist-csf", "PR.DS-11"), ("hipaa-security", "164.308(a)(7)(ii)(A)")],
+    ),
+}  # fmt: skip
+
+# Departures from a document: asked for by a unit's steward, decided by the leader of the unit
+# that keeps the document. One is in force; one waits for the security leader.
+DOCUMENT_EXCEPTIONS = [
+    {
+        "document": "encryption",
+        "unit": "IMG",
+        "ago": 74,
+        "decided": {
+            "by": "ciso",
+            "ago": 71,
+            "note": "Until the vendor's update. Tell me if it slips.",
+        },
+        "until": 40,
+        "name": "Confocal microscope control PC",
+        "justification": "The confocal microscope's control PC runs vendor software that stops working when the disk is encrypted. The vendor's update that fixes it is due this winter.",
+        "compensating": "The PC is not on the network, sits in a locked room, and holds images only until they are copied to research storage each evening.",
+    },
+    {
+        "document": "vuln",
+        "unit": "CLAB",
+        "ago": 4,
+        "until": 150,
+        "name": "Chemistry analyzer patching",
+        "justification": "The chemistry analyzers' maker must certify each operating system patch before it may be applied, which takes up to 90 days: longer than the standard allows for a high-severity fix.",
+        "compensating": "The analyzers sit on their own network segment that reaches only the laboratory system, they are scanned weekly, and certified patches are applied within a week of release.",
+    },
+]
+
+# Agreements, with their dates in days from the build. The data use agreement imposes its
+# own terms on the scope that holds the backups of the cohort's data; the genomic data
+# certification names a published framework the enclave already meets; the backup vaulting
+# agreement's notice date is near, and is on the security leader's Home; the imaging pilot's
+# memorandum ended and was closed.
+AGREEMENTS = [
+    {
+        "key": "cohort_dua",
+        "name": "Open Cohort Trust data use agreement",
+        "kind": "data_use",
+        "parties": "Open Cohort Trust",
+        "reference": "OCT-DUA-2025-117",
+        "unit": "PS",
+        "owner": "PS",
+        "made": 380,
+        "starts": -631,
+        "ends": 465,
+        "notice_days": 90,
+        "renews": True,
+        "terms": "own",
+        "summary": "Lets Population Sciences use the trust's cohort data for the approved study, on the trust's terms.",
+        "covers": ["info_open_cohort", "storage", "backup"],
+    },
+    {
+        "key": "genomic_cert",
+        "name": "Genomic data access certification",
+        "kind": "data_use",
+        "parties": "Genome Commons Repository",
+        "reference": "GCR-CERT-8841",
+        "unit": "RC",
+        "owner": "rc_dir",
+        "made": 200,
+        "starts": -400,
+        "ends": 48,
+        "renews": False,
+        "terms": "nist-800-171",
+        "summary": "The repository's conditions for controlled-access genomic data: held only in a system that meets SP 800-171.",
+        "covers": ["info_genomic"],
+        "scopes": ["Controlled-access data enclave"],
+    },
+    {
+        "key": "vault_baa",
+        "name": "Offsite backup vaulting",
+        "kind": "business_associate",
+        "parties": "Stonebridge Data Vaulting",
+        "reference": "SDV-2024-0391",
+        "unit": "IT",
+        "owner": "ciso",
+        "made": 640,
+        "starts": -700,
+        "ends": 75,
+        "notice_days": 60,
+        "renews": True,
+        "summary": "Stonebridge keeps the offsite copy of the backups, which hold patient records, as a business associate.",
+        "covers": ["backup"],
+    },
+    {
+        "key": "imaging_mou",
+        "name": "Imaging pilot data sharing",
+        "kind": "memorandum",
+        "parties": "Calder Bay University",
+        "unit": "IMG",
+        "owner": "IMG",
+        "made": 500,
+        "starts": -500,
+        "ends": -120,
+        "renews": False,
+        "summary": "Shared de-identified images with the university's imaging group for a one-year pilot.",
+        "covers": [],
+        "closed": (110, "Ended on its date; the pilot finished and was not renewed."),
+    },
+]
+
+# A scope set up on SP 800-53 Rev. 4, because the industry sponsor's contract named it. Rev. 5
+# is loaded beside it; the platform has not moved yet. One of its decisions is about a control
+# Rev. 5 withdrew, and would be left behind.
+SCOPE_TRIALS = {
+    "name": "Trial data platform",
+    "unit": "CR",
+    "summary": "The hosted systems that hold the institute's clinical trial data, kept to the "
+    "control baseline the industry sponsor's contract names.",
+    "boundary": "Electronic data capture and the trial management system, and the trial "
+    "participant data they hold. The hosting company runs both; the institute decides who may "
+    "use them.",
+    "members": ["edc", "ctms", "info_trials"],
+    "units": [],
+    "framework": ("nist-800-53-r4", "moderate"),
+    "loaded": 560,
+    "made": 520,
+    "decisions": [
+        ("PE-3", False, "The hosting company runs the data center; its physical access "
+         "controls are covered by its own attestation report."),
+        ("PE-6", False, "As for PE-3: watching physical access is the hosting company's."),
+        ("SA-12", True, "The sponsor's contract asks for supply chain protection, though the "
+         "moderate baseline does not."),
+    ],
+    "reviewed": 20,  # days ago, when crosswalks the publisher's mapping suggests were looked at
+    # The central controls the platform's keepers mapped to Rev. 4 when it was set up. One is
+    # to a control Rev. 5 moved into the supply chain family.
+    "mapped": [
+        ("access_approved", "IT", "AC-2"), ("second_factor", "IT", "IA-2(1)"),
+        ("backups_tested", "IT", "CP-9"), ("encryption_at_rest", "IT", "SC-28"),
+        ("access_reviewed", "SEC", "AC-2(3)"), ("supplier_assessed", "SEC", "SA-19"),
+    ],
+}  # fmt: skip
+
+# The strategic plan's objectives, adopted by the President, and the risk categories whose
+# risks threaten each: a category's own key, or the key of a category beneath it.
+GOVERNANCE = {
+    "period": "Strategic plan 2026 to 2030",
+    "adopted": 330,  # days ago
+    "named": 320,
+    "committee": "Risk and compliance committee",
+    "attendees": "The President and Director (chair), the Chief Operating Officer, the Chief "
+    "Scientific Officer, the Chief Information Officer, the Chief Information Security Officer, "
+    "and the Chief Risk and Compliance Officer (secretary). Apologies from the Chief Financial "
+    "Officer.",
+}
+OBJECTIVES = [
+    {
+        "name": "Grow the population cohort to 40,000 participants",
+        "summary": "The cohort is the institute's longest-running study, and most of Population "
+        "Sciences rests on it.",
+        "measure": "Enrolled participants, counted each June; consent withdrawals under one in a "
+        "hundred a year.",
+        "categories": ["human_subjects", "data_quality", "partnerships"],
+    },
+    {
+        "name": "Bring two new therapies into first-in-human trials",
+        "summary": "The translational program's aim for the plan's five years.",
+        "measure": "Two investigational new drug applications cleared, and the first participant "
+        "dosed in each.",
+        "categories": ["clinical", "integrity", "scientific_direction"],
+    },
+    {
+        "name": "Keep the trust of participants and patients",
+        "summary": "People give the institute their samples, their data, and their care. They do "
+        "so only while they trust it.",
+        "measure": "No reportable breach of participant or patient information; complaints "
+        "answered within ten working days.",
+        "categories": ["privacy", "confidentiality", "patient_safety", "reputation",
+                       "supplier_security"],
+    },
+    {
+        "name": "Sustain sponsored research funding",
+        "summary": "Federal and foundation awards fund most of the research.",
+        "measure": "Award income held at or above the plan's baseline each year; no costs "
+        "disallowed on audit.",
+        "categories": ["financial", "grants", "funding_environment"],
+    },
+    {
+        "name": "Run research infrastructure people can rely on",
+        "summary": "The cores, the cluster, and the freezer farm that every lab depends on.",
+        "measure": "Core services available nineteen days in twenty; no irreplaceable samples "
+        "lost.",
+        "categories": ["operations", "availability", "supplier_dependence"],
+    },
+]  # fmt: skip
+
+# The committee's sessions, in days from the build. Each agenda takes the open risks rated
+# highest that it has not yet discussed, then the items named. The third is still to come.
+RISK_DECISIONS = [
+    ("approved", "Fund the treatment plan as proposed. The owner reports progress at the next "
+     "session."),
+    ("deferred", "Bring it back with the cost of the second option before anything is agreed."),
+    ("approved", "Accept the residual risk for twelve months. The owner tells the committee at "
+     "once if anything changes."),
+    ("noted", None),
+]  # fmt: skip
+SESSIONS = [
+    {
+        "planned": 190, "meets": -170, "held": True,
+        "risks": 3,
+        "items": [
+            ("topic", "The risk appetite, reviewed",
+             "Does the appetite for information and technology still stand at moderate?",
+             ("approved", "The appetite stands as it is for another year.")),
+            ("topic", "Next year's internal audit plan", None,
+             ("approved", "Adopted, with research data management added in the second half.")),
+        ],
+        "minutes": "# Minutes\n\nThe chair opened the meeting and the minutes of the last "
+        "session were agreed.\n\n## Risks above appetite\n\nThe committee went through the "
+        "risks rated highest, with their owners. Decisions are recorded against each risk.\n\n"
+        "## Matters arising\n\n- The security office will report on the tabletop exercise at "
+        "the next session.\n- Finance will bring the cost of a second freezer site.",
+    },
+    {
+        "planned": 95, "meets": -78, "held": True,
+        "risks": 2,
+        "items": [
+            ("agreement", "Genomic data access certification",
+             "It ends in the new year. Renew it on the repository's terms, or move the data out?",
+             ("approved", "Renew it. Research Computing to confirm the enclave still meets "
+              "SP 800-171 before the renewal is signed.")),
+            ("document", "Incident response procedure",
+             "What changed after the spring exercise.",
+             ("noted", None)),
+            ("topic", "The tabletop exercise: what it found", None,
+             ("noted", "Three findings, each raised as an issue with an owner and a date.")),
+        ],
+        "minutes": "# Minutes\n\nThe chair opened the meeting. The actions from the last "
+        "session were reviewed: both are done.\n\n## The tabletop exercise\n\nThe Chief "
+        "Information Security Officer described the exercise and its three findings. The "
+        "committee thanked the teams who took part.\n\n## Renewals\n\nThe genomic data "
+        "certification is to be renewed, subject to the enclave's assessment.",
+    },
+    {
+        "planned": 20, "meets": 12, "held": False,
+        "risks": 2,
+        "items": [
+            ("topic", "The trial data platform: moving to SP 800-53 Rev. 5",
+             "Agree a date for the move, and who reviews what changed.", None),
+        ],
+        "later": (
+            3,
+            [
+                ("exception", "Chemistry analyzer patching",
+                 "The laboratory asks to patch on the maker's schedule. The security leader "
+                 "wants the committee's view before deciding.", None),
+                ("document", "Information security policy",
+                 "Version 3 waits for the President's approval: what it changes.", None),
+            ],
+        ),
+    },
+]  # fmt: skip
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (

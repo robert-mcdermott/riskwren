@@ -29,6 +29,8 @@ PREFIXES = {
     "RAN": "Risk analysis",
     "POL": "Policy document",
     "AGR": "Agreement",
+    "OBJ": "Objective",
+    "SES": "Committee session",
     "AUD": "Audit engagement",
     "INC": "Incident",
 }

@@ -21,7 +21,7 @@ from riskwren.db.models.inventory import RECORD_STATUSES
 from riskwren.db.refs import claim_ref, next_ref, parse_ref
 from riskwren.events import audit
 from riskwren.inventory import access
-from riskwren.inventory.registry import RecordType
+from riskwren.inventory.registry import TYPES, RecordType
 from riskwren.people import units
 from riskwren.program import vocab
 
@@ -353,13 +353,17 @@ def update(
         if errors:
             session.expire(record)  # put back what was there
             raise Invalid(f"The {record_type.label} was not saved.", errors)
-        if "org_unit_id" in values and not access.can_add(principal, record.org_unit_id):
+        may_add = record_type.extra.get("can_add") or access.can_add
+        if "org_unit_id" in values and not may_add(principal, record.org_unit_id):
             session.expire(record)
             raise PermissionDenied("You can move a record only to a unit you look after.")
         if getattr(record, "_external_refs", None) is not None:
             _save_external_refs(session, record_type, record)
             record.updated_at = utc_now()
         touch(session, record)
+    updated = record_type.extra.get("updated")
+    if updated is not None:
+        updated(session, principal, record)
     return record
 
 
@@ -643,7 +647,19 @@ def detail(
     more = record_type.extra.get("detail")
     if more is not None:
         out.update(more(session, principal, record))
+    out["decisions"] = _decisions(session, principal, record_type, record)
     return out
+
+
+def _decisions(
+    session: Session, principal: Principal, record_type: RecordType, record: Any
+) -> list[dict[str, Any]]:
+    """What committees decided about the record, from the sessions the person may see."""
+    if "committee_session" not in TYPES:
+        return []
+    from riskwren.oversight import sessions  # it builds on this module
+
+    return sessions.decisions_about(session, principal, record_type.key, record.id)
 
 
 def load(session: Session, principal: Principal, record_type: RecordType, ref: str) -> Any:

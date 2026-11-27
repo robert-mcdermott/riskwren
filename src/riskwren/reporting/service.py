@@ -398,12 +398,14 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
         verb = {
             "attestation": "Attest", "self_assessment": "Look again at",
             "completeness": "Check the records of", "profile": "Describe the security of",
-            "evidence": "Provide evidence for",
+            "evidence": "Provide evidence for", "acknowledgment": "Read and acknowledge",
         }[campaign.kind]  # fmt: skip
-        add(
-            "campaign", f"{verb} {about}", f"{campaign.ref} · {campaign.name}",
-            f"/campaign-items/{item.id}", campaign.due_on, ref=campaign.ref,
+        href = (
+            f"/library/{item.subject_ref}" if campaign.kind == "acknowledgment"
+            else f"/campaign-items/{item.id}"
         )  # fmt: skip
+        add("campaign", f"{verb} {about}", f"{campaign.ref} · {campaign.name}", href,
+            campaign.due_on, ref=campaign.ref)  # fmt: skip
 
     # An analysis the person leads that still has questions without an answer.
     from riskwren.risk.analysis import ANALYSIS
@@ -419,6 +421,85 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"{left} of {card['items']} questions have no answer yet."
                 if left != 1 else f"1 of {card['items']} questions has no answer yet.",
                 f"/risk-analyses/{found.ref}", None, ref=found.ref,
+            )  # fmt: skip
+
+    # Documents: drafts waiting for this person's approval, approved ones waiting to be
+    # published, ones sent back, and reviews coming due.
+    from riskwren.policy import documents as policy_documents
+
+    for document, version in policy_documents.awaiting(session, principal):
+        add(
+            "approve", f"Approve the new version of {document.name}",
+            f"{document.ref} · sent by {version.submitted_by_name}",
+            f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+        )  # fmt: skip
+    from riskwren.policy import library as policy_library
+
+    asked = policy_library.asked_by_campaign(session, principal)
+    for document in policy_library.outstanding(session, principal):
+        if document.id in asked:
+            continue  # the campaign that asks for it is on the list already
+        add(
+            "acknowledge", f"Read and acknowledge {document.name}",
+            f"{document.ref} · {policy_documents.KIND_LABELS[document.kind].lower()}",
+            f"/library/{document.ref}", None, ref=document.ref,
+        )  # fmt: skip
+    soon = date.fromordinal(today.toordinal() + policy_documents.SOON)
+    for document in policy_documents.owned(session, principal):
+        working = policy_documents.open_version(session, document)
+        if working is not None and working.status == "approved":
+            add(
+                "publish", f"Publish the new version of {document.name}",
+                f"{document.ref} · everyone named has approved it",
+                f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+            )  # fmt: skip
+        elif working is not None and working.status == "draft" and working.review_round:
+            add(
+                "rework", f"Rework the draft of {document.name}",
+                f"{document.ref} · it was returned with a reason",
+                f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+            )  # fmt: skip
+        if document.next_review_on is not None and document.next_review_on <= soon:
+            add(
+                "document_review", f"Review {document.name}",
+                f"{document.ref} · keep it as it is, or start a new version",
+                f"/documents/{document.ref}", document.next_review_on, ref=document.ref,
+            )  # fmt: skip
+
+    # Committee sessions this person keeps, coming up within a fortnight.
+    from riskwren.oversight import sessions as committee_sessions
+
+    for meeting in committee_sessions.coming_up(session, principal):
+        add(
+            "session", f"Prepare the agenda: {meeting.name}",
+            f"{meeting.ref} · {meeting.committee}", f"/sessions/{meeting.ref}", meeting.held_on,
+            ref=meeting.ref,
+        )  # fmt: skip
+
+    # Agreements whose notice date or end draws near, or has passed while they are open.
+    from riskwren.compliance import agreements
+
+    for agreement, state in agreements.waiting_on(session, principal):
+        if state == "notice":
+            notice = agreements.notice_on(agreement)
+            add(
+                "agreement_notice", f"Give notice, or let it carry on: {agreement.name}",
+                f"{agreement.ref} · with {agreement.parties} · "
+                + ("it renews by itself unless notice is given" if agreement.renews
+                   else "it ends unless it is renewed"),
+                f"/agreements/{agreement.ref}", notice, ref=agreement.ref,
+            )  # fmt: skip
+        elif state == "ending":
+            add(
+                "agreement_end", f"{agreement.name} ends",
+                f"{agreement.ref} · with {agreement.parties} · renew it, or let it end",
+                f"/agreements/{agreement.ref}", agreement.ends_on, ref=agreement.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "agreement_end", f"Close or renew {agreement.name}",
+                f"{agreement.ref} · it has ended, and what it imposes still binds its scopes",
+                f"/agreements/{agreement.ref}", agreement.ends_on, ref=agreement.ref,
             )  # fmt: skip
 
     # Tests a person has been asked to do, and results that wait for their review.

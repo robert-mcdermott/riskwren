@@ -87,12 +87,13 @@ class ReasonBody(BaseModel):
 
 
 class ExceptionBody(BaseModel):
-    """A request for an exception. Name a control, or a requirement and the scope."""
+    """A request for an exception. Name a control, a requirement and the scope, or a document."""
 
     version: int | None = None
     name: str | None = Field(default=None, max_length=400)
     control: str | None = Field(default=None, description="The control's reference")
     requirement: RequirementRef | None = None
+    document: str | None = Field(default=None, description="The document's reference")
     scope: str | None = Field(default=None, description="The scope it applies in")
     justification: str | None = None
     compensating: str | None = Field(default=None, description="What makes up for it meanwhile")
@@ -248,6 +249,8 @@ def list_exceptions(
         default=None, description="requested, in_force, expired, refused, or withdrawn"
     ),
     scope: str | None = Query(default=None, description="A scope's reference"),
+    document: str | None = Query(default=None, description="A document's reference"),
+    about: str | None = Query(default=None, description="control, requirement, or document"),
     owner: int | None = None,
     mine: bool = MINE,
     sort: str = Query(
@@ -256,7 +259,8 @@ def list_exceptions(
     limit: int | None = LIMIT,
     cursor: str | None = None,
 ) -> dict[str, Any]:
-    filters = {"q": q, "unit": unit, "state": state, "scope": scope, "owner": owner, "mine": mine}
+    filters = {"q": q, "unit": unit, "state": state, "scope": scope, "document": document,
+               "about": about, "owner": owner, "mine": mine}  # fmt: skip
     return list_records(request, EXCEPTION, filters, sort, limit, cursor)
 
 

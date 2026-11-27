@@ -26,7 +26,7 @@ const IMAGES = "img"; // the directory of screenshots, inside docs/ and on the s
 export const MENU = [
   ["Start", [["index", "Overview"], ["getting-started", "Getting started"]]],
   ["Use", [["the-register", "The register"], ["compliance", "Compliance"], ["evidence-and-testing", "Evidence and testing"],
-    ["issues-and-exceptions", "Issues and exceptions"], ["running-the-program", "Running the program"]]],
+    ["issues-and-exceptions", "Issues and exceptions"], ["policies", "Policies"], ["running-the-program", "Running the program"]]],
   ["Run", [["configuration", "Configuration"]]],
   ["Reference", [["api", "The API"], ["api-reference", "API reference"], ["cli", "Command reference"], ["changelog", "Changelog"]]],
 ];
@@ -275,7 +275,7 @@ const TAGS = {
   system: "System", session: "Signing in", "single sign-on": "Single sign-on", people: "People and units", branding: "Appearance",
   inventory: "The inventory", risks: "Risks", controls: "Controls", treatment: "Treatment",
   frameworks: "Frameworks", scopes: "Scopes", evidence: "Evidence", assessments: "Assessments and tests",
-  issues: "Issues, exceptions, and notices", "import and export": "Import and export", reporting: "Reports", operations: "Scheduled work and email", questionnaires: "Questionnaires", campaigns: "Campaigns", indicators: "Indicators", find: "Find and tidy", "risk analyses": "Risk analyses",
+  issues: "Issues, exceptions, and notices", "import and export": "Import and export", reporting: "Reports", operations: "Scheduled work and email", questionnaires: "Questionnaires", campaigns: "Campaigns", indicators: "Indicators", find: "Find and tidy", "risk analyses": "Risk analyses", documents: "Documents and the library", agreements: "Agreements", "objectives and sessions": "Objectives and committee sessions",
 };
 
 function schemaType(schema) {

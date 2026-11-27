@@ -34,19 +34,26 @@ function covered(subject) {
   return subject.ref ? recordChip(subject, { link: subject.open !== false }) : h("span", {}, subject.name);
 }
 
+function whereItApplies(subject, scope) {
+  if (scope) return ["Within ", h("a", { href: `/scopes/${scope.ref}?tab=requirements` }, scope.name), "."];
+  return subject?.type === "document" ? "Wherever the document applies." : "Wherever the control is relied on.";
+}
+
 /**
  * Ask for an exception. Give `scope` ({ ref, name }) with a `control` ({ ref, name }) or a
- * `requirement` ({ framework, code, title }); or `renews`, an exception to carry on from; or
- * `exception`, a request not yet decided, to reword it.
+ * `requirement` ({ framework, code, title }); or a `document` ({ ref, name }); or `renews`,
+ * an exception to carry on from; or `exception`, a request not yet decided, to reword it.
  */
-export function requestException({ scope = null, control = null, requirement = null, renews = null, exception = null, onDone = null }) {
+export function requestException({ scope = null, control = null, requirement = null, document: paper = null, renews = null, exception = null, onDone = null }) {
   const from = exception ?? renews;
   openOverlay({
     title: exception ? "Edit the request" : renews ? "Ask for it again" : "Ask for an exception",
     subtitle: from ? `${from.ref} · ${from.name}` : "A departure for a time, with what makes up for it.",
     render: (body, footer, close) => {
       const what = from ? covered(from.subject) : control ? recordChip({ ...control, type: "control" }, { link: false })
-        : h("span", {}, h("span", { class: "requirement-code" }, requirement.code), " ", requirement.title ?? "");
+        : paper ? recordChip({ ...paper, type: "document" }, { link: false })
+          : h("span", {}, h("span", { class: "requirement-code" }, requirement.code), " ", requirement.title ?? "");
+      const subject = from ? from.subject : paper ? { type: "document" } : null;
       const where = from ? from.scope : scope;
       const today = new Date();
       const begins = renews ? new Date(new Date(renews.expires_on).getTime() + 86400000) : today;
@@ -62,15 +69,16 @@ export function requestException({ scope = null, control = null, requirement = n
         const done = await submit({ button: save, fields: { justification: why, compensating: instead, starts_on: start, expires_on: end }, banner: problem,
           run: () => (exception ? patch(`/api/v1/exceptions/${exception.ref}`, { version: exception.version, ...values })
             : post("/api/v1/exceptions", { ...values, ...(renews ? { renews: renews.ref }
-              : { scope: scope?.ref ?? null, control: control?.ref ?? null, requirement: requirement ? { framework: requirement.framework, code: requirement.code } : null }) })) });
+              : { scope: scope?.ref ?? null, control: control?.ref ?? null, document: paper?.ref ?? null, requirement: requirement ? { framework: requirement.framework, code: requirement.code } : null }) })) });
         if (!done) return;
         close();
-        toast(exception ? "Saved." : `${done.data.ref} was requested. Someone with authority over the unit decides it.`);
+        toast(exception ? "Saved." : subject?.type === "document" ? `${done.data.ref} was requested. A leader or manager of the unit that keeps the document decides it.`
+          : `${done.data.ref} was requested. Someone with authority over the unit decides it.`);
         if (onDone) onDone(done.data);
         else navigate(`/exceptions/${done.data.ref}`);
       });
       body.append(h("div", { class: "stack-lg" }, problem,
-        section("What it is an exception to", h("p", {}, what), where ? h("p", { class: "subtle" }, `Within ${where.name}.`) : h("p", { class: "subtle" }, "Wherever the control is relied on.")),
+        section("What it is an exception to", h("p", {}, what), h("p", { class: "subtle" }, where ? `Within ${where.name}.` : whereItApplies(subject, null))),
         section("Why, and what instead", why.node, instead.node),
         section("For how long", h("div", { class: "grid-2" }, start.node, end.node),
           h("p", { class: "subtle" }, "While it is in force, what it covers is shown as excepted. The day after it ends, the state underneath is back, without anyone doing anything."))));
@@ -141,11 +149,13 @@ function overview(item, ctx) {
   const state = item.state;
   return h("div", { class: "split" },
     h("div", { class: "stack-lg" },
-      state === "requested" ? alert("info", icon("info"), h("div", {}, "Not yet decided. It covers nothing until someone with authority over the unit, who did not ask for it, approves it.")) : null,
+      state === "requested" ? alert("info", icon("info"), h("div", {}, item.subject.type === "document"
+        ? "Not yet decided. It covers nothing until a leader or manager of the unit that keeps the document, who did not ask for it, approves it."
+        : "Not yet decided. It covers nothing until someone with authority over the unit, who did not ask for it, approves it.")) : null,
       state === "expiring" ? alert("warn", icon("alert"), h("div", {}, `This ends on ${date(item.expires_on)}. If it is still needed, ask again before then.`)) : null,
       state === "expired" ? alert("info", icon("info"), h("div", {}, `This ended on ${date(item.expires_on)}. What it covered is back to the state underneath.`)) : null,
       card({ title: "What it is an exception to" }, h("p", {}, covered(item.subject)),
-        h("p", { class: "subtle" }, item.scope ? ["Within ", h("a", { href: `/scopes/${item.scope.ref}?tab=requirements` }, item.scope.name), "."] : "Wherever the control is relied on.")),
+        h("p", { class: "subtle" }, whereItApplies(item.subject, item.scope))),
       card({ title: "Why it is needed" }, prose(item.justification)),
       card({ title: "What makes up for it meanwhile" }, item.compensating ? prose(item.compensating) : h("p", { class: "muted" }, "Nothing is offered in its place.")),
       item.decided_by ? card({ title: item.status === "refused" ? "Refused" : item.status === "withdrawn" ? "Withdrawn" : "Approved" },
@@ -204,6 +214,7 @@ export function exceptionList(main) {
       keepSearchFocus(search);
       const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("state", [["", "Any standing"], ...["requested", "in_force", "expired", "refused", "withdrawn"].map((key) => [key, EXCEPTION_STATE[key][0]])], "Standing"),
+        filterSelect("about", [["", "To anything"], ["control", "To a control"], ["requirement", "To a requirement"], ["document", "To a document"]], "To"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"), mineToggle());
       const body = rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
         h("thead", {}, h("tr", {}, sortHeader("Exception", "name", "expires_on"), h("th", { scope: "col" }, "To"), h("th", { scope: "col" }, "Within"), h("th", { scope: "col" }, "Asked by"),
@@ -216,7 +227,7 @@ export function exceptionList(main) {
           h("td", { class: "nowrap" }, date(r.expires_on)),
           h("td", {}, exceptionState(r.state)))))))
         : emptyState(isFiltering() ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.", action: button("Clear filters", { onclick: clearFilters }) }
-          : { iconName: "exception", title: "No exceptions", text: `${meta.lede} One is asked for from a scope: from a requirement on its Requirements tab, or a control on its Controls tab.` });
+          : { iconName: "exception", title: "No exceptions", text: `${meta.lede} One is asked for from a scope (a requirement on its Requirements tab, or a control on its Controls tab), or from a document in force.` });
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Compliance", title: "Exceptions", lede: meta.lede, actions: exportButton("exceptions") }),
         bar,

@@ -112,6 +112,7 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
 
     describe = record_type.extra.get("history_title")
     title = describe(event, lookups) if describe else None
+    described = bool(title)
     # Some operations change what is otherwise only ever changed by something already told
     # (a rating, by an assessment). Told under their own title, they show every line.
     loud = (event.context or {}).get("op") in record_type.extra.get("history_loud", ())
@@ -172,7 +173,7 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
         "operation": operation,
         "title": title,
         "lines": lines,
-        "told": bool(describe and title and not lines and event.action == "updated"),
+        "told": bool(described and not lines and event.action == "updated"),
     }
 
 
@@ -192,7 +193,10 @@ def for_record(
         .limit(limit)
     ).all()
     lookups = Lookups(session, record_type)
-    story = [entry(event, record_type, lookups) for event in events]
+    hidden = record_type.extra.get("history_hidden", ())
+    story = [
+        entry(event, record_type, lookups) for event in events if event.subject_type not in hidden
+    ]
     # A change that only copied what another entry already says (a rating onto its control,
     # an assessment onto its risk) is not told twice, unless the type says its own titled
     # changes are each worth telling (a result confirmed, in an assessment).

@@ -41,6 +41,22 @@ KNOWN: dict[str, list[tuple[str, str]]] = {
         ("rated_at", "rated_at"), ("risks", "risks"),
     ],
     "scope": [("status", "status"), ("frameworks", "frameworks"), ("controls", "controls")],
+    "document": [
+        ("kind", "kind"), ("status", "status"), ("number", "version_in_force"),
+        ("working", "new_version"), ("next_review_on", "next_review_on"),
+        ("review_state", "review"), ("controls", "controls"), ("requirements", "requirements"),
+    ],
+    "objective": [("status", "status"), ("period", "period"), ("risks", "risks")],
+    "committee_session": [
+        ("committee", "committee"), ("held_on", "held_on"), ("status", "status"),
+        ("items", "items"), ("decided", "decided"),
+    ],
+    "agreement": [
+        ("kind", "kind"), ("parties", "parties"), ("reference", "reference"),
+        ("status", "status"), ("starts_on", "starts_on"), ("ends_on", "ends_on"),
+        ("notice_on", "notice_on"), ("renews", "renews"), ("state", "state"),
+        ("covers", "covers"),
+    ],
     "indicator": [
         ("status", "status"), ("state", "state"), ("measure", "measure"),
         ("direction", "direction"), ("warn_at", "warn_at"), ("breach_at", "breach_at"),

@@ -347,8 +347,11 @@ function overview(scope, ctx) {
         flush: scope.held_to.length > 0 },
       scope.held_to.length ? h("div", {}, scope.held_to.map((held) => h("div", { class: "list-row" },
         h("div", { class: "grow" }, h("a", { class: "cell-main", href: `/scopes/${scope.ref}?tab=requirements&framework=${held.key}` }, held.title),
-          h("div", { class: "cell-sub" }, [held.version, held.baseline ? held.baseline.title : "Every requirement"].filter(Boolean).join(" · "))),
-        edit ? button("Remove", { kind: "btn-sm btn-ghost", "aria-label": `Remove ${held.title}`, onclick: () => confirmAction({
+          h("div", { class: "cell-sub" }, [held.version, held.baseline ? held.baseline.title : "Every requirement"].filter(Boolean).join(" · ")),
+          held.agreement ? h("div", { class: "cell-sub" }, "Because ", h("a", { href: `/agreements/${held.agreement.ref}` }, `${held.agreement.ref} ${held.agreement.name}`), " covers what it holds") : null,
+          (held.later ?? []).map((later) => h("div", { class: "cell-sub" }, "A later version is loaded: ",
+            h("a", { href: `/frameworks/${later.key}/changes?from=${held.key}` }, `see what changed in ${later.title}, and move to it`)))),
+        edit && !held.agreement ? button("Remove", { kind: "btn-sm btn-ghost", "aria-label": `Remove ${held.title}`, onclick: () => confirmAction({
           title: `Take ${held.title} off this scope?`, text: "The decisions made about which of its requirements apply here go with it. The history keeps them.",
           confirmLabel: "Remove", danger: true,
           run: async () => {

@@ -72,6 +72,8 @@ async function boot() {
   route("/notices", page("notices", "noticeList"));
   route("/scopes", page("scopes", "scopeList"));
   route("/scopes/:ref", page("scopes", "scopePage"));
+  route("/frameworks/:key/changes", page("framework-versions", "frameworkChanges"));
+  route("/frameworks/:key/suggestions", page("framework-versions", "frameworkSuggestions"));
   route("/frameworks/:key", page("frameworks", "frameworkPage"));
   route("/plans", page("actions", "planList"));
   route("/acceptances", page("actions", "acceptanceList"));
@@ -86,6 +88,18 @@ async function boot() {
   route("/search", page("find", "searchPage"));
   route("/tidy", page("find", "tidyPage"));
   route("/handover/:id", page("find", "handoverPage"));
+  route("/objectives", page("objectives", "objectiveList"));
+  route("/objectives/:ref", page("objectives", "objectivePage"));
+  route("/sessions", page("sessions", "sessionList"));
+  route("/sessions/:ref", page("sessions", "sessionPage"));
+  route("/agreements", page("agreements", "agreementList"));
+  route("/agreements/:ref", page("agreements", "agreementPage"));
+  route("/library", page("library", "libraryList"));
+  route("/library/:ref", page("library", "libraryReading"));
+  route("/documents", page("documents", "documentList"));
+  route("/documents/:ref", page("documents", "documentPage"));
+  route("/documents/:ref/versions/:id", page("documents", "documentVersion"));
+  route("/documents/:ref/compare", page("documents", "documentCompare"));
   route("/risk-analyses", page("analyses", "analysisList"));
   route("/risk-analyses/:ref", page("analyses", "analysisPage"));
   route("/risk-analyses/:ref/:subject", page("analyses", "analysisAsset"));

@@ -1,10 +1,10 @@
 """How one record connects to the others (INV-11).
 
 A record's neighbors, grouped by what joins them: what it relies on and what relies on it,
-the risks that bear on it, the controls that reduce them, the scopes it sits in, and the
-evidence, issues, exceptions, and assessments about it. Each neighbor is one the person may
-see; the rest are counted. The picture and the list beside it are drawn from this one answer,
-so they cannot disagree.
+the risks that bear on it, the controls that reduce them, the documents that direct them, the
+scopes it sits in, and the evidence, issues, exceptions, and assessments about it. Each
+neighbor is one the person may see; the rest are counted. The picture and the list beside it
+are drawn from this one answer, so they cannot disagree.
 """
 
 from __future__ import annotations
@@ -16,14 +16,19 @@ from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
 from riskwren.db.models import (
+    AgreementCoverage,
     Assessment,
+    CommitteeItem,
     ControlTest,
+    DocumentControl,
     EvidenceLink,
     ExceptionRequest,
     Implementation,
     IssueSubject,
+    PolicyDocument,
     RecordLink,
     RiskControl,
+    RiskObjective,
     RiskSubject,
     ScopeMember,
 )
@@ -82,6 +87,26 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
         add("tested_in", "Tested in", "assessment", session.scalars(
             select(ControlTest.assessment_id).where(ControlTest.control_id == record_id)
         ))  # fmt: skip
+        add("directed_by", "Directed by", "document", session.scalars(
+            select(DocumentControl.document_id).where(DocumentControl.control_id == record_id)
+        ))  # fmt: skip
+    if key == "document":
+        row = session.get(PolicyDocument, record_id)
+        if row is not None and row.parent_id is not None:
+            found.append(("implements", "Implements", "document", row.parent_id))
+        add("implemented_by", "Implemented by", "document", session.scalars(
+            select(PolicyDocument.id).where(PolicyDocument.parent_id == record_id)
+            .order_by(PolicyDocument.name)
+        ))  # fmt: skip
+        add("directs", "Directs", "control", session.scalars(
+            select(DocumentControl.control_id).where(DocumentControl.document_id == record_id)
+        ))  # fmt: skip
+        add("exceptions", "Exceptions", "exception", session.scalars(
+            select(ExceptionRequest.id).where(
+                ExceptionRequest.subject_type == "document",
+                ExceptionRequest.subject_id == record_id,
+            )
+        ))  # fmt: skip
     if key == "scope":
         for subject_type, subject_id in session.execute(
             select(ScopeMember.subject_type, ScopeMember.subject_id)
@@ -109,6 +134,40 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
             select(ExceptionRequest.id).where(
                 ExceptionRequest.subject_type == "control",
                 ExceptionRequest.subject_id == record_id,
+            )
+        ))  # fmt: skip
+    if key == "agreement":
+        for subject_type, subject_id in session.execute(
+            select(AgreementCoverage.subject_type, AgreementCoverage.subject_id)
+            .where(AgreementCoverage.agreement_id == record_id)
+            .order_by(AgreementCoverage.id)
+        ):
+            found.append(("agreement_covers", "Covers", subject_type, subject_id))
+    else:
+        add("covered_by", "Covered by agreements", "agreement", session.scalars(
+            select(AgreementCoverage.agreement_id).where(
+                AgreementCoverage.subject_type == key, AgreementCoverage.subject_id == record_id
+            )
+        ))  # fmt: skip
+    if key == "risk":
+        add("threatens", "Threatens", "objective", session.scalars(
+            select(RiskObjective.objective_id).where(RiskObjective.risk_id == record_id)
+        ))  # fmt: skip
+    if key == "objective":
+        add("threatened_by", "Threatened by", "risk", session.scalars(
+            select(RiskObjective.risk_id).where(RiskObjective.objective_id == record_id)
+        ))  # fmt: skip
+    if key == "committee_session":
+        for subject_type, subject_id in session.execute(
+            select(CommitteeItem.subject_type, CommitteeItem.subject_id)
+            .where(CommitteeItem.session_id == record_id, CommitteeItem.subject_id.is_not(None))
+            .order_by(CommitteeItem.position)
+        ):
+            found.append(("agenda", "On the agenda", subject_type, subject_id))
+    else:
+        add("discussed_in", "Discussed in", "committee_session", session.scalars(
+            select(CommitteeItem.session_id).where(
+                CommitteeItem.subject_type == key, CommitteeItem.subject_id == record_id
             )
         ))  # fmt: skip
     if key == "evidence":
@@ -147,8 +206,8 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
     if key == "exception":
         row = session.get(ExceptionRequest, record_id)
         if row is not None:
-            if row.subject_type == "control":
-                found.append(("excepts", "An exception to", "control", row.subject_id))
+            if row.subject_type in ("control", "document"):
+                found.append(("excepts", "An exception to", row.subject_type, row.subject_id))
             if row.scope_id is not None:
                 found.append(("in_scope", "Within the scope", "scope", row.scope_id))
     return found

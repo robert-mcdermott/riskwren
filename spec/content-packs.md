@@ -51,6 +51,8 @@ A pack is one JSON document. JSON is chosen because the standard library reads a
 - A requirement has a `code`, and any of a `title`, its `text`, the source's `guidance`, a `kind` (the source's own word for it: control, enhancement, standard), and `children`. One marked `group` is a heading: it holds others and is not itself something to meet or to map a control to.
 - A baseline is a published selection: a key, a title, and the codes it selects.
 - `built_from` names the publisher's file the pack was generated from.
+- `follows` (wave 4), in the header, is the key of the earlier version this one follows. A new version has a key of its own and is loaded beside the old, never over it. `moved` lists, for codes of that earlier version that this one withdrew, where each went: `[earlier code, moved_to or incorporated_into, code here]`.
+- `mappings` (wave 4) is a publisher's own account of how this framework's requirements stand to another's: `{"framework": key, "relation": "derived_from", "pairs": [[code here, code there], …]}`. Mappings are kept by key and code, so they hold whichever framework is loaded first, and they suggest crosswalks that a person confirms.
 - `version` is the version of the source document; `pack_version` is the version of this pack, which also changes when mappings or wording are corrected.
 - Every requirement has a `code` that is stable across pack versions. Codes are how crosswalks, implementations, tests, and evidence stay attached when a pack is updated.
 - A pack is checked whole before anything is written. A pack with anything wrong is refused whole, with every problem listed: a code used twice, a baseline naming a code that is not there, a field that is not known, text the pack's policy does not allow.
@@ -113,12 +115,13 @@ SP 800-53 is large. It loads as a catalog; a scope adopts a **baseline** from it
 
 | Pack | Wave | Text policy | Notes |
 |---|---|---|---|
-| `nist-800-171-r2` | 4 | verbatim | Revision 2 is still the version named by some federal programs |
-| `nist-privacy` | 4 | verbatim | NIST Privacy Framework 1.0 |
+| `nist-800-53-r4` | 4 (shipped) | verbatim | SP 800-53 Rev. 4 with its Low, Moderate, and High baselines, loaded on request beside Rev. 5, which records where each withdrawn Rev. 4 control went. Built from the publisher's catalog in the same release of its machine-readable content |
+| `nist-800-171-r2` | later | verbatim | Revision 2 is still the version named by some federal programs. The publisher's machine-readable content carries only Rev. 3 |
+| `nist-privacy` | later | verbatim | NIST Privacy Framework 1.0 |
 | `hipaa-privacy`, `hipaa-breach` | 8 | verbatim | 45 CFR Part 164 Subparts E and D, with the breach assessment |
-| `common-rule` | 4 | verbatim | 45 CFR Part 46, protection of human research subjects |
-| `part-11` | 4 | verbatim | 21 CFR Part 11, electronic records and signatures |
-| `uniform-guidance` | 4 | summary | 2 CFR Part 200, selected subparts on internal control, procurement, and subrecipient monitoring |
+| `common-rule` | later | verbatim | 45 CFR Part 46, protection of human research subjects |
+| `part-11` | later | verbatim | 21 CFR Part 11, electronic records and signatures |
+| `uniform-guidance` | later | summary | 2 CFR Part 200, selected subparts on internal control, procurement, and subrecipient monitoring |
 | `nist-ai-rmf` | 9 | verbatim | NIST AI Risk Management Framework 1.0, for organizations that track AI risk here |
 | `iso-27001` | 9 | identifiers | Codes of the clauses and Annex A controls with RiskWren's own labels; the official text is imported locally by licence holders |
 | `pci-dss`, `soc-2` | 9 | identifiers | The same approach, if the publishers' terms allow identifiers; otherwise load-your-own |

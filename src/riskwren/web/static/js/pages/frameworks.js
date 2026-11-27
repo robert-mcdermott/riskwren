@@ -9,6 +9,7 @@ import { can } from "../core/session.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { statePill } from "../components/control.js";
 import { coveragePill, mapCrosswalk } from "../components/crosswalk.js";
+import { kindPill } from "../components/document.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
@@ -20,6 +21,8 @@ import { clearFilters, filterSelect, keepSearchFocus, pager, searchBox } from ".
 
 const KINDS = [["agreement", "Agreement"], ["internal", "Internal standard"], ["standard", "Standard"], ["regulation", "Regulation"]];
 const api = (key, rest = "") => `/api/v1/frameworks/${encodeURIComponent(key)}${rest}`;
+// Versions and suggestions are fetched when they are wanted.
+const versionsPart = () => import("./framework-versions.js");
 const one = (key, code) => api(key, `/requirement?code=${encodeURIComponent(code)}`);
 
 // ---- Forms ----
@@ -190,6 +193,14 @@ function openRequirement(framework, code, reload) {
             statePill(mapping.control.state), coveragePill(mapping.coverage))))
             : h("p", { class: "subtle" }, item.hidden ? "None that you have access to." : "No control is mapped to this requirement yet."),
           item.hidden && item.controls.length ? h("p", { class: "subtle" }, `And ${item.hidden} more that you do not have access to.`) : null) : null,
+        item.is_citable ? h("div", { class: "stack-sm" },
+          h("h3", {}, item.documents.length ? `Documents that answer it (${item.documents.length})` : "Documents that answer it"),
+          item.documents.length ? h("ul", { class: "requirement-list stack-sm" }, item.documents.map((doc) => h("li", { class: "mapped-control" },
+            h("div", { class: "grow" }, h("a", { class: "cell-main", href: `/documents/${doc.ref}` }, doc.name),
+              h("div", { class: "cell-sub" }, [doc.ref, `version ${doc.number}`, doc.note].filter(Boolean).join(" · "))),
+            kindPill(doc.kind))))
+            : h("p", { class: "subtle" }, item.documents_hidden ? "None that you have access to." : "No document in force says it answers this requirement. One is said to from the document's What it governs tab."),
+          item.documents_hidden && item.documents.length ? h("p", { class: "subtle" }, `And ${item.documents_hidden} more that you do not have access to.`) : null) : null,
         item.children_list.length ? h("div", { class: "stack-sm" }, h("h3", {}, `Beneath it (${item.children_list.length})`),
           h("ul", { class: "requirement-list" }, item.children_list.map((child) => h("li", {},
             h("button", { type: "button", class: "requirement-row", onclick: () => openRequirement(framework, child.code, reload) },
@@ -291,6 +302,7 @@ export function frameworkPage(main, params) {
           path: `requirements/${framework.key}`, what: "requirements", onDone: reload }) }) : null,
         exportButton("requirements", { framework: framework.key }),
         framework.can.edit ? button("Edit", { iconName: "edit", onclick: () => editFramework(framework) }) : null,
+        framework.can.edit ? button("Start a new version", { onclick: async () => (await versionsPart()).startVersion(framework) }) : null,
         framework.can.retire ? button(framework.status === "active" ? "Retire" : "Restore", { kind: "btn-ghost", onclick: () => confirmAction({
           title: framework.status === "active" ? `Retire ${framework.title}?` : `Restore ${framework.title}?`,
           text: framework.status === "active" ? "It is kept, with everything attached to it, and is offered to nothing new." : "It is offered again wherever frameworks are chosen.",
@@ -311,6 +323,9 @@ export function frameworkPage(main, params) {
         pageHeader({ eyebrow: [framework.kind_label, framework.version].filter(Boolean).join(" · "), title: framework.title,
           lede: framework.summary, actions: actions.length ? actions : null }),
         framework.status === "retired" ? alert("info", "This framework is retired. It is kept, and is offered to nothing new.") : null,
+        framework.versions.later.length ? alert("info", icon("info"), h("div", {}, h("strong", {}, "A later version is loaded: "),
+          framework.versions.later.map((later, index) => [index ? ", " : "", h("a", { href: `/frameworks/${later.key}/changes?from=${framework.key}` }, `what changed in ${later.title}`)]),
+          ". Scopes on this one stay as they are until they are moved.")) : null,
         h("div", { class: "split" },
           h("div", { class: "stack" }, bar,
             card({ title: flat ? plural(page.meta.total, "match", "matches") : "Requirements", flush: true, footer: flat ? pager(page.meta, rows.length) : null }, list)),
@@ -322,6 +337,14 @@ export function frameworkPage(main, params) {
                 h("p", {}, h("strong", {}, `${coverage.mapped} of ${coverage.citable}`), " requirements have a control mapped to them."),
                 coverage.unmapped ? h("a", { href: `/frameworks/${framework.key}?mapped=false` }, `See the ${coverage.unmapped} with none`) : h("span", { class: "subtle" }, "Every requirement has at least one."),
                 h("p", { class: "subtle" }, "Counted from the controls you may see. Whether they work is another question, answered by testing them."))),
+            framework.versions.line.length > 1 ? card({ title: "Versions" },
+              h("ol", { class: "plain-list stack-sm" }, framework.versions.line.map((each, index) => h("li", { class: "row wrap" },
+                each.current ? h("strong", { class: "grow" }, each.title) : h("a", { class: "grow", href: `/frameworks/${each.key}` }, each.title),
+                index && each.current ? h("a", { class: "cell-sub", href: `/frameworks/${each.key}/changes?from=${framework.versions.line[index - 1].key}` }, "What changed") : null,
+                each.status === "retired" ? pill("Retired") : null)))) : null,
+            framework.suggested ? card({ title: "Suggested crosswalks" },
+              h("p", {}, `${plural(framework.suggested, "crosswalk")} suggested by a publisher's mapping between this framework and another, waiting for someone to confirm or set aside.`),
+              h("a", { class: "btn btn-sm", href: `/frameworks/${framework.key}/suggestions` }, "Review them")) : null,
             card({ title: "About" }, facts([
               ["Requirements", `${framework.citable_count} to meet, in ${plural(framework.requirement_count, "entry", "entries")}`],
               [framework.origin === "local" ? "From" : "Publisher", framework.publisher],
@@ -350,6 +373,7 @@ export function frameworkList(main) {
     view: (rows) => {
       const mayAdd = can("configure");
       const add = mayAdd ? button("Add a framework", { kind: "btn-primary", iconName: "plus", onclick: () => editFramework() }) : null;
+      const load = mayAdd ? button("Load a framework", { iconName: "upload", onclick: async () => (await versionsPart()).loadFramework() }) : null;
       const table = h("div", { class: "table-wrap" }, h("table", { class: "table" },
         h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Framework"), h("th", { scope: "col" }, "Kind"), h("th", { scope: "col" }, "From"),
           h("th", { scope: "col", class: "numeric" }, "Requirements"), h("th", { scope: "col" }, "Baselines"))),
@@ -362,7 +386,7 @@ export function frameworkList(main) {
           h("td", { class: "muted" }, row.baselines.map((b) => b.title.replace(/ baseline$/, "")).join(", ")))))));
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Compliance", title: "Frameworks",
-          lede: "What the organization is held to: public standards and regulations, and the terms of its own agreements.", actions: add }),
+          lede: "What the organization is held to: public standards and regulations, and the terms of its own agreements.", actions: [add, load].filter(Boolean) }),
         rows.length ? card({ title: plural(rows.length, "framework"), flush: true }, table)
           : card({}, emptyState({ iconName: "framework", title: "No frameworks yet",
             text: "The built-in ones are loaded with `riskwren frameworks load --builtin`. Your own are entered here.", action: add })));

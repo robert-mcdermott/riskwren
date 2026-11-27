@@ -24,6 +24,7 @@ from riskwren.controls.service import CONTROL
 from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
 from riskwren.db.models import (
+    Agreement,
     Baseline,
     BaselineRequirement,
     Control,
@@ -149,6 +150,33 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
     return found
 
 
+def _history_title(event: Any, lookups: Any) -> str | None:
+    context = event.context or {}
+    if context.get("op") == "scope.move":
+        was, now = context.get("was") or "the earlier version", context.get("now") or "the new one"
+        if event.subject_type == "scope_framework":
+            return (
+                f"Moved from {was} to {now}"
+                if event.action == "created"
+                else f"No longer held to {was}"
+            )
+        if event.subject_type == "scope_requirement":
+            changes = event.changes or {}
+            pair = changes.get("requirement_id") or [None, None]
+            ident = pair[1] if event.action == "updated" else (pair[0] or pair[1])
+            row = lookups.session.get(Requirement, ident) if ident else None
+            code = row.code if row is not None else "a requirement"
+            if event.action == "updated":
+                return f"Carried its decision on {code} across to {now}"
+            return f"Left its decision on {code} behind: {now} has no such requirement"
+    if context.get("op") == "agreement.scopes" and event.subject_type == "scope_framework":
+        framework, agreement = context.get("framework") or "a framework", context.get("agreement")
+        if context.get("held"):
+            return f"Held to {framework}, because {agreement} covers what it holds"
+        return f"No longer held to {framework}: {agreement} no longer covers what it holds"
+    return None
+
+
 SCOPE = register(
     RecordType(
         "scope",
@@ -168,6 +196,8 @@ SCOPE = register(
             "detail": _detail,
             "conditions": _conditions,
             "history_labels": {"offers_controls": "Offers its controls", "boundary": "Boundary"},
+            "history_title": _history_title,
+            "history_keeps_titled": True,
         },
     )
 )
@@ -239,6 +269,10 @@ def set_members(
                 ScopeMember(scope_id=scope.id, subject_type=subject_type, subject_id=subject_id)
             )
         records.touch(session, scope)
+    # What it now holds may be covered by an agreement that imposes a framework.
+    from riskwren.compliance import agreements  # it builds on this module
+
+    agreements.sync(session)
 
 
 # --- What it must meet --------------------------------------------------------------------
@@ -252,14 +286,35 @@ def held_to(session: Session, scope: Scope) -> list[dict[str, Any]]:
         .where(ScopeFramework.scope_id == scope.id)
         .order_by(Framework.title)
     ).all()
+    by = {
+        row.id: row
+        for row in session.scalars(
+            select(Agreement).where(
+                Agreement.id.in_([held.agreement_id for held, _, _ in rows if held.agreement_id])
+            )
+        )
+    }
     return [
         {
             "key": framework.key,
             "title": framework.title,
             "version": framework.version,
             "baseline": {"key": baseline.key, "title": baseline.title} if baseline else None,
+            # Held because an agreement covers what the scope holds.
+            "agreement": {"ref": by[held.agreement_id].ref, "name": by[held.agreement_id].name}
+            if held.agreement_id in by
+            else None,
+            # A later version loaded beside it, which the scope can be moved to.
+            "later": [
+                {"key": each.key, "title": each.title}
+                for each in session.scalars(
+                    select(Framework).where(
+                        Framework.follows == framework.key, Framework.status == "active"
+                    )
+                )
+            ],
         }
-        for _, framework, baseline in rows
+        for held, framework, baseline in rows
     ]
 
 
@@ -315,6 +370,8 @@ def hold_to(
             )  # fmt: skip
         else:
             row.baseline_id = baseline.id if baseline else None
+            # Held by the scope's own decision now, it stays when the agreement goes.
+            row.agreement_id = None
         records.touch(session, scope)
 
 
@@ -323,6 +380,13 @@ def release_from(session: Session, principal: Principal, scope: Scope, framework
     _editable(session, principal, scope)
     framework = frameworks.by_key(session, framework_key)
     row = _held(session, scope, framework)
+    if row.agreement_id is not None:
+        agreement = session.get(Agreement, row.agreement_id)
+        raise Conflict(
+            f"{scope.name} is held to {framework.title} because "
+            f"{agreement.ref if agreement else 'an agreement'} covers what it holds. Change what "
+            "the agreement covers, or close it."
+        )
     with audit.operation(session, "scope.framework"):
         for decision in session.scalars(
             select(ScopeRequirement)

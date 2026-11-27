@@ -3,7 +3,7 @@
 import { missingNote } from "../components/tidy.js";
 import { del, get, patch, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
-import { dateTime, relative } from "../core/format.js";
+import { date, dateTime, relative } from "../core/format.js";
 import { label, program as loadProgram, units, vocabularies } from "../core/lookups.js";
 import { query, setQuery } from "../core/router.js";
 import { banner, field, select, submit } from "../components/form.js";
@@ -151,9 +151,22 @@ export function externalCard(record, ctx) {
       : h("p", { class: "muted" }, "No identifier in another system is recorded."));
 }
 
-/** Who answers for a record, and beneath that what it is called elsewhere. */
+/** Who answers for a record, beneath that what it is called elsewhere, and what committees
+ * decided about it. */
 export function ownersCard(record, ctx) {
-  return [ownersOnly(record, ctx), externalCard(record, ctx)];
+  return [ownersOnly(record, ctx), externalCard(record, ctx), decisionsCard(record)];
+}
+
+const OUTCOMES = { noted: ["Noted", ""], approved: ["Approved", "ok"], declined: ["Declined", "danger"], deferred: ["Deferred", "warn"] };
+
+/** What committees decided about a record, newest first. Nothing when there is nothing. */
+export function decisionsCard(record) {
+  const found = record.decisions ?? [];
+  if (!found.length) return null;
+  return card({ title: "Committee decisions" }, h("ul", { class: "plain-list stack" }, found.map((row) => h("li", { class: "stack-sm" },
+    h("div", { class: "row wrap" }, h("a", { class: "grow", href: `/sessions/${row.session.ref}` }, `${row.session.committee}, ${date(row.session.held_on)}`),
+      h("span", { class: `pill ${OUTCOMES[row.outcome]?.[1] ? `pill-${OUTCOMES[row.outcome][1]}` : ""}` }, OUTCOMES[row.outcome]?.[0] ?? row.outcome)),
+    row.decision ? h("p", {}, row.decision) : null))));
 }
 
 function ownersOnly(record, ctx) {

@@ -19,11 +19,21 @@ from sqlalchemy.orm import Session
 
 from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid
-from riskwren.db.models import Baseline, BaselineRequirement, Framework, Requirement
-from riskwren.db.models.compliance import FRAMEWORK_KINDS
+from riskwren.db.models import (
+    Baseline,
+    BaselineRequirement,
+    Framework,
+    FrameworkMapping,
+    Requirement,
+)
+from riskwren.db.models.compliance import FRAMEWORK_KINDS, MAPPING_RELATIONS
 from riskwren.events import audit
 
 BUILTIN = ("nist-csf", "nist-800-53", "nist-800-171", "hipaa-security")
+# Shipped, and loaded when someone asks: an earlier version that some programs still name.
+OPTIONAL = ("nist-800-53-r4",)
+AVAILABLE = BUILTIN + OPTIONAL
+KEY_CHARACTERS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.")
 # What a pack may declare. ``own`` is for frameworks entered here, never for a pack.
 PACK_POLICIES = ("verbatim", "attributed", "identifiers", "summary")
 # Under ``identifiers`` a pack carries codes and RiskWren's own short labels, and none of the
@@ -141,7 +151,88 @@ def problems(pack: Any) -> list[str]:
         missing = [code for code in baseline.get("codes", []) if code not in seen]
         if missing:
             found.append(f"Baseline {name}: {missing[0]!r} is not a requirement of this pack.")
+    found += relation_problems(pack, seen)
     return [*found, *policy_problems(pack)][:50]
+
+
+def relation_problems(pack: dict[str, Any], codes: set[str]) -> list[str]:
+    """What a pack says of other frameworks: the version it follows, where codes of that
+    version went, and how its requirements stand to another framework's."""
+    found: list[str] = []
+    follows = pack["pack"].get("follows")
+    if follows is not None and (
+        not isinstance(follows, str) or not follows or not set(follows) <= KEY_CHARACTERS
+    ):
+        found.append("pack.follows is the key of the version this one follows.")
+    moved = pack.get("moved", [])
+    if moved and follows is None:
+        found.append("moved says where codes of an earlier version went: name it in pack.follows.")
+    if not isinstance(moved, list):
+        return [*found, "moved is a list of [earlier code, relation, code here]."]
+    for entry in moved:
+        if (
+            not isinstance(entry, list)
+            or len(entry) != 3
+            or not all(isinstance(part, str) and part for part in entry)
+        ):
+            found.append(f"moved: {entry!r} is not [earlier code, relation, code here].")
+        elif entry[1] not in ("moved_to", "incorporated_into"):
+            found.append(f"moved: {entry[1]!r} is moved_to or incorporated_into.")
+        elif entry[2] not in codes:
+            found.append(f"moved: {entry[2]!r} is not a requirement of this pack.")
+    mappings = pack.get("mappings", [])
+    if not isinstance(mappings, list):
+        return [*found, "mappings is a list of {framework, relation, pairs}."]
+    for mapping in mappings:
+        if not isinstance(mapping, dict) or not isinstance(mapping.get("pairs"), list):
+            found.append("A mapping names a framework, a relation, and its pairs.")
+            continue
+        other = mapping.get("framework")
+        if not isinstance(other, str) or not other or not set(other) <= KEY_CHARACTERS:
+            found.append("A mapping names the key of the other framework.")
+        if mapping.get("relation") not in MAPPING_RELATIONS:
+            found.append(f"A mapping's relation is one of: {', '.join(MAPPING_RELATIONS)}.")
+        for pair in mapping["pairs"]:
+            if (
+                not isinstance(pair, list)
+                or len(pair) != 2
+                or not all(isinstance(part, str) and part for part in pair)
+            ):
+                found.append(f"A mapping pair is [code here, code there], not {pair!r}.")
+            elif pair[0] not in codes:
+                found.append(f"A mapping names {pair[0]!r}, which is not a requirement here.")
+    return found
+
+
+def relate(session: Session, pack: dict[str, Any]) -> int:
+    """Keep what a pack says of other frameworks, adding only what is not here already.
+    Returns how many were added."""
+    head = pack["pack"]
+    key = head["key"].strip()
+    wanted: set[tuple[str, str, str, str, str]] = set()
+    follows = head.get("follows")
+    for old, relation, new in pack.get("moved", []) or []:
+        wanted.add((follows, old, relation, key, new))
+    for mapping in pack.get("mappings", []) or []:
+        for here, there in mapping["pairs"]:
+            wanted.add((key, here, mapping["relation"], mapping["framework"], there))
+    if not wanted:
+        return 0
+    have = set(
+        session.execute(
+            select(
+                FrameworkMapping.from_key, FrameworkMapping.from_code, FrameworkMapping.relation,
+                FrameworkMapping.to_key, FrameworkMapping.to_code,
+            ).where(FrameworkMapping.pack_key == key)
+        ).all()
+    )  # fmt: skip
+    fresh = sorted(wanted - have)
+    session.add_all(
+        FrameworkMapping(from_key=a, from_code=b, relation=c, to_key=d, to_code=e, pack_key=key)
+        for a, b, c, d, e in fresh
+    )
+    session.flush()
+    return len(fresh)
 
 
 def _place(
@@ -209,6 +300,7 @@ def load(session: Session, pack: dict[str, Any], *, account_id: int | None = Non
             source_url=head.get("source_url"),
             built_from=head.get("built_from"),
             pack_version=head.get("pack_version"),
+            follows=head.get("follows"),
             origin="pack",
             status="active",
             digest=digest(pack),
@@ -234,16 +326,26 @@ def load(session: Session, pack: dict[str, Any], *, account_id: int | None = Non
                 for code in codes
             )
         framework.requirement_count, framework.citable_count = len(rows), citable
+        relate(session, pack)
         session.flush()
     return framework
 
 
 def install(session: Session, keys: tuple[str, ...] = BUILTIN) -> int:
-    """Load whichever built-in frameworks are not here yet. Safe to run again."""
-    have = set(session.scalars(select(Framework.key)))
+    """Load whichever built-in frameworks are not here yet. Safe to run again. A built-in
+    framework already loaded gains what a later release of its pack says of other frameworks:
+    the version it follows, and the publisher's mappings."""
+    have = {row.key: row for row in session.scalars(select(Framework))}
     added = 0
     for key in keys:
         if key not in have:
             load(session, builtin(key))
             added += 1
+    for key, framework in have.items():
+        if key in AVAILABLE and framework.origin == "pack":
+            pack = builtin(key)
+            with audit.operation(session, "framework.relate", pack=key):
+                if framework.follows is None and pack["pack"].get("follows"):
+                    framework.follows = pack["pack"]["follows"]
+                relate(session, pack)
     return added

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from riskwren.db.models.agreements import Agreement, AgreementCoverage
 from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
 from riskwren.db.models.compliance import (
     Assessment,
@@ -13,6 +14,7 @@ from riskwren.db.models.compliance import (
     EvidenceLink,
     ExceptionRequest,
     Framework,
+    FrameworkMapping,
     Implementation,
     Issue,
     IssueSubject,
@@ -23,6 +25,7 @@ from riskwren.db.models.compliance import (
     ScopeMember,
     ScopeRequirement,
     StoredFile,
+    SuggestionSetAside,
     TestResult,
 )
 from riskwren.db.models.controls import (
@@ -33,6 +36,21 @@ from riskwren.db.models.controls import (
     ControlRating,
     RiskControl,
     TreatmentPlan,
+)
+from riskwren.db.models.documents import (
+    DocumentControl,
+    DocumentRequirement,
+    PolicyAcknowledgment,
+    PolicyApproval,
+    PolicyAudience,
+    PolicyDocument,
+    PolicyVersion,
+)
+from riskwren.db.models.governance import (
+    CommitteeItem,
+    CommitteeSession,
+    Objective,
+    RiskObjective,
 )
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.inventory import (
@@ -80,12 +98,16 @@ __all__ = [
     "Acceptance",
     "Account",
     "Action",
+    "Agreement",
+    "AgreementCoverage",
     "Assessment",
     "Baseline",
     "BaselineRequirement",
     "Campaign",
     "CampaignItem",
     "ChainHead",
+    "CommitteeItem",
+    "CommitteeSession",
     "Control",
     "ControlLibraryEntry",
     "ControlRating",
@@ -93,6 +115,8 @@ __all__ = [
     "ControlTest",
     "Counter",
     "Credential",
+    "DocumentControl",
+    "DocumentRequirement",
     "Event",
     "Evidence",
     "EvidenceLink",
@@ -100,6 +124,7 @@ __all__ = [
     "ExternalRef",
     "FailedSignIn",
     "Framework",
+    "FrameworkMapping",
     "Handover",
     "Identity",
     "Implementation",
@@ -114,8 +139,14 @@ __all__ = [
     "Membership",
     "NotDuplicate",
     "Notice",
+    "Objective",
     "OrgUnit",
     "OutboxMessage",
+    "PolicyAcknowledgment",
+    "PolicyApproval",
+    "PolicyAudience",
+    "PolicyDocument",
+    "PolicyVersion",
     "Process",
     "ProviderMapping",
     "Questionnaire",
@@ -132,6 +163,7 @@ __all__ = [
     "RiskCategory",
     "RiskControl",
     "RiskLibraryEntry",
+    "RiskObjective",
     "RiskSubject",
     "RoleGrant",
     "SavedView",
@@ -144,6 +176,7 @@ __all__ = [
     "Setting",
     "SignInRequest",
     "StoredFile",
+    "SuggestionSetAside",
     "System",
     "TestResult",
     "ThirdParty",

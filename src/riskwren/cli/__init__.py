@@ -413,6 +413,27 @@ def cmd_db_current(args: argparse.Namespace) -> int:
     return EXIT_OK if current == head else EXIT_ERROR
 
 
+def _verify_documents(config: Config, db: Database) -> int:
+    """Every published version of a document against the fingerprint the history took."""
+    from riskwren.policy import documents
+
+    try:
+        with db.read() as session:
+            found = documents.check_fingerprints(session, DataHome(config.data.home).files)
+    finally:
+        db.dispose()
+    for problem in found["problems"]:
+        print(problem, file=sys.stderr)
+    if found["problems"]:
+        return EXIT_ERROR
+    if found["checked"]:
+        versions = "1 published version" if found["checked"] == 1 else (
+            f"{found['checked']} published versions"
+        )  # fmt: skip
+        print(f"Documents: {versions} match what the history says was published.")
+    return EXIT_OK
+
+
 def cmd_verify(args: argparse.Namespace) -> int:
     config, _ = _load(args)
     db = _database(config)
@@ -424,7 +445,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
     if report.ok:
         print(f"The history holds: {report.events} events, each following the last.")
         print(f"Head: {report.head}")
-        return EXIT_OK
+        return _verify_documents(config, db)
     print(f"The history is broken at event {report.broken_at}: {report.reason}.", file=sys.stderr)
     print(f"{report.events} events before it verify.", file=sys.stderr)
     return EXIT_ERROR
@@ -720,7 +741,9 @@ def build_parser() -> argparse.ArgumentParser:
         "verify",
         help="check that the history has not been altered",
         description="Recompute the hash chain over every event in the history and report the "
-        "first one that does not hold. Exits with 1 if the history is broken.",
+        "first one that does not hold, then check every published version of a document "
+        "against the fingerprint the history took when it was published. Exits with 1 if "
+        "either does not hold.",
     )
     verify.set_defaults(handler=cmd_verify)
 
@@ -745,7 +768,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     held_load.add_argument("file", nargs="?", metavar="FILE", help="the pack to load")
     held_load.add_argument(
-        "--builtin", action="store_true", help="load the built-in frameworks not yet here"
+        "--builtin",
+        action="store_true",
+        help="load the built-in frameworks not yet here, and the publishers' mappings for "
+        "those that are",
     )
     held_load.add_argument(
         "--dry-run", action="store_true", help="check the pack, and load nothing"

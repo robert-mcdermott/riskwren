@@ -196,7 +196,8 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         from riskwren.compliance import frameworks
 
         held = {row.key: row for row in frameworks.all_(session)}
-        assert len(held) == 5 and held["nist-800-53"].citable_count == 1014
+        # The four that ship with every installation, Rev. 4 loaded beside Rev. 5, and its own.
+        assert len(held) == 6 and held["nist-800-53"].citable_count == 1014
         agreement = held["data-use-agreement-open-cohort-trust"]
         assert (agreement.origin, agreement.citable_count) == ("local", 9)
         assert frameworks.find(session, agreement, "DUA-5.1").guidance
@@ -218,6 +219,7 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         by_name = {scope.name: scope for scope in session.scalars(select(Scope))}
         assert set(by_name) == {
             "Central information technology", "Clinical systems", "Controlled-access data enclave",
+            "Trial data platform",
         }  # fmt: skip
         assert by_name["Central information technology"].offers_controls
         clinic = scopes.statement(session, reader, by_name["Clinical systems"], "hipaa-security")
@@ -327,6 +329,112 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert privacy.escalated_to_unit_id is not None and privacy.escalation_reason
         gone = session.scalars(select(Account).where(Account.status == "disabled")).one()
         assert gone.title == "Principal Investigator"
+        # Everyone is asked to acknowledge the acceptable use policy; most have read its third
+        # version, a campaign chases the rest, and the sample staff member has still to.
+        from riskwren.db.models import Campaign, PolicyDocument
+        from riskwren.policy import library
+
+        papers = {row.name: row for row in session.scalars(select(PolicyDocument))}
+        aup = library.standing(session, papers["Acceptable use policy"])
+        active = select(func.count()).select_from(Account).where(Account.status == "active")
+        assert aup["required"]["number"] == 3 and aup["people"] == session.scalar(active)
+        assert 0.4 < aup["acknowledged"] / aup["people"] < 0.8
+        staff = next(p["name"] for p in built.sample_accounts if p["role"] == "Staff member")
+        member = next(row for row in aup["rows"] if row["name"] == staff)
+        assert (member["acknowledged"], member["version"]) == (False, 2)
+        chase = session.scalars(select(Campaign).where(Campaign.kind == "acknowledgment")).one()
+        assert chase.status == "open" and chase.document_id == papers["Acceptable use policy"].id
+        incident = library.standing(session, papers["Incident response procedure"])
+        assert 10 < incident["people"] < aup["people"] / 2
+        assert incident["acknowledged"] / incident["people"] > 0.6
+        # Each document but one says what it governs, and two have exceptions.
+        from riskwren.compliance import frameworks as framework_service
+        from riskwren.policy import governs
+
+        policy = governs.of_document(session, reader, papers["Information security policy"])
+        assert len(policy["controls"]) == 3 and policy["requirements"] == 8
+        asks = framework_service.find(
+            session, framework_service.by_key(session, "nist-csf"), "GV.PO-01"
+        )
+        assert [
+            row["name"] for row in governs.of_requirement(session, reader, asks)["documents"]
+        ] == ["Information security policy"]
+        departures = session.scalars(
+            select(ExceptionRequest).where(ExceptionRequest.subject_type == "document")
+        ).all()
+        assert sorted(exceptions.state_of(item, TODAY) for item in departures) == [
+            "in_force",
+            "requested",
+        ]
+        bare = governs.counts(session, [papers["Research data management policy"].id])
+        assert bare[papers["Research data management policy"].id] == (0, 0)
+        # Agreements: the data use agreement binds the scope that holds the cohort's backups to
+        # its own terms; one ends soon, one's notice date is near, one has been closed.
+        from riskwren.compliance import agreements as agreement_service
+        from riskwren.compliance import scopes as scope_service
+        from riskwren.db.models import Agreement, Scope
+
+        pacts = {row.name: row for row in session.scalars(select(Agreement))}
+        states = {name: agreement_service.state_of(row, TODAY) for name, row in pacts.items()}
+        assert states == {
+            "Open Cohort Trust data use agreement": "in_force",
+            "Genomic data access certification": "ending",
+            "Offsite backup vaulting": "notice",
+            "Imaging pilot data sharing": "closed",
+        }
+        central = session.scalars(
+            select(Scope).where(Scope.name == "Central information technology")
+        ).one()
+        imposed = [
+            row["agreement"]["ref"]
+            for row in scope_service.held_to(session, central)
+            if row["agreement"]
+        ]
+        assert imposed == [pacts["Open Cohort Trust data use agreement"].ref]
+        # A scope still on SP 800-53 Rev. 4, with Rev. 5 loaded beside it; suggestions from
+        # the publisher's mapping, some confirmed and one set aside.
+        from riskwren.compliance import versions
+        from riskwren.db.models import ControlRequirement, SuggestionSetAside
+
+        trials = session.scalars(select(Scope).where(Scope.name == "Trial data platform")).one()
+        assert [row["key"] for row in scope_service.held_to(session, trials)] == ["nist-800-53-r4"]
+        assert scope_service.held_to(session, trials)[0]["later"][0]["key"] == "nist-800-53"
+        old = framework_service.by_key(session, "nist-800-53-r4")
+        new = framework_service.by_key(session, "nist-800-53")
+        changed = versions.changes(session, old, new)["counts"]
+        assert changed["withdrawn"] > 100 and changed["added"] > 200
+        assert session.scalars(
+            select(ControlRequirement).where(ControlRequirement.note.like("Suggested by%"))
+        ).all()
+        assert session.scalars(select(SuggestionSetAside)).all()
+        # The strategic plan's objectives, each named by the risks that threaten it; and the
+        # committee: two sessions held with their decisions, the next one coming up.
+        from riskwren.db.models import CommitteeItem, CommitteeSession, Objective
+        from riskwren.inventory import records as record_service
+        from riskwren.risk import objectives
+        from riskwren.risk.register import RISK
+
+        aims = session.scalars(select(Objective)).all()
+        assert len(aims) == 5
+        assert all(objectives.risks_of(session, reader, aim)["risks"] for aim in aims)
+        meetings = session.scalars(
+            select(CommitteeSession).order_by(CommitteeSession.held_on)
+        ).all()
+        assert [meeting.status for meeting in meetings] == ["held", "held", "planned"]
+        assert meetings[-1].held_on > TODAY and meetings[0].minutes
+        decided = session.scalars(
+            select(CommitteeItem).where(CommitteeItem.outcome.is_not(None))
+        ).all()
+        assert len(decided) >= 8
+        about = next(item for item in decided if item.subject_type == "risk")
+        risk = session.get(RISK.model, about.subject_id)
+        shown = record_service.detail(session, reader, RISK, risk)["decisions"]
+        held_in = session.get(CommitteeSession, about.session_id).ref
+        assert held_in in {row["session"]["ref"] for row in shown}
+        coming = session.scalars(
+            select(CommitteeItem).where(CommitteeItem.session_id == meetings[-1].id)
+        ).all()
+        assert len(coming) >= 4 and not any(item.outcome for item in coming)
     assert built.counts["acceptances refused"] == 1
 
 

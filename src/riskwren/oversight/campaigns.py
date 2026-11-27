@@ -33,7 +33,9 @@ from riskwren.db.models import (
     Evidence,
     EvidenceLink,
     Implementation,
+    Membership,
     OrgUnit,
+    PolicyDocument,
     Questionnaire,
     RecordOwner,
     Response,
@@ -95,9 +97,12 @@ KINDS: dict[str, Kind] = {
         Kind(
             "evidence", "Evidence request", "The owners of controls", "control", None, by_scope=True
         ),
+        Kind(
+            "acknowledgment", "Acknowledgment", "The people a document applies to", "document", None
+        ),
     )
 }
-PATHS = {"control": "controls", "risk": "risks", "system": "systems"}
+PATHS = {"control": "controls", "risk": "risks", "system": "systems", "document": "library"}
 
 
 # --- Who may --------------------------------------------------------------------------------
@@ -122,6 +127,8 @@ def find(session: Session, principal: Principal, ref: str) -> Campaign:
 def _answerers(session: Session, item: CampaignItem) -> set[int]:
     """Everyone who may answer an item: whoever was asked, and any other owner of its subject."""
     people = {item.account_id} if item.account_id else set()
+    if item.subject_type == "document":
+        return people  # an acknowledgment is each person's own
     if item.subject_type != "org_unit":
         people |= set(notices.owners(session, item.subject_type, item.subject_id))
     return people
@@ -178,12 +185,34 @@ def _first_owner(session: Session, record_type: str, record_id: int) -> int | No
 
 
 def audience(
-    session: Session, kind: Kind, org_unit_id: int | None, scope: Scope | None
-) -> list[Asked]:
+    session: Session, kind: Kind, org_unit_id: int | None, scope: Scope | None,
+    document: PolicyDocument | None = None,
+) -> list[Asked]:  # fmt: skip
     """Everything the campaign is about, each with whoever is asked. Something with nobody
     to ask is still listed, so that the gap shows."""
     within = units.with_descendants(session, [org_unit_id]) if org_unit_id else None
     found: list[Asked] = []
+    if kind.subject == "document":
+        # Everyone the document applies to, each about the document, counted in their unit.
+        from riskwren.policy import library
+
+        assert document is not None
+        everyone = library.people(session, document)
+        homes = library.home_units(session, [person.id for person in everyone])
+        if within is not None:
+            belongs = {
+                account
+                for account, unit in session.execute(
+                    select(Membership.account_id, Membership.org_unit_id)
+                )
+                if unit in within
+            }
+            everyone = [person for person in everyone if person.id in belongs]
+        return [
+            Asked("document", document.id, document.ref, document.name, homes.get(person.id),
+                  person.id)
+            for person in everyone
+        ]  # fmt: skip
     if kind.subject == "control":
         query = select(Control).where(Control.status == "active").order_by(Control.id)
         if scope is not None:
@@ -274,6 +303,10 @@ def _check(
         errors["due_on"] = "Give a date after today."
     if kind is not None and kind.key == "evidence" and not str(values.get("wanted") or "").strip():
         errors["wanted"] = "Say what evidence is wanted."
+    if kind is not None and kind.key == "acknowledgment":
+        document = _document(session, values)
+        if document is None:
+            errors["document"] = "Choose a document that asks people to acknowledge it."
     if errors:
         raise Invalid("The campaign was not started.", errors)
     assert kind is not None and due is not None
@@ -284,10 +317,24 @@ def _check(
     return kind, unit_id, scope, due
 
 
+def _document(session: Session, values: Mapping[str, Any]) -> PolicyDocument | None:
+    """The document an acknowledgment campaign is about: in force, and asking for it."""
+    ref = str(values.get("document") or "").strip().upper()
+    found = session.scalars(select(PolicyDocument).where(PolicyDocument.ref == ref)).first()
+    if (
+        found is None
+        or found.status != "active"
+        or not found.acknowledge
+        or found.published_version_id is None
+    ):
+        return None
+    return found
+
+
 def preview(session: Session, principal: Principal, values: Mapping[str, Any]) -> dict[str, Any]:
     """Who a campaign would ask, without starting it."""
     kind, unit_id, scope, _due = _check(session, principal, {"name": "preview", **values})
-    asked = audience(session, kind, unit_id, scope)
+    asked = audience(session, kind, unit_id, scope, _document(session, values))
     return {
         "items": len(asked),
         "people": len({each.account_id for each in asked if each.account_id}),
@@ -298,7 +345,8 @@ def preview(session: Session, principal: Principal, values: Mapping[str, Any]) -
 
 def launch(session: Session, principal: Principal, values: Mapping[str, Any]) -> Campaign:
     kind, unit_id, scope, due = _check(session, principal, values)
-    asked = audience(session, kind, unit_id, scope)
+    document = _document(session, values) if kind.subject == "document" else None
+    asked = audience(session, kind, unit_id, scope, document)
     if not asked:
         raise Invalid("The campaign was not started.", {"kind": "There is nobody to ask."})
     row = questionnaires.find(session, kind.questionnaire) if kind.questionnaire else None
@@ -322,6 +370,7 @@ def launch(session: Session, principal: Principal, values: Mapping[str, Any]) ->
             org_unit_id=unit_id,
             scope_id=scope.id if scope else None,
             wanted=str(values.get("wanted") or "").strip() or None,
+            document_id=document.id if document is not None else None,
             due_on=due,
             created_by=principal.account_id,
             created_by_name=principal.name,
@@ -343,8 +392,30 @@ def launch(session: Session, principal: Principal, values: Mapping[str, Any]) ->
                 )
             )
         session.flush()
+        if document is not None:
+            _already_acknowledged(session, campaign, document)
     _tell_pending(session, campaign, principal, first=True)
     return campaign
+
+
+def _already_acknowledged(session: Session, campaign: Campaign, document: PolicyDocument) -> None:
+    """Those who have already acknowledged what is asked are counted as having answered."""
+    from riskwren.policy import library
+
+    must = library.required(session, document)
+    items = session.scalars(
+        select(CampaignItem).where(CampaignItem.campaign_id == campaign.id)
+    ).all()
+    seen = library.acknowledged(
+        session, document, [item.account_id for item in items if item.account_id]
+    )
+    for item in items:
+        said = seen.get(item.account_id) if item.account_id else None
+        if library.counts_for(must, said):
+            assert said is not None
+            item.status, item.outcome = "done", "acknowledged"
+            item.completed_at, item.completed_by_name = said[1], item.account_name
+    session.flush()
 
 
 def _tell_pending(
@@ -397,6 +468,8 @@ def answer(
         raise Conflict("This campaign has ended.")
     if item.status != "pending":
         raise Conflict("This has already been answered.")
+    if campaign.kind == "acknowledgment":
+        raise Conflict("This is answered by reading the document and acknowledging it.")
     if campaign.questionnaire_id is None:
         raise Conflict(
             "This asks for evidence, not for answers. Attach the evidence to the control."
@@ -622,6 +695,7 @@ def summary(session: Session, campaign: Campaign, counts: dict[str, int]) -> dic
         "overdue": campaign.status == "open" and campaign.due_on < today and counts["pending"] > 0,
         "unit": {"id": unit.id, "name": unit.name} if unit else None,
         "scope": {"ref": scope.ref, "name": scope.name} if scope else None,
+        "document": _document_chip(session, campaign),
         "wanted": campaign.wanted,
         "started_by": campaign.created_by_name,
         "started_at": campaign.created_at,
@@ -630,6 +704,11 @@ def summary(session: Session, campaign: Campaign, counts: dict[str, int]) -> dic
         "counts": {**counts, "asked": asked},
         "answered": round(100 * counts["done"] / asked) if asked else 100,
     }
+
+
+def _document_chip(session: Session, campaign: Campaign) -> dict[str, Any] | None:
+    found = session.get(PolicyDocument, campaign.document_id) if campaign.document_id else None
+    return {"ref": found.ref, "name": found.name} if found else None
 
 
 def search(session: Session, principal: Principal, *, status: str | None = None) -> list[dict]:

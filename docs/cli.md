@@ -129,7 +129,7 @@ Show an account's roles, or with --set replace the roles granted in RiskWren. Ro
 
 ## `riskwren verify`
 
-Recompute the hash chain over every event in the history and report the first one that does not hold. Exits with 1 if the history is broken.
+Recompute the hash chain over every event in the history and report the first one that does not hold, then check every published version of a document against the fingerprint the history took when it was published. Exits with 1 if either does not hold.
 
 ## `riskwren frameworks`
 
@@ -146,7 +146,7 @@ Load a framework from a pack file, or the built-in ones that are missing. A pack
 | Option | Meaning |
 |---|---|
 | `FILE` | the pack to load |
-| `--builtin` | load the built-in frameworks not yet here |
+| `--builtin` | load the built-in frameworks not yet here, and the publishers' mappings for those that are |
 | `--dry-run` | check the pack, and load nothing |
 
 ### `riskwren frameworks show`

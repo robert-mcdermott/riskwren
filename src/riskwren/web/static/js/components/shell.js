@@ -19,6 +19,7 @@ export const NAV = [
     heading: "Risks",
     items: [
       { href: "/risks", label: "Register", iconName: "risk" },
+      { href: "/objectives", label: "Objectives", iconName: "objective" },
       { href: "/heat-map", label: "Heat map", iconName: "grid" },
       { href: "/indicators", label: "Indicators", iconName: "chart" },
       { href: "/risk-analyses", label: "Analyses", iconName: "scope" },
@@ -42,7 +43,15 @@ export const NAV = [
       { href: "/assessments", label: "Assessments", iconName: "assessment" },
       { href: "/issues", label: "Issues", iconName: "issue" },
       { href: "/exceptions", label: "Exceptions", iconName: "exception" },
+      { href: "/agreements", label: "Agreements", iconName: "agreement" },
       { href: "/campaigns", label: "Campaigns", iconName: "bell", when: ["assess", "read_all"] },
+    ],
+  },
+  {
+    heading: "Policies",
+    items: [
+      { href: "/library", label: "Policy library", iconName: "document" },
+      { href: "/documents", label: "Documents", iconName: "edit", when: ["steward", "lead", "assess", "read_all"] },
     ],
   },
   {
@@ -60,6 +69,7 @@ export const NAV = [
       { href: "/compliance", label: "Compliance", iconName: "shield-check" },
       { href: "/dashboard", label: "Risk", iconName: "chart" },
       { href: "/tidy", label: "Tidy", iconName: "check" },
+      { href: "/sessions", label: "Committee sessions", iconName: "session" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },
     ],
   },
