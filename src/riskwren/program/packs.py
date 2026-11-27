@@ -231,4 +231,10 @@ def import_(
                 if not dry_run:
                     rules.put(session, name, pack[name])
         session.flush()
+        if changed and not dry_run:
+            # Every open risk is read again under what was loaded: its ratings from the
+            # matrix, its standing from appetite, its next review from the cadences.
+            from riskwren.risk import program
+
+            program.settle(session)
     return {"dry_run": dry_run, "changed": changed}

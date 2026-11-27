@@ -106,15 +106,19 @@ Local accounts stay the default and are never removed: an evaluation or a small 
 
 **Not done:** merging two records into one (INV-12 asks for it, keeping both histories). A record is referred to by type and id from too many places to move them all safely in this slice: links, owners, risk and control links, scopes, evidence, issues, campaign items, and indicators. Duplicates are found and shown, and a person retires one by hand. Merging is carried to a later wave.
 
-### Slice 7: Program editors ☐
+### Slice 7: Program editors ☑
 
 **Goal:** the program is edited where it is used.
 
-- [ ] Editors for the taxonomy, scales and matrix, appetite, cadences, and vocabularies
-- [ ] An impact preview: the risks whose rating or standing would change
-- [ ] Structured risk assessments over a scope
+- [x] Editors for the taxonomy, scales and matrix, appetite, cadences, and vocabularies
+- [x] An impact preview: the risks whose rating or standing would change
+- [x] Structured risk assessments over a scope
 
 **Acceptance:** publishing a changed matrix changes exactly the risks the preview listed.
+
+**Done:** one function, `riskwren.risk.program.change`, changes the scoring method, appetites, or cadences and returns every open risk whose ratings, standing, or next review moved. A preview is that function run and then rolled back, so it lists what publishing would change by doing it; nothing of it is kept, not an event. Publishing a method makes a new version and reads every open risk again from the matrix in force, then its standing and its next review; each assessment keeps the rating it was given and its version, and a risk the program moved says so in its history with the lines that changed. Loading a program pack settles the register the same way, which it did not before. A method is refused if it removes or re-keys a rating, or has fewer levels than risks are rated at; cadences are checked whole, each problem against the part it is in. Categories are added (two deep), renamed, ordered, and retired. A vocabulary is renamed, ordered, added to, and retired, never re-keyed; lists the software gives meaning to (severities, kinds of link, control frequencies, owner kinds) can only be renamed, and a value new records start with cannot be retired. Admin → Program has a tab for each, with a draft bar and a preview dialog for what can move a risk. A structured risk assessment is a **risk analysis** (`RAN`), so named because "assessment" already means a judgment of one risk and the testing of controls. It is over a scope's boundary, units included, or over what a unit holds, against the library risks of chosen categories: one question for each thing against each threat, made when it starts. Each is answered as not applying, as covered by a risk on the register (which then says it concerns the thing, and may be put in doubt), or by raising a risk from the library for the thing's owner. It closes when every question has an answer and with what it found; its report keeps the names of the day. The acceptance test is `tests/test_program_editing.py::test_publishing_a_changed_matrix_changes_exactly_the_risks_the_preview_listed`; the analysis is covered by `tests/test_analysis.py`.
+
+**Not done in the app:** who may accept what, the number of levels and ratings, and how much a control may reduce a rating. They are changed with a program pack, where everything that names a rating can be changed together.
 
 ### Slice 8: Release prep ☐
 

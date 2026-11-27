@@ -135,6 +135,12 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET /campaigns/{ref}` · `POST /campaigns/{ref}/remind` · `/close` · `/cancel` | One campaign with its coverage by unit and items; remind those who have not answered; end it |
 | `GET /campaign-items/{id}` · `POST /campaign-items/{id}/answer` · `/excuse` | What one person is asked; answer it, as a draft or in full; take it out of the campaign |
 | `GET` · `POST /indicators` · `GET` · `PATCH /indicators/{ref}` · `PUT /indicators/{ref}/owners` · `GET /indicators/{ref}/history` | Indicators with where each stands; one with its readings, trend, and the risks it warns of |
+| `POST /program/preview` · `POST /program/publish` | Which open risks a change to the scoring method, appetite, or cadences would move; make the change (those who run the program) |
+| `POST /risk-categories` · `PATCH /risk-categories/{key}` | Add a risk category; rename, describe, retire, or move one |
+| `GET /admin/vocabularies` · `PUT /vocabularies/{name}` | Every vocabulary with what may be changed in it; rename, reorder, add to, or retire its values |
+| `GET` · `POST /risk-analyses` · `POST /risk-analyses/preview` · `GET` · `PATCH /risk-analyses/{ref}` | Risk analyses; start one over a scope or a unit; how many questions one would have; one with its progress and everything it considered |
+| `GET /risk-analyses/{ref}/assets/{subject}` · `POST /risk-analyses/{ref}/items/{id}` · `POST …/assets/{subject}/rest` | One thing with each threat and the risks that might answer it; answer one question; say none of the others apply |
+| `POST /risk-analyses/{ref}/close` · `/reopen` | Close an analysis with what it found; reopen it |
 | `GET /search` | Every kind of record, and actions, by words; only what you may open |
 | `GET` · `POST /views` · `PATCH` · `DELETE /views/{id}` | Saved views of a list: yours and the shared ones |
 | `GET /tidy` · `GET /similar` · `POST /tidy/not-duplicates` | What records are missing, likely duplicates, and what people who have left still hold; what a new name might already be; say two records are different things |

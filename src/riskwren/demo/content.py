@@ -877,6 +877,41 @@ SCOPE_ENCLAVE = {
     "excluded": [],
 }  # fmt: skip
 
+# Risk analyses: a scope taken against kinds of threat. "walked" is how much of it has been
+# worked through, "pace" the days between one thing and the next.
+ANALYSES = [
+    {
+        "name": "Clinic systems, security risk analysis",
+        "scope": SCOPE_CLINIC["name"], "categories": ["availability", "confidentiality"],
+        "summary": "The yearly analysis the security rule asks for. Each system and service "
+        "in the clinic's boundary is taken against the ways it could be lost or exposed. "
+        "Led by security assurance with the clinic's system owners.",
+        "began": 150, "walked": 1.0, "pace": 0.4, "raises": 3,
+        "conclusion": "Three risks were not on the register and now are, each with the owner "
+        "of the system it concerns. Several risks already there were looked at again against "
+        "systems they did not name, and now name them. Paper records and the building were "
+        "out of scope and are for the facilities analysis.",
+    },
+    {
+        "name": "Data enclave, threat analysis before the next data release",
+        "scope": SCOPE_ENCLAVE["name"], "categories": ["confidentiality", "research_security"],
+        "summary": "Asked for by the data access committee before controlled-access data from "
+        "a new study is admitted. To be finished before the committee meets.",
+        "began": 16, "walked": 0.5, "pace": 1.0, "raises": 1,
+    },
+]  # fmt: skip
+ANALYSIS_NOTES = {
+    "covered": "The risk already on the register covers this here as well.",
+    "again": "It covers this, but its rating was made before this system was in the picture.",
+    "raised": "Nothing on the register covers this here. Raised for its owner to assess.",
+    "not_applicable": [
+        "It holds no data of this kind.",
+        "It is not reachable from outside the unit's network.",
+        "The service is run for us; this is the supplier's to manage and is in the contract.",
+        "Looked at with its owner: the way this would happen does not exist here.",
+    ],
+}
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (

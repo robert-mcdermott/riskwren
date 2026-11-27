@@ -309,6 +309,21 @@ for _route in (
     ("POST", "/api/v1/accounts/{account_id}/handover"),
 ):  # fmt: skip
     REACH[_route] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/risk-analyses"),
+    ("POST", "/api/v1/risk-analyses"),
+    ("POST", "/api/v1/risk-analyses/preview"),
+    ("GET", "/api/v1/risk-analyses/{ref}"),
+    ("PATCH", "/api/v1/risk-analyses/{ref}"),
+    ("PUT", "/api/v1/risk-analyses/{ref}/owners"),
+    ("GET", "/api/v1/risk-analyses/{ref}/history"),
+    ("GET", "/api/v1/risk-analyses/{ref}/assets/{subject}"),
+    ("POST", "/api/v1/risk-analyses/{ref}/items/{item_id}"),
+    ("POST", "/api/v1/risk-analyses/{ref}/assets/{subject}/rest"),
+    ("POST", "/api/v1/risk-analyses/{ref}/close"),
+    ("POST", "/api/v1/risk-analyses/{ref}/reopen"),
+):
+    REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}
 REACH[("GET", "/api/v1/campaigns")] = EVERYONE
 REACH[("POST", "/api/v1/campaigns")] = RUNNERS
@@ -321,6 +336,12 @@ REACH[("GET", "/api/v1/campaign-items/{item_id}")] = EVERYONE
 REACH[("POST", "/api/v1/campaign-items/{item_id}/answer")] = EVERYONE
 REACH[("POST", "/api/v1/campaign-items/{item_id}/excuse")] = RUNNERS
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
+for _route in (
+    ("GET", "/api/v1/admin/vocabularies"), ("PUT", "/api/v1/vocabularies/{name}"),
+    ("POST", "/api/v1/risk-categories"), ("POST", "/api/v1/program/preview"),
+    ("POST", "/api/v1/program/publish"),
+):  # fmt: skip
+    REACH[_route] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE

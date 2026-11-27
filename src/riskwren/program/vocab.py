@@ -7,6 +7,7 @@ history. Until an organization edits a vocabulary, the default program pack's ar
 from __future__ import annotations
 
 import json
+import re
 from importlib import resources
 from typing import Any
 
@@ -78,6 +79,75 @@ def check_many(session: Session, name: str, values: list[str] | None, field: str
             "The record is not valid.", {field: f"{unknown[0]!r} is not one of the choices."}
         )
     return chosen
+
+
+# Lists whose values the software itself gives meaning to: a severity sets a clock, a kind
+# of link says what it joins. Their names and meanings can be changed; values are added or
+# taken away by a program pack.
+LABELS_ONLY = ("issue_severities", "link_kinds", "control_frequencies", "owner_kinds")
+# Values that are the default somewhere, and so cannot be retired.
+KEPT = {
+    "criticalities": {"moderate"},
+    "lifecycles": {"in_service"},
+    "issue_sources": {"observation", "test"},
+    "unit_kinds": {"organization"},
+}
+KEY = re.compile(r"[a-z][a-z0-9_]{0,39}")
+
+
+def describe(session: Session) -> list[dict[str, Any]]:
+    """Every vocabulary with what may be done to it here."""
+    return [
+        {"name": name, "items": get(session, name), "labels_only": name in LABELS_ONLY,
+         "kept": sorted(KEPT.get(name, ()))}
+        for name in NAMES
+    ]  # fmt: skip
+
+
+def edit(session: Session, name: str, items: Any) -> list[dict[str, Any]]:
+    """Change a vocabulary from the app: rename, describe, reorder, add, and retire. What a
+    value's key is never changes, and what the software relies on stays."""
+    if name not in DEFAULTS:
+        raise Invalid("There is no such vocabulary.", {"name": name})
+    if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
+        raise Invalid("The vocabulary is not valid.", {"items": "Send the whole list of values."})
+    have = {item["key"]: item for item in get(session, name)}
+    cleaned = []
+    for item in items:
+        key = str(item.get("key", "")).strip()
+        if key not in have and not KEY.fullmatch(key):
+            raise Invalid(
+                "The vocabulary is not valid.",
+                {"items": f"{key!r} is not a key: use lower-case letters, digits, underscores."},
+            )
+        if key not in have and name in LABELS_ONLY:
+            raise Invalid(
+                "The vocabulary is not valid.",
+                {"items": "Values of this list are added by a program pack, not here."},
+            )
+        if item.get("retired") and key in KEPT.get(name, ()):
+            raise Invalid(
+                "The vocabulary is not valid.",
+                {"items": f"{have[key]['label']} is what new records start with, so it stays."},
+            )
+        if item.get("retired") and name in LABELS_ONLY:
+            raise Invalid(
+                "The vocabulary is not valid.",
+                {"items": "Values of this list cannot be retired here."},
+            )
+        # What the list holds beyond a name and a meaning stays as it was.
+        merged = {**have.get(key, {}), "key": key, "label": str(item.get("label", "")).strip()}
+        if "description" in item:
+            merged["description"] = str(item.get("description") or "").strip()
+        if item.get("retired"):
+            merged["retired"] = True
+        else:
+            merged.pop("retired", None)
+        cleaned.append(merged)
+    if not any(not item.get("retired") for item in cleaned):
+        raise Invalid("The vocabulary is not valid.", {"items": "Keep at least one value in use."})
+    put(session, name, cleaned)
+    return get(session, name)
 
 
 def put(session: Session, name: str, items: list[dict[str, Any]]) -> None:

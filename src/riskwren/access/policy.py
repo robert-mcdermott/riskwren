@@ -70,6 +70,20 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("POST", "/api/v1/tidy/not-duplicates"): Needs.MEMBER,
     ("GET", "/api/v1/accounts/{account_id}/holdings"): Needs.MEMBER,
     ("POST", "/api/v1/accounts/{account_id}/handover"): Needs.MEMBER,
+    # Risk analyses are records like any other: who may start, work through, or read one
+    # is decided where it is read or written.
+    ("GET", "/api/v1/risk-analyses"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/preview"): Needs.MEMBER,
+    ("GET", "/api/v1/risk-analyses/{ref}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/risk-analyses/{ref}"): Needs.MEMBER,
+    ("PUT", "/api/v1/risk-analyses/{ref}/owners"): Needs.MEMBER,
+    ("GET", "/api/v1/risk-analyses/{ref}/history"): Needs.MEMBER,
+    ("GET", "/api/v1/risk-analyses/{ref}/assets/{subject}"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/items/{item_id}"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/assets/{subject}/rest"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/close"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/reopen"): Needs.MEMBER,
     # Indicators are records like any other: what a person may see or change is decided
     # where it is read or written.
     ("GET", "/api/v1/indicators"): Needs.MEMBER,
@@ -120,6 +134,11 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/vocabularies"): Needs.MEMBER,
     ("GET", "/api/v1/admin/visibility"): Needs.CONFIGURE,
     ("PUT", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+    ("GET", "/api/v1/admin/vocabularies"): Needs.CONFIGURE,
+    ("PUT", "/api/v1/vocabularies/{name}"): Needs.CONFIGURE,
+    ("POST", "/api/v1/risk-categories"): Needs.CONFIGURE,
+    ("POST", "/api/v1/program/preview"): Needs.CONFIGURE,
+    ("POST", "/api/v1/program/publish"): Needs.CONFIGURE,
 }
 
 

@@ -198,6 +198,130 @@
         "title": "AddTestBody",
         "type": "object"
       },
+      "AnalysisBody": {
+        "description": "A change to an analysis. Send only what changes, with the ``version`` you had.",
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "AnalysisBody",
+        "type": "object"
+      },
+      "AnswerBody": {
+        "properties": {
+          "look_again": {
+            "default": false,
+            "description": "For covered: put its rating in doubt",
+            "title": "Look Again",
+            "type": "boolean"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For raised: its title",
+            "title": "Name"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why",
+            "title": "Note"
+          },
+          "outcome": {
+            "description": "not_applicable, covered, raised, or pending to take back",
+            "title": "Outcome",
+            "type": "string"
+          },
+          "risk": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For covered: the risk's reference",
+            "title": "Risk"
+          }
+        },
+        "required": [
+          "outcome"
+        ],
+        "title": "AnswerBody",
+        "type": "object"
+      },
       "BrandingBody": {
         "properties": {
           "accent": {
@@ -351,6 +475,18 @@
             ],
             "title": "Description"
           },
+          "move": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "up or down, among those beside it",
+            "title": "Move"
+          },
           "name": {
             "anyOf": [
               {
@@ -376,6 +512,24 @@
           }
         },
         "title": "CategoryBody",
+        "type": "object"
+      },
+      "CloseBody": {
+        "properties": {
+          "conclusion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the analysis found",
+            "title": "Conclusion"
+          }
+        },
+        "title": "CloseBody",
         "type": "object"
       },
       "ClosureBody": {
@@ -2026,6 +2180,67 @@
         "title": "NewAccount",
         "type": "object"
       },
+      "NewCategoryBody": {
+        "properties": {
+          "appetite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A rating; needed at the top",
+            "title": "Appetite"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Made from the name if absent",
+            "title": "Key"
+          },
+          "name": {
+            "maxLength": 200,
+            "title": "Name",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The key of the category above it",
+            "title": "Parent"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "NewCategoryBody",
+        "type": "object"
+      },
       "NewPassword": {
         "properties": {
           "new_password": {
@@ -2081,6 +2296,24 @@
           "kind"
         ],
         "title": "NewUnit",
+        "type": "object"
+      },
+      "NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
         "type": "object"
       },
       "OwnersBody": {
@@ -2344,6 +2577,61 @@
           }
         },
         "title": "ProcessBody",
+        "type": "object"
+      },
+      "ProgramChange": {
+        "description": "A change to what moves risks. Send only the parts that change, each of them whole.",
+        "properties": {
+          "appetites": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Category key to rating; null takes the one above",
+            "title": "Appetites"
+          },
+          "cadences": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The whole cadence table",
+            "title": "Cadences"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The whole scoring method",
+            "title": "Method"
+          }
+        },
+        "title": "ProgramChange",
         "type": "object"
       },
       "QuestionnaireChange": {
@@ -3107,6 +3395,102 @@
         "title": "SignIn",
         "type": "object"
       },
+      "StartBody": {
+        "description": "What to look at, and against what. Name a scope, or a unit for everything it and the\nunits beneath it hold; and library risks, whole categories of them, or both.",
+        "properties": {
+          "categories": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Keys of risk categories",
+            "title": "Categories"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The unit; a scope's own if absent",
+            "title": "Org Unit Id"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A scope's reference, such as SCP-0002",
+            "title": "Scope"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why it is being done, and how",
+            "title": "Summary"
+          },
+          "threats": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Keys of library risks",
+            "title": "Threats"
+          }
+        },
+        "title": "StartBody",
+        "type": "object"
+      },
       "SystemBody": {
         "properties": {
           "criticality": {
@@ -3656,6 +4040,24 @@
           "visibility"
         ],
         "title": "VisibilityBody",
+        "type": "object"
+      },
+      "VocabularyBody": {
+        "properties": {
+          "items": {
+            "description": "Every value, in order: key, label, description, and retired",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "VocabularyBody",
         "type": "object"
       },
       "riskwren__api__routers__assessments__AssessmentBody": {
@@ -5253,6 +5655,29 @@
           }
         },
         "summary": "Change how much of the register everyone can see",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/admin/vocabularies": {
+      "get": {
+        "operationId": "describe_vocabularies_api_v1_admin_vocabularies_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Describe Vocabularies Api V1 Admin Vocabularies Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Every vocabulary, with what may be changed in it",
         "tags": [
           "inventory"
         ]
@@ -12838,6 +13263,94 @@
         ]
       }
     },
+    "/api/v1/program/preview": {
+      "post": {
+        "description": "Makes the change, lists every open risk whose rating, standing, or next review moved,\nand then undoes it. Nothing is changed, and what is listed is exactly what publishing\nthe same change would move.",
+        "operationId": "preview_program_api_v1_program_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Preview Program Api V1 Program Preview Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "See which risks a change to the program would move",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
+    "/api/v1/program/publish": {
+      "post": {
+        "description": "A changed scoring method is published as a new version. Every open risk is read again\nunder what is now in force; assessments keep the rating they were given.",
+        "operationId": "publish_program_api_v1_program_publish_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Publish Program Api V1 Program Publish Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change the scoring method, appetite, or cadences",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
     "/api/v1/questionnaires": {
       "get": {
         "operationId": "list__api_v1_questionnaires_get",
@@ -13237,6 +13750,767 @@
         "summary": "Confirm a test result, or return it",
         "tags": [
           "assessments"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses": {
+      "get": {
+        "operationId": "list_analyses_api_v1_risk_analyses_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; start with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "-updated_at",
+              "description": "A field name; start with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Analyses Api V1 Risk Analyses Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find risk analyses",
+        "tags": [
+          "risk analyses"
+        ]
+      },
+      "post": {
+        "description": "One question is made for each thing against each threat. Nothing is added later, so\nthe analysis says what it looked at on the day it started.",
+        "operationId": "start_analysis_api_v1_risk_analyses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Analysis Api V1 Risk Analyses Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start a risk analysis",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/preview": {
+      "post": {
+        "operationId": "preview_analysis_api_v1_risk_analyses_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Preview Analysis Api V1 Risk Analyses Preview Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "How big an analysis would be",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}": {
+      "get": {
+        "operationId": "show_analysis_api_v1_risk_analyses__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Analysis Api V1 Risk Analyses  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One analysis: its progress and what it found",
+        "tags": [
+          "risk analyses"
+        ]
+      },
+      "patch": {
+        "operationId": "update_analysis_api_v1_risk_analyses__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Analysis Api V1 Risk Analyses  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename or describe an analysis",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/assets/{subject}": {
+      "get": {
+        "operationId": "show_asset_api_v1_risk_analyses__ref__assets__subject__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject",
+            "required": true,
+            "schema": {
+              "title": "Subject",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Asset Api V1 Risk Analyses  Ref  Assets  Subject  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One thing in an analysis, with each threat and what might answer it",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/assets/{subject}/rest": {
+      "post": {
+        "operationId": "answer_rest_api_v1_risk_analyses__ref__assets__subject__rest_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subject",
+            "required": true,
+            "schema": {
+              "title": "Subject",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Rest Api V1 Risk Analyses  Ref  Assets  Subject  Rest Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say none of the unanswered threats apply to one thing",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/close": {
+      "post": {
+        "operationId": "close_analysis_api_v1_risk_analyses__ref__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Close Analysis Api V1 Risk Analyses  Ref  Close Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close an analysis, with what it found",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/history": {
+      "get": {
+        "operationId": "analysis_history_api_v1_risk_analyses__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Analysis History Api V1 Risk Analyses  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that happened in an analysis",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/items/{item_id}": {
+      "post": {
+        "description": "The threat does not apply to the thing; a risk on the register covers it; or a risk\nis raised for it, started from the library with the thing as what it concerns.",
+        "operationId": "answer_item_api_v1_risk_analyses__ref__items__item_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Item Api V1 Risk Analyses  Ref  Items  Item Id  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer one question",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/owners": {
+      "put": {
+        "operationId": "set_analysis_owners_api_v1_risk_analyses__ref__owners_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Analysis Owners Api V1 Risk Analyses  Ref  Owners Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set who leads an analysis",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-analyses/{ref}/reopen": {
+      "post": {
+        "operationId": "reopen_analysis_api_v1_risk_analyses__ref__reopen_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reopen Analysis Api V1 Risk Analyses  Ref  Reopen Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reopen a closed analysis",
+        "tags": [
+          "risk analyses"
+        ]
+      }
+    },
+    "/api/v1/risk-categories": {
+      "post": {
+        "operationId": "add_category_api_v1_risk_categories_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCategoryBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Category Api V1 Risk Categories Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a risk category",
+        "tags": [
+          "risks"
         ]
       }
     },
@@ -18073,6 +19347,61 @@
           }
         },
         "summary": "The lists of values records choose from",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/vocabularies/{name}": {
+      "put": {
+        "description": "A value's key never changes, so renaming one never rewrites a record. A value in use\nis retired, not removed: records keep it and new ones cannot choose it.",
+        "operationId": "save_vocabulary_api_v1_vocabularies__name__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VocabularyBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Vocabulary Api V1 Vocabularies  Name  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename, reorder, add to, or retire a vocabulary",
         "tags": [
           "inventory"
         ]

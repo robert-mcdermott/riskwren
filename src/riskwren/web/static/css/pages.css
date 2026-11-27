@@ -138,3 +138,23 @@
 .pill-x { min-width: 24px; min-height: 24px; }
 .drawer-header .icon-button { flex: none; }
 .pick { width: 24px; height: 24px; accent-color: var(--accent); cursor: pointer; }
+
+/* Program editors */
+.draft-bar { position: sticky; top: var(--space-3); z-index: 5; display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-4); border: 1px solid var(--warn); border-radius: var(--radius-m); background: var(--warn-soft); color: var(--text); box-shadow: var(--shadow-1); }
+.indent { padding-left: var(--space-5); }
+.matrix-pick { width: 100%; min-width: 0; padding-left: 6px; padding-right: 22px; font-size: var(--text-s); background-color: var(--surface-1); color: var(--text); }
+.fold { border: 1px solid var(--border); border-radius: var(--radius-m); padding: var(--space-3) var(--space-4); }
+.fold > summary { cursor: pointer; font-weight: 600; }
+.fold[open] > summary { margin-bottom: var(--space-3); }
+.input.short { max-width: 110px; display: inline-block; }
+.field .unit { margin-left: var(--space-2); color: var(--text-muted); }
+.card-pad { padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border); }
+.add-row { align-items: flex-end; }
+.add-row .field { flex: 1 1 260px; max-width: 420px; }
+.ref { font-family: var(--font-mono); font-size: var(--text-s); color: var(--text-muted); }
+.table del { color: var(--text-muted); }
+.table ins { text-decoration: none; font-weight: 600; }
+
+/* Risk analyses */
+.question { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-5); align-items: start; }
+@media (max-width: 900px) { .question { grid-template-columns: minmax(0, 1fr); } }

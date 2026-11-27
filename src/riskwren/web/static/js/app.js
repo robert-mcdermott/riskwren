@@ -86,6 +86,9 @@ async function boot() {
   route("/search", page("find", "searchPage"));
   route("/tidy", page("find", "tidyPage"));
   route("/handover/:id", page("find", "handoverPage"));
+  route("/risk-analyses", page("analyses", "analysisList"));
+  route("/risk-analyses/:ref", page("analyses", "analysisPage"));
+  route("/risk-analyses/:ref/:subject", page("analyses", "analysisAsset"));
   route("/indicators", page("indicators", "indicatorList"));
   route("/indicators/:ref", page("indicators", "indicatorPage"));
   route("/campaigns", page("campaigns", "campaignList"));

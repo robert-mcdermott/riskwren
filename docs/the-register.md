@@ -213,6 +213,29 @@ If you may not accept a risk, its page says why and what is needed. An acceptanc
 
 An acceptance covers the rating that was accepted. If the residual rating later rises above it, or the acceptance expires or is withdrawn, the risk needs a decision again. **Acceptances** in the sidebar lists them, soonest to expire first, and can show only those expiring within 30 or 90 days.
 
+## Risk analyses
+
+A risk analysis is a structured look at what is in a scope: each thing taken against each of a list of threats. It is the exercise a security rule or a funder asks for by name, and it leaves a report of what was considered. **Risks → Analyses → Start a risk analysis** (a steward, a manager, or an assessor).
+
+- **What to look at:** what a [scope](compliance.md)'s boundary names, including everything held by the units it names; or everything a unit and the units beneath it hold. Only what is in use, and only what you may see.
+- **Which threats:** whole categories of the risk library. Each library risk is one threat.
+
+One question is made for each thing against each threat, on the day it starts; the form says how many before you begin. Nothing is added later, so the analysis says what it looked at.
+
+Open a thing to work through it. For each threat there are three answers, each with room to say why:
+
+| Answer | What it does |
+|---|---|
+| **Does not apply** | Records that it was considered and set aside, with the reason |
+| **A risk already covers it** | Names the risk. The risk now says it concerns this thing. Tick **its rating needs another look** to put its residual rating in doubt and tell its owners |
+| **Raise a risk** | Starts a risk from the library, in the thing's unit, about the thing. It goes to whoever owns the thing, and they are told |
+
+Risks already on the register that were started from the same threat, in the thing's unit or about the thing itself, are offered first. **None of the others apply** answers the rest for one thing at once.
+
+The analysis page shows how far it has got, each thing with its count, and the risks raised and looked at again. Whoever leads it has **Carry on** on Home until it is finished. It can be closed only when every question has an answer and with a few sentences on what it found, so the report passes over nothing in silence.
+
+**Report** lists everything considered, thing by thing, with what was decided, why, by whom, and when, and prints. It keeps the names things had on the day, so it still reads if one is later renamed or retired. A closed analysis can be reopened by those who work it.
+
 ## Find anything
 
 Press **⌘K** (or Ctrl K), or use the box at the top of every page, and type a name, a reference, or a few words. Records that match appear under the pages and actions; **Search everything** opens the full results.
@@ -282,6 +305,7 @@ A reading that falls due is on its owners' Home and is reminded as it falls due 
 
 - **Register** lists risks, with filters for category, residual rating, standing, and unit, a switch for the ones you are named on, and grouping by category or unit.
 - **Indicators** lists every indicator with where it stands, and can show only those past their limit, past their warning level, or never read.
+- **Analyses** lists the risk analyses, open and closed, each with how much of it has been answered.
 - **Heat map** places every rated risk on the matrix, for the residual, inherent, or target rating, for a unit and everything beneath it, or for one category. Each cell opens the risks in it.
 - **Reports → Risk** shows where the register stands, and **Reports → Compliance** how ready each scope is against what it is held to. Every figure opens the list it counts. See [Read the dashboards](running-the-program.md#read-the-dashboards).
 - **⌘K** (or Ctrl K) finds any record by name or reference, and goes to any page. See [Find anything](#find-anything).

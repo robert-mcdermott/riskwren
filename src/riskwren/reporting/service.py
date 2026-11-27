@@ -405,6 +405,22 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             f"/campaign-items/{item.id}", campaign.due_on, ref=campaign.ref,
         )  # fmt: skip
 
+    # An analysis the person leads that still has questions without an answer.
+    from riskwren.risk.analysis import ANALYSIS
+
+    led, _ = records.search(
+        session, principal, ANALYSIS, {"mine": True, "status": "open"}, limit=20
+    )
+    for found, card in zip(led, records.cards(session, ANALYSIS, led), strict=True):
+        if card["pending"]:
+            left = card["pending"]
+            add(
+                "analysis", f"Carry on with {found.name}",
+                f"{left} of {card['items']} questions have no answer yet."
+                if left != 1 else f"1 of {card['items']} questions has no answer yet.",
+                f"/risk-analyses/{found.ref}", None, ref=found.ref,
+            )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 

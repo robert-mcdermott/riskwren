@@ -112,7 +112,17 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
 
     describe = record_type.extra.get("history_title")
     title = describe(event, lookups) if describe else None
-    if title:
+    # Some operations change what is otherwise only ever changed by something already told
+    # (a rating, by an assessment). Told under their own title, they show every line.
+    loud = (event.context or {}).get("op") in record_type.extra.get("history_loud", ())
+    if title and loud and event.action == "updated":
+        lines = [
+            {"field": field, "label": lookups.labels.get(field, words(field)),
+             "before": lookups.value(field, old), "after": lookups.value(field, new)}
+            for field, (old, new) in changes.items()
+            if field not in HIDDEN
+        ]  # fmt: skip
+    elif title:
         pass
     elif event.subject_type == "record_owner":
         person = lookups.name("account", now("account_id"))

@@ -682,8 +682,9 @@ def build_parser() -> argparse.ArgumentParser:
     disable = people_commands.add_parser(
         "disable",
         help="stop an account signing in",
-        description="Stop an account signing in and end its sessions. Its records and history "
-        "are kept. The last active administrator cannot be disabled.",
+        description="Stop an account signing in and end its sessions. Its history is kept, "
+        "and what the person alone answered for passes to the steward of its unit until "
+        "someone is named for good. The last active administrator cannot be disabled.",
     )
     enable = people_commands.add_parser(
         "enable",
@@ -780,7 +781,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="load a program pack",
         description="Load a program pack. The whole pack is checked first, and nothing is "
         "loaded unless all of it can be. A new scoring method is published as a new version; "
-        "assessments already made keep the version they were made under.",
+        "assessments already made keep the version they were made under, and every open risk "
+        "is read again from what was loaded: its ratings, its standing, and its next review.",
     )
     program_import.add_argument("file", metavar="FILE", help="the pack to load")
     program_import.add_argument(

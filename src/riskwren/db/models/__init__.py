@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
 from riskwren.db.models.compliance import (
     Assessment,
     Baseline,
@@ -125,6 +126,8 @@ __all__ = [
     "Requirement",
     "Response",
     "Risk",
+    "RiskAnalysis",
+    "RiskAnalysisItem",
     "RiskAssessment",
     "RiskCategory",
     "RiskControl",

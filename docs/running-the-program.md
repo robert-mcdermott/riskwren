@@ -73,15 +73,70 @@ One consequence is worth knowing. Under the default setting a steward cannot lin
 
 ## Shape the program
 
-**Admin → Program** shows how risks are rated here, in full: the categories and their appetite, the matrix, what follows from each rating, and the written definition of every level. Anyone assessing a risk sees the same definitions as they choose.
+**Admin → Program** is where the program is kept, by those who run it: managers for the whole organization, and administrators. It has five parts.
+
+| Part | What is there |
+|---|---|
+| Categories and appetite | The kinds of risk, in a tree two deep, and how much of each the organization will live with |
+| Scales and matrix | What each level of likelihood and impact means, the ratings, and the matrix that combines them |
+| Cadences | How often risks are reviewed and key controls tested, how long a rating stands, how long an issue is given, and when reminders go |
+| Vocabularies | The lists records choose from: kinds of system, data classes, root causes, and the rest |
+| Who sees what | How much of the register a person with no role sees |
 
 ![Admin, Program: the categories with their appetite, the matrix, and the written definition of every level](img/program-light.webp)
 
+### See what a change would do before you make it
+
+Three things can move a risk without anyone touching it: the **matrix** gives it its rating, **appetite** its standing, and the **cadences** its next review. A change to any of them is not made as you type. The page holds it as a draft, says so in a bar at the top, and **Preview and publish** shows every open risk that would change, with what would change about it:
+
+- its inherent, residual, or target **rating**;
+- its **standing**: a risk within appetite may now need a decision, or the other way about;
+- when it is **next reviewed**.
+
+Nothing has changed at that point. **Publish** makes the change, and changes exactly the risks listed. **Cancel** leaves everything as it was, draft included; **Discard** drops the draft.
+
+What is published is recorded in the history, and each risk that moved says so in its own history, with the line that changed.
+
+### Categories
+
+**Add a category** at the top of the tree or beneath a category that is there. A category at the top needs an appetite of its own. **Edit** renames one, describes it, or retires it: a retired category is not offered to new risks, and risks already in it keep it. The arrows put categories in the order people will choose from.
+
 ### Appetite
 
-Appetite is the highest residual rating the organization will live with for a kind of risk without a plan or an acceptance. It is set for each of the nine top categories and can be set differently for any category beneath; one that sets none takes its parent's.
+Appetite is the highest residual rating the organization will live with for a kind of risk without a plan or an acceptance. It is set for each top category and can be set differently for any category beneath; one that sets none takes its parent's.
 
-As shipped, clinical, regulatory, and financial risk have a low appetite, strategic risk a high one, and the rest moderate. Change any of them on the Program page. The page says at once how many risks changed standing, and the change is recorded in the history.
+As shipped, clinical, regulatory, and financial risk have a low appetite, strategic risk a high one, and the rest moderate. Changing one is previewed first, because it changes which risks need a decision.
+
+### Scales and matrix
+
+Every word in the method can be changed: the name and meaning of each level of likelihood, the name of each level of impact, what each impact level means on each dimension, and the name and meaning of each rating. Each cell of the matrix is a choice of rating.
+
+- **A rating may not fall as likelihood or impact rises.** A matrix that breaks this is refused, with the reason.
+- **Publishing makes a new version.** Every open risk is read again from the matrix now in force, so the register always speaks one language. Each judgment already made keeps the rating it was given and the version it was made under: the assessments of a risk show what was decided at the time, and its history shows when the program moved it.
+- **The shape stays.** The number of levels and the set of ratings are changed with a program pack, because appetite, acceptances, the review cadence, and people's limits all name the ratings. So is how much a control may reduce a rating.
+
+### Cadences
+
+| Cadence | As shipped |
+|---|---|
+| How often a risk is reviewed, by residual rating | Critical 3 months, high 6, moderate 12, low 24 |
+| How soon a risk not yet rated is due | 3 months |
+| How long a control's rating, a test result, and evidence hold | 12 months |
+| How often a key control is tested | 6 months |
+| The longest an exception may run | 12 months |
+| How long an issue is given, by severity | Critical 30 days, high 90, moderate 180, low 365 |
+| Reminders | 14 days before; the steward 7 days late; the leader 21 days late |
+
+A higher rating is never reviewed less often, and a more severe issue is never given longer. Changing how often risks are reviewed moves their review dates, so it is previewed. An issue already raised keeps the date it was given.
+
+### Vocabularies
+
+Choose a list, then rename its values, say what each means, put them in order, add one, or retire one.
+
+- **Records store a value's key, never its name**, so renaming a value rewrites nothing. A new value's key is made from its name and never changes.
+- **A value in use is retired, not removed.** Records that have it keep it; new records cannot choose it.
+- **Some lists can only be renamed.** A severity sets a clock, a kind of link says what it joins, an owner kind decides who may edit. Their names, meanings, and order can be changed here; values are added or taken away with a program pack.
+- **A value new records start with cannot be retired**, such as a system's lifecycle "in service".
 
 ### Who may accept what
 
@@ -96,18 +151,6 @@ The table on the Program page shows, for each rating, how often a risk is review
 
 A leader's limit is set with the role. A sensible start: unit leaders at moderate, division leaders at high, and one or two executives at critical.
 
-### Clocks for issues and exceptions
-
-Two more rules are part of the program:
-
-| Rule | As shipped |
-|---|---|
-| How long after it is raised an issue is due, by severity | Critical 30 days, high 90, moderate 180, low 365 |
-| The longest an exception may run | 12 months |
-| How long a control's rating, a test result, and evidence hold | 12 months |
-
-They are in the program pack under `cadences`, as `issue_due_days`, `exception_max_months`, and `control_rating_months`. The meanings of the four severities, the root causes an issue is closed with, what can find an issue, and the other systems a record can be known in (each with an optional address pattern, so that an identifier becomes a link) are vocabularies in the same pack.
-
 ### Change the program with a pack
 
 The scoring method, cadences, the acceptance table, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
@@ -118,7 +161,9 @@ uv run riskwren program import program.json --dry-run   # check an edited one
 uv run riskwren program import program.json             # load it
 ```
 
-An import checks the whole pack first and reports every problem together. A scoring method in which a rating falls as likelihood or impact rises is refused. A changed method becomes a new version: assessments already made keep the version they were made under, so an old rating always means what it meant.
+An import checks the whole pack first and reports every problem together. A scoring method in which a rating falls as likelihood or impact rises is refused. A changed method becomes a new version: assessments already made keep the version they were made under, and every open risk is read again from what was loaded, as it is when a change is published in the app.
+
+A pack is the way to change what the Program page does not: who may accept what, the number of levels and ratings, and how much a control may reduce a rating.
 
 A pack is also how one installation's program is copied to another, and how a program is kept under version control.
 

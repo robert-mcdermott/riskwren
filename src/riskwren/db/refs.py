@@ -26,6 +26,7 @@ PREFIXES = {
     "EXC": "Exception",
     "CMP": "Campaign",
     "IND": "Indicator",
+    "RAN": "Risk analysis",
     "POL": "Policy document",
     "AGR": "Agreement",
     "AUD": "Audit engagement",

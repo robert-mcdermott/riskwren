@@ -88,7 +88,7 @@ Decision record: [ADR-0009](decisions/0009-documentation-toolchain.md)
 | 4 | Campaigns | Risk and control self-assessment, control attestation, and unit completeness campaigns, with coverage by unit; evidence requests; attestation as a basis of assurance, shown apart from a test | ☑ |
 | 5 | Indicators | Indicators with thresholds, readings, and trends, linked to risks; breaches raise notices | ☑ |
 | 6 | Find and tidy | Search across all records, saved views, completeness, duplicates, and reassignment when someone leaves | ☑ |
-| 7 | Program editors | Editing the taxonomy, scoring method, appetite, cadences, and vocabularies in the app with an impact preview; structured risk assessments over a scope | ☐ |
+| 7 | Program editors | Editing the taxonomy, scoring method, appetite, cadences, and vocabularies in the app with an impact preview; structured risk assessments over a scope | ☑ |
 | 8 | Release prep | Guides, changelog, release | ☐ |
 
 Detail: [waves/wave-3.md](waves/wave-3.md)

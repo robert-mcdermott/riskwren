@@ -196,6 +196,8 @@ def _history_title(event: Event, lookups: Any) -> str | None:
         return f"Assessed the {now('kind')} risk as {rating}"
     if event.subject_type == "risk_assessment":
         return "An earlier assessment was superseded"
+    if event.subject_type == "risk" and (event.context or {}).get("op") == "program.change":
+        return "Changed when the program was changed"
     if event.subject_type == "risk_subject":
         kind = now("subject_type")
         name = lookups.name(kind, now("subject_id")) if kind in TYPES else "a record"
@@ -273,6 +275,7 @@ RISK = register(
             },
             "history_title": _history_title,
             "history_value": _history_value,
+            "history_loud": ("program.change",),
             "history_quiet": (
                 "next_review_on",
                 *(
@@ -306,8 +309,10 @@ RISK = register(
 # --- Raising and changing -----------------------------------------------------------------
 
 
-def create(session: Session, principal: Principal, values: Mapping[str, Any]) -> Risk:
-    risk: Risk = records.create(session, principal, RISK, values)
+def create(
+    session: Session, principal: Principal, values: Mapping[str, Any], *, checked: bool = False
+) -> Risk:
+    risk: Risk = records.create(session, principal, RISK, values, checked=checked)
     with audit.operation(session, "risk.create"):
         refresh(session, risk)
     return risk
@@ -361,7 +366,9 @@ def next_review(session: Session, risk: Risk) -> date | None:
     if newest is None:
         months = int(cadences.get("unrated_risk_review_months", 3))
         return rules.add_months(risk.created_at.date(), months)
-    months = int(cadences["risk_review_months"].get(newest.rating, 12))
+    # The rating as the method in force reads it, which may not be the one it was given.
+    rating = risk.residual_rating or newest.rating
+    months = int(cadences["risk_review_months"].get(rating, 12))
     return rules.add_months(newest.assessed_at.date(), months)
 
 

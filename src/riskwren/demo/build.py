@@ -57,6 +57,8 @@ from riskwren.db.models import (
     Indicator,
     Issue,
     Risk,
+    RiskAnalysis,
+    RiskAnalysisItem,
     Scope,
     TreatmentPlan,
 )
@@ -66,7 +68,7 @@ from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PART
 from riskwren.oversight import campaigns
 from riskwren.people import accounts, handover, units
 from riskwren.program import branding, packs, settings
-from riskwren.risk import categories, indicators, register
+from riskwren.risk import analysis, categories, indicators, register
 from riskwren.risk.indicators import INDICATOR
 from riskwren.risk.register import RISK
 from riskwren.treatment import service as treatment
@@ -2279,6 +2281,58 @@ class Builder:
                 )  # fmt: skip
             self.risks[risk]["owner"] = by
 
+    def _story_analyses(self) -> Script:
+        """Two risk analyses by the assurance team: one of the clinic's systems, finished and
+        reported, and one of the data enclave, part of the way through."""
+        lead = self.cast["assess1"]
+        for spec in c.ANALYSES:
+            yield self._on(spec["began"])
+            with self.act(lead) as (session, who):
+                scope = session.scalars(select(Scope).where(Scope.name == spec["scope"])).one()
+                found = analysis.start(
+                    session, who,
+                    {"name": spec["name"], "summary": spec["summary"], "scope": scope.ref,
+                     "categories": spec["categories"]},
+                )  # fmt: skip
+                made = found.id
+                refs = list(dict.fromkeys(
+                    session.scalars(
+                        select(RiskAnalysisItem.subject_ref)
+                        .where(RiskAnalysisItem.analysis_id == made)
+                        .order_by(RiskAnalysisItem.id)
+                    )
+                ))  # fmt: skip
+            self.tally("risk analyses")
+            walked = refs[: max(1, round(len(refs) * spec["walked"]))]
+            raised = 0
+            for at, ref in enumerate(walked):
+                yield self._on(spec["began"] - 1 - at * spec["pace"], hour=14)
+                with self.act(lead) as (session, who):
+                    found = session.get(RiskAnalysis, made)
+                    page = analysis.asset(session, who, found, ref)
+                    for index, item in enumerate(page["items"]):
+                        row = session.get(RiskAnalysisItem, item["id"])
+                        if item["suggested"]:
+                            again = (at + index) % 5 == 0
+                            values = {"outcome": "covered", "risk": item["suggested"][0]["ref"],
+                                      "look_again": again,
+                                      "note": c.ANALYSIS_NOTES["again" if again else "covered"]}  # fmt: skip
+                        elif (at * 3 + index) % 11 == 4 and raised < spec["raises"]:
+                            values = {"outcome": "raised", "note": c.ANALYSIS_NOTES["raised"]}
+                            raised += 1
+                            self.tally("risks raised by an analysis")
+                        else:
+                            notes = c.ANALYSIS_NOTES["not_applicable"]
+                            values = {"outcome": "not_applicable",
+                                      "note": notes[(at + index) % len(notes)]}  # fmt: skip
+                        analysis.consider(session, who, found, row, values)
+            if spec.get("conclusion"):
+                yield self._on(spec["began"] - 2 - len(walked) * spec["pace"], hour=16)
+                with self.act(lead) as (session, who):
+                    analysis.close(
+                        session, who, session.get(RiskAnalysis, made), spec["conclusion"]
+                    )
+
     def _story_views(self) -> Script:
         """Lists people keep coming back to, saved and shared."""
         yield self.ago(60)
@@ -2337,7 +2391,7 @@ class Builder:
             self._story_escalated, self._story_departure, self._story_power,
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
-            self._story_indicators, self._story_views,
+            self._story_indicators, self._story_views, self._story_analyses,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

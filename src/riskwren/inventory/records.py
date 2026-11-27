@@ -258,8 +258,12 @@ def create(
     principal: Principal,
     record_type: RecordType,
     values: Mapping[str, Any],
+    *,
+    checked: bool = False,
 ) -> Any:
-    """Add a record. Whoever adds it becomes its owner until they name someone else."""
+    """Add a record. Whoever adds it becomes its owner until they name someone else.
+    ``checked`` says the caller has already decided, by a rule of its own, that this person
+    may add it here."""
     now = utc_now()
     record: Any = record_type.model(created_by=principal.account_id, created_at=now, updated_at=now)
     record.tags, record.restricted, record.version = [], False, 1
@@ -272,7 +276,7 @@ def create(
     if errors:
         raise Invalid(f"The {record_type.label} was not saved.", errors)
     may_add = record_type.extra.get("can_add")
-    allowed = (
+    allowed = checked or (
         may_add(principal, record.org_unit_id)
         if may_add is not None
         else access.can_add(principal, record.org_unit_id)

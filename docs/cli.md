@@ -95,7 +95,7 @@ List every account with its status and roles.
 
 ### `riskwren users disable`
 
-Stop an account signing in and end its sessions. Its records and history are kept. The last active administrator cannot be disabled.
+Stop an account signing in and end its sessions. Its history is kept, and what the person alone answered for passes to the steward of its unit until someone is named for good. The last active administrator cannot be disabled.
 
 | Option | Meaning |
 |---|---|
@@ -171,7 +171,7 @@ Write the whole program as one JSON document, to a file or to standard output.
 
 ### `riskwren program import`
 
-Load a program pack. The whole pack is checked first, and nothing is loaded unless all of it can be. A new scoring method is published as a new version; assessments already made keep the version they were made under.
+Load a program pack. The whole pack is checked first, and nothing is loaded unless all of it can be. A new scoring method is published as a new version; assessments already made keep the version they were made under, and every open risk is read again from what was loaded: its ratings, its standing, and its next review.
 
 | Option | Meaning |
 |---|---|

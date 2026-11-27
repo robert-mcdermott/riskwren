@@ -12,6 +12,11 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   for (records, open actions, treatment plans, and what campaigns were waiting on them for)
   passes to the steward of its unit, who is told, until someone is named for good. Before,
   such records were shown as having nobody answering for them.
+- **Publishing a scoring method re-reads the register.** Every open risk takes its ratings
+  from the matrix now in force, then its standing and its next review, whether the method
+  is published in the app or loaded from a program pack. Before, a risk kept the rating its
+  last assessment gave it until it was assessed again. Each assessment still keeps the
+  rating it was given and the version it was made under.
 - **A list's search needs every word, in any order.** Before, the words had to appear
   together as typed.
 - Risks are brought up to date with the calendar every hour by a scheduled job, as well as
@@ -97,6 +102,19 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   says they are different things.
 - **Passing on what a person held.** A page lists everything someone answers for, and an
   administrator, or a steward for their own units, passes it to someone else in one step.
+- **The program is edited where it is used.** Admin → Program has editors for the risk
+  categories, the scales and the matrix, appetite, the cadences, and the vocabularies.
+  Categories are added, renamed, ordered, and retired; values of a vocabulary are renamed,
+  ordered, added, and retired, and never re-keyed.
+- **A preview before anything moves.** A change to the matrix, to appetite, or to the
+  cadences is held as a draft. Preview lists every open risk whose rating, standing, or
+  next review would change, and publishing changes exactly those. The preview is the change
+  itself, made and then undone, so the two cannot disagree.
+- **Risk analyses.** A structured assessment over a scope or a unit: each thing in it is
+  taken against each threat from the risk library, and the answer is that it does not
+  apply, that a risk on the register covers it, or that a risk is raised for the thing's
+  owner. It closes when every question has an answer, and its report says what was
+  considered, what was decided, and why.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
 
