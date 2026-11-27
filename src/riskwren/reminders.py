@@ -1,7 +1,8 @@
 """Reminders and escalation: what is nearly due or late, and who is told (OVS-03).
 
 One pass looks at everything with a date on it: actions, risk reviews, issues, evidence,
-acceptances, exceptions, and the next test of each control. Whoever a thing is waiting on is
+acceptances, exceptions, the next test of each control, and the review of each document.
+Whoever a thing is waiting on is
 reminded shortly before its date and again when it passes. If it stays late, the steward of
 its unit is told, and later the unit's leader. Each of those is said once for a given date;
 moving the date starts again.
@@ -33,6 +34,7 @@ from riskwren.db.models import (
     ExceptionRequest,
     Indicator,
     Issue,
+    PolicyDocument,
     Reminder,
     Risk,
     Scope,
@@ -185,6 +187,28 @@ def _campaign_items(session: Session, horizon: date) -> Iterator[Due]:
         )
 
 
+def _documents(session: Session, horizon: date) -> Iterator[Due]:
+    """Documents in force that are due to be looked at again."""
+    for document in session.scalars(
+        select(PolicyDocument).where(
+            PolicyDocument.status == "active",
+            PolicyDocument.next_review_on.is_not(None),
+            PolicyDocument.next_review_on <= horizon,
+        )
+    ):
+        assert document.next_review_on is not None
+        yield Due(
+            "document_review",
+            document.id,
+            document.next_review_on,
+            f"review of {document.ref} {document.name}",
+            f"/documents/{document.ref}",
+            tuple(notices.owners(session, "document", document.id)),
+            document.org_unit_id,
+            late="Review overdue",
+        )
+
+
 def _readings(session: Session, horizon: date) -> Iterator[Due]:
     """Indicators whose next reading is due. A reading nobody takes is an indicator that
     warns of nothing."""
@@ -250,6 +274,7 @@ def send(session: Session, *, today: date | None = None) -> dict[str, int]:
         *due_items(session, today, horizon),
         *_campaign_items(session, horizon),
         *_readings(session, horizon),
+        *_documents(session, horizon),
     ]
     for due in everything:
         stage = stage_of(due, today, plan)

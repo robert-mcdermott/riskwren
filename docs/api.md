@@ -135,6 +135,11 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET /campaigns/{ref}` · `POST /campaigns/{ref}/remind` · `/close` · `/cancel` | One campaign with its coverage by unit and items; remind those who have not answered; end it |
 | `GET /campaign-items/{id}` · `POST /campaign-items/{id}/answer` · `/excuse` | What one person is asked; answer it, as a draft or in full; take it out of the campaign |
 | `GET` · `POST /indicators` · `GET` · `PATCH /indicators/{ref}` · `PUT /indicators/{ref}/owners` · `GET /indicators/{ref}/history` | Indicators with where each stands; one with its readings, trend, and the risks it warns of |
+| `GET` · `POST /documents` · `GET` · `PATCH /documents/{ref}` · `PUT /documents/{ref}/owners` · `GET /documents/{ref}/history` | Policies, standards, procedures, and guidelines; one with the version in force, the one coming, and every published version |
+| `POST` · `PATCH` · `DELETE /documents/{ref}/draft` · `POST /documents/{ref}/draft/file` | Start the next version, change it, discard it, or send a file as its content |
+| `POST /documents/{ref}/draft/submit` · `/decision` · `/withdraw` · `/publish` | Send it to named people to approve; approve it or return it; take it back; publish it |
+| `POST /documents/{ref}/review` · `/retire` · `/reinstate` | Review it and keep it as it is; take it out of use; put it back |
+| `GET /documents/{ref}/versions/{id}` · `GET …/versions/{id}/file` · `GET /documents/{ref}/compare?from=&to=` | One version; its file; two versions side by side |
 | `POST /program/preview` · `POST /program/publish` | Which open risks a change to the scoring method, appetite, or cadences would move; make the change (those who run the program) |
 | `POST /risk-categories` · `PATCH /risk-categories/{key}` | Add a risk category; rename, describe, retire, or move one |
 | `GET /admin/vocabularies` · `PUT /vocabularies/{name}` | Every vocabulary with what may be changed in it; rename, reorder, add to, or retire its values |

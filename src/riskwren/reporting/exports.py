@@ -41,6 +41,11 @@ KNOWN: dict[str, list[tuple[str, str]]] = {
         ("rated_at", "rated_at"), ("risks", "risks"),
     ],
     "scope": [("status", "status"), ("frameworks", "frameworks"), ("controls", "controls")],
+    "document": [
+        ("kind", "kind"), ("status", "status"), ("number", "version_in_force"),
+        ("working", "new_version"), ("next_review_on", "next_review_on"),
+        ("review_state", "review"),
+    ],
     "indicator": [
         ("status", "status"), ("state", "state"), ("measure", "measure"),
         ("direction", "direction"), ("warn_at", "warn_at"), ("breach_at", "breach_at"),

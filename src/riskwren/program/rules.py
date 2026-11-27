@@ -18,10 +18,13 @@ NAMES = ("cadences", "authority")
 
 
 def get(session: Session, name: str) -> dict[str, Any]:
+    """The table in force. A rule a later release adds is taken from the default program
+    until the organization sets it, so a table saved before it was known still has it."""
     if name not in NAMES:
         raise KeyError(name)
+    defaults = copy.deepcopy(vocab.default_pack()[name])
     stored = settings.get(session, f"rules.{name}", None)
-    return stored if stored is not None else copy.deepcopy(vocab.default_pack()[name])
+    return {**defaults, **stored} if stored is not None else defaults
 
 
 def put(session: Session, name: str, value: dict[str, Any]) -> bool:

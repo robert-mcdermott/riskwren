@@ -19,7 +19,7 @@ from riskwren.access.principal import Principal
 from riskwren.core import scoring
 from riskwren.core.clock import utc_now
 from riskwren.core.errors import Invalid, PermissionDenied
-from riskwren.db.models import Risk, RiskAssessment
+from riskwren.db.models import PolicyDocument, Risk, RiskAssessment
 from riskwren.db.models.risk import ASSESSMENT_KINDS
 from riskwren.events import audit
 from riskwren.program import rules, vocab
@@ -74,6 +74,7 @@ def cadence_problems(session: Session, doc: Any, ratings: list[str]) -> dict[str
         ("control_rating_months", "how long a control's rating stands"),
         ("key_control_test_months", "how often a key control is tested"),
         ("exception_max_months", "how long an exception may run"),
+        ("document_review_months", "how often a document is reviewed"),
     ):
         if not _whole(doc.get(name), *MONTHS):
             found[name] = f"Give {label} as a number of months, from 1 to 120."
@@ -100,6 +101,7 @@ def cadence_problems(session: Session, doc: Any, ratings: list[str]) -> dict[str
     unknown = set(doc) - {
         "risk_review_months", "unrated_risk_review_months", "control_rating_months",
         "key_control_test_months", "exception_max_months", "issue_due_days", "reminders",
+        "document_review_months",
     }  # fmt: skip
     if unknown:
         found["cadences"] = f"{sorted(unknown)[0]!r} is not a cadence."
@@ -154,6 +156,25 @@ def settle(session: Session) -> None:
                 risk.version += 1
                 risk.updated_at = utc_now()
         register.refresh(session, risk)
+
+
+def _redate_documents(session: Session) -> int:
+    """Documents that follow the program's review cadence take their next review from it.
+    Returns how many moved."""
+    from riskwren.policy import documents
+
+    moved = 0
+    for document in session.scalars(
+        select(PolicyDocument).where(
+            PolicyDocument.status == "active", PolicyDocument.review_months.is_(None)
+        )
+    ):
+        due = documents.next_review(session, document)
+        if document.next_review_on != due:
+            document.next_review_on = due
+            moved += 1
+    session.flush()
+    return moved
 
 
 def change(session: Session, principal: Principal, changes: Mapping[str, Any]) -> dict[str, Any]:
@@ -215,6 +236,7 @@ def change(session: Session, principal: Principal, changes: Mapping[str, Any]) -
             said.append("cadences")
         session.flush()
         settle(session)
+        redated = _redate_documents(session)
     after = _snapshot(session)
 
     moved = []
@@ -240,6 +262,7 @@ def change(session: Session, principal: Principal, changes: Mapping[str, Any]) -
             "rating": count("inherent_rating", "residual_rating", "target_rating"),
             "standing": count("standing"),
             "review": count("next_review_on"),
+            "documents": redated,
         },
         "method_version": methods.current_row(session).version,
     }

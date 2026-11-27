@@ -324,6 +324,29 @@ for _route in (
     ("POST", "/api/v1/risk-analyses/{ref}/reopen"),
 ):
     REACH[_route] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/documents"),
+    ("POST", "/api/v1/documents"),
+    ("GET", "/api/v1/documents/{ref}"),
+    ("PATCH", "/api/v1/documents/{ref}"),
+    ("PUT", "/api/v1/documents/{ref}/owners"),
+    ("GET", "/api/v1/documents/{ref}/history"),
+    ("POST", "/api/v1/documents/{ref}/draft"),
+    ("PATCH", "/api/v1/documents/{ref}/draft"),
+    ("DELETE", "/api/v1/documents/{ref}/draft"),
+    ("POST", "/api/v1/documents/{ref}/draft/file"),
+    ("POST", "/api/v1/documents/{ref}/draft/submit"),
+    ("POST", "/api/v1/documents/{ref}/draft/decision"),
+    ("POST", "/api/v1/documents/{ref}/draft/withdraw"),
+    ("POST", "/api/v1/documents/{ref}/draft/publish"),
+    ("POST", "/api/v1/documents/{ref}/review"),
+    ("POST", "/api/v1/documents/{ref}/retire"),
+    ("POST", "/api/v1/documents/{ref}/reinstate"),
+    ("GET", "/api/v1/documents/{ref}/versions/{version_id}"),
+    ("GET", "/api/v1/documents/{ref}/compare"),
+    ("GET", "/api/v1/documents/{ref}/versions/{version_id}/file"),
+):
+    REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}
 REACH[("GET", "/api/v1/campaigns")] = EVERYONE
 REACH[("POST", "/api/v1/campaigns")] = RUNNERS

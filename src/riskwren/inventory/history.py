@@ -112,6 +112,7 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
 
     describe = record_type.extra.get("history_title")
     title = describe(event, lookups) if describe else None
+    described = bool(title)
     # Some operations change what is otherwise only ever changed by something already told
     # (a rating, by an assessment). Told under their own title, they show every line.
     loud = (event.context or {}).get("op") in record_type.extra.get("history_loud", ())
@@ -172,7 +173,7 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
         "operation": operation,
         "title": title,
         "lines": lines,
-        "told": bool(describe and title and not lines and event.action == "updated"),
+        "told": bool(described and not lines and event.action == "updated"),
     }
 
 

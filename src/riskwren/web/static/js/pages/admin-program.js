@@ -73,6 +73,7 @@ async function review(program, changes, { unitIndex, onDone }) {
             [rated ? `${rated} in rating` : null, standing ? `${standing} in standing` : null, reviewed ? `${reviewed} in when it is next reviewed` : null].filter(Boolean).join(", "),
             ". Judgments already made keep the rating they were given; what each risk shows is read again from what is in force."))
           : alert("info", "No open risk would change its rating, its standing, or when it is next reviewed."),
+        found.counts.documents ? alert("info", `${plural(found.counts.documents, "document")} that follow the program's review cadence would have their next review moved.`) : null,
         count ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
           h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Risk"), h("th", { scope: "col" }, "What would change"))),
           h("tbody", {}, found.risks.map((risk) => h("tr", {},
@@ -283,7 +284,9 @@ function cadencesTab(program, ctx, vocab) {
     card({ title: "Controls, tests, and exceptions" }, h("div", { class: "grid-3" },
       number("A control's rating stands for", () => draft.control_rating_months, (value) => { draft.control_rating_months = value; }, "months", "After that it is stale, and counts for nothing."),
       number("A key control is tested every", () => draft.key_control_test_months, (value) => { draft.key_control_test_months = value; }, "months"),
-      number("An exception may run for", () => draft.exception_max_months, (value) => { draft.exception_max_months = value; }, "months"))),
+      number("An exception may run for", () => draft.exception_max_months, (value) => { draft.exception_max_months = value; }, "months"),
+      number("A document is reviewed every", () => draft.document_review_months, (value) => { draft.document_review_months = value; }, "months",
+        "A document may set its own. Changing this moves the next review of those that do not."))),
     card({ title: "How long an issue is given" }, h("div", { class: "stack" },
       h("p", { class: "muted" }, "From the day it is raised, by its severity. A more severe issue is never given longer. Issues already raised keep the date they were given."),
       h("div", { class: "grid-3" }, severities.map((item) =>

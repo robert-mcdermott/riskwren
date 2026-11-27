@@ -46,6 +46,12 @@ export const NAV = [
     ],
   },
   {
+    heading: "Policies",
+    items: [
+      { href: "/documents", label: "Documents", iconName: "document" },
+    ],
+  },
+  {
     heading: "Inventory",
     items: [
       { href: "/processes", label: "Processes", iconName: "process" },

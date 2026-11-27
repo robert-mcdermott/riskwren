@@ -1099,6 +1099,7 @@
     },
     "exception_max_months": 12,
     "key_control_test_months": 6,
+    "document_review_months": 12,
     "reminders": {
       "soon_days": 14,
       "steward_after_days": 7,

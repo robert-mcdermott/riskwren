@@ -192,7 +192,7 @@ def test_appetite_and_cadences_are_previewed_the_same_way(
         ).json()["data"]
     assert both["changed"] == ["appetite for Data and specimen integrity", "cadences"]
     assert {each["ref"] for each in both["risks"]} == {refs["Likely"], refs["Small"]}
-    assert both["counts"] == {"risks": 2, "rating": 0, "standing": 1, "review": 1}
+    assert both["counts"] == {"risks": 2, "rating": 0, "standing": 1, "review": 1, "documents": 0}
     assert state(db)[refs["Small"]][4] == date(2029, 3, 2)
     for cadence, field in [
         ({**cadences, "risk_review_months": {"low": 12}}, "risk_review_months"),

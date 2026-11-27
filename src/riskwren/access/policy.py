@@ -70,6 +70,28 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("POST", "/api/v1/tidy/not-duplicates"): Needs.MEMBER,
     ("GET", "/api/v1/accounts/{account_id}/holdings"): Needs.MEMBER,
     ("POST", "/api/v1/accounts/{account_id}/handover"): Needs.MEMBER,
+    # Documents are records like any other: who may add, change, approve, or read one is
+    # decided where it is read or written.
+    ("GET", "/api/v1/documents"): Needs.MEMBER,
+    ("POST", "/api/v1/documents"): Needs.MEMBER,
+    ("GET", "/api/v1/documents/{ref}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/documents/{ref}"): Needs.MEMBER,
+    ("PUT", "/api/v1/documents/{ref}/owners"): Needs.MEMBER,
+    ("GET", "/api/v1/documents/{ref}/history"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/draft"): Needs.MEMBER,
+    ("PATCH", "/api/v1/documents/{ref}/draft"): Needs.MEMBER,
+    ("DELETE", "/api/v1/documents/{ref}/draft"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/draft/file"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/draft/submit"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/draft/decision"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/draft/withdraw"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/draft/publish"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/review"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/retire"): Needs.MEMBER,
+    ("POST", "/api/v1/documents/{ref}/reinstate"): Needs.MEMBER,
+    ("GET", "/api/v1/documents/{ref}/versions/{version_id}"): Needs.MEMBER,
+    ("GET", "/api/v1/documents/{ref}/compare"): Needs.MEMBER,
+    ("GET", "/api/v1/documents/{ref}/versions/{version_id}/file"): Needs.MEMBER,
     # Risk analyses are records like any other: who may start, work through, or read one
     # is decided where it is read or written.
     ("GET", "/api/v1/risk-analyses"): Needs.MEMBER,

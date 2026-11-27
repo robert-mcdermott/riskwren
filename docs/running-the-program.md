@@ -126,6 +126,7 @@ Every word in the method can be changed: the name and meaning of each level of l
 | How long a control's rating, a test result, and evidence hold | 12 months |
 | How often a key control is tested | 6 months |
 | The longest an exception may run | 12 months |
+| How often a policy, standard, procedure, or guideline is reviewed | 12 months, unless the document sets its own |
 | How long an issue is given, by severity | Critical 30 days, high 90, moderate 180, low 365 |
 | Reminders | 14 days before; the steward 7 days late; the leader 21 days late |
 

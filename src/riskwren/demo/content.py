@@ -912,6 +912,456 @@ ANALYSIS_NOTES = {
     ],
 }
 
+# Policy documents. Each has its words, who adds it ("by": a cast key, or a unit's steward
+# when "by" names a unit), who approves its versions, and its history: the days ago each
+# version was published, with a list of changes from the one before; reviews that kept it as
+# it was; and what is being written now. All of it is invented.
+INFOSEC_V1 = """# Information security policy
+
+## Purpose
+
+Northmere holds information that patients, research participants, funders, and partners have trusted it with. This policy says how that information, and the systems that hold it, are protected.
+
+## Who it applies to
+
+Everyone who works at Northmere or studies here, contractors and visiting researchers, and anyone else who uses Northmere's systems or handles its information.
+
+## What we require
+
+- Information is classified, and protected according to its class (see the data classification standard).
+- Access is given for a purpose, to named people, and removed when the purpose ends.
+- Restricted information is kept only in systems approved for it.
+- Systems are kept up to date, and weaknesses are found and fixed.
+- Anyone who suspects an incident reports it at once to the Information Security office.
+
+## Roles
+
+| Role | Responsibility |
+|---|---|
+| Chief Information Security Officer | Keeps this policy and the standards beneath it, and reports on them to leadership |
+| System owners | Make sure their systems meet the standards |
+| Everyone | Follows this policy, and reports what looks wrong |
+
+## Exceptions
+
+An exception to this policy, or to a standard beneath it, is asked for in writing, says what makes up for it, and ends on a date. Exceptions are decided by the Chief Information Security Officer.
+
+## Review
+
+This policy is reviewed every year, and sooner if the law or the organization changes.
+"""
+
+INFOSEC_V2 = [
+    (
+        "- Systems are kept up to date, and weaknesses are found and fixed.",
+        "- Systems are kept up to date, and weaknesses are found and fixed in the times the vulnerability management standard sets.",
+    ),
+    (
+        "- Anyone who suspects an incident reports it at once to the Information Security office.",
+        "- Anyone who suspects an incident reports it at once to the Information Security office, and does not try to investigate it alone.\n- Suppliers who hold Northmere's information agree to protect it as this policy does.",
+    ),
+]
+INFOSEC_V3 = [
+    (
+        "Exceptions are decided by the Chief Information Security Officer.",
+        "Exceptions are decided by the Chief Information Security Officer, and those that bear on patient or participant information also by the privacy officer.",
+    ),
+    (
+        "## Review\n",
+        "## Training\n\nEveryone completes security awareness training when they join and every year after.\n\n## Review\n",
+    ),
+]
+
+AUP_V1 = """# Acceptable use policy
+
+## Purpose
+
+Northmere's computers, networks, and accounts are provided for its work. This policy says what using them well looks like.
+
+## You may
+
+- Use Northmere systems for your work, and for occasional personal use that does not get in its way.
+- Use approved collaboration tools to work with colleagues and partners.
+
+## You must not
+
+- Share your account, or use anyone else's.
+- Store restricted information on a personal device or an unapproved service.
+- Install software that has not been approved for your role.
+- Try to get around a security control.
+
+## Monitoring
+
+Northmere may monitor the use of its systems to keep them secure, within the law and its privacy notice.
+
+## If something goes wrong
+
+Report a lost device, a suspicious message, or anything that looks wrong to the help desk at once.
+"""
+AUP_V2 = [
+    (
+        "- Use approved collaboration tools to work with colleagues and partners.",
+        "- Use approved collaboration tools to work with colleagues and partners.\n- Use generative tools that Northmere has approved, and never paste restricted information into one that it has not.",
+    ),
+    (
+        "Report a lost device, a suspicious message, or anything that looks wrong to the help desk at once.",
+        "Report a lost device, a suspicious message, or anything that looks wrong to the help desk at once. Reporting a mistake is never held against you.",
+    ),
+]
+
+ACCESS_V1 = """# Access control standard
+
+This standard puts the information security policy into practice for access to systems.
+
+## Accounts
+
+1. Every account belongs to one named person.
+2. Accounts are created only when a manager asks, for a stated purpose.
+3. Shared and generic accounts are not allowed, except service accounts with a named owner.
+
+## Privileges
+
+- Access is the least a person needs for their work.
+- Administrator rights are held in a separate account, used only for administration.
+- Privileged access is reviewed every quarter by the system owner.
+
+## Leavers and movers
+
+- Access is removed within two working days of someone leaving.
+- When someone changes role, access they no longer need is removed within ten working days.
+
+## Reviews
+
+System owners review who has access to their systems at least twice a year, and keep the record.
+"""
+
+PASSWORDS_V1 = """# Password and authentication standard
+
+## Passwords
+
+- At least 12 characters, with no forced complexity rules.
+- Checked against lists of known breached passwords when set.
+- Changed only when there is reason to think it is known to someone else.
+
+## Second factor
+
+- Required for remote access and for email.
+- Required for every administrator account.
+
+## Service accounts
+
+Service accounts use long random secrets, kept in the approved vault and changed when someone who knew them leaves.
+"""
+PASSWORDS_V2 = [
+    (
+        "- Required for remote access and for email.",
+        "- Required for every account that can be reached from outside Northmere's network.",
+    ),
+    (
+        "- Required for every administrator account.",
+        "- Required for every administrator account, using a phishing-resistant method.\n- Codes sent by text message are no longer accepted for new enrolments.",
+    ),
+]
+
+CLASSIFICATION_V1 = """# Data classification standard
+
+Every body of information at Northmere has one of four classes. Its owner says which.
+
+| Class | What it is | Examples |
+|---|---|---|
+| Public | Meant to be shared | Published papers, the public website |
+| Internal | For Northmere's work, harmless if seen | Meeting notes, internal procedures |
+| Confidential | Would cause harm if seen by the wrong people | Unpublished results, contracts, staff records |
+| Restricted | Protected by law or agreement | Patient records, identifiable participant data, controlled-access genomic data |
+
+## Handling
+
+- Restricted information is kept only in systems approved for it, encrypted in storage and in transit.
+- Confidential information is shared only with those who need it.
+- When in doubt, treat information as the higher class and ask the privacy office.
+"""
+
+ENCRYPTION_V1 = """# Encryption standard
+
+## In storage
+
+- Laptops and portable media are encrypted with the approved full-disk encryption.
+- Restricted information in databases and file shares is encrypted at rest.
+
+## In transit
+
+- Restricted and confidential information is sent only over encrypted connections.
+- Email holding restricted information is sent with the approved secure-mail option.
+
+## Keys
+
+Keys are kept apart from the information they protect, by the system's administrators, and are rotated at least every two years.
+"""
+
+VULN_V1 = """# Vulnerability management standard
+
+## Finding weaknesses
+
+- Systems on Northmere's network are scanned at least monthly.
+- Systems reachable from the internet are scanned weekly and tested by an outside firm each year.
+
+## Fixing them
+
+| Severity | Fixed within |
+|---|---|
+| Critical | 15 days |
+| High | 30 days |
+| Medium | 90 days |
+| Low | At the next planned change |
+
+A weakness that cannot be fixed in time needs an exception, with what makes up for it until it is.
+"""
+
+INCIDENT_V1 = """# Incident response procedure
+
+## When you suspect an incident
+
+1. Stop, and do not try to investigate on your own.
+2. Call the help desk, and say it may be a security incident.
+3. Write down what you saw, and when.
+
+## The response team
+
+The Information Security office leads the response, with IT and, when personal information may be involved, the privacy office.
+
+## Steps
+
+1. Contain: isolate what is affected.
+2. Assess: what happened, what was reached, whose information.
+3. Recover: restore from clean backups.
+4. Learn: a review within two weeks, with actions and owners.
+"""
+INCIDENT_V2 = [
+    (
+        "1. Contain: isolate what is affected.",
+        "1. Contain: isolate what is affected, and keep its logs.",
+    ),
+    (
+        "The Information Security office leads the response, with IT and, when personal information may be involved, the privacy office.",
+        "The Information Security office leads the response, with IT and, when personal information may be involved, the privacy office. Out of hours, the on-call security engineer is reached through the help desk.",
+    ),
+]
+INCIDENT_V3 = [
+    (
+        "2. Assess: what happened, what was reached, whose information.",
+        "2. Assess: what happened, what was reached, whose information.\n3. Decide whether anyone must be told: the privacy office decides within 24 hours of learning that personal information may be involved.",
+    ),
+    ("3. Recover: restore from clean backups.", "4. Recover: restore from clean backups."),
+    (
+        "4. Learn: a review within two weeks, with actions and owners.",
+        "5. Learn: a review within two weeks, with actions and owners, recorded as issues in RiskWren.",
+    ),
+]
+
+REMOTE_V1 = """# Working away from the office
+
+Some advice for working securely at home and when travelling.
+
+- Use the VPN before reaching internal systems.
+- Lock your screen when you step away, even at home.
+- Keep work on Northmere devices; do not print restricted information at home.
+- On a shared network, assume someone else can see what is not encrypted.
+"""
+
+RDM_LINES = [
+    "Research data management policy",
+    "",
+    "1. Every research project names a data steward when it begins.",
+    "2. Research data is kept in Research Computing's managed storage, never only on",
+    "   a laptop or an instrument computer.",
+    "3. Identifiable participant data is kept in the controlled-access enclave.",
+    "4. Data is kept for at least seven years after publication, or longer if the",
+    "   funder or the agreement under which it was received requires.",
+    "5. Data shared outside Northmere is shared under a data use agreement.",
+    "",
+    "Approved by the Chief Scientific Officer.",
+]
+
+DOCUMENTS = [
+    {
+        "key": "infosec",
+        "name": "Information security policy",
+        "kind": "policy",
+        "unit": "SEC",
+        "by": "ciso",
+        "approvers": ["president"],
+        "summary": "What Northmere requires to protect the information it holds, and who does what.",
+        "versions": [
+            (720, INFOSEC_V1, None),
+            (
+                340,
+                INFOSEC_V2,
+                "Patching follows the vulnerability standard's times; suppliers are bound by the policy.",
+            ),
+        ],
+        "draft": {
+            "since": 18,
+            "edits": INFOSEC_V3,
+            "note": "Privacy decides exceptions that touch personal information; yearly training is required.",
+            "approvers": ["president", "cro"],
+            "approved": ["cro"],
+        },
+    },
+    {
+        "key": "aup",
+        "name": "Acceptable use policy",
+        "kind": "policy",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["coo"],
+        "summary": "What using Northmere's computers, networks, and accounts well looks like.",
+        "versions": [
+            (690, AUP_V1, None),
+            (
+                300,
+                AUP_V2,
+                "Generative tools: only approved ones, and never with restricted information.",
+            ),
+        ],
+    },
+    {
+        "key": "access",
+        "name": "Access control standard",
+        "kind": "standard",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "Who gets access to what, how it is given, reviewed, and taken away.",
+        "versions": [(400, ACCESS_V1, None)],
+    },
+    {
+        "key": "passwords",
+        "name": "Password and authentication standard",
+        "kind": "standard",
+        "unit": "IT",
+        "parent": "infosec",
+        "by": "cio",
+        "approvers": ["ciso"],
+        "summary": "How people prove who they are: passwords, second factors, and service accounts.",
+        "versions": [
+            (500, PASSWORDS_V1, None),
+            (
+                120,
+                PASSWORDS_V2,
+                "A second factor wherever an account can be reached from outside; no more text-message codes for new enrolments.",
+            ),
+        ],
+    },
+    {
+        "key": "classification",
+        "name": "Data classification standard",
+        "kind": "standard",
+        "unit": "CMPL",
+        "parent": "infosec",
+        "by": "CMPL",
+        "approvers": ["ciso", "cro"],
+        "summary": "The four classes of information, and how each is handled.",
+        "versions": [(600, CLASSIFICATION_V1, None)],
+        "reviews": [
+            (
+                240,
+                "Checked against the new genomic data sharing terms; the restricted class already covers them.",
+            )
+        ],
+    },
+    {
+        "key": "encryption",
+        "name": "Encryption standard",
+        "kind": "standard",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "What is encrypted, in storage and in transit, and how keys are kept.",
+        "versions": [(345, ENCRYPTION_V1, None)],
+    },
+    {
+        "key": "vuln",
+        "name": "Vulnerability management standard",
+        "kind": "standard",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "How weaknesses are found, and how quickly each is fixed.",
+        "versions": [(260, VULN_V1, None)],
+    },
+    {
+        "key": "incident",
+        "name": "Incident response procedure",
+        "kind": "procedure",
+        "unit": "SEC",
+        "parent": "infosec",
+        "by": "ciso",
+        "approvers": ["cio", "cro"],
+        "review_months": 6,
+        "summary": "What to do when a security incident is suspected, and how the response runs.",
+        "versions": [
+            (560, INCIDENT_V1, None),
+            (
+                230,
+                INCIDENT_V2,
+                "After the spring exercise: keep logs when containing, and how to reach us out of hours.",
+            ),
+            (
+                60,
+                INCIDENT_V3,
+                "The privacy office decides within 24 hours whether anyone must be told.",
+            ),
+        ],
+    },
+    {
+        "key": "backup",
+        "name": "Backup and restore procedure",
+        "kind": "procedure",
+        "unit": "IT",
+        "parent": "infosec",
+        "by": "cio",
+        "approvers": ["ciso"],
+        "summary": "How systems are backed up and restored. Kept on the IT intranet, where the runbooks live.",
+        "link": "https://intranet.northmere.example/it/runbooks/backup-and-restore",
+        "versions": [(280, None, None)],
+    },
+    {
+        "key": "remote",
+        "name": "Working away from the office",
+        "kind": "guideline",
+        "unit": "SEC",
+        "parent": "aup",
+        "by": "ciso",
+        "approvers": ["cio"],
+        "summary": "Advice for working securely at home and when travelling.",
+        "versions": [],
+        "draft": {
+            "since": 26,
+            "body": REMOTE_V1,
+            "approvers": ["cio"],
+            "returned": (
+                "cio",
+                "The VPN is not needed for the systems we moved to single sign-on last year; say which ones still need it.",
+            ),
+        },
+    },
+    {
+        "key": "rdm",
+        "name": "Research data management policy",
+        "kind": "policy",
+        "unit": "RES",
+        "by": "cso",
+        "approvers": ["president"],
+        "summary": "Where research data is kept, for how long, and how it is shared. Kept as the signed PDF.",
+        "file": RDM_LINES,
+        "versions": [(450, None, None)],
+    },
+]
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (

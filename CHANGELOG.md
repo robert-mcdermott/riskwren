@@ -4,6 +4,31 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## Unreleased
+
+### Added
+
+- **Policy documents.** Policies, standards, procedures, and guidelines as records, each
+  implementing one of its own kind or a broader one, with owners, a unit, and a history.
+  A version is written here in a simple Markdown, linked to where the organization keeps it,
+  or attached as a file.
+- **Approval by named people.** A draft is sent to the people who must approve it, none of
+  whom may have written or sent it. Each approves it or returns it with a reason; once all
+  have approved, it can be published.
+- **Published versions that never change.** A published version is numbered and supersedes
+  the one before. The history keeps its fingerprint, and `riskwren verify` checks every
+  published version against it.
+- **Comparing versions,** side by side, with the words that differ marked.
+- **Review dates.** Each document is reviewed on the program's cadence (12 months as
+  shipped) or its own. A review that is due shows on the document, on its owners' Home, and
+  in the reminders; it is recorded as kept, or a new version is started.
+- **A new guide, [Policies](docs/policies.md).**
+
+### Changed
+
+- A rule a later release adds to the program's cadences is taken from the default program
+  until the organization sets it, so a table saved earlier still has it.
+
 ## 0.3.0 (2026-11-26)
 
 Wave 3, *Keeping watch*: a register that stays true without a central team chasing it.

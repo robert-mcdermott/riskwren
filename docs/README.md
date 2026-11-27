@@ -11,9 +11,10 @@ These guides describe RiskWren 0.3.0. Read them in this order if you are new, or
 | 3 | [Compliance](compliance.md) | Security and compliance leads, and the stewards of what must comply | Frameworks, mapping controls to requirements, scopes, inherited controls, readiness, the compliance dashboard, connections |
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
-| 6 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, when someone leaves, reminders, the dashboards, the history, appearance |
-| 7 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
-| 8 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
+| 6 | [Policies](policies.md) | Whoever writes, approves, or keeps the organization's policies | Policies, standards, procedures, and guidelines; writing a version; approval; publishing; comparing versions; review |
+| 7 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, when someone leaves, reminders, the dashboards, the history, appearance |
+| 8 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
+| 9 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
 
 ## Reference
 
@@ -47,6 +48,8 @@ These two are written from the code, so they always match the version they ship 
 | What is everything connected to this system? | [Connections](compliance.md#connections) |
 | Who changed this, and when? | [The history](running-the-program.md#the-history) |
 | Who can see a risk? | [Who sees what](running-the-program.md#who-sees-what) |
+| How do I get a policy approved and published? | [Approval](policies.md#approval) |
+| What changed between two versions of a procedure? | [Publishing](policies.md#publishing) |
 | How do I change appetite, the scales, or the review cadence? | [Shape the program](running-the-program.md#shape-the-program) |
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |

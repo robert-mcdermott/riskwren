@@ -421,6 +421,38 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/risk-analyses/{found.ref}", None, ref=found.ref,
             )  # fmt: skip
 
+    # Documents: drafts waiting for this person's approval, approved ones waiting to be
+    # published, ones sent back, and reviews coming due.
+    from riskwren.policy import documents as policy_documents
+
+    for document, version in policy_documents.awaiting(session, principal):
+        add(
+            "approve", f"Approve the new version of {document.name}",
+            f"{document.ref} · sent by {version.submitted_by_name}",
+            f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+        )  # fmt: skip
+    soon = date.fromordinal(today.toordinal() + policy_documents.SOON)
+    for document in policy_documents.owned(session, principal):
+        working = policy_documents.open_version(session, document)
+        if working is not None and working.status == "approved":
+            add(
+                "publish", f"Publish the new version of {document.name}",
+                f"{document.ref} · everyone named has approved it",
+                f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+            )  # fmt: skip
+        elif working is not None and working.status == "draft" and working.review_round:
+            add(
+                "rework", f"Rework the draft of {document.name}",
+                f"{document.ref} · it was returned with a reason",
+                f"/documents/{document.ref}?tab=draft", None, ref=document.ref,
+            )  # fmt: skip
+        if document.next_review_on is not None and document.next_review_on <= soon:
+            add(
+                "document_review", f"Review {document.name}",
+                f"{document.ref} · keep it as it is, or start a new version",
+                f"/documents/{document.ref}", document.next_review_on, ref=document.ref,
+            )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 

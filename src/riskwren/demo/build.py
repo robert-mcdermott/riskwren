@@ -16,7 +16,7 @@ from __future__ import annotations
 import heapq
 import random
 import unicodedata
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
@@ -56,6 +56,7 @@ from riskwren.db.models import (
     ExceptionRequest,
     Indicator,
     Issue,
+    PolicyDocument,
     Risk,
     RiskAnalysis,
     RiskAnalysisItem,
@@ -67,6 +68,7 @@ from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.oversight import campaigns
 from riskwren.people import accounts, handover, units
+from riskwren.policy import documents
 from riskwren.program import branding, packs, settings
 from riskwren.risk import analysis, categories, indicators, register
 from riskwren.risk.indicators import INDICATOR
@@ -105,6 +107,7 @@ class Builder:
     def __init__(self, db: Database, *, seed: int, today: date, files: Path | None = None) -> None:
         self.db = db
         self.files = files  # where evidence files are kept; without it, items have none
+        self._doc_refs: dict[str, str] = {}  # the reference each demo document was given
         self.seed = seed
         self.rng = random.Random(seed)
         # A second stream for details added later, so that they do not shift the first.
@@ -1866,6 +1869,187 @@ class Builder:
                 self.tally("indicators")
                 made[index] = (row.id, keeper)
 
+    # --- Policy documents -------------------------------------------------------------------
+
+    def _story_documents(self) -> Script:
+        """The information security policy and the documents beneath it, written, approved,
+        published, and revised over two years. Now: a new version of the policy waits for
+        the president's approval, a guideline has been sent back to its author, and the
+        access control standard is overdue for review."""
+        steps: list[tuple[float, int, int, Callable[[Session, Principal], None]]] = []
+        made: dict[str, int] = {}
+        order = 0
+
+        def who_is(key: str) -> int:
+            return self.steward(self.units[key]) if key in self.units else self.cast[key]
+
+        def step(ago: float, actor: int, act: Callable[[Session, Principal], None]) -> None:
+            nonlocal order
+            order += 1
+            steps.append((ago, order, actor, act))
+
+        def doc(session: Session, key: str) -> PolicyDocument:
+            return session.get(PolicyDocument, made[key])
+
+        def content(spec: dict[str, Any], text: str | None) -> dict[str, Any]:
+            if spec.get("link"):
+                return {"form": "link", "url": spec["link"]}
+            return {"form": "text", "body": text}
+
+        for spec in c.DOCUMENTS:
+            author = who_is(spec["by"])
+            approvers = [self.cast[key] for key in spec["approvers"]]
+            texts: list[str | None] = []
+            text: str | None = None
+            for _ago, body, _note in spec["versions"]:
+                if isinstance(body, list):
+                    for old, new in body:
+                        text = (text or "").replace(old, new)
+                else:
+                    text = body
+                texts.append(text)
+            first = spec["versions"][0][0] if spec["versions"] else spec["draft"]["since"] + 4
+
+            def create(
+                session: Session,
+                by: Principal,
+                spec: dict[str, Any] = spec,
+                text: str | None = texts[0] if texts else spec.get("draft", {}).get("body"),
+            ) -> None:
+                values = {
+                    "name": spec["name"],
+                    "kind": spec["kind"],
+                    "summary": spec["summary"],
+                    "org_unit_id": self.units[spec["unit"]],
+                    "parent": self._doc_refs.get(spec.get("parent", "")),
+                    "review_months": spec.get("review_months"),
+                    **content(spec, text),
+                }
+                document = documents.create(session, by, values)
+                made[spec["key"]] = document.id
+                self._doc_refs[spec["key"]] = document.ref
+                if spec.get("file"):
+                    if self.files is not None:
+                        documents.attach_file(
+                            session,
+                            by,
+                            document,
+                            self.files,
+                            _pdf(spec["file"]),
+                            f"{spec['name']}.pdf",
+                        )
+                    else:
+                        documents.save_draft(
+                            session,
+                            by,
+                            document,
+                            {
+                                "form": "link",
+                                "url": f"https://intranet.{c.DOMAIN}/policies/{spec['key']}.pdf",
+                            },
+                        )
+                self.tally("documents")
+
+            step(first + 21, author, create)
+            for index, (ago, _body, note) in enumerate(spec["versions"]):
+                if index:
+
+                    def redraft(
+                        session: Session,
+                        by: Principal,
+                        key: str = spec["key"],
+                        text: str | None = texts[index],
+                        note: str | None = note,
+                        spec: dict[str, Any] = spec,
+                    ) -> None:
+                        document = doc(session, key)
+                        documents.start_draft(session, by, document)
+                        documents.save_draft(
+                            session, by, document, {**content(spec, text), "change_note": note}
+                        )
+
+                    step(ago + 14, author, redraft)
+
+                def send(
+                    session: Session,
+                    by: Principal,
+                    key: str = spec["key"],
+                    approvers: list[int] = approvers,
+                ) -> None:
+                    documents.submit(session, by, doc(session, key), approvers)
+
+                step(ago + 9, author, send)
+                for place, approver in enumerate(approvers):
+
+                    def approve(session: Session, by: Principal, key: str = spec["key"]) -> None:
+                        documents.decide(session, by, doc(session, key), "approved", None)
+
+                    step(ago + 6 - place, approver, approve)
+
+                def go(session: Session, by: Principal, key: str = spec["key"]) -> None:
+                    documents.publish(session, by, doc(session, key))
+                    self.tally("document versions published")
+
+                step(ago, author, go)
+            for ago, said in spec.get("reviews", []):
+
+                def keep(
+                    session: Session, by: Principal, key: str = spec["key"], said: str = said
+                ) -> None:
+                    documents.review(session, by, doc(session, key), said)
+
+                step(ago, author, keep)
+            working = spec.get("draft")
+            if working is None:
+                continue
+            since = working["since"]
+            if spec["versions"]:
+
+                def begin(
+                    session: Session,
+                    by: Principal,
+                    key: str = spec["key"],
+                    working: dict[str, Any] = working,
+                    text: str | None = texts[-1],
+                ) -> None:
+                    document = doc(session, key)
+                    documents.start_draft(session, by, document)
+                    for old, new in working["edits"]:
+                        text = (text or "").replace(old, new)
+                    documents.save_draft(
+                        session, by, document, {"body": text, "change_note": working["note"]}
+                    )
+
+                step(since + 6, author, begin)
+            asked = [self.cast[key] for key in working["approvers"]]
+
+            def ask(
+                session: Session, by: Principal, key: str = spec["key"], asked: list[int] = asked
+            ) -> None:
+                documents.submit(session, by, doc(session, key), asked)
+
+            step(since, author, ask)
+            for place, key in enumerate(working.get("approved", [])):
+
+                def agree(session: Session, by: Principal, doc_key: str = spec["key"]) -> None:
+                    documents.decide(session, by, doc(session, doc_key), "approved", "Agreed.")
+
+                step(since - 3 - place, self.cast[key], agree)
+            if working.get("returned"):
+                back, why = working["returned"]
+
+                def refuse(
+                    session: Session, by: Principal, key: str = spec["key"], why: str = why
+                ) -> None:
+                    documents.decide(session, by, doc(session, key), "returned", why)
+
+                step(since - 4, self.cast[back], refuse)
+
+        for ago, _order, actor, act in sorted(steps, key=lambda each: (-each[0], each[1])):
+            yield self._on(ago, hour=10)
+            with self.act(actor) as (session, who):
+                act(session, who)
+
     # --- Campaigns ------------------------------------------------------------------------
 
     def _on(self, days: float, hour: int = 11) -> datetime:
@@ -2392,6 +2576,7 @@ class Builder:
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
+            self._story_documents,
         ):  # fmt: skip
             self.schedule(story())
         self.run()
@@ -2424,3 +2609,35 @@ def marker(session: Session) -> dict[str, Any] | None:
     """What says this installation is a demo, or None if it is not."""
     value = settings.get(session, SETTING)
     return value if isinstance(value, dict) else None
+
+
+def _pdf(lines: list[str]) -> bytes:
+    """A one-page PDF of plain lines, for a document the demo keeps as a file."""
+
+    def escaped(line: str) -> str:
+        return line.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+    text = (
+        "BT /F1 11 Tf 15 TL 72 740 Td " + " ".join(f"({escaped(line)}) '" for line in lines) + " ET"
+    )
+    objects = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+        "/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        f"<< /Length {len(text)} >>\nstream\n{text}\nendstream",
+    ]
+    out = b"%PDF-1.4\n"
+    offsets = []
+    for number, body in enumerate(objects, 1):
+        offsets.append(len(out))
+        out += f"{number} 0 obj\n{body}\nendobj\n".encode("latin-1")
+    table = len(out)
+    out += f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode()
+    for offset in offsets:
+        out += f"{offset:010d} 00000 n \n".encode()
+    out += (
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{table}\n%%EOF\n".encode()
+    )
+    return out

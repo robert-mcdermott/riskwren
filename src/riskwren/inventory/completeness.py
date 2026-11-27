@@ -73,7 +73,9 @@ def _no_links(record_type: RecordType) -> Callable[[Any], Any]:
 
 # The kinds of record that are described once and then relied on. An assessment, an issue,
 # or an exception has a life of its own, and says what it lacks in its own words.
-DESCRIBED = ("process", "system", "third_party", "information", "risk", "control", "indicator")
+DESCRIBED = (
+    "process", "system", "third_party", "information", "risk", "control", "indicator", "document",
+)  # fmt: skip
 
 
 def expected(record_type: RecordType) -> list[Expected]:
