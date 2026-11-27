@@ -970,6 +970,18 @@ OFFBOARDING = {
               ("information", 9, "The site's content and analytics were exported, and the supplier deleted its copies.")],
 }  # fmt: skip
 
+# Leadership reports, issued by the risk manager each quarter: days ago, and what they said.
+LEADERSHIP_REPORTS = [
+    (119, "The register now covers every division: each unit's risks have owners, and most "
+          "have a residual rating.\n\nRansomware reaching research computing is the risk "
+          "above appetite that most needs attention. The plan to keep the backups apart from "
+          "the campus network is under way, and its actions are tracked here."),
+    (28, "Third parties are now part of the record: those that matter most are tiered, and "
+         "their due diligence, findings, and agreements are kept here.\n\nIssues past their "
+         "date are the figure to watch. The security team asks each owner to agree a new date "
+         "or close the issue before the next report."),
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

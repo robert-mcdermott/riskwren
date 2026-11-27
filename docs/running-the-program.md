@@ -354,6 +354,29 @@ As everywhere, each figure counts only what you may see, and opens its list with
 
 The calendar is caught up every hour by [scheduled work](configuration.md#scheduled-work): when an acceptance expires or a plan runs late, the risk's standing is updated, and the history records that as done by the system. Reading the register catches it up as well, so a figure is never behind the date even where the scheduler is turned off.
 
+### Leadership reports
+
+**Reports → Leadership reports** holds the reports given to leadership, the latest first. A manager for the whole organization prepares the next one: **Prepare the next report** shows it as it stands now, for the period from the day after the last report ended (the first time, the last quarter) to today. A report says:
+
+| Part | What it shows |
+|---|---|
+| Summary | What the person issuing it has to say about the period, in their own words |
+| In the period | Risks added, issues raised, and issues closed |
+| Top risks | The ten open risks with the highest residual rating, each with its unit, family, standing, and owners, and how it moved since the last report: new since then, joined the top, rose or fell from the rating it had, or unchanged; and the risks the last report listed that are no longer among them |
+| Appetite | Each family of risk with its appetite: open risks, those above appetite, those needing a decision, and reviews overdue |
+| Posture by framework | How much of each framework is verified or in place in the scopes held to it, how far that moved since the last report, and the open and overdue issues and exceptions in force about its requirements |
+| Third parties with most at stake | Those in the two highest tiers: their next review, open risks, open issues, and sharing no agreement covers |
+| Measures | Every [defined measure](#measures) now, against the last report; the first time, against the organization's snapshot from the start of the period |
+| Overdue | Issues, risk reviews, third-party reviews, and actions past their date: how many, and the ten most overdue of each |
+
+Until a report is issued nothing of it is kept: it is worked out afresh each time it is looked at. **Issue the report** freezes what it says, with its title and summary, and gives it a reference (`LDR-0001`). From then on it reopens exactly as it was, whatever happens to the register. Its figures are what they were on the day, so, unlike the dashboards', they do not open today's lists.
+
+An issued report carries a **fingerprint**: the SHA-256 of what it says, written canonically (keys sorted, no spaces, UTF-8). The history records the issue with the same fingerprint, in its hash chain. Whenever the report is opened, what it says is hashed again and compared with both, and **The fingerprint verifies** means it is the report that was given. A report changed afterwards no longer matches, and the page says so. A report is never edited or withdrawn: the next report is the place to correct one. **Print** prints it without the application around it.
+
+Leadership reports are the organization's. Those who read everything (managers, auditors, and administrators) and those who lead the whole organization read them; only managers for the whole organization prepare and issue them.
+
+![A leadership report as it was issued: the fingerprint verifies, then the summary, what happened in the period, and the top risks with how each moved](img/leadership-report-light.webp)
+
 ## The history
 
 Every change to every record is written to an append-only history in the same transaction as the change: who, when, and each value before and after. Each event is hashed together with the one before it, and the database itself refuses updates and deletes on the history.

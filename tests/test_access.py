@@ -443,6 +443,12 @@ for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
 REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/measures")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/portfolio")] = EVERYONE
+# Leadership reports are read by those who read everything (and those who lead all of it,
+# whom this organization does not have), and prepared and issued by managers.
+for _template in ("/api/v1/leadership-reports", "/api/v1/leadership-reports/{ref}"):
+    REACH[("GET", _template)] = {"admin", "manager", "auditor"}
+REACH[("GET", "/api/v1/leadership-reports/next")] = {"manager"}
+REACH[("POST", "/api/v1/leadership-reports")] = {"manager"}
 REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():

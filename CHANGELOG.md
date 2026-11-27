@@ -18,6 +18,12 @@ Wave 6, *Insight*.
 - **The portfolio:** the register and compliance by unit, category, framework, and third
   party over the last quarter, half year, or year, and issues by root cause, source, and age
   with a year month by month. Every figure opens its list. **Reports → Portfolio**.
+- **Leadership reports:** a periodic report of the top risks and how they moved, appetite,
+  posture by framework, the third parties with most at stake, the measures against the last
+  report, and what is overdue. Issued, it is frozen with a SHA-256 fingerprint that the
+  history records too, and reopens exactly as it was; the page says whether the fingerprint
+  still verifies. **Reports → Leadership reports**, read by those who read everything and
+  those who lead the whole organization, and issued by managers.
 - **Lists cut to a period:** risks by when they were added, issues by when they were raised
   or closed, issues by root cause, and issues and exceptions about a framework's requirements.
 

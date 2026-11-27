@@ -260,6 +260,12 @@ POLICIES.update(
         ("GET", "/api/v1/coverage"): Needs.MEMBER,
         # Measures carry the organization's trend, so they are for those who read everything.
         ("GET", "/api/v1/measures"): Needs.READ_ALL,
+        # Leadership reports: read by those who read everything and those who lead all of it,
+        # which the service decides; prepared and issued by managers for the organization.
+        ("GET", "/api/v1/leadership-reports"): Needs.MEMBER,
+        ("GET", "/api/v1/leadership-reports/next"): Needs.MANAGE,
+        ("POST", "/api/v1/leadership-reports"): Needs.MANAGE,
+        ("GET", "/api/v1/leadership-reports/{ref}"): Needs.MEMBER,
         # The portfolio counts only what each person may see, as the dashboards do.
         ("GET", "/api/v1/portfolio"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/call-review"): Needs.MEMBER,

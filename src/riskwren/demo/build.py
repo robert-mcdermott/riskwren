@@ -1998,6 +1998,16 @@ class Builder:
                 measures.snapshot(session, self.today)
             self.tally("measure snapshots")
 
+    def _story_leadership(self) -> Script:
+        """The risk manager issues a leadership report each quarter, frozen as it was."""
+        from riskwren.insight import leadership
+
+        for days, summary in c.LEADERSHIP_REPORTS:
+            yield self._on(days, hour=16)
+            with self.act(self.cast["cro"]) as (session, who):
+                leadership.issue(session, who, summary=summary)
+            self.tally("leadership reports")
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3249,7 +3259,7 @@ class Builder:
             self._story_documents, self._story_agreements, self._story_framework_update,
             self._story_governance, self._story_third_parties, self._story_due_diligence,
             self._story_assurance, self._story_coverage, self._story_lifecycle,
-            self._story_measures,
+            self._story_measures, self._story_leadership,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

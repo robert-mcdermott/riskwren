@@ -257,6 +257,10 @@ export const SCENES = [
   { name: "portfolio-third-party", as: "ciso", path: "/portfolio?by=third_party&period=year" },
   { name: "portfolio-causes", as: "auditor", path: "/portfolio?by=causes&period=year" },
   { name: "portfolio-member", as: "member", path: "/portfolio?by=category" },
+  { name: "leadership-reports", as: "cro", path: "/leadership-reports" },
+  { name: "leadership-report", as: "president", path: "/leadership-reports/LDR-0002" },
+  { name: "leadership-next", as: "cro", path: "/leadership-reports/next" },
+  { name: "leadership-first", as: "auditor", path: "/leadership-reports/LDR-0001" },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

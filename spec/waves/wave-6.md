@@ -44,14 +44,16 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `riskwren.insight.portfolio` builds five views over the last quarter, half year, or year: by unit (the units beneath the organization), by category (each family of risk), by framework (each framework a scope the person may see is held to, with how much of what applies is verified or in place), by third party (those in the two highest tiers, with their next review and the sharing no agreement covers), and issues by root cause, source, and age, with twelve months raised and closed. Each figure is `reporting.count` over the list's own conditions for the person, with the list's path and filters; rows with nothing in them are left out. New list filters make each figure openable: risks `added`, issues `raised` and `closed` (each `FROM..TO`, both days counted), issues `root_cause` and `framework`, and exceptions `framework`. **Reports → Portfolio** is open to everyone, counting only what each may see. The acceptance test is `tests/test_portfolio.py::test_every_figure_opens_exactly_the_records_it_counts`, which opens every figure of every view and period as three roles.
 
-### Slice 3: Leadership report ☐
+### Slice 3: Leadership report ☑
 
 **Goal:** a report given once, and reopened exactly as it was.
 
-- [ ] A periodic report of top risks, movement since the last, appetite, posture by framework, third parties, and overdue items
-- [ ] Issued, it is frozen as a snapshot with a fingerprint, and reopens unchanged whatever has happened since
+- [x] A periodic report of top risks, movement since the last, appetite, posture by framework, third parties, and overdue items
+- [x] Issued, it is frozen as a snapshot with a fingerprint, and reopens unchanged whatever has happened since
 
 **Acceptance:** a report reopened after the register has changed shows what it showed when issued, and its fingerprint verifies.
+
+**Done:** `riskwren.insight.leadership` builds a report for a period, by default from the day after the last report ended (the first time, the last quarter) to today: the summary in the issuer's words; risks added and issues raised and closed in the period; the ten open risks with the highest residual rating, each marked new since the last report, joined the top, rose, fell, or unchanged, with those that left the top; appetite by family; posture by framework, with its change since the last report; the third parties in the two highest tiers; every measure against the last report (or the first time, the snapshot from the start of the period); and the most overdue issues, risk reviews, third-party reviews, and actions. Until it is issued it is worked out afresh each time. Issuing stores it in `leadership_report` (`LDR`) as plain JSON, with the SHA-256 of its canonical form; the body is left out of the history, which records the fingerprint with the issue, so the chain vouches for the fingerprint and the fingerprint for the body. Opening it hashes the body again and compares it with both. Reports are read by those who read everything and by those who lead the whole organization (a principal's new `leads_all`, worked out at sign-in, and the `reports` permission), and prepared and issued by managers for the whole organization. **Reports → Leadership reports** lists them, prepares the next with its period, title, and summary, and shows each with whether its fingerprint verifies and a print button. The demo's risk manager issues one each quarter. The acceptance test is `tests/test_leadership.py::test_a_report_reopens_as_it_was_issued_and_its_fingerprint_verifies`, with `::test_a_changed_report_no_longer_verifies`.
 
 ### Slice 4: As of ☐
 
@@ -73,3 +75,5 @@ The wave is done when, on a fresh checkout:
 
 - A measure is defined once, in code, as the same condition a list uses, so a figure and the list behind it cannot disagree (RPT-04).
 - A snapshot records the organization's figure for each measure on a day. It is bookkeeping, not history: it is not in the hash chain, and it can be taken again.
+- An issued leadership report is history: its issue is in the hash chain with its fingerprint. Its figures are kept as counts, not as lists to open, because the lists move on and the report must not. A report is never edited or withdrawn; the next one corrects it.
+- Those who lead the whole organization read the reports though they cannot read everything: the report is written for them. It may name restricted risks, which such a leader may already see.

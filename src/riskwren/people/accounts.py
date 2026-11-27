@@ -93,6 +93,10 @@ def principal_for(
     member_units = units.with_descendants(
         session, (m.org_unit_id for m in memberships_of(session, account.id))
     )
+    leading = coverage.get(roles.LEADER, frozenset())
+    leads_all = roles.LEADER in coverage and (
+        leading is None or set(session.scalars(select(OrgUnit.id))) <= leading
+    )
     return Principal(
         account_id=account.id,
         name=account.display_name,
@@ -103,6 +107,7 @@ def principal_for(
         csrf_token=token.csrf_token if token else "",
         has_password=has_password(session, account.id),
         session_id=token.id if token else None,
+        leads_all=leads_all,
     )
 
 

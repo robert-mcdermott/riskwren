@@ -2797,6 +2797,64 @@
         "title": "JobSwitch",
         "type": "object"
       },
+      "LeadershipReportBody": {
+        "properties": {
+          "from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The first day it covers; after the last report",
+            "title": "From"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the issuer has to say about it",
+            "title": "Summary"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Its title",
+            "title": "Title"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The last day it covers; today",
+            "title": "To"
+          }
+        },
+        "title": "LeadershipReportBody",
+        "type": "object"
+      },
       "MappingBody": {
         "properties": {
           "code": {
@@ -16890,6 +16948,187 @@
         "summary": "Run one job now",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/leadership-reports": {
+      "get": {
+        "operationId": "leadership_reports_api_v1_leadership_reports_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leadership Reports Api V1 Leadership Reports Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The leadership reports issued, the latest first",
+        "tags": [
+          "reporting"
+        ]
+      },
+      "post": {
+        "operationId": "issue_leadership_report_api_v1_leadership_reports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadershipReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Issue Leadership Report Api V1 Leadership Reports Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Issue a leadership report: what it says is frozen, with its fingerprint",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/leadership-reports/next": {
+      "get": {
+        "operationId": "next_leadership_report_api_v1_leadership_reports_next_get",
+        "parameters": [
+          {
+            "description": "The first day it covers",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The first day it covers",
+              "title": "From"
+            }
+          },
+          {
+            "description": "The last day it covers",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The last day it covers",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Next Leadership Report Api V1 Leadership Reports Next Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The next leadership report as it stands now: not stored until it is issued",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/leadership-reports/{ref}": {
+      "get": {
+        "operationId": "leadership_report_api_v1_leadership_reports__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leadership Report Api V1 Leadership Reports  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A leadership report as it was issued, and whether its fingerprint verifies",
+        "tags": [
+          "reporting"
         ]
       }
     },

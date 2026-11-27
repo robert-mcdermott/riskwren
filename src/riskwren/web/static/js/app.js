@@ -94,6 +94,9 @@ async function boot() {
   route("/coverage", page("coverage", "coveragePage"));
   route("/measures", page("measures", "measuresPage"));
   route("/portfolio", page("portfolio", "portfolioPage"));
+  route("/leadership-reports", page("leadership", "leadershipList"));
+  route("/leadership-reports/next", page("leadership", "leadershipNext"));
+  route("/leadership-reports/:ref", page("leadership", "leadershipReport"));
   route("/reviews/:ref", page("reviews", "reviewPage"));
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   route("/search", page("find", "searchPage"));

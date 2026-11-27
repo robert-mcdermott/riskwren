@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Any
 
 from fastapi import APIRouter, Query, Request
+from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
-from riskwren.api.common import envelope, reading
+from riskwren.api.common import envelope, reading, writing
 from riskwren.api.routers.inventory import UNIT
 from riskwren.inventory import records
 from riskwren.reporting import service as reporting
@@ -137,3 +139,77 @@ def show_portfolio(
     principal = current(request)
     with reading(request) as session:
         return envelope(portfolio.view(session, principal, by, period))
+
+
+# --- Leadership reports -------------------------------------------------------------------
+
+
+FIRST_DAY = Query(default=None, alias="from", description="The first day it covers")
+LAST_DAY = Query(default=None, description="The last day it covers")
+
+
+class LeadershipReportBody(BaseModel):
+    title: str | None = Field(default=None, max_length=400, description="Its title")
+    summary: str | None = Field(
+        default=None, max_length=20000, description="What the issuer has to say about it"
+    )
+    from_: date | None = Field(
+        default=None, alias="from", description="The first day it covers; after the last report"
+    )
+    to: date | None = Field(default=None, description="The last day it covers; today")
+
+
+@router.get("/leadership-reports", summary="The leadership reports issued, the latest first")
+def leadership_reports(request: Request) -> dict[str, Any]:
+    from riskwren.insight import leadership
+
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(leadership.listing(session, principal))
+
+
+@router.get(
+    "/leadership-reports/next",
+    summary="The next leadership report as it stands now: not stored until it is issued",
+)
+def next_leadership_report(
+    request: Request,
+    from_: date | None = FIRST_DAY,
+    to: date | None = LAST_DAY,
+) -> dict[str, Any]:
+    from riskwren.insight import leadership
+
+    principal = current(request)
+    treatment.catch_up(request.app.state.db)
+    with reading(request) as session:
+        return envelope(leadership.draft(session, principal, from_, to))
+
+
+@router.post(
+    "/leadership-reports",
+    status_code=201,
+    summary="Issue a leadership report: what it says is frozen, with its fingerprint",
+)
+def issue_leadership_report(request: Request, body: LeadershipReportBody) -> dict[str, Any]:
+    from riskwren.insight import leadership
+
+    principal = current(request)
+    treatment.catch_up(request.app.state.db)
+    with writing(request, principal.actor) as session:
+        report = leadership.issue(
+            session, principal, title=body.title, summary=body.summary, start=body.from_,
+            end=body.to,
+        )  # fmt: skip
+        return envelope(leadership.view(session, principal, report.ref))
+
+
+@router.get(
+    "/leadership-reports/{ref}",
+    summary="A leadership report as it was issued, and whether its fingerprint verifies",
+)
+def leadership_report(request: Request, ref: str) -> dict[str, Any]:
+    from riskwren.insight import leadership
+
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(leadership.view(session, principal, ref.strip().upper()))
