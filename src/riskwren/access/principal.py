@@ -153,6 +153,7 @@ class Principal:
             "steward": self.stewards or self.manages_somewhere,
             "lead": self.leads,
             "reports": self.reads_reports,
+            "audit": self.has(roles.AUDITOR),
         }
 
     def to_json(self) -> dict[str, Any]:

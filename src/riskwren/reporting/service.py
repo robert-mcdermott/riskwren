@@ -525,6 +525,24 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/reviews/{review.ref}", review.due_on, ref=review.ref,
             )  # fmt: skip
 
+    # Internal audit: requests to answer, and answers for an engagement's team to read.
+    from riskwren.internal_audit import requests as audit_requests
+
+    for request, engagement, state in audit_requests.waiting_on(session, principal):
+        what = request.what if len(request.what) <= 80 else request.what[:77] + "..."
+        if state == "answer":
+            add(
+                "audit_request", f"Internal audit asks: {what}",
+                f"{engagement.ref} · {engagement.name} · asked by {request.asked_by_name}",
+                f"/audit/requests/{request.id}", request.due_on,
+            )  # fmt: skip
+        else:
+            add(
+                "audit_answer", f"Read the answer: {what}",
+                f"{engagement.ref} · accept it or send it back", f"/audit/requests/{request.id}",
+                None,
+            )  # fmt: skip
+
     # Third parties due for review: on their tier's cadence, or because something happened.
     from riskwren.thirdparty import lifecycle
 

@@ -404,6 +404,7 @@ for _route in (
 ):
     REACH[_route] = EVERYONE
 # Through a link, without an account: reached by anyone, and answered by the link.
+REACH[("GET", "/api/v1/outside")] = EVERYONE | {"nobody"}  # an outsider's link, in a header
 for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
                ("POST", "/api/v1/respond/submit"), ("POST", "/api/v1/respond/files")):  # fmt: skip
     REACH[_route] = EVERYONE | {"nobody"}
@@ -456,6 +457,29 @@ for _route in (
     ("GET", "/api/v1/scopes/{ref}/security-plan"), ("GET", "/api/v1/scopes/{ref}/oscal/{document}"),
 ):  # fmt: skip
     REACH[_route] = EVERYONE
+# Internal audit is read by those who read everything; only auditors change it.
+for _key in POLICIES:
+    if _key[1].startswith(
+        (
+            "/api/v1/audit/",
+            "/api/v1/engagements/",
+            "/api/v1/workpapers/",
+            "/api/v1/review-notes/",
+            "/api/v1/auditors",
+        )
+    ):
+        REACH[_key] = {"admin", "manager", "auditor"} if _key[0] == "GET" else {"auditor"}
+# A plan is approved by an auditor who did not draft it or by a leader of the whole
+# organization, which the service decides among those who may read plans.
+REACH[("POST", "/api/v1/audit/plans/{ref}/approve")] = {"admin", "manager", "auditor"}
+# A request is opened and answered by the person asked, whoever they are.
+for _template in (
+    "/api/v1/audit/requests/{request_id}",
+    "/api/v1/audit/requests/{request_id}/answer",
+):
+    for _method in ("GET", "POST"):
+        if (_method, _template) in POLICIES:
+            REACH[(_method, _template)] = EVERYONE
 for _key in POLICIES:
     # Scenarios, and a risk's bow-tie and estimate, are decided by the record.
     if _key[1].startswith("/api/v1/scenarios") or _key[1] in (

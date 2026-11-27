@@ -268,6 +268,24 @@ export const SCENES = [
     path: async (page) => `/as-of/${await first("/api/v1/risks?q=ransomware")(page)}?on=${daysAgo(120)}` },
   { name: "as-of-third-parties", as: "ciso", path: `/as-of?type=third_party&on=${daysAgo(200)}&live=false` },
   { name: "check-dossier", as: "auditor", path: "/check-dossier" },
+  { name: "audit-universe", as: "auditor", path: "/audit/universe" },
+  { name: "audit-plans", as: "auditor", path: "/audit/plans" },
+  { name: "audit-plan", as: "auditor", path: "/audit/plans/APL-0001" },
+  { name: "audit-universe-manager", as: "cro", path: "/audit/universe?kind=scope" },
+  { name: "audit-engagement", as: "auditor", path: "/audit/engagements/AUD-0003" },
+  { name: "audit-engagement-restricted", as: "cro", path: "/audit/engagements/AUD-0003" },
+  { name: "audit-engagement-reported", as: "cro", path: "/audit/engagements/AUD-0001" },
+  { name: "audit-committee-report", as: "president", path: "/audit/plans/APL-0001/committee-report" },
+  { name: "audit-outside", as: "auditor", path: "/audit/outside" },
+  { name: "outside-page", as: "auditor", path: async (page) => page.evaluate(`(async () => {
+      const me = (await (await fetch("/api/v1/session")).json()).data;
+      const made = await fetch("/api/v1/audit/outside", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": me.csrf_token },
+        body: JSON.stringify({ name: "Dana Reyes", organization: "Halvard & Associates", kind: "engagement", ref: "AUD-0001", days: 7 }) });
+      const url = (await made.json()).meta.link.url;
+      // A visit that differed only after "#" would not load the page again.
+      return "/outside?visit=" + Date.now() + "#" + url.split("#")[1]; })()`) },
+  { name: "audit-finding", as: "cro", path: async (page) => `/issues/${await first("/api/v1/issues?q=full+restore")(page)}` },
+  { name: "audit-request", as: "ciso", path: async (page) => `/audit/requests/${await first("/api/v1/home", "(data) => data.items.find((item) => item.kind === 'audit_request').href.split('/').pop()")(page)}` },
   { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },
   { name: "risk-estimate", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=estimate` },
   { name: "scenarios", as: "ciso", path: "/scenarios" },

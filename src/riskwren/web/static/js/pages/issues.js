@@ -239,7 +239,8 @@ function overview(issue, ctx) {
       issue.status === "open" && issue.return_note ? alert("warn", icon("alert"), h("div", {}, `Sent back: ${issue.return_note}`)) : null,
       issue.status === "cancelled" ? alert("info", icon("info"), h("div", {}, `Withdrawn: ${issue.closure_note}`)) : null,
       card({ title: "What is wrong" }, issue.summary ? prose(issue.summary) : h("p", { class: "muted" }, "No detail was given."),
-        issue.source?.review ? h("p", { class: "subtle" }, "From ", h("a", { href: `/reviews/${issue.source.review.ref}` }, `${issue.source.review.ref} ${issue.source.review.name}`), ".")
+        issue.source?.engagement ? h("p", { class: "subtle" }, "A finding of internal audit, from ", h("a", { href: `/audit/engagements/${issue.source.engagement.ref}` }, `${issue.source.engagement.ref} ${issue.source.engagement.name}`), ". Internal audit confirms its closure.")
+          : issue.source?.review ? h("p", { class: "subtle" }, "From ", h("a", { href: `/reviews/${issue.source.review.ref}` }, `${issue.source.review.ref} ${issue.source.review.name}`), ".")
           : issue.source ? h("p", { class: "subtle" }, "From ", h("a", { href: `/assessments/${issue.source.assessment.ref}` }, `${issue.source.assessment.ref} ${issue.source.assessment.name}`),
             `, tested by ${issue.source.tested_by} on ${date(issue.source.tested_at)}.`) : null),
       card({ title: "What it is about" },

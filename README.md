@@ -42,7 +42,7 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared, half a year of measures, a leadership report each quarter, and a ransomware scenario worked through in dollars. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared, half a year of measures, a leadership report each quarter, a ransomware scenario worked through in dollars, and a year of internal audit: a plan approved for the committee, two engagements reported and one in fieldwork, and a finding confirmed closed. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
@@ -53,16 +53,25 @@ Its sign-in page offers ten sample people and asks for no password. Try a few:
 | The steward | One unit's inventory and risks, a critical risk brought to high by controls, with its plan, and the unit's suppliers that are due for review |
 | The unit leader | A high risk that is beyond their authority to accept |
 | The assessor | An assessment in progress, a result to review, an attestation campaign most of the way through, and a risk analysis half done |
-| The auditor | Everything, read-only, with every change in one place, the register as it stood on any day, and a dossier of any scope to check |
+| The auditor | Everything, read-only, with every change in one place, the register as it stood on any day, and a dossier of any scope to check; and internal audit's own work: the universe, this year's plan, an engagement in fieldwork with a review note waiting, and the report for the committee |
 | A staff member | Home for someone with one action to finish and a policy to acknowledge, the policy library, and only their own unit's part of the register |
 
 A demo listens only on the machine it runs on. See [Configuration](docs/configuration.md#the-demo-and-the-network) before changing that.
 
 ## What is in this release
 
-Version 0.6.0 is *Insight*: the record read back to those who answer for it, with figures that say what they count, a report that can be shown to be the one that was given, the register as it stood on any day, and packages an auditor can check. It follows 0.5.0, which added third parties, and 0.4.0, which added the organization's policies and agreements.
+Version 0.7.0 is *Audit*: internal audit's own workspace on the same record, without compromising its independence. It follows 0.6.0, which read the record back as measures, reports, and packages that prove themselves, and 0.5.0, which added third parties.
 
-**Insight, new in 0.6.0**
+**Audit, new in 0.7.0**
+
+- **The audit universe:** every unit, process, system, third party, and scope, ranked from the register (worst open risk, risks above appetite, open issues, criticality, readiness, and time since the last audit), with each part of the ranking shown, and moved by audit only with a reason.
+- **A plan for each period,** approved by someone other than its drafter, and tracked against.
+- **Engagements** through planning, fieldwork, and reporting, with **workpapers** reviewed with notes and signed off by someone other than their preparer. Until the report is issued, the work is its team's alone, and the history keeps its words out.
+- **Requests to the audited,** answered with evidence, offered first from what is already on file.
+- **Findings as issues** in the one register, with management's action plan as their actions, **confirmed closed by internal audit** rather than the second line; and **a report for the audit committee**.
+- **Outside auditors** given one reported engagement or one scope through a link, read-only, until a date, with every look recorded.
+
+**Insight, from 0.6.0**
 
 - **Measures** that say what they count, each opening the list behind it, with a trend from a daily snapshot.
 - **The portfolio:** risk and compliance by unit, family of risk, framework, and third party over a quarter, half year, or year, and issues by root cause, source, and age.
@@ -129,7 +138,7 @@ Version 0.6.0 is *Insight*: the record read back to those who answer for it, wit
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Audits come next, then incidents and resilience. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Incidents and resilience come next, then adoption by other organizations. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 
@@ -144,6 +153,7 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Issues and exceptions](docs/issues-and-exceptions.md) | Whoever fixes, checks, or decides |
 | [Policies](docs/policies.md) | Whoever writes, approves, or keeps the organization's policies |
 | [Third parties](docs/third-parties.md) | Whoever looks after the organization's suppliers and partners |
+| [Internal audit](docs/internal-audit.md) | Internal audit, the third line |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
 | [API](docs/api.md) | Anyone connecting another system |

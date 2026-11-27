@@ -26,7 +26,7 @@ const IMAGES = "img"; // the directory of screenshots, inside docs/ and on the s
 export const MENU = [
   ["Start", [["index", "Overview"], ["getting-started", "Getting started"]]],
   ["Use", [["the-register", "The register"], ["compliance", "Compliance"], ["evidence-and-testing", "Evidence and testing"],
-    ["issues-and-exceptions", "Issues and exceptions"], ["policies", "Policies"], ["third-parties", "Third parties"],
+    ["issues-and-exceptions", "Issues and exceptions"], ["policies", "Policies"], ["third-parties", "Third parties"], ["internal-audit", "Internal audit"],
     ["running-the-program", "Running the program"]]],
   ["Run", [["configuration", "Configuration"]]],
   ["Reference", [["api", "The API"], ["api-reference", "API reference"], ["cli", "Command reference"], ["changelog", "Changelog"]]],

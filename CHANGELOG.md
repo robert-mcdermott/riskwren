@@ -4,6 +4,57 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.7.0 (2026-11-27)
+
+Wave 7, *Audit*: the third line's own workspace on the same record, without compromising its
+independence. The audit universe ranks every unit, process, system, third party, and scope
+from the register, with its working shown. A period's plan is approved by a named person and
+tracked against. Engagements move through planning, fieldwork, and reporting, with workpapers
+reviewed and signed off by someone other than their preparer, and their work is the team's
+alone until the report is issued. Requests to the audited are answered with evidence already
+on file. Findings are issues in the one register, which internal audit confirms closed. A
+report goes to the audit committee, and an outside auditor can be given one engagement or one
+scope, read-only, with every look recorded.
+
+### Upgrading from 0.6.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0035 to 0038). Every row is
+kept, and the history still verifies. A few things look different afterwards:
+
+- **The menu has a new group, Audit,** with Universe, Plans, and Outside access, for those who
+  read everything and those who lead the whole organization. Only auditors change them.
+- **The universe is there at once,** worked out from the register; nothing needs entering. Every
+  thing in it counts as never audited until audit records an earlier audit or reports one.
+- **Closing an issue raised by internal audit is confirmed by an auditor,** not by the second
+  line. Issues raised before 0.7.0 are unchanged. The route that confirms a closure is now open
+  to everyone signed in, and the issue decides who may.
+
+### Added
+
+- **The audit universe:** every unit beneath the organization, and every process, system,
+  third party, and scope in use, ranked from the register (its worst open risk, risks above
+  appetite, open issues, criticality, a scope's readiness, and how long since it was last
+  audited), with each part of the ranking shown. An auditor may move a thing with a reason,
+  record an audit from before RiskWren, or leave a thing out. **Audit → Universe**.
+- **Audit plans:** a period's engagements, each on one thing with its reason, approved by an
+  auditor other than the drafter or by a leader of the whole organization, then tracked
+  against; engagements dropped with a reason. **Audit → Plans**.
+- **Engagements and workpapers:** a team and a lead; planning, fieldwork, reporting, and
+  reported, with a summary and an opinion; a program of work whose workpapers say what was
+  done and found with the evidence, are reviewed with notes, and are signed off by someone
+  other than their preparer. Until the report is issued, the work is its team's alone, and
+  the history keeps its words out.
+- **Findings and follow-up:** a finding is an issue in the one register, from its engagement,
+  with management's action plan as its actions; internal audit, not the second line, confirms
+  it closed. **The committee report:** a plan's engagements with their opinions, findings by
+  severity, and what is past its date.
+- **Outside auditors:** a link for someone outside the organization to one reported
+  engagement or one scope, read-only, for at most 90 days, kept only as a digest, withdrawn at
+  will, and every use recorded in the history. **Audit → Outside access**.
+- **Requests to the audited:** what an engagement needs, asked of one person by a date and
+  on their home page, answered with words and evidence, offered first from what is already on
+  file, and accepted by the team or sent back with what is still needed.
+
 ## 0.6.0 (2026-11-27)
 
 Wave 6, *Insight*: the record read back to those who answer for it. Measures say what they

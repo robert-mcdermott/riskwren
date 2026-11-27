@@ -198,6 +198,37 @@
         "title": "AddTestBody",
         "type": "object"
       },
+      "AdvanceBody": {
+        "properties": {
+          "opinion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "effective, needs_improvement, ...",
+            "title": "Opinion"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For the report",
+            "title": "Summary"
+          }
+        },
+        "title": "AdvanceBody",
+        "type": "object"
+      },
       "AgreementBody": {
         "description": "An agreement. On a change, send only what changes, with the ``version`` you had.",
         "properties": {
@@ -450,62 +481,31 @@
         "title": "AnalysisBody",
         "type": "object"
       },
-      "AnswerBody": {
+      "AskBody": {
         "properties": {
-          "look_again": {
-            "default": false,
-            "description": "For covered: put its rating in doubt",
-            "title": "Look Again",
-            "type": "boolean"
+          "assignee": {
+            "description": "The account id of the person asked",
+            "title": "Assignee",
+            "type": "integer"
           },
-          "name": {
-            "anyOf": [
-              {
-                "maxLength": 200,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "For raised: its title",
-            "title": "Name"
-          },
-          "note": {
-            "anyOf": [
-              {
-                "maxLength": 4000,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Why",
-            "title": "Note"
-          },
-          "outcome": {
-            "description": "not_applicable, covered, raised, or pending to take back",
-            "title": "Outcome",
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
             "type": "string"
           },
-          "risk": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "For covered: the risk's reference",
-            "title": "Risk"
+          "what": {
+            "description": "What is needed",
+            "maxLength": 8000,
+            "title": "What",
+            "type": "string"
           }
         },
         "required": [
-          "outcome"
+          "what",
+          "assignee",
+          "due_on"
         ],
-        "title": "AnswerBody",
+        "title": "AskBody",
         "type": "object"
       },
       "AssuranceReviewBody": {
@@ -1517,6 +1517,63 @@
         "title": "DueBody",
         "type": "object"
       },
+      "EngagementBody": {
+        "properties": {
+          "key": {
+            "description": "A unit's id, or the record's reference",
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "description": "unit, process, system, third_party, or scope",
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "planned_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned End"
+          },
+          "planned_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Start"
+          },
+          "reason": {
+            "description": "Why it is in the plan",
+            "maxLength": 8000,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "key",
+          "reason"
+        ],
+        "title": "EngagementBody",
+        "type": "object"
+      },
       "EscalationBody": {
         "properties": {
           "reason": {
@@ -1950,49 +2007,6 @@
           "value"
         ],
         "title": "ExternalRefBody",
-        "type": "object"
-      },
-      "FindingBody": {
-        "properties": {
-          "name": {
-            "maxLength": 400,
-            "title": "Name",
-            "type": "string"
-          },
-          "owner_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Who here puts it right",
-            "title": "Owner Id"
-          },
-          "severity": {
-            "description": "critical, high, moderate, or low",
-            "title": "Severity",
-            "type": "string"
-          },
-          "summary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Summary"
-          }
-        },
-        "required": [
-          "name",
-          "severity"
-        ],
-        "title": "FindingBody",
         "type": "object"
       },
       "FrameworkBody": {
@@ -3374,6 +3388,70 @@
         "title": "OffboardBody",
         "type": "object"
       },
+      "OutsideBody": {
+        "properties": {
+          "days": {
+            "description": "How long it stays open, at most 90 days",
+            "title": "Days",
+            "type": "integer"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "kind": {
+            "description": "engagement (once reported) or scope",
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "description": "The person it is for",
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "organization": {
+            "description": "Whom they are with",
+            "maxLength": 400,
+            "title": "Organization",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "ref": {
+            "description": "The engagement's or the scope's reference",
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "organization",
+          "kind",
+          "ref",
+          "days"
+        ],
+        "title": "OutsideBody",
+        "type": "object"
+      },
       "OwnersBody": {
         "properties": {
           "owners": {
@@ -3490,41 +3568,6 @@
           "text"
         ],
         "title": "PasteBody",
-        "type": "object"
-      },
-      "PlanBody": {
-        "properties": {
-          "due_on": {
-            "format": "date",
-            "title": "Due On",
-            "type": "string"
-          },
-          "objective": {
-            "title": "Objective",
-            "type": "string"
-          },
-          "owner_id": {
-            "title": "Owner Id",
-            "type": "integer"
-          },
-          "target_rating": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Target Rating"
-          }
-        },
-        "required": [
-          "objective",
-          "owner_id",
-          "due_on"
-        ],
-        "title": "PlanBody",
         "type": "object"
       },
       "Preferences": {
@@ -3952,23 +3995,6 @@
         "title": "ReadingBody",
         "type": "object"
       },
-      "ReasonBody": {
-        "properties": {
-          "reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reason"
-          }
-        },
-        "title": "ReasonBody",
-        "type": "object"
-      },
       "ReportBody": {
         "properties": {
           "collected_on": {
@@ -4066,6 +4092,32 @@
           }
         },
         "title": "ReportBody",
+        "type": "object"
+      },
+      "RequestAnswerBody": {
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "evidence": {
+            "description": "References of evidence",
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "title": "RequestAnswerBody",
         "type": "object"
       },
       "RequirementBody": {
@@ -4428,6 +4480,85 @@
           "roles"
         ],
         "title": "Roles",
+        "type": "object"
+      },
+      "SayBody": {
+        "description": "What audit says about an auditable thing. Send only what changes.",
+        "properties": {
+          "adjustment": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Points up or down, at most 30",
+            "title": "Adjustment"
+          },
+          "adjustment_reason": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adjustment Reason"
+          },
+          "last_audit_note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Audit Note"
+          },
+          "last_audited_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "An audit before RiskWren",
+            "title": "Last Audited On"
+          },
+          "left_out": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Left Out"
+          },
+          "left_out_reason": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Left Out Reason"
+          }
+        },
+        "title": "SayBody",
         "type": "object"
       },
       "ScenarioBody": {
@@ -4997,100 +5128,31 @@
         "title": "SignIn",
         "type": "object"
       },
-      "StartBody": {
-        "description": "What to look at, and against what. Name a scope, or a unit for everything it and the\nunits beneath it hold; and library risks, whole categories of them, or both.",
+      "StepBody": {
         "properties": {
-          "categories": {
+          "procedure": {
             "anyOf": [
               {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Keys of risk categories",
-            "title": "Categories"
-          },
-          "name": {
-            "anyOf": [
-              {
-                "maxLength": 400,
+                "maxLength": 8000,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Name"
+            "description": "What is to be done",
+            "title": "Procedure"
           },
-          "org_unit_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "The unit; a scope's own if absent",
-            "title": "Org Unit Id"
-          },
-          "restricted": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Restricted"
-          },
-          "scope": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "A scope's reference, such as SCP-0002",
-            "title": "Scope"
-          },
-          "summary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Why it is being done, and how",
-            "title": "Summary"
-          },
-          "threats": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Keys of library risks",
-            "title": "Threats"
+          "title": {
+            "maxLength": 400,
+            "title": "Title",
+            "type": "string"
           }
         },
-        "title": "StartBody",
+        "required": [
+          "title"
+        ],
+        "title": "StepBody",
         "type": "object"
       },
       "SubmitBody": {
@@ -5784,6 +5846,42 @@
         "title": "VocabularyBody",
         "type": "object"
       },
+      "WorkBody": {
+        "properties": {
+          "done": {
+            "description": "What was done",
+            "maxLength": 20000,
+            "title": "Done",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "References of evidence",
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "found": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What was found",
+            "title": "Found"
+          }
+        },
+        "required": [
+          "done"
+        ],
+        "title": "WorkBody",
+        "type": "object"
+      },
       "riskwren__api__routers__agreements__CloseBody": {
         "properties": {
           "note": {
@@ -5803,6 +5901,64 @@
         "title": "CloseBody",
         "type": "object"
       },
+      "riskwren__api__routers__analyses__AnswerBody": {
+        "properties": {
+          "look_again": {
+            "default": false,
+            "description": "For covered: put its rating in doubt",
+            "title": "Look Again",
+            "type": "boolean"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For raised: its title",
+            "title": "Name"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why",
+            "title": "Note"
+          },
+          "outcome": {
+            "description": "not_applicable, covered, raised, or pending to take back",
+            "title": "Outcome",
+            "type": "string"
+          },
+          "risk": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For covered: the risk's reference",
+            "title": "Risk"
+          }
+        },
+        "required": [
+          "outcome"
+        ],
+        "title": "AnswerBody",
+        "type": "object"
+      },
       "riskwren__api__routers__analyses__CloseBody": {
         "properties": {
           "conclusion": {
@@ -5819,6 +5975,102 @@
           }
         },
         "title": "CloseBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__analyses__StartBody": {
+        "description": "What to look at, and against what. Name a scope, or a unit for everything it and the\nunits beneath it hold; and library risks, whole categories of them, or both.",
+        "properties": {
+          "categories": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Keys of risk categories",
+            "title": "Categories"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The unit; a scope's own if absent",
+            "title": "Org Unit Id"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A scope's reference, such as SCP-0002",
+            "title": "Scope"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why it is being done, and how",
+            "title": "Summary"
+          },
+          "threats": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Keys of library risks",
+            "title": "Threats"
+          }
+        },
+        "title": "StartBody",
         "type": "object"
       },
       "riskwren__api__routers__assessments__AssessmentBody": {
@@ -6167,6 +6419,169 @@
         "title": "MoveBody",
         "type": "object"
       },
+      "riskwren__api__routers__internal_audit__AnswerBody": {
+        "properties": {
+          "answer": {
+            "maxLength": 8000,
+            "title": "Answer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "title": "AnswerBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__internal_audit__FindingBody": {
+        "properties": {
+          "name": {
+            "description": "The finding, in a line",
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "owner_id": {
+            "description": "The manager who answers for putting it right",
+            "title": "Owner Id",
+            "type": "integer"
+          },
+          "severity": {
+            "description": "critical, high, moderate, or low",
+            "title": "Severity",
+            "type": "string"
+          },
+          "subjects": {
+            "description": "Controls or risks it is about",
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What was found",
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "name",
+          "severity",
+          "owner_id"
+        ],
+        "title": "FindingBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__internal_audit__PlanBody": {
+        "properties": {
+          "ends_on": {
+            "format": "date",
+            "title": "Ends On",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "title": "Starts On",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "name",
+          "starts_on",
+          "ends_on"
+        ],
+        "title": "PlanBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__internal_audit__ReasonBody": {
+        "properties": {
+          "reason": {
+            "maxLength": 4000,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ReasonBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__internal_audit__ReviewBody": {
+        "properties": {
+          "note": {
+            "maxLength": 8000,
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "note"
+        ],
+        "title": "ReviewBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__internal_audit__StartBody": {
+        "properties": {
+          "lead": {
+            "description": "The lead auditor's account id",
+            "title": "Lead",
+            "type": "integer"
+          },
+          "members": {
+            "description": "The rest of the team",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "scope_note": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What it covers",
+            "title": "Scope Note"
+          }
+        },
+        "required": [
+          "lead"
+        ],
+        "title": "StartBody",
+        "type": "object"
+      },
       "riskwren__api__routers__inventory__LinkBody": {
         "properties": {
           "note": {
@@ -6277,6 +6692,23 @@
           "approve"
         ],
         "title": "DecisionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__issues__ReasonBody": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "ReasonBody",
         "type": "object"
       },
       "riskwren__api__routers__issues__SubjectsBody": {
@@ -6450,6 +6882,49 @@
         "title": "AnswersBody",
         "type": "object"
       },
+      "riskwren__api__routers__third_parties__FindingBody": {
+        "properties": {
+          "name": {
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who here puts it right",
+            "title": "Owner Id"
+          },
+          "severity": {
+            "description": "critical, high, moderate, or low",
+            "title": "Severity",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "name",
+          "severity"
+        ],
+        "title": "FindingBody",
+        "type": "object"
+      },
       "riskwren__api__routers__third_parties__ReviewBody": {
         "properties": {
           "due_on": {
@@ -6573,6 +7048,41 @@
           "due_on"
         ],
         "title": "ActionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__treatment__PlanBody": {
+        "properties": {
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "objective": {
+            "title": "Objective",
+            "type": "string"
+          },
+          "owner_id": {
+            "title": "Owner Id",
+            "type": "integer"
+          },
+          "target_rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Rating"
+          }
+        },
+        "required": [
+          "objective",
+          "owner_id",
+          "due_on"
+        ],
+        "title": "PlanBody",
         "type": "object"
       }
     }
@@ -9108,6 +9618,814 @@
         "summary": "The kinds of report, opinions, and judgments a review uses",
         "tags": [
           "third parties"
+        ]
+      }
+    },
+    "/api/v1/audit/outside": {
+      "get": {
+        "operationId": "list_outside_api_v1_audit_outside_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Outside Api V1 Audit Outside Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Outside access given, and what may be opened",
+        "tags": [
+          "internal audit"
+        ]
+      },
+      "post": {
+        "operationId": "grant_outside_api_v1_audit_outside_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutsideBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Grant Outside Api V1 Audit Outside Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open one engagement or scope to an outsider",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/outside/{access_id}/revoke": {
+      "post": {
+        "operationId": "revoke_outside_api_v1_audit_outside__access_id__revoke_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "access_id",
+            "required": true,
+            "schema": {
+              "title": "Access Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Revoke Outside Api V1 Audit Outside  Access Id  Revoke Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Withdraw outside access",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans": {
+      "get": {
+        "operationId": "list_plans_api_v1_audit_plans_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Plans Api V1 Audit Plans Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The audit plans, the latest period first",
+        "tags": [
+          "internal audit"
+        ]
+      },
+      "post": {
+        "operationId": "create_plan_api_v1_audit_plans_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__PlanBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Plan Api V1 Audit Plans Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Draft a plan for a period",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans/{ref}": {
+      "get": {
+        "operationId": "show_plan_api_v1_audit_plans__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Plan Api V1 Audit Plans  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A plan, with each engagement and where it stands",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans/{ref}/approve": {
+      "post": {
+        "operationId": "approve_plan_api_v1_audit_plans__ref__approve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Approve Plan Api V1 Audit Plans  Ref  Approve Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve a draft plan",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans/{ref}/close": {
+      "post": {
+        "operationId": "close_plan_api_v1_audit_plans__ref__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Close Plan Api V1 Audit Plans  Ref  Close Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close a plan whose period is over",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans/{ref}/committee-report": {
+      "get": {
+        "operationId": "committee_report_api_v1_audit_plans__ref__committee_report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Committee Report Api V1 Audit Plans  Ref  Committee Report Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A plan's engagements, findings by severity, and what is past its date",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans/{ref}/engagements": {
+      "post": {
+        "operationId": "plan_engagement_api_v1_audit_plans__ref__engagements_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EngagementBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Plan Engagement Api V1 Audit Plans  Ref  Engagements Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plan an engagement",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}": {
+      "get": {
+        "operationId": "show_request_api_v1_audit_requests__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Request Api V1 Audit Requests  Request Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A request, for the person asked or the team",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}/accept": {
+      "post": {
+        "operationId": "accept_request_api_v1_audit_requests__request_id__accept_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Accept Request Api V1 Audit Requests  Request Id  Accept Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accept the answer to a request",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}/answer": {
+      "post": {
+        "operationId": "answer_request_api_v1_audit_requests__request_id__answer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAnswerBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Request Api V1 Audit Requests  Request Id  Answer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer a request, with evidence",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}/return": {
+      "post": {
+        "operationId": "return_request_api_v1_audit_requests__request_id__return_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__ReasonBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Return Request Api V1 Audit Requests  Request Id  Return Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send an answer back, with what is missing",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/universe": {
+      "get": {
+        "operationId": "show_universe_api_v1_audit_universe_get",
+        "parameters": [
+          {
+            "description": "unit, process, system, ...",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "unit, process, system, ...",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "Those left out of the universe",
+            "in": "query",
+            "name": "left_out",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Those left out of the universe",
+              "title": "Left Out",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Universe Api V1 Audit Universe Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything worth auditing, ranked from the register",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/universe/{kind}/{key}": {
+      "get": {
+        "operationId": "show_entity_api_v1_audit_universe__kind___key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Entity Api V1 Audit Universe  Kind   Key  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One auditable thing and how it ranks",
+        "tags": [
+          "internal audit"
+        ]
+      },
+      "put": {
+        "operationId": "say_entity_api_v1_audit_universe__kind___key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SayBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Say Entity Api V1 Audit Universe  Kind   Key  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say what audit knows about a thing",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/auditors": {
+      "get": {
+        "operationId": "list_auditors_api_v1_auditors_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Auditors Api V1 Auditors Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The auditors, who may be on an engagement's team",
+        "tags": [
+          "internal audit"
         ]
       }
     },
@@ -12256,6 +13574,418 @@
         ]
       }
     },
+    "/api/v1/engagements/{ref}": {
+      "get": {
+        "operationId": "show_engagement_api_v1_engagements__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Engagement Api V1 Engagements  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "An engagement; its work only for its team until reported",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/advance": {
+      "post": {
+        "operationId": "advance_engagement_api_v1_engagements__ref__advance_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdvanceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Advance Engagement Api V1 Engagements  Ref  Advance Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Move an engagement to its next stage",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/drop": {
+      "post": {
+        "operationId": "drop_engagement_api_v1_engagements__ref__drop_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__ReasonBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Drop Engagement Api V1 Engagements  Ref  Drop Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Drop a planned engagement, with the reason",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/findings": {
+      "post": {
+        "operationId": "raise_finding_api_v1_engagements__ref__findings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__FindingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Raise Finding Api V1 Engagements  Ref  Findings Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise a finding as an issue",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/requests": {
+      "post": {
+        "operationId": "ask_for_api_v1_engagements__ref__requests_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Ask For Api V1 Engagements  Ref  Requests Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask the audited for something",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/restore": {
+      "post": {
+        "operationId": "restore_engagement_api_v1_engagements__ref__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Restore Engagement Api V1 Engagements  Ref  Restore Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put a dropped engagement back in the plan",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/start": {
+      "post": {
+        "operationId": "start_engagement_api_v1_engagements__ref__start_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__StartBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Engagement Api V1 Engagements  Ref  Start Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start a planned engagement with its team",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/workpapers": {
+      "post": {
+        "operationId": "add_workpaper_api_v1_engagements__ref__workpapers_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StepBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Workpaper Api V1 Engagements  Ref  Workpapers Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a step of the work",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
     "/api/v1/evidence": {
       "get": {
         "operationId": "list_evidence_api_v1_evidence_get",
@@ -13392,7 +15122,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReasonBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__issues__ReasonBody"
               }
             }
           },
@@ -16812,7 +18542,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReasonBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__issues__ReasonBody"
               }
             }
           },
@@ -17072,7 +18802,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReasonBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__issues__ReasonBody"
               }
             }
           },
@@ -18267,6 +19997,27 @@
         "summary": "Set an objective's owners",
         "tags": [
           "objectives and sessions"
+        ]
+      }
+    },
+    "/api/v1/outside": {
+      "get": {
+        "operationId": "outside_view_api_v1_outside_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Outside View Api V1 Outside Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "What an outsider's link opens (no account; the link in a header)",
+        "tags": [
+          "internal audit"
         ]
       }
     },
@@ -19789,6 +21540,104 @@
         ]
       }
     },
+    "/api/v1/review-notes/{note_id}/answer": {
+      "post": {
+        "operationId": "answer_review_note_api_v1_review_notes__note_id__answer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "note_id",
+            "required": true,
+            "schema": {
+              "title": "Note Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__AnswerBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Review Note Api V1 Review Notes  Note Id  Answer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer a review note",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/review-notes/{note_id}/clear": {
+      "post": {
+        "operationId": "clear_review_note_api_v1_review_notes__note_id__clear_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "note_id",
+            "required": true,
+            "schema": {
+              "title": "Note Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Clear Review Note Api V1 Review Notes  Note Id  Clear Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear an answered review note",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
     "/api/v1/reviews": {
       "get": {
         "operationId": "list_reviews_api_v1_reviews_get",
@@ -20200,7 +22049,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FindingBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__FindingBody"
               }
             }
           },
@@ -20599,7 +22448,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StartBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__analyses__StartBody"
               }
             }
           },
@@ -20642,7 +22491,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StartBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__analyses__StartBody"
               }
             }
           },
@@ -21016,7 +22865,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AnswerBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__analyses__AnswerBody"
               }
             }
           },
@@ -22603,7 +24452,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PlanBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__treatment__PlanBody"
               }
             }
           },
@@ -28968,6 +30817,158 @@
         "summary": "Rename, reorder, add to, or retire a vocabulary",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/workpapers/{paper_id}": {
+      "put": {
+        "operationId": "record_work_api_v1_workpapers__paper_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paper_id",
+            "required": true,
+            "schema": {
+              "title": "Paper Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Work Api V1 Workpapers  Paper Id  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record what was done, found, and the evidence",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/workpapers/{paper_id}/notes": {
+      "post": {
+        "operationId": "add_review_note_api_v1_workpapers__paper_id__notes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paper_id",
+            "required": true,
+            "schema": {
+              "title": "Paper Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__ReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Review Note Api V1 Workpapers  Paper Id  Notes Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a review note",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/workpapers/{paper_id}/sign-off": {
+      "post": {
+        "operationId": "sign_off_api_v1_workpapers__paper_id__sign_off_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paper_id",
+            "required": true,
+            "schema": {
+              "title": "Paper Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Sign Off Api V1 Workpapers  Paper Id  Sign Off Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sign a workpaper off",
+        "tags": [
+          "internal audit"
         ]
       }
     }

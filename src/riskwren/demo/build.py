@@ -2060,6 +2060,223 @@ class Builder:
                         "status": "concluded", "conclusion": item["conclusion"]},
                         version=scenario.version)  # fmt: skip
 
+    def _story_internal_audit(self) -> Script:
+        """The auditor says what audit knows about a few things in the universe, drafts this
+        year's plan, which the president approves for the committee, and next year's."""
+        from datetime import timedelta
+
+        from riskwren.db.models import Engagement, OrgUnit, Process, Scope, System, ThirdParty
+        from riskwren.internal_audit import plans, universe
+
+        models = {"process": Process, "system": System, "third_party": ThirdParty,
+                  "scope": Scope}  # fmt: skip
+
+        def key_of(session: Session, kind: str, name: str) -> str:
+            if kind == "unit":
+                return str(session.scalars(select(OrgUnit.id).where(OrgUnit.name == name)).one())
+            model = models[kind]
+            return str(session.scalars(select(model.ref).where(model.name == name)).one())
+
+        auditor = self.cast["auditor"]
+        yield self._on(345, hour=10)
+        with self.act(auditor) as (session, who):
+            for kind, name, said in c.AUDIT_SAYS:
+                values = dict(said)
+                if "last_audited_on" in values:
+                    values["last_audited_on"] = self.today - timedelta(
+                        days=values["last_audited_on"]
+                    )
+                universe.say(session, who, kind, key_of(session, kind, name), values)
+        for spec in c.AUDIT_PLANS:
+            yield self._on(spec["drafted"], hour=10)
+            with self.act(auditor) as (session, who):
+                plan = plans.create(session, who, {
+                    "name": spec["name"], "summary": spec["summary"],
+                    "starts_on": self.today - timedelta(days=spec["from"] - spec["drafted"]),
+                    "ends_on": self.today - timedelta(days=spec["to"] - spec["drafted"])})  # fmt: skip
+                ref = plan.ref
+                for name, kind, what, why, start, end, _ in spec["engagements"]:
+                    plans.add_engagement(session, who, plan, {
+                        "name": name, "kind": kind, "key": key_of(session, kind, what),
+                        "reason": why,
+                        "planned_start": self.today - timedelta(days=start - spec["drafted"]),
+                        "planned_end": self.today - timedelta(days=end - spec["drafted"])})  # fmt: skip
+            self.tally("audit plans")
+            if spec["approved"] is not None:
+                yield self._on(spec["approved"], hour=15)
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    plan = plans.find(session, who, ref)
+                    plans.approve(session, who, plan, spec["note"])
+            for name, _, _, _, start, _, dropped in spec["engagements"]:
+                if dropped:
+                    yield self._on(max(start - 20, 1), hour=11)
+                    with self.act(auditor) as (session, who):
+                        plan = plans.find(session, who, ref)
+                        found = next(e for e in session.scalars(select(Engagement).where(
+                            Engagement.plan_id == plan.id)) if e.name == name)  # fmt: skip
+                        plans.drop(session, who, found, dropped)
+
+    def _story_engagements(self) -> Script:
+        """This year's engagements carried out: started with a team, worked through step by
+        step with review notes and sign-off, and reported; the last still in fieldwork."""
+        from datetime import timedelta
+
+        from riskwren.db.models import AuditRequest, Engagement, ReviewNote, Workpaper
+        from riskwren.internal_audit import engagements
+        from riskwren.internal_audit import findings as audit_findings
+        from riskwren.internal_audit import requests as audit_requests
+
+        def find(session: Session, name: str) -> Engagement:
+            return session.scalars(select(Engagement).where(Engagement.name == name)).one()
+
+        steps: list[tuple[int, int, Any]] = []
+        for order, spec in enumerate(c.ENGAGEMENTS):
+            steps.append((spec["start"], order, ("start", spec)))
+            steps.append((spec["start"] - 2, order, ("program", spec)))
+            steps.append((spec["fieldwork"], order, ("advance", spec)))
+            for index, step in enumerate(spec["steps"]):
+                if step[2]:
+                    steps.append((spec["fieldwork"] - 5 - 6 * index, order, ("work", spec, index)))
+            for key in ("reporting", "reported"):
+                if spec[key]:
+                    steps.append((spec[key], order, ("advance", spec)))
+            for index, raised in enumerate(spec["findings"]):
+                steps.append((raised[0], order, ("finding", spec, index)))
+                for done in raised[6]:
+                    if done[2] is not None:
+                        steps.append((done[2], order, ("finish", spec, index)))
+                if raised[7]:
+                    steps.append((raised[7][0], order, ("propose", spec, index)))
+                    steps.append((raised[7][3], order, ("confirm", spec, index)))
+            for index, asked in enumerate(spec["requests"]):
+                steps.append((asked[0], order, ("ask", spec, index)))
+                if asked[5]:
+                    steps.append((asked[5][0], order, ("answer", spec, index)))
+                if asked[6]:
+                    steps.append((asked[6], order, ("accept", spec, index)))
+        for days, _, what in sorted(steps, key=lambda step: (-step[0], step[1])):
+            yield self._on(days, hour=14)
+            spec = what[1]
+            lead, members = self.cast[spec["lead"]], [self.cast[m] for m in spec["members"]]
+            if what[0] == "start":
+                with self.act(lead) as (session, who):
+                    engagements.start(session, who, find(session, spec["name"]), {
+                        "lead": lead, "members": members, "scope_note": spec["scope"]})  # fmt: skip
+            elif what[0] == "program":
+                with self.act(lead) as (session, who):
+                    found = find(session, spec["name"])
+                    for title, procedure, *_ in spec["steps"]:
+                        engagements.add_step(session, who, found, {"title": title,
+                                                                  "procedure": procedure})  # fmt: skip
+            elif what[0] == "advance":
+                with self.act(lead) as (session, who):
+                    found = find(session, spec["name"])
+                    engagements.advance(session, who, found, {"summary": spec["summary"],
+                                                              "opinion": spec["opinion"]})  # fmt: skip
+                self.tally(f"engagements {found.status}")
+            elif what[0] in ("finding", "finish", "propose", "confirm"):
+                _, by, name, summary, severity, owner, plan, closure = spec["findings"][what[2]]
+                if what[0] == "finding":
+                    with self.act(self.cast[by]) as (session, who):
+                        found = find(session, spec["name"])
+                        issue = audit_findings.raise_finding(session, who, found, {
+                            "name": name, "summary": summary, "severity": severity,
+                            "owner_id": self.cast[owner]})  # fmt: skip
+                        issue_id = issue.id
+                    with self.act(self.cast[owner]) as (session, who):
+                        for title, due_in, _ in plan:
+                            issues.add_action(session, who, session.get(Issue, issue_id), title=title,
+                                              owner_id=self.cast[owner],
+                                              due_on=self.today + timedelta(days=due_in))  # fmt: skip
+                    self.tally("audit findings")
+                    continue
+                with self.db.read() as session:
+                    issue_id = session.scalars(select(Issue.id).where(Issue.name == name)).one()
+                if what[0] == "finish":
+                    with self.act(self.cast[owner]) as (session, who):
+                        for action in session.scalars(select(Action).where(
+                                Action.source_type == "issue", Action.source_id == issue_id)):  # fmt: skip
+                            treatment.update_action(session, who, action, {"status": "done"})
+                elif what[0] == "propose":
+                    with self.act(self.cast[owner]) as (session, who):
+                        issues.propose(session, who, session.get(Issue, issue_id),
+                                       note=closure[1], root_cause=closure[2])  # fmt: skip
+                else:
+                    with self.act(self.cast["auditor2" if by == "auditor" else "auditor"]) as (
+                        session,
+                        who,
+                    ):
+                        issues.validate(session, who, session.get(Issue, issue_id), confirm=True,
+                                        note="Seen alerting on a test job.")  # fmt: skip
+            elif what[0] in ("ask", "answer", "accept"):
+                _, by, of, text, due_in, answered, _ = spec["requests"][what[2]]
+                if what[0] == "ask":
+                    with self.act(self.cast[by]) as (session, who):
+                        audit_requests.ask(session, who, find(session, spec["name"]), {
+                            "what": text, "assignee": self.cast[of],
+                            "due_on": self.today + timedelta(days=due_in)})  # fmt: skip
+                    self.tally("audit requests")
+                    continue
+                with self.act(self.cast[of] if what[0] == "answer" else lead) as (session, who):
+                    found = find(session, spec["name"])
+                    request = session.scalars(select(AuditRequest).where(
+                        AuditRequest.engagement_id == found.id,
+                        AuditRequest.what == text)).one()  # fmt: skip
+                    if what[0] == "answer":
+                        offered = audit_requests.on_file(session, who, found)
+                        audit_requests.answer(session, who, request, {
+                            "answer": answered[1],
+                            "evidence": [item["ref"] for item in offered[:1]]})  # fmt: skip
+                    else:
+                        audit_requests.accept(session, who, request, found)
+            else:
+                title, _, done, found_text, preparer, signer, note = spec["steps"][what[2]]
+                with self.act(self.cast[preparer]) as (session, who):
+                    found = find(session, spec["name"])
+                    paper = session.scalars(select(Workpaper).where(
+                        Workpaper.engagement_id == found.id, Workpaper.title == title)).one()  # fmt: skip
+                    engagements.record_work(session, who, paper, found,
+                                            {"done": done, "found": found_text})  # fmt: skip
+                reviewer = self.cast[signer] if signer else (
+                    lead if self.cast[preparer] != lead else members[0])  # fmt: skip
+                if note:
+                    with self.act(reviewer) as (session, who):
+                        found = find(session, spec["name"])
+                        paper = session.get(Workpaper, paper.id)
+                        engagements.add_note(session, who, paper, found, note[0])
+                    if note[1]:
+                        with self.act(self.cast[preparer]) as (session, who):
+                            row = session.scalars(select(ReviewNote).where(
+                                ReviewNote.workpaper_id == paper.id)).one()  # fmt: skip
+                            engagements.answer_note(session, who, row, find(session, spec["name"]),
+                                                    note[1])  # fmt: skip
+                        with self.act(reviewer) as (session, who):
+                            row = session.scalars(select(ReviewNote).where(
+                                ReviewNote.workpaper_id == paper.id)).one()  # fmt: skip
+                            engagements.clear_note(session, who, row, find(session, spec["name"]))
+                if signer:
+                    with self.act(self.cast[signer]) as (session, who):
+                        found = find(session, spec["name"])
+                        engagements.sign_off(session, who, session.get(Workpaper, paper.id), found)
+
+    def _story_outside(self) -> Script:
+        """The external auditors are given the reported backups engagement for a month, and
+        look at it twice; the sponsor's monitor had the trial data platform last spring."""
+        from riskwren.internal_audit import outside
+
+        auditor = self.cast["auditor"]
+        for days, spec, looks in ((150, c.OUTSIDE[1], 0), (12, c.OUTSIDE[0], 2)):
+            yield self._on(days, hour=9)
+            with self.act(auditor) as (session, who):
+                access, token = outside.grant(session, who, spec)
+            self.tally("outside access")
+            for look in range(looks):
+                yield self._on(days - 2 - look * 3, hour=13)
+                with self.db.write(outside.actor_for(access)) as session:
+                    found = outside.find(session, token)
+                    outside.package(session, found)
+                    outside.record_view(session, found)
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3312,6 +3529,7 @@ class Builder:
             self._story_governance, self._story_third_parties, self._story_due_diligence,
             self._story_assurance, self._story_coverage, self._story_lifecycle,
             self._story_measures, self._story_leadership, self._story_scenarios,
+            self._story_internal_audit, self._story_engagements, self._story_outside,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

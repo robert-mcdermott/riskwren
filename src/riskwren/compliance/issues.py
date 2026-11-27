@@ -140,12 +140,25 @@ def _owns(session: Session, principal: Principal, issue: Issue) -> bool:
     return bool(kinds & set(access.EDITING_KINDS))
 
 
+def from_audit(issue: Issue) -> bool:
+    """A finding of internal audit: it is audit, not the second line, that confirms it closed."""
+    return issue.source_type == "engagement"
+
+
+def confirms(principal: Principal, issue: Issue) -> bool:
+    """Who may confirm, cancel, or reopen the issue: the second line for the unit, or for a
+    finding of internal audit, an auditor."""
+    if from_audit(issue):
+        return principal.has(roles.AUDITOR)
+    return principal.assesses_unit(issue.org_unit_id)
+
+
 def can_validate(session: Session, principal: Principal, issue: Issue) -> bool:
-    """Closure is confirmed by the second line, and never by whoever owns the issue or
-    proposed that it be closed."""
+    """Closure is confirmed by the second line (by audit, for its findings), and never by
+    whoever owns the issue or proposed that it be closed."""
     me = principal.account_id
     return (
-        principal.assesses_unit(issue.org_unit_id)
+        confirms(principal, issue)
         and not _owns(session, principal, issue)
         and (me is None or me != issue.proposed_by)
     )
@@ -271,6 +284,13 @@ def source_of(session: Session, issue: Issue) -> dict[str, Any] | None:
 
         review = session.get(ThirdPartyReview, issue.source_id)
         return {"review": {"ref": review.ref, "name": review.name}} if review else None
+    if issue.source_type == "engagement" and issue.source_id is not None:
+        from riskwren.db.models import Engagement
+
+        engagement = session.get(Engagement, issue.source_id)
+        return (
+            {"engagement": {"ref": engagement.ref, "name": engagement.name}} if engagement else None
+        )
     if issue.source_type != "test_result" or issue.source_id is None:
         return None
     result = session.get(TestResult, issue.source_id)
@@ -320,7 +340,7 @@ def _contacts(session: Session, issue: Issue) -> list[dict[str, Any]]:
 def _detail(session: Session, principal: Principal, issue: Issue) -> dict[str, Any]:
     live = issue.status in LIVE
     editable = access.can_edit(session, principal, ISSUE, issue)
-    second = principal.assesses_unit(issue.org_unit_id)
+    second = confirms(principal, issue)
     return {
         "extensions": issue.extensions or [],
         "root_cause": issue.root_cause,
@@ -813,11 +833,14 @@ def propose(
         records.touch(session, issue)
         session.flush()
         owners = set(notices.owners(session, KEY, issue.id))
-        second = [
-            person
-            for person in notices.holders(session, SECOND_LINE, issue.org_unit_id)
-            if person not in owners
-        ]
+        if from_audit(issue):  # audit confirms its own findings: tell the engagement's team
+            from riskwren.db.models import EngagementMember
+
+            confirmers = list(session.scalars(select(EngagementMember.account_id).where(
+                EngagementMember.engagement_id == issue.source_id)))  # fmt: skip
+        else:
+            confirmers = notices.holders(session, SECOND_LINE, issue.org_unit_id)
+        second = [person for person in confirmers if person not in owners]
         notices.tell_all(
             session, second, "closure",
             f"{issue.ref} is said to be put right, and waits for someone to confirm it",
@@ -837,8 +860,12 @@ def validate(
         raise PermissionDenied("Nobody confirms the closure of an issue they own.")
     if principal.account_id is not None and principal.account_id == issue.proposed_by:
         raise PermissionDenied("Nobody confirms a closure they proposed. Ask someone else.")
-    if not principal.assesses_unit(issue.org_unit_id):
-        raise PermissionDenied("Closure is confirmed by an assessor or a manager for the unit.")
+    if not confirms(principal, issue):
+        raise PermissionDenied(
+            "Internal audit confirms the closure of its findings."
+            if from_audit(issue)
+            else "Closure is confirmed by an assessor or a manager for the unit."
+        )
     said = records.text(note)
     if not confirm and not said:
         raise Invalid("It was not sent back.", {"note": "Say what is still missing."})
@@ -866,7 +893,7 @@ def validate(
 def cancel(session: Session, principal: Principal, issue: Issue, *, reason: str | None) -> Issue:
     """Withdraw an issue raised in error. That is for the second line, since an owner who
     could cancel their own issue would never need to have its closure confirmed."""
-    if not principal.assesses_unit(issue.org_unit_id):
+    if not confirms(principal, issue):
         raise PermissionDenied("An issue is withdrawn by an assessor or a manager for the unit.")
     if issue.status not in LIVE:
         raise Conflict("This issue is already closed.")
@@ -895,7 +922,7 @@ def cancel(session: Session, principal: Principal, issue: Issue, *, reason: str 
 
 def reopen(session: Session, principal: Principal, issue: Issue, *, reason: str | None) -> Issue:
     """Open a closed issue again, because it turned out not to be put right."""
-    if not principal.assesses_unit(issue.org_unit_id):
+    if not confirms(principal, issue):
         raise PermissionDenied("An issue is reopened by an assessor or a manager for the unit.")
     if issue.status in LIVE:
         raise Conflict("This issue is open.")
@@ -1005,9 +1032,22 @@ def waiting_on(session: Session, principal: Principal) -> list[dict[str, Any]]:
         select(Issue).where(Issue.id.in_(owned), Issue.status == "open").order_by(Issue.due_on)
     ):
         found.append({"kind": "issue", "issue": issue})
+    if principal.has(roles.AUDITOR):  # audit's findings wait for audit
+        for issue in session.scalars(
+            select(Issue)
+            .where(Issue.status == "proposed", Issue.source_type == "engagement",
+                   Issue.id.not_in(owned))
+            .order_by(Issue.proposed_at)
+            .limit(25)
+        ):  # fmt: skip
+            if issue.proposed_by != me:
+                found.append({"kind": "closure", "issue": issue})
     second = principal.units_for(*SECOND_LINE)
     if second is None or second:
-        statement = select(Issue).where(Issue.status == "proposed", Issue.id.not_in(owned))
+        statement = select(Issue).where(
+            Issue.status == "proposed", Issue.id.not_in(owned),
+            or_(Issue.source_type.is_(None), Issue.source_type != "engagement"),
+        )  # fmt: skip
         if second is not None:
             statement = statement.where(Issue.org_unit_id.in_(second))
         for issue in session.scalars(statement.order_by(Issue.proposed_at).limit(25)):

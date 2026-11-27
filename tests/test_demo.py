@@ -482,6 +482,22 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         scenarios = {row.name: row for row in session.scalars(select(Scenario))}
         assert len(scenarios) == 2
         assert [row.status for row in scenarios.values()].count("concluded") == 1
+        # Internal audit: this year's plan approved, next year's in draft; two engagements
+        # reported and one in fieldwork; a finding confirmed closed by audit; outside access.
+        from riskwren.db.models import AuditPlan, AuditRequest, Engagement, Issue, OutsideAccess
+
+        plans = {row.status for row in session.scalars(select(AuditPlan))}
+        assert plans == {"approved", "draft"}
+        statuses = sorted(row.status for row in session.scalars(select(Engagement)))
+        assert statuses.count("reported") == 2 and statuses.count("fieldwork") == 1
+        assert statuses.count("dropped") == 1
+        found = session.scalars(select(Issue).where(Issue.source_type == "engagement")).all()
+        assert sorted(row.status for row in found) == ["closed", "open"]
+        assert all(row.source_kind == "audit" for row in found)
+        asked = sorted(row.status for row in session.scalars(select(AuditRequest)))
+        assert asked == ["accepted", "answered", "open"]
+        grants = session.scalars(select(OutsideAccess).order_by(OutsideAccess.id)).all()
+        assert [row.views for row in grants] == [0, 2]
     assert built.counts["acceptances refused"] == 1
 
 

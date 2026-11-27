@@ -109,6 +109,7 @@ def test_who_someone_is(db: Database, people: People) -> None:
             "steward",
             "lead",
             "reports",
+            "audit",
         ],
         False,
     )
