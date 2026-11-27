@@ -322,6 +322,38 @@
         "title": "AnswerBody",
         "type": "object"
       },
+      "AnswersBody": {
+        "properties": {
+          "code": {
+            "description": "The requirement's code",
+            "title": "Code",
+            "type": "string"
+          },
+          "framework": {
+            "description": "The framework's key",
+            "title": "Framework",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "framework",
+          "code"
+        ],
+        "title": "AnswersBody",
+        "type": "object"
+      },
       "AudienceBody": {
         "properties": {
           "everyone": {
@@ -825,6 +857,32 @@
         "title": "DemoSignIn",
         "type": "object"
       },
+      "DirectsBody": {
+        "properties": {
+          "control": {
+            "description": "The control's reference",
+            "title": "Control",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "control"
+        ],
+        "title": "DirectsBody",
+        "type": "object"
+      },
       "DocumentBody": {
         "description": "A document. On a change, send only what changes, with the ``version`` you had. On\nadding one, its first draft may be given as well.",
         "properties": {
@@ -1307,7 +1365,7 @@
         "type": "object"
       },
       "ExceptionBody": {
-        "description": "A request for an exception. Name a control, or a requirement and the scope.",
+        "description": "A request for an exception. Name a control, a requirement and the scope, or a document.",
         "properties": {
           "compensating": {
             "anyOf": [
@@ -1332,6 +1390,18 @@
             ],
             "description": "The control's reference",
             "title": "Control"
+          },
+          "document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The document's reference",
+            "title": "Document"
           },
           "expires_on": {
             "anyOf": [
@@ -8569,6 +8639,114 @@
         ]
       }
     },
+    "/api/v1/documents/{ref}/controls": {
+      "put": {
+        "description": "Add the control, or change the note on it.",
+        "operationId": "direct_control_api_v1_documents__ref__controls_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DirectsBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Direct Control Api V1 Documents  Ref  Controls Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say a document directs a control",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/documents/{ref}/controls/{link_id}": {
+      "delete": {
+        "operationId": "undirect_control_api_v1_documents__ref__controls__link_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Undirect Control Api V1 Documents  Ref  Controls  Link Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Take a control off a document",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
     "/api/v1/documents/{ref}/draft": {
       "delete": {
         "operationId": "discard_draft_api_v1_documents__ref__draft_delete",
@@ -8970,6 +9148,51 @@
         ]
       }
     },
+    "/api/v1/documents/{ref}/governs": {
+      "get": {
+        "description": "The controls it directs and the requirements it answers, framework by framework.",
+        "operationId": "what_it_governs_api_v1_documents__ref__governs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response What It Governs Api V1 Documents  Ref  Governs Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What a document governs",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
     "/api/v1/documents/{ref}/history": {
       "get": {
         "operationId": "document_history_api_v1_documents__ref__history_get",
@@ -9107,6 +9330,114 @@
           }
         },
         "summary": "Put a retired document back in use",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/documents/{ref}/requirements": {
+      "put": {
+        "description": "Add the requirement, or change the note on it.",
+        "operationId": "answer_requirement_api_v1_documents__ref__requirements_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Requirement Api V1 Documents  Ref  Requirements Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say a document answers a requirement",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/documents/{ref}/requirements/{link_id}": {
+      "delete": {
+        "operationId": "unanswer_requirement_api_v1_documents__ref__requirements__link_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Unanswer Requirement Api V1 Documents  Ref  Requirements  Link Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Take a requirement off a document",
         "tags": [
           "documents"
         ]
@@ -10044,6 +10375,42 @@
               ],
               "description": "A scope's reference",
               "title": "Scope"
+            }
+          },
+          {
+            "description": "A document's reference",
+            "in": "query",
+            "name": "document",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A document's reference",
+              "title": "Document"
+            }
+          },
+          {
+            "description": "control, requirement, or document",
+            "in": "query",
+            "name": "about",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "control, requirement, or document",
+              "title": "About"
             }
           },
           {

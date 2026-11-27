@@ -1,4 +1,5 @@
-"""Exceptions: approved, time-limited departures from a control or a requirement.
+"""Exceptions: approved, time-limited departures from a control, a requirement, or a
+document.
 
 Someone asks, saying why and what makes up for it. Someone with authority over the unit who
 did not ask decides. An approved exception runs from one date to another and no longer;
@@ -27,6 +28,7 @@ from riskwren.db.models import (
     ExceptionRequest,
     Framework,
     Implementation,
+    PolicyDocument,
     RecordOwner,
     Requirement,
     Scope,
@@ -37,6 +39,8 @@ from riskwren.events import audit
 from riskwren.inventory import access, records
 from riskwren.inventory.registry import RecordType, find, register
 from riskwren.people import notices
+from riskwren.policy import documents
+from riskwren.policy.documents import DOCUMENT
 from riskwren.program import rules
 
 KEY = "exception"
@@ -203,6 +207,15 @@ def subject_of(session: Session, principal: Principal, item: ExceptionRequest) -
             "code": requirement.code,
             "name": requirement.title or requirement.code,
         }
+    if item.subject_type == "document":
+        document = session.get(PolicyDocument, item.subject_id)
+        if document is None:
+            return {"type": "document", "name": "A document that is no longer on record"}
+        return {
+            **records.chip(DOCUMENT, document),
+            "kind": document.kind,
+            "open": access.can_see(session, principal, DOCUMENT, document),
+        }
     control = session.get(Control, item.subject_id)
     if control is None:
         return {"type": "control", "name": "A control that is no longer on record"}
@@ -297,6 +310,17 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         except NotFound:
             return [ExceptionRequest.id < 0]
         found.append(ExceptionRequest.scope_id == scope.id)
+    if filters.get("document"):
+        try:
+            document = find(session, DOCUMENT, str(filters["document"]))
+        except NotFound:
+            return [ExceptionRequest.id < 0]
+        found += [
+            ExceptionRequest.subject_type == "document",
+            ExceptionRequest.subject_id == document.id,
+        ]
+    if filters.get("about") in ("control", "requirement", "document"):
+        found.append(ExceptionRequest.subject_type == filters["about"])
     return found
 
 
@@ -339,31 +363,51 @@ EXCEPTION = register(
 
 
 def _subject_record(session: Session, item: ExceptionRequest) -> Any:
-    """The record whose keepers may ask: the scope it applies in, or else the control."""
+    """The record whose keepers may ask: the document it departs from, the scope it applies
+    in, or else the control."""
+    if item.subject_type == "document":
+        return (DOCUMENT, session.get(PolicyDocument, item.subject_id))
     if item.scope_id:
         return (SCOPE, session.get(Scope, item.scope_id))
     return (CONTROL, session.get(Control, item.subject_id))
 
 
+def may_ask_document(
+    session: Session, principal: Principal, document: PolicyDocument, scope: Scope | None = None
+) -> bool:
+    """Anyone who keeps a unit (its steward, leader, or manager) may ask to depart from a
+    document, as may those who keep the document or the scope it would apply in. It is
+    decided by a leader or manager of the document's own unit."""
+    if principal.stewards or principal.leads or principal.manages_somewhere:
+        return True
+    if documents.can_edit(session, principal, document):
+        return True
+    return scope is not None and access.can_edit(session, principal, SCOPE, scope)
+
+
 def may_ask(session: Session, principal: Principal, org_unit_id: int, about: Any) -> bool:
     """An exception is asked for by those who keep the scope or the control it is about."""
     record_type, record = about
+    if record_type is DOCUMENT:
+        return record is not None and may_ask_document(session, principal, record)
     if principal.manages_unit(org_unit_id) or principal.stewards_unit(org_unit_id):
         return True
     return record is not None and access.can_edit(session, principal, record_type, record)
 
 
 def request(session: Session, principal: Principal, values: Mapping[str, Any]) -> ExceptionRequest:
-    """Ask for an exception to a control, or to a requirement within a scope.
+    """Ask for an exception to a control, to a requirement within a scope, or to a document.
 
-    ``values``: ``control`` (a reference) or ``requirement`` (``{"framework", "code"}``),
-    ``scope`` (a reference; needed for a requirement), ``justification``, ``compensating``,
+    ``values``: ``control`` (a reference), ``requirement`` (``{"framework", "code"}``), or
+    ``document`` (a reference), ``scope`` (a reference; needed for a requirement, and where an
+    exception to a document applies, if it is given), ``justification``, ``compensating``,
     ``starts_on``, ``expires_on``, and ``renews`` (the exception this one carries on from).
     """
     errors = records.Errors()
     scope: Scope | None = None
     control: Control | None = None
     requirement: Requirement | None = None
+    document: PolicyDocument | None = None
     earlier: ExceptionRequest | None = None
     if values.get("renews"):
         try:
@@ -377,6 +421,8 @@ def request(session: Session, principal: Principal, values: Mapping[str, Any]) -
         scope = session.get(Scope, earlier.scope_id) if earlier.scope_id else None
         if earlier.subject_type == "control":
             control = session.get(Control, earlier.subject_id)
+        elif earlier.subject_type == "document":
+            document = session.get(PolicyDocument, earlier.subject_id)
         else:
             requirement = session.get(Requirement, earlier.subject_id)
     else:
@@ -403,8 +449,18 @@ def request(session: Session, principal: Principal, values: Mapping[str, Any]) -
                 requirement = frameworks.find(session, framework, str(given.get("code", "")))
             except NotFound as missing:
                 errors.add("requirement", str(missing))
+        elif values.get("document"):
+            try:
+                document = records.load(session, principal, DOCUMENT, str(values["document"]))
+            except NotFound as missing:
+                errors.add("document", str(missing))
+            else:
+                if document.status != "active" or document.published_version_id is None:
+                    errors.add("document", "Nothing of that document is in force to depart from.")
         elif "control" not in errors:
-            errors.add("control", "Say which control or requirement it is an exception to.")
+            errors.add(
+                "control", "Say which control, requirement, or document it is an exception to."
+            )
     if requirement is not None:
         held = (
             scope is not None
@@ -444,14 +500,25 @@ def request(session: Session, principal: Principal, values: Mapping[str, Any]) -
     _apply(session, item, {"starts_on": None, "expires_on": None, **values}, errors, creating=True)
     if errors:
         raise Invalid("The exception was not requested.", errors)
-    assert control is not None or requirement is not None
-    owner_unit = scope.org_unit_id if scope is not None else control.org_unit_id  # type: ignore[union-attr]
-    about = (SCOPE, scope) if scope is not None else (CONTROL, control)
-    if not may_ask(session, principal, owner_unit, about):
-        raise PermissionDenied(
-            "An exception is asked for by those who keep the scope or the control it is about."
-        )
-    if control is not None:
+    assert control is not None or requirement is not None or document is not None
+    if document is not None:
+        # Departing from a document is for the leaders of the unit that keeps it to decide.
+        owner_unit = document.org_unit_id
+        if not may_ask_document(session, principal, document, scope):
+            raise PermissionDenied(
+                "An exception to a document is asked for by a unit's steward, leader, or "
+                "manager, or by those who keep the document."
+            )
+    else:
+        owner_unit = scope.org_unit_id if scope is not None else control.org_unit_id  # type: ignore[union-attr]
+        about = (SCOPE, scope) if scope is not None else (CONTROL, control)
+        if not may_ask(session, principal, owner_unit, about):
+            raise PermissionDenied(
+                "An exception is asked for by those who keep the scope or the control it is about."
+            )
+    if document is not None:
+        item.subject_type, item.subject_id, covered = "document", document.id, document.name
+    elif control is not None:
         item.subject_type, item.subject_id, covered = "control", control.id, control.name
     else:
         assert requirement is not None
@@ -597,6 +664,8 @@ def in_force_for(
         .order_by(ExceptionRequest.expires_on)
     )
     for item in rows:
+        if item.subject_type == "document":
+            continue  # a departure from a document does not change how a scope stands
         if item.subject_type == "requirement":
             found["requirement"][item.subject_id] = item
         elif item.scope_id in (None, scope.id, providers.get(item.subject_id)):

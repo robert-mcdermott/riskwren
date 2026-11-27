@@ -14,7 +14,7 @@ export function coveragePill(coverage) {
 }
 
 /** A search box over one list, and what was chosen from it. onPick(item) is told. */
-function picker({ label, placeholder, find, draw, onPick }) {
+export function picker({ label, placeholder, find, draw, onPick }) {
   const found = h("div", { class: "pick-results", role: "listbox", "aria-label": `${label} found` });
   const chosen = h("div", { class: "picked", hidden: true });
   const search = field(label, { type: "search", placeholder });
@@ -54,7 +54,7 @@ function picker({ label, placeholder, find, draw, onPick }) {
   return { node: h("div", { class: "stack-sm" }, search.node, found, chosen), search, reset };
 }
 
-const requirementLine = (item) => [h("span", { class: "requirement-code" }, item.code), " ", item.title || item.excerpt || ""];
+export const requirementLine = (item) => [h("span", { class: "requirement-code" }, item.code), " ", item.title || item.excerpt || ""];
 
 /**
  * Map one control to one requirement. Start from the control (choose the requirement) or

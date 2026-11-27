@@ -40,7 +40,7 @@ REQUIREMENT_STATUSES = ("active", "withdrawn")
 SEVERITIES = ("critical", "high", "moderate", "low")
 ISSUE_STATUSES = ("open", "proposed", "closed", "cancelled")
 EXCEPTION_STATUSES = ("requested", "approved", "refused", "withdrawn")
-EXCEPTION_SUBJECTS = ("control", "requirement")
+EXCEPTION_SUBJECTS = ("control", "requirement", "document")
 
 
 class Framework(Base):

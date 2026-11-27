@@ -27,6 +27,8 @@ from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
 from riskwren.db.models import (
     Account,
+    DocumentControl,
+    DocumentRequirement,
     Event,
     PolicyApproval,
     PolicyDocument,
@@ -50,6 +52,7 @@ KIND_LABELS = {
     "guideline": "Guideline",
 }
 RANK = {kind: place for place, kind in enumerate(DOCUMENT_KINDS)}
+RANK_ORDER = case(RANK, value=PolicyDocument.kind)
 OPEN = ("draft", "in_review", "approved")  # a version still being worked on
 SHOWN = ("published", "superseded")  # versions anyone who sees the document may read
 MOST_TEXT = 200_000
@@ -262,12 +265,17 @@ def _cards(session: Session, rows: list[PolicyDocument]) -> list[dict[str, Any]]
             )
         )
     }
+    from riskwren.policy import governs  # it builds on this module
+
+    governed = governs.counts(session, [row.id for row in rows])
     today = utc_now().date()
     return [
         {
             "kind": row.kind,
             "status": row.status,
             "number": numbers.get(row.published_version_id),
+            "controls": governed.get(row.id, (0, 0))[0],
+            "requirements": governed.get(row.id, (0, 0))[1],
             "working": working.get(row.id),
             "next_review_on": row.next_review_on,
             "review_state": review_state(row, today),
@@ -387,11 +395,49 @@ def _detail(session: Session, principal: Principal, document: PolicyDocument) ->
         "versions": [version_view(session, principal, document, row, words=False) for row in every],
         "acknowledge": document.acknowledge,
         **_audience_and_standing(session, principal, document),
+        **_governs_and_exceptions(session, principal, document),
         "can": {
             "edit": editable,
             "draft": editable and working is None and document.status == "active",
             "review": editable and in_force is not None and document.status == "active",
         },
+    }
+
+
+def _governs_and_exceptions(
+    session: Session, principal: Principal, document: PolicyDocument
+) -> dict[str, Any]:
+    """How many controls it directs and requirements it answers, and the exceptions to it the
+    reader may see, those still to be decided or in force first."""
+    from riskwren.compliance import exceptions  # they build on this module
+    from riskwren.policy import governs
+
+    directs, answers = governs.counts(session, [document.id]).get(document.id, (0, 0))
+    shown = [
+        item
+        for item in session.scalars(
+            select(exceptions.ExceptionRequest)
+            .where(
+                exceptions.ExceptionRequest.subject_type == "document",
+                exceptions.ExceptionRequest.subject_id == document.id,
+            )
+            .order_by(exceptions.ExceptionRequest.expires_on.desc())
+        )
+        if exceptions.can_see(session, principal, item)
+    ]
+    order = {"requested": 0, "expiring": 1, "in_force": 2, "upcoming": 3}
+    found = sorted(
+        ({"ref": item.ref, "name": item.name, "status": item.status,
+          "state": exceptions.state_of(item), "starts_on": item.starts_on,
+          "expires_on": item.expires_on} for item in shown),
+        key=lambda row: order.get(row["state"], 9),
+    )  # fmt: skip
+    return {
+        "governs": {"controls": directs, "requirements": answers},
+        "exceptions": found,
+        "can_ask_exception": document.status == "active"
+        and document.published_version_id is not None
+        and exceptions.may_ask_document(session, principal, document),
     }
 
 
@@ -518,6 +564,17 @@ def _history_title(event: Any, lookups: Any) -> str | None:
         return f"Retired it: {note}" if note else "Retired it"
     if op == "document.reinstate":
         return "Put it back in use"
+    context = event.context or {}
+    if op in ("document.direct", "document.undirect") and context.get("control"):
+        what = f"{context['control']} {context.get('called') or ''}".strip()
+        if op == "document.undirect":
+            return f"No longer directs {what}"
+        return f"Directs {what}" if event.action == "created" else f"Changed the note on {what}"
+    if op in ("document.answer", "document.unanswer") and context.get("code"):
+        what = f"{context['code']} of {context.get('framework') or 'a framework'}"
+        if op == "document.unanswer":
+            return f"No longer answers {what}"
+        return f"Answers {what}" if event.action == "created" else f"Changed the note on {what}"
     if event.subject_type == "policy_audience":
         if now("role"):
             what = f"everyone who is {ROLE_WORDS.get(now('role'), now('role'))}"
@@ -547,6 +604,16 @@ def _never_published(model: Any) -> Any:
 
 def _implements_nothing(model: Any) -> Any:
     return and_(model.parent_id.is_(None), model.kind != "policy")
+
+
+def _governs_nothing(model: Any) -> Any:
+    """A policy, standard, or procedure that directs no control and answers no requirement.
+    A guideline is advice, and is not expected to."""
+    return and_(
+        model.kind != "guideline",
+        ~exists(select(DocumentControl.id).where(DocumentControl.document_id == model.id)),
+        ~exists(select(DocumentRequirement.id).where(DocumentRequirement.document_id == model.id)),
+    )
 
 
 DOCUMENT: RecordType = register(
@@ -586,6 +653,12 @@ DOCUMENT: RecordType = register(
                     "A standard, procedure, or guideline that names no policy has nothing "
                     "behind it.",
                 ),
+                Expected(
+                    "governs",
+                    "a control it directs or a requirement it answers",
+                    _governs_nothing,
+                    "Nothing shows what it governs, or what puts it into effect.",
+                ),
             ],
             "live_statuses": ("active",),
             "history_title": _history_title,
@@ -606,6 +679,11 @@ DOCUMENT: RecordType = register(
                 "ask_again": "Must be acknowledged again",
             },
             "history_quiet": (
+                "document_id",
+                "control_id",
+                "requirement_id",
+                "created_by",
+                "created_at",
                 "published_version_id",
                 "last_reviewed_on",
                 "next_review_on",

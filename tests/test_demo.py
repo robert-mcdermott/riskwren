@@ -345,6 +345,27 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         incident = library.standing(session, papers["Incident response procedure"])
         assert 10 < incident["people"] < aup["people"] / 2
         assert incident["acknowledged"] / incident["people"] > 0.6
+        # Each document but one says what it governs, and two have exceptions.
+        from riskwren.compliance import frameworks as framework_service
+        from riskwren.policy import governs
+
+        policy = governs.of_document(session, reader, papers["Information security policy"])
+        assert len(policy["controls"]) == 3 and policy["requirements"] == 8
+        asks = framework_service.find(
+            session, framework_service.by_key(session, "nist-csf"), "GV.PO-01"
+        )
+        assert [
+            row["name"] for row in governs.of_requirement(session, reader, asks)["documents"]
+        ] == ["Information security policy"]
+        departures = session.scalars(
+            select(ExceptionRequest).where(ExceptionRequest.subject_type == "document")
+        ).all()
+        assert sorted(exceptions.state_of(item, TODAY) for item in departures) == [
+            "in_force",
+            "requested",
+        ]
+        bare = governs.counts(session, [papers["Research data management policy"].id])
+        assert bare[papers["Research data management policy"].id] == (0, 0)
     assert built.counts["acceptances refused"] == 1
 
 

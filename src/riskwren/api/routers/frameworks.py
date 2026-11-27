@@ -11,6 +11,7 @@ from riskwren.access.policy import current
 from riskwren.api.common import clamp_limit, decode_cursor, envelope, reading, writing
 from riskwren.api.routers.inventory import paging
 from riskwren.compliance import crosswalk, frameworks
+from riskwren.policy import governs
 
 router = APIRouter(prefix="/api/v1", tags=["frameworks"])
 
@@ -154,7 +155,11 @@ def show_requirement(request: Request, key: str, code: str = CODE) -> dict[str, 
         framework = frameworks.by_key(session, key)
         found = frameworks.detail(session, framework, code)
         row = frameworks.find(session, framework, code)
-        return envelope({**found, **crosswalk.controls_of(session, principal, row)})
+        return envelope({
+            **found,
+            **crosswalk.controls_of(session, principal, row),
+            **governs.of_requirement(session, principal, row),
+        })  # fmt: skip
 
 
 @router.patch("/frameworks/{key}/requirement", summary="Change a requirement of your own")

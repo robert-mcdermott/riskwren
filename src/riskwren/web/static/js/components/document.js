@@ -114,3 +114,6 @@ export function comparison(found, { before, after }) {
       ? h("tr", { class: "diff-folded" }, h("td", { colspan: "2" }, `${row.count} ${row.count === 1 ? "line" : "lines"} the same`))
       : h("tr", { "data-op": row.op }, side(row.before, row.op), side(row.after, row.op)))))));
 }
+
+/** The roles a document can be said to apply to, as their holders are called. */
+export const ROLE_NAMES = { admin: "Administrators", manager: "Managers", assessor: "Assessors", auditor: "Auditors", leader: "Leaders", steward: "Stewards" };

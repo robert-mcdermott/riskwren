@@ -35,6 +35,8 @@ from riskwren.db.models.controls import (
     TreatmentPlan,
 )
 from riskwren.db.models.documents import (
+    DocumentControl,
+    DocumentRequirement,
     PolicyAcknowledgment,
     PolicyApproval,
     PolicyAudience,
@@ -100,6 +102,8 @@ __all__ = [
     "ControlTest",
     "Counter",
     "Credential",
+    "DocumentControl",
+    "DocumentRequirement",
     "Event",
     "Evidence",
     "EvidenceLink",

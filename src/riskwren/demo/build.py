@@ -68,7 +68,7 @@ from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.oversight import campaigns
 from riskwren.people import accounts, handover, units
-from riskwren.policy import documents, library
+from riskwren.policy import documents, governs, library
 from riskwren.program import branding, packs, settings
 from riskwren.risk import analysis, categories, indicators, register
 from riskwren.risk.indicators import INDICATOR
@@ -2099,6 +2099,64 @@ class Builder:
                     documents.decide(session, by, doc(session, key), "returned", why)
 
                 step(since - 4, self.cast[back], refuse)
+
+        # Later, once the central controls are on record, each document's author says what it
+        # governs; and departures from two of them are asked for.
+        for key, (directed, answered) in c.GOVERNS.items():
+            spec = next(each for each in c.DOCUMENTS if each["key"] == key)
+
+            def tie(
+                session: Session,
+                by: Principal,
+                key: str = key,
+                directed: list[tuple[str, str]] = directed,
+                answered: list[tuple[str, str]] = answered,
+            ) -> None:
+                document = doc(session, key)
+                for control_key, unit in directed:
+                    found = self.controls.get((control_key, self.units[unit]))
+                    if found is not None:
+                        ref = session.get(Control, found).ref
+                        governs.direct(session, by, document, ref)
+                        self.tally("controls a document directs")
+                for framework, code in answered:
+                    governs.answer(session, by, document, framework=framework, code=code)
+                    self.tally("requirements a document answers")
+
+            step(250, who_is(spec["by"]), tie)
+        for asked in c.DOCUMENT_EXCEPTIONS:
+            made_ref: dict[str, str] = {}
+
+            def ask(
+                session: Session,
+                by: Principal,
+                asked: dict[str, Any] = asked,
+                made_ref: dict[str, str] = made_ref,
+            ) -> None:
+                item = exceptions.request(
+                    session, by,
+                    {"document": doc(session, asked["document"]).ref, "name": asked["name"],
+                     "justification": asked["justification"],
+                     "compensating": asked["compensating"],
+                     "expires_on": self.day(asked["until"]).isoformat()},
+                )  # fmt: skip
+                made_ref["ref"] = item.ref
+                self.tally("exceptions to documents")
+
+            step(asked["ago"], self.steward(self.units[asked["unit"]]), ask)
+            if asked.get("decided"):
+                decided = asked["decided"]
+
+                def agree(
+                    session: Session,
+                    by: Principal,
+                    decided: dict[str, Any] = decided,
+                    made_ref: dict[str, str] = made_ref,
+                ) -> None:
+                    item = records.load(session, by, exceptions.EXCEPTION, made_ref["ref"])
+                    exceptions.decide(session, by, item, approve=True, note=decided["note"])
+
+                step(decided["ago"], self.cast[decided["by"]], agree)
 
         for ago, _order, actor, act in sorted(steps, key=lambda each: (-each[0], each[1])):
             yield self._on(ago, hour=10)

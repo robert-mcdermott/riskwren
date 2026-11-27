@@ -9,6 +9,7 @@ import { can } from "../core/session.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { statePill } from "../components/control.js";
 import { coveragePill, mapCrosswalk } from "../components/crosswalk.js";
+import { kindPill } from "../components/document.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
@@ -190,6 +191,14 @@ function openRequirement(framework, code, reload) {
             statePill(mapping.control.state), coveragePill(mapping.coverage))))
             : h("p", { class: "subtle" }, item.hidden ? "None that you have access to." : "No control is mapped to this requirement yet."),
           item.hidden && item.controls.length ? h("p", { class: "subtle" }, `And ${item.hidden} more that you do not have access to.`) : null) : null,
+        item.is_citable ? h("div", { class: "stack-sm" },
+          h("h3", {}, item.documents.length ? `Documents that answer it (${item.documents.length})` : "Documents that answer it"),
+          item.documents.length ? h("ul", { class: "requirement-list stack-sm" }, item.documents.map((doc) => h("li", { class: "mapped-control" },
+            h("div", { class: "grow" }, h("a", { class: "cell-main", href: `/documents/${doc.ref}` }, doc.name),
+              h("div", { class: "cell-sub" }, [doc.ref, `version ${doc.number}`, doc.note].filter(Boolean).join(" · "))),
+            kindPill(doc.kind))))
+            : h("p", { class: "subtle" }, item.documents_hidden ? "None that you have access to." : "No document in force says it answers this requirement. One is said to from the document's What it governs tab."),
+          item.documents_hidden && item.documents.length ? h("p", { class: "subtle" }, `And ${item.documents_hidden} more that you do not have access to.`) : null) : null,
         item.children_list.length ? h("div", { class: "stack-sm" }, h("h3", {}, `Beneath it (${item.children_list.length})`),
           h("ul", { class: "requirement-list" }, item.children_list.map((child) => h("li", {},
             h("button", { type: "button", class: "requirement-row", onclick: () => openRequirement(framework, child.code, reload) },

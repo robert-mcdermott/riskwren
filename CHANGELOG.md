@@ -22,6 +22,15 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Review dates.** Each document is reviewed on the program's cadence (12 months as
   shipped) or its own. A review that is due shows on the document, on its owners' Home, and
   in the reminders; it is recorded as kept, or a new version is started.
+- **What a document governs:** the controls it directs and the requirements it answers,
+  shown from each side. A requirement lists the published documents that answer it beside
+  its controls, and a control the documents that direct it.
+- **Exceptions to a document,** asked for by a unit's steward, leader, or manager and
+  decided by a leader or manager of the unit that keeps the document. They end by their
+  dates like every exception.
+- **Documents in the web of records:** in the Connections picture, in search, in Tidy (a
+  policy, standard, or procedure that governs nothing is listed as missing it), and with
+  what each governs in the export of the document list.
 - **Who a document applies to:** everyone, or the people in chosen units and those who
   hold chosen roles.
 - **The policy library.** Everyone reads the published documents that apply to them, or

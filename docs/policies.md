@@ -63,6 +63,31 @@ When a review comes due it shows on the document, on its owners' Home, and in th
 
 A document no longer needed is **retired**, with the reason. Its versions and history stay on record, and it can be put back in use. A document that others still implement is not retired until they are moved or retired first.
 
+## What it governs
+
+A document is connected to what it governs on its **What it governs** tab, by those who may change it:
+
+- **The controls it directs.** A control a document directs is how what the document requires is done: the access control standard directs account approval, access reviews, and removing access on leaving. **Add a control** finds one by name or reference.
+- **The requirements it answers.** A requirement a document answers is one the organization meets, at least in part, by saying so in it: the information security policy answers the Cybersecurity Framework's GV.PO-01 and the HIPAA Security Rule's 164.316(a). **Add a requirement** chooses a framework and finds the requirement by code or words.
+
+Each side shows the other. A control's page lists the documents that **direct** it. A requirement, opened in its framework, lists the **documents that answer it**, beside the controls that do, but only documents in force: a draft, or a document never published or retired, says nothing yet. So "is there a policy for this?" has an answer with a version and a date on it. The history of the document keeps each control and requirement added and taken off.
+
+![The information security policy's What it governs tab: the three controls it directs, with how well each works, and the requirements it answers, framework by framework](img/document-governs-light.webp)
+
+Documents are in the **Connections** picture (what each implements, what implements it, the controls it directs, and the exceptions to it), in search, and in **Tidy**: a policy, standard, or procedure that directs no control and answers no requirement is listed as missing what it governs. A guideline is advice, and is not expected to. The export of the document list counts the controls and requirements of each.
+
+## Exceptions to a document
+
+A unit that cannot follow a document for a time asks for an exception to it, as it would to a control or a requirement ([Issues and exceptions](issues-and-exceptions.md#exceptions)): **Ask for an exception** on the document's page, saying why, what it does instead, and until when.
+
+- **Who asks:** a unit's steward, leader, or manager, or those who keep the document. A member of staff asks their steward.
+- **Who decides:** a leader or a manager of the unit that keeps the document, and never whoever asked. A departure from the security office's encryption standard is decided by the security leader, whichever lab asks.
+- **It ends by its dates,** like every exception. While it is in force the document's page lists it, and the day after it ends it is shown as ended, without anyone doing anything.
+
+An exception to a document does not change how a scope stands: a scope counts exceptions to its requirements and to the controls it uses.
+
+![An exception to the vulnerability management standard, waiting for the security leader: the analyzers' maker certifies each patch, so a high-severity fix takes longer than the standard allows](img/document-exception-light.webp)
+
 ## Who it applies to
 
 A document applies to **everyone**, as shipped, or to the people chosen under **Who it applies to** on its page:

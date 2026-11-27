@@ -44,7 +44,7 @@ KNOWN: dict[str, list[tuple[str, str]]] = {
     "document": [
         ("kind", "kind"), ("status", "status"), ("number", "version_in_force"),
         ("working", "new_version"), ("next_review_on", "next_review_on"),
-        ("review_state", "review"),
+        ("review_state", "review"), ("controls", "controls"), ("requirements", "requirements"),
     ],
     "indicator": [
         ("status", "status"), ("state", "state"), ("measure", "measure"),

@@ -11,6 +11,7 @@ const MISSING = {
   data_class: "the class of data they handle", links: "a link to anything else", rating: "a rating",
   controls: "a control that bears on them",
   reading: "a reading", risks: "a risk they warn of", source: "where they are read from",
+  published: "a version in force", parent: "what they implement", governs: "a control they direct or a requirement they answer",
 };
 
 /** What goes beside a list's search box: what it is cut to, and its saved views. */

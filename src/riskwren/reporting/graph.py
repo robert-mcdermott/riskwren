@@ -1,10 +1,10 @@
 """How one record connects to the others (INV-11).
 
 A record's neighbors, grouped by what joins them: what it relies on and what relies on it,
-the risks that bear on it, the controls that reduce them, the scopes it sits in, and the
-evidence, issues, exceptions, and assessments about it. Each neighbor is one the person may
-see; the rest are counted. The picture and the list beside it are drawn from this one answer,
-so they cannot disagree.
+the risks that bear on it, the controls that reduce them, the documents that direct them, the
+scopes it sits in, and the evidence, issues, exceptions, and assessments about it. Each
+neighbor is one the person may see; the rest are counted. The picture and the list beside it
+are drawn from this one answer, so they cannot disagree.
 """
 
 from __future__ import annotations
@@ -18,10 +18,12 @@ from riskwren.access.principal import Principal
 from riskwren.db.models import (
     Assessment,
     ControlTest,
+    DocumentControl,
     EvidenceLink,
     ExceptionRequest,
     Implementation,
     IssueSubject,
+    PolicyDocument,
     RecordLink,
     RiskControl,
     RiskSubject,
@@ -81,6 +83,26 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
         ))  # fmt: skip
         add("tested_in", "Tested in", "assessment", session.scalars(
             select(ControlTest.assessment_id).where(ControlTest.control_id == record_id)
+        ))  # fmt: skip
+        add("directed_by", "Directed by", "document", session.scalars(
+            select(DocumentControl.document_id).where(DocumentControl.control_id == record_id)
+        ))  # fmt: skip
+    if key == "document":
+        row = session.get(PolicyDocument, record_id)
+        if row is not None and row.parent_id is not None:
+            found.append(("implements", "Implements", "document", row.parent_id))
+        add("implemented_by", "Implemented by", "document", session.scalars(
+            select(PolicyDocument.id).where(PolicyDocument.parent_id == record_id)
+            .order_by(PolicyDocument.name)
+        ))  # fmt: skip
+        add("directs", "Directs", "control", session.scalars(
+            select(DocumentControl.control_id).where(DocumentControl.document_id == record_id)
+        ))  # fmt: skip
+        add("exceptions", "Exceptions", "exception", session.scalars(
+            select(ExceptionRequest.id).where(
+                ExceptionRequest.subject_type == "document",
+                ExceptionRequest.subject_id == record_id,
+            )
         ))  # fmt: skip
     if key == "scope":
         for subject_type, subject_id in session.execute(
@@ -147,8 +169,8 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
     if key == "exception":
         row = session.get(ExceptionRequest, record_id)
         if row is not None:
-            if row.subject_type == "control":
-                found.append(("excepts", "An exception to", "control", row.subject_id))
+            if row.subject_type in ("control", "document"):
+                found.append(("excepts", "An exception to", row.subject_type, row.subject_id))
             if row.scope_id is not None:
                 found.append(("in_scope", "Within the scope", "scope", row.scope_id))
     return found

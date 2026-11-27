@@ -1384,6 +1384,84 @@ DOCUMENTS = [
     },
 ]
 
+# What each document governs: the controls it directs and the requirements it answers, said
+# by its author once the central controls were on record. The research data policy says
+# nothing yet, so that one document shows what is missing.
+GOVERNS = {
+    "infosec": (
+        [("security_policy", "SEC"), ("security_roles", "SEC"), ("security_oversight", "SEC")],
+        [("nist-csf", "GV.PO-01"), ("nist-csf", "GV.PO-02"), ("nist-csf", "GV.RR-02"),
+         ("nist-800-53", "PL-1"), ("nist-800-53", "PM-1"), ("hipaa-security", "164.316(a)"),
+         ("hipaa-security", "164.308(a)(1)(i)"), ("nist-800-171", "03.15.01")],
+    ),
+    "aup": (
+        [("security_training", "SEC")],
+        [("nist-800-53", "PL-4"), ("nist-csf", "PR.AT-01"), ("hipaa-security", "164.308(a)(5)(i)")],
+    ),
+    "access": (
+        [("access_approved", "IT"), ("access_reviewed", "SEC"), ("access_removed_on_leaving", "IT"),
+         ("unique_accounts", "IT"), ("privileged_access", "IT")],
+        [("nist-800-53", "AC-1"), ("nist-800-53", "AC-2"), ("nist-csf", "PR.AA-05"),
+         ("hipaa-security", "164.308(a)(4)(i)")],
+    ),
+    "passwords": (
+        [("second_factor", "IT"), ("unique_accounts", "IT")],
+        [("nist-800-53", "IA-5"), ("nist-csf", "PR.AA-01")],
+    ),
+    "classification": (
+        [("data_classified", "CMPL")],
+        [("nist-800-53", "RA-2"), ("nist-csf", "ID.AM-07")],
+    ),
+    "encryption": (
+        [("encryption_at_rest", "IT"), ("encryption_in_transit", "IT")],
+        [("nist-800-53", "SC-13"), ("nist-800-53", "SC-28"), ("nist-csf", "PR.DS-01"),
+         ("nist-csf", "PR.DS-02"), ("hipaa-security", "164.312(a)(2)(iv)"),
+         ("hipaa-security", "164.312(e)(2)(ii)")],
+    ),
+    "vuln": (
+        [("vulnerability_scanning", "SEC"), ("patching", "IT")],
+        [("nist-800-53", "RA-5"), ("nist-800-53", "SI-2"), ("nist-csf", "ID.RA-01"),
+         ("nist-csf", "PR.PS-02")],
+    ),
+    "incident": (
+        [("incident_response", "SEC"), ("incident_reporting", "SEC")],
+        [("nist-800-53", "IR-1"), ("nist-800-53", "IR-8"), ("nist-csf", "RS.MA-01"),
+         ("hipaa-security", "164.308(a)(6)(i)"), ("hipaa-security", "164.308(a)(6)(ii)")],
+    ),
+    "backup": (
+        [("backups_tested", "IT"), ("disaster_recovery", "IT")],
+        [("nist-800-53", "CP-9"), ("nist-csf", "PR.DS-11"), ("hipaa-security", "164.308(a)(7)(ii)(A)")],
+    ),
+}  # fmt: skip
+
+# Departures from a document: asked for by a unit's steward, decided by the leader of the unit
+# that keeps the document. One is in force; one waits for the security leader.
+DOCUMENT_EXCEPTIONS = [
+    {
+        "document": "encryption",
+        "unit": "IMG",
+        "ago": 74,
+        "decided": {
+            "by": "ciso",
+            "ago": 71,
+            "note": "Until the vendor's update. Tell me if it slips.",
+        },
+        "until": 40,
+        "name": "Confocal microscope control PC",
+        "justification": "The confocal microscope's control PC runs vendor software that stops working when the disk is encrypted. The vendor's update that fixes it is due this winter.",
+        "compensating": "The PC is not on the network, sits in a locked room, and holds images only until they are copied to research storage each evening.",
+    },
+    {
+        "document": "vuln",
+        "unit": "CLAB",
+        "ago": 4,
+        "until": 150,
+        "name": "Chemistry analyzer patching",
+        "justification": "The chemistry analyzers' maker must certify each operating system patch before it may be applied, which takes up to 90 days: longer than the standard allows for a high-severity fix.",
+        "compensating": "The analyzers sit on their own network segment that reaches only the laboratory system, they are scanned weekly, and certified patches are applied within a week of release.",
+    },
+]
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (

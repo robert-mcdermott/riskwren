@@ -161,3 +161,42 @@ class PolicyAcknowledgment(Base):
         UniqueConstraint("version_id", "account_id"),
         Index("ix_policy_acknowledgment_account", "account_id", "document_id"),
     )
+
+
+class DocumentControl(Base):
+    """A document directs a control: the control is how what the document requires is done."""
+
+    __tablename__ = "document_control"
+    __audit_parent__ = ("document", "document_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("policy_document.id"))
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id"))
+    note: Mapped[str | None] = mapped_column(String(300))
+    created_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("document_id", "control_id"),
+        Index("ix_document_control_control_id", "control_id"),
+    )
+
+
+class DocumentRequirement(Base):
+    """A document answers a requirement: it is where the organization says it will do what
+    the requirement asks."""
+
+    __tablename__ = "document_requirement"
+    __audit_parent__ = ("document", "document_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("policy_document.id"))
+    requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement.id"))
+    note: Mapped[str | None] = mapped_column(String(300))
+    created_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        UniqueConstraint("document_id", "requirement_id"),
+        Index("ix_document_requirement_requirement_id", "requirement_id"),
+    )

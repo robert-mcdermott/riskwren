@@ -29,7 +29,7 @@ from riskwren.api.routers.inventory import (
 )
 from riskwren.core.errors import PermissionDenied
 from riskwren.inventory import records
-from riskwren.policy import documents, library
+from riskwren.policy import documents, governs, library
 from riskwren.policy.documents import DOCUMENT
 
 router = APIRouter(prefix="/api/v1", tags=["documents"])
@@ -264,6 +264,62 @@ def download_file(request: Request, ref: str, version_id: int) -> Response:
         media_type=media_type if media_type in INERT else "application/octet-stream",
         headers={**DOWNLOAD_HEADERS, "Content-Disposition": disposition},
     )
+
+
+class DirectsBody(BaseModel):
+    control: str = Field(description="The control's reference")
+    note: str | None = Field(default=None, max_length=400)
+
+
+class AnswersBody(BaseModel):
+    framework: str = Field(description="The framework's key")
+    code: str = Field(description="The requirement's code")
+    note: str | None = Field(default=None, max_length=400)
+
+
+@router.get("/documents/{ref}/governs", summary="What a document governs")
+def what_it_governs(request: Request, ref: str) -> dict[str, Any]:
+    """The controls it directs and the requirements it answers, framework by framework."""
+    principal = current(request)
+    with reading(request) as session:
+        document = records.load(session, principal, DOCUMENT, ref)
+        return envelope(governs.of_document(session, principal, document))
+
+
+def _governs(request: Request, ref: str, change: Any) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        document = records.load(session, principal, DOCUMENT, ref)
+        change(session, principal, document)
+        return envelope(governs.of_document(session, principal, document))
+
+
+@router.put("/documents/{ref}/controls", summary="Say a document directs a control")
+def direct_control(request: Request, ref: str, body: DirectsBody) -> dict[str, Any]:
+    """Add the control, or change the note on it."""
+    return _governs(request, ref, lambda s, p, d: governs.direct(s, p, d, body.control, body.note))
+
+
+@router.delete("/documents/{ref}/controls/{link_id}", summary="Take a control off a document")
+def undirect_control(request: Request, ref: str, link_id: int) -> dict[str, Any]:
+    return _governs(request, ref, lambda s, p, d: governs.undirect(s, p, d, link_id))
+
+
+@router.put("/documents/{ref}/requirements", summary="Say a document answers a requirement")
+def answer_requirement(request: Request, ref: str, body: AnswersBody) -> dict[str, Any]:
+    """Add the requirement, or change the note on it."""
+    return _governs(
+        request, ref,
+        lambda s, p, d: governs.answer(s, p, d, framework=body.framework, code=body.code,
+                                       note=body.note),
+    )  # fmt: skip
+
+
+@router.delete(
+    "/documents/{ref}/requirements/{link_id}", summary="Take a requirement off a document"
+)
+def unanswer_requirement(request: Request, ref: str, link_id: int) -> dict[str, Any]:
+    return _governs(request, ref, lambda s, p, d: governs.unanswer(s, p, d, link_id))
 
 
 @router.put("/documents/{ref}/audience", summary="Say who a document applies to")

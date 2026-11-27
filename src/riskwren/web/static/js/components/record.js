@@ -33,7 +33,7 @@ export const TYPES = {
     lede: "Something found to be wrong that must be put right: a failed test, a gap, a finding, or what somebody noticed. Its date follows from its severity, and it closes when someone who does not own it has confirmed that it is fixed." },
   exception: { prefix: "EXC", path: "exceptions", label: "Exception", plural: "Exceptions", noun: "exception", nouns: "exceptions",
     article: "an exception", iconName: "exception", section: "Compliance",
-    lede: "An approved departure from a control or a requirement, for a time, with what makes up for it. It is decided by someone who did not ask for it, and when it ends the state underneath returns." },
+    lede: "An approved departure from a control, a requirement, or a document, for a time, with what makes up for it. It is decided by someone who did not ask for it, and when it ends the state underneath returns." },
   indicator: { prefix: "IND", path: "indicators", label: "Indicator", plural: "Indicators", noun: "indicator", nouns: "indicators",
     article: "an indicator", iconName: "chart", section: "Risks",
     lede: "A number read on a schedule that warns of a risk before it happens: with a level to worry at, and a limit." },

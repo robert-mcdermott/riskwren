@@ -71,7 +71,7 @@ An issue is known to those with a part in it: whoever raised it, those named on 
 
 ## Exceptions
 
-An exception is an approved departure from a control or a requirement, for a time, with what makes up for it. It is the honest answer when something cannot be met yet and everyone knows it.
+An exception is an approved departure from a control, a requirement, or a document, for a time, with what makes up for it. It is the honest answer when something cannot be met yet and everyone knows it.
 
 ### Ask
 
@@ -79,6 +79,8 @@ An exception is asked for from a scope, by those who keep it:
 
 - on the **Requirements** tab, **Ask for an exception** beside a requirement that is a gap, planned, or failing;
 - on the **Controls** tab, **Exception** beside a control, including one the scope inherits and cannot fix itself.
+
+An exception to a policy, standard, or procedure is asked for from the document's own page, and decided by a leader or manager of the unit that keeps it ([Policies](policies.md#exceptions-to-a-document)).
 
 Say why it is needed, what is done in its place meanwhile, and the dates it runs between. It is never open-ended: by default it runs for at most twelve months.
 
@@ -96,7 +98,7 @@ Whoever asked sees it on Home a month before it ends. **Ask again** starts a new
 
 ![An approved exception that ends soon: what it is an exception to, why it is needed, what makes up for it meanwhile, and its dates](img/exception-light.webp)
 
-**Compliance → Exceptions** lists them, and can show those waiting to be decided, in force, ended, refused, or withdrawn.
+**Compliance → Exceptions** lists them, and can show those waiting to be decided, in force, ended, refused, or withdrawn, and those to a control, a requirement, or a document.
 
 ## The plan of action
 

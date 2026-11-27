@@ -124,11 +124,12 @@ def test_documents_are_arranged_by_what_they_implement(db: Database, people: Peo
         mine = records.detail(session, leader, DOCUMENT, policy)
         assert mine["working"]["body"].startswith("# Information security policy")
         assert mine["can"]["edit"] and not mine["can"]["draft"]  # a draft is already open
-        # What a document is missing: nothing is published, and the procedure is fine.
+        # What a document is missing: nothing is published, and nothing shows what it governs;
+        # what it implements, the procedure says.
         cards = {
             card["ref"]: card for card in records.cards(session, DOCUMENT, [standard, procedure])
         }
-        assert [each["key"] for each in cards[procedure.ref]["missing"]] == ["published"]
+        assert [each["key"] for each in cards[procedure.ref]["missing"]] == ["published", "governs"]
 
 
 # --- Approval and publishing ------------------------------------------------------------------

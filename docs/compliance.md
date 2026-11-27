@@ -38,7 +38,7 @@ Paste and Import check everything first and add nothing unless every line can be
 A mapping says that a control helps to satisfy a requirement, **in full** or **in part**, with a note if it needs one.
 
 - From a control, open its **Requirements** tab: it lists what the control answers, in every framework, and adds more.
-- From a requirement, open it in its framework: it lists the controls that answer it, and adds one.
+- From a requirement, open it in its framework: it lists the controls that answer it, and adds one. It also lists the published documents that answer it ([Policies](policies.md#what-it-governs)).
 
 ![A control's Requirements tab: the requirements it answers in each framework, in full or in part](img/control-requirements-light.webp)
 
@@ -129,7 +129,7 @@ Every figure is the count of a list, and opens that list with the same filters. 
 
 ## Connections
 
-Every record has a **Connections** link beside its name. It opens a picture of what the record is joined to: what it relies on and what relies on it, the risks that bear on it, the controls that reduce them, the scopes it sits in, and the evidence, issues, exceptions, and assessments about it.
+Every record has a **Connections** link beside its name. It opens a picture of what the record is joined to: what it relies on and what relies on it, the risks that bear on it, the controls that reduce them, the documents that direct those controls, the scopes it sits in, and the evidence, issues, exceptions, and assessments about it.
 
 The button on a neighbor shows what lies beyond it without leaving the page, and choosing a neighbor puts it in the middle. A list beside the picture says the same in full, so nothing is told by the picture alone. Everything in it can be reached and opened with the keyboard.
 
