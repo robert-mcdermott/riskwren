@@ -360,6 +360,9 @@ def update(
             _save_external_refs(session, record_type, record)
             record.updated_at = utc_now()
         touch(session, record)
+    updated = record_type.extra.get("updated")
+    if updated is not None:
+        updated(session, principal, record)
     return record
 
 

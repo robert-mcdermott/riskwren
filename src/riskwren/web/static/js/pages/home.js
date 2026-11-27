@@ -35,7 +35,7 @@ const KINDS = {
   test: ["assessment", "Test"], confirm: ["assessment", "Review"],
   issue: ["issue", "Put right"], closure: ["issue", "Confirm"], exception: ["exception", "Decide"],
   campaign: ["bell", "Answer"], reading: ["chart", "Record"], handover: ["user", "Pass on"], analysis: ["scope", "Carry on"],
-  approve: ["document", "Approve"], acknowledge: ["document", "Read"], publish: ["document", "Publish"], rework: ["document", "Rework"], document_review: ["document", "Review"],
+  approve: ["document", "Approve"], acknowledge: ["document", "Read"], publish: ["document", "Publish"], rework: ["document", "Rework"], document_review: ["document", "Review"], agreement_notice: ["agreement", "Notice"], agreement_end: ["agreement", "Renew"],
 };
 
 function owed(listing) {

@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
 from riskwren.db.models import (
+    AgreementCoverage,
     Assessment,
     ControlTest,
     DocumentControl,
@@ -131,6 +132,19 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
             select(ExceptionRequest.id).where(
                 ExceptionRequest.subject_type == "control",
                 ExceptionRequest.subject_id == record_id,
+            )
+        ))  # fmt: skip
+    if key == "agreement":
+        for subject_type, subject_id in session.execute(
+            select(AgreementCoverage.subject_type, AgreementCoverage.subject_id)
+            .where(AgreementCoverage.agreement_id == record_id)
+            .order_by(AgreementCoverage.id)
+        ):
+            found.append(("agreement_covers", "Covers", subject_type, subject_id))
+    else:
+        add("covered_by", "Covered by agreements", "agreement", session.scalars(
+            select(AgreementCoverage.agreement_id).where(
+                AgreementCoverage.subject_type == key, AgreementCoverage.subject_id == record_id
             )
         ))  # fmt: skip
     if key == "evidence":

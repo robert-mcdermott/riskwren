@@ -181,6 +181,18 @@ export const SCENES = [
   { name: "control-directed", as: "ciso", path: async (page) => `/controls/${await first("/api/v1/controls?q=devices+and+storage+encrypted")(page)}` },
   { name: "requirement-documents", as: "auditor", path: "/frameworks/nist-csf?r=GV.PO-01" },
   { name: "search-documents", as: "ciso", path: "/search?q=encryption" },
+  { name: "agreements", as: "ciso", path: "/agreements" },
+  { name: "agreement", as: "cro", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=open+cohort")(page)}` },
+  { name: "agreement-notice", as: "ciso", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=backup+vaulting")(page)}` },
+  { name: "agreement-ending", as: "cro", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=genomic")(page)}` },
+  { name: "agreement-closed", as: "auditor", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=imaging+pilot&status=closed")(page)}` },
+  { name: "agreement-history", as: "auditor", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=open+cohort")(page)}?tab=history` },
+  { name: "agreement-new", as: "cro", path: "/agreements", step: click("Add an agreement") },
+  { name: "agreement-covers", as: "cro", path: async (page) => `/agreements/${await first("/api/v1/agreements?q=open+cohort")(page)}`,
+    step: `(() => { const card = [...document.querySelectorAll(".card")].find((el) => (el.querySelector("h2")?.textContent ?? "").startsWith("What it covers"));
+      const change = card && [...card.querySelectorAll("button")].find((each) => each.textContent.trim() === "Change");
+      if (change) change.click(); else window.__sceneMissed = "the Change button of What it covers"; })()` },
+  { name: "scope-agreement", as: "cro", path: async (page) => `/scopes/${await first("/api/v1/scopes?q=central+information")(page)}` },
   { name: "library", as: "member", path: "/library" },
   { name: "library-everything", as: "member", path: "/library?all=true" },
   { name: "library-search", as: "member", path: "/library?all=true&q=backup" },

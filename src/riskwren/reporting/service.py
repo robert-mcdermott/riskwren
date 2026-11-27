@@ -466,6 +466,32 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/documents/{document.ref}", document.next_review_on, ref=document.ref,
             )  # fmt: skip
 
+    # Agreements whose notice date or end draws near, or has passed while they are open.
+    from riskwren.compliance import agreements
+
+    for agreement, state in agreements.waiting_on(session, principal):
+        if state == "notice":
+            notice = agreements.notice_on(agreement)
+            add(
+                "agreement_notice", f"Give notice, or let it carry on: {agreement.name}",
+                f"{agreement.ref} · with {agreement.parties} · "
+                + ("it renews by itself unless notice is given" if agreement.renews
+                   else "it ends unless it is renewed"),
+                f"/agreements/{agreement.ref}", notice, ref=agreement.ref,
+            )  # fmt: skip
+        elif state == "ending":
+            add(
+                "agreement_end", f"{agreement.name} ends",
+                f"{agreement.ref} · with {agreement.parties} · renew it, or let it end",
+                f"/agreements/{agreement.ref}", agreement.ends_on, ref=agreement.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "agreement_end", f"Close or renew {agreement.name}",
+                f"{agreement.ref} · it has ended, and what it imposes still binds its scopes",
+                f"/agreements/{agreement.ref}", agreement.ends_on, ref=agreement.ref,
+            )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 

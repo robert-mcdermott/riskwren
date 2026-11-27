@@ -31,6 +31,13 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Documents in the web of records:** in the Connections picture, in search, in Tidy (a
   policy, standard, or procedure that governs nothing is listed as missing it), and with
   what each governs in the export of the document list.
+- **Agreements** (`AGR`): awards, data use agreements, business associate agreements,
+  contracts, and the like, with their parties, dates, notice periods, and what they cover.
+  The framework an agreement imposes is held by every scope that holds what it covers, and
+  is said to be because of it; covering less, or closing the agreement, takes it away.
+- **Warnings before an agreement's notice date and its end,** further ahead than other
+  reminders, on its owners' Home and under the bell. One that has ended stays open, and goes
+  up to the steward and the leader, until it is renewed or closed.
 - **Who a document applies to:** everyone, or the people in chosen units and those who
   hold chosen roles.
 - **The policy library.** Everyone reads the published documents that apply to them, or

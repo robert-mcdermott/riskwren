@@ -17,8 +17,8 @@ from riskwren.inventory.registry import TYPES, RecordType
 
 # The order the kinds are shown in when nothing else ranks them.
 ORDER = (
-    "risk", "control", "document", "issue", "system", "process", "third_party", "information",
-    "scope", "evidence", "assessment", "exception", "indicator",
+    "risk", "control", "document", "agreement", "issue", "system", "process", "third_party",
+    "information", "scope", "evidence", "assessment", "exception", "indicator",
 )  # fmt: skip
 ACTIONS = "action"
 LOOKED_AT = 60  # of each kind, before ranking
@@ -67,7 +67,10 @@ def everywhere(
     for record_type in kinds():
         if only and only != record_type.key:
             continue
-        rows, total = records.search(session, principal, record_type, {"q": asked}, limit=LOOKED_AT)
+        # A search looks everywhere, closed and retired records too.
+        rows, total = records.search(
+            session, principal, record_type, {"q": asked, "anywhere": True}, limit=LOOKED_AT
+        )
         if not total:
             continue
         ranked = sorted(

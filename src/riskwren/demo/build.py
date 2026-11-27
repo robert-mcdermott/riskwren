@@ -29,6 +29,7 @@ from sqlalchemy.orm import Session
 from riskwren import reminders
 from riskwren.access.principal import Grant, Principal
 from riskwren.compliance import (
+    agreements,
     assessments,
     crosswalk,
     evidence,
@@ -37,6 +38,7 @@ from riskwren.compliance import (
     issues,
     scopes,
 )
+from riskwren.compliance.agreements import AGREEMENT
 from riskwren.compliance.evidence import EVIDENCE
 from riskwren.compliance.scopes import SCOPE
 from riskwren.controls import service as controls
@@ -108,6 +110,7 @@ class Builder:
         self.db = db
         self.files = files  # where evidence files are kept; without it, items have none
         self._doc_refs: dict[str, str] = {}  # the reference each demo document was given
+        self._agreement_refs: dict[str, str] = {}  # and each demo agreement
         self.seed = seed
         self.rng = random.Random(seed)
         # A second stream for details added later, so that they do not shift the first.
@@ -1606,6 +1609,48 @@ class Builder:
                 )  # fmt: skip
             self.tally("requirements mapped by hand")
 
+    def _story_agreements(self) -> Script:
+        """The agreements themselves, with their dates, owners, and what they cover. What one
+        covers binds the scopes that hold it to its terms."""
+        lead = self.cast["risk2"]
+        for spec in sorted(c.AGREEMENTS, key=lambda each: -each["made"]):
+            yield self._on(spec["made"])
+            owner = self.cast.get(spec["owner"]) or self.steward(self.units[spec["owner"]])
+            with self.act(lead) as (session, who):
+                values = {
+                    "name": spec["name"], "kind": spec["kind"], "parties": spec["parties"],
+                    "reference": spec.get("reference"), "summary": spec["summary"],
+                    "org_unit_id": self.units[spec["unit"]],
+                    "starts_on": self.day(spec["starts"]).isoformat(),
+                    "ends_on": self.day(spec["ends"]).isoformat(),
+                    "notice_days": spec.get("notice_days"), "renews": spec["renews"],
+                    "framework": (
+                        frameworks.slug(c.AGREEMENT["title"])
+                        if spec.get("terms") == "own"
+                        else spec.get("terms")
+                    ),
+                }  # fmt: skip
+                agreement = records.create(session, who, AGREEMENT, values)
+                records.set_owners(
+                    session, who, AGREEMENT, agreement, [{"account_id": owner, "kind": "owner"}]
+                )
+                refs = [self.things[key][2] for key in spec["covers"]]
+                refs += [self._scope_named(session, name).ref for name in spec.get("scopes", [])]
+                if refs:
+                    agreements.set_coverage(session, who, agreement, refs)
+                self._agreement_refs[spec["key"]] = agreement.ref
+            self.tally("agreements")
+        for spec in c.AGREEMENTS:
+            if spec.get("closed"):
+                days, why = spec["closed"]
+                yield self._on(days)
+                owner = self.cast.get(spec["owner"]) or self.steward(self.units[spec["owner"]])
+                with self.act(owner) as (session, who):
+                    agreement = records.load(
+                        session, who, AGREEMENT, self._agreement_refs[spec["key"]]
+                    )
+                    agreements.close(session, who, agreement, why)
+
     def _scope(self, by: int, spec: dict[str, Any]) -> int:
         """A scope with its boundary and the framework it is held to."""
         values = {"name": spec["name"], "org_unit_id": self.units[spec["unit"]],
@@ -2691,7 +2736,7 @@ class Builder:
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
-            self._story_documents,
+            self._story_documents, self._story_agreements,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

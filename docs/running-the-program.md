@@ -265,7 +265,7 @@ Letting a person sign in again does not give anything back. Accounts disabled be
 
 ## Reminders
 
-Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, what a campaign has asked, and the next reading of each indicator.
+Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, what a campaign has asked, the next reading of each indicator, document reviews, and agreements.
 
 | When | Who is told |
 |---|---|
@@ -275,6 +275,7 @@ Everything with a date reminds whoever it is waiting on: actions, risk reviews, 
 | Still late after 21 days | The unit's leader |
 
 - Each of these is said **once** for a given date. Moving the date starts again.
+- An agreement is told of further ahead: 30 days before the last day to give notice, and 60 days before it ends, because a renewal takes longer to arrange than an action takes to finish ([Agreements](compliance.md#dates-and-warnings)).
 - Actions, issues, and what a campaign has asked go up to the steward and the leader. An indicator's reading is reminded only as it falls due, not two weeks ahead. The rest are for their owners: nobody else can renew a person's evidence or review their risk for them.
 - Something found already long overdue, as on the first day after an upgrade, is told once to whoever it has reached, and not to everyone below as well.
 - A reminder is a notice. It is read under the bell, and sent by email where [email is set up](configuration.md#email).

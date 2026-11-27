@@ -366,6 +366,29 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         ]
         bare = governs.counts(session, [papers["Research data management policy"].id])
         assert bare[papers["Research data management policy"].id] == (0, 0)
+        # Agreements: the data use agreement binds the scope that holds the cohort's backups to
+        # its own terms; one ends soon, one's notice date is near, one has been closed.
+        from riskwren.compliance import agreements as agreement_service
+        from riskwren.compliance import scopes as scope_service
+        from riskwren.db.models import Agreement, Scope
+
+        pacts = {row.name: row for row in session.scalars(select(Agreement))}
+        states = {name: agreement_service.state_of(row, TODAY) for name, row in pacts.items()}
+        assert states == {
+            "Open Cohort Trust data use agreement": "in_force",
+            "Genomic data access certification": "ending",
+            "Offsite backup vaulting": "notice",
+            "Imaging pilot data sharing": "closed",
+        }
+        central = session.scalars(
+            select(Scope).where(Scope.name == "Central information technology")
+        ).one()
+        imposed = [
+            row["agreement"]["ref"]
+            for row in scope_service.held_to(session, central)
+            if row["agreement"]
+        ]
+        assert imposed == [pacts["Open Cohort Trust data use agreement"].ref]
     assert built.counts["acceptances refused"] == 1
 
 

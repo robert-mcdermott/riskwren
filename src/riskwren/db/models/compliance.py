@@ -220,6 +220,8 @@ class ScopeFramework(Base):
     scope_id: Mapped[int] = mapped_column(ForeignKey("scope.id", ondelete="CASCADE"))
     framework_id: Mapped[int] = mapped_column(ForeignKey("framework.id"))
     baseline_id: Mapped[int | None] = mapped_column(ForeignKey("baseline.id"))
+    # Held because an agreement covers what the scope holds, and imposes the framework.
+    agreement_id: Mapped[int | None] = mapped_column(ForeignKey("agreement.id"))
 
     __table_args__ = (
         UniqueConstraint("scope_id", "framework_id", name="uq_scope_framework"),

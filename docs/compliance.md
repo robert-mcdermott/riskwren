@@ -75,6 +75,36 @@ People in the inheriting scope see whose control they rely on, where it stands, 
 
 ![A scope's Controls tab: controls shared with or inherited from the central scope, each with where it stands here and how well it is known to work](img/scope-controls-light.webp)
 
+## Agreements
+
+**Compliance → Agreements** holds what the organization has promised others: an award's terms, a data use agreement, a business associate agreement, a contract, a confidentiality agreement, a memorandum of understanding. **Add an agreement** (a steward or leader of the unit that answers for it, or a manager) records:
+
+- **who it is with**, and their reference for it;
+- **when it runs**: the day it starts and the day it ends, or none for one that runs until it is ended;
+- **its notice period**: how many days before it ends notice must be given, to end it or to keep it going, and whether it carries on by itself unless notice is given;
+- **its terms**: the framework of the requirements it imposes. That is usually its own terms, entered as [a framework of your own](#a-framework-of-your-own), but it can be a published one the agreement names, as a sponsor that requires SP 800-171 does;
+- where the signed copy is kept.
+
+![An agreement: what it covers, the framework it imposes, and the scope held to that framework because the agreement covers what the scope holds](img/agreement-light.webp)
+
+### What it covers, and what that binds
+
+**What it covers** names the systems, the bodies of information, and the scopes the agreement binds. Then every scope that is one of them, or holds one of them inside its boundary, is **held to the agreement's terms**, without anyone adding the framework by hand. On the scope's page the framework says why: *because AGR-0003 covers what it holds*. Its requirements are answered like any others, and the agreement's page lists the scopes it binds.
+
+The scopes follow the agreement as it changes. Cover more, or put a covered system into a scope, and the terms arrive. Cover less, or close the agreement, and they go, with the decisions made about their requirements; the history of the scope keeps both. A scope's keepers cannot remove terms an agreement imposes, but they can hold the scope to the framework themselves (**Add a framework**), and then it stays when the agreement goes. A scope already held to the framework by its own decision is left as it is.
+
+### Dates and warnings
+
+An agreement is **in force**, **ending** (within 60 days of its end), **notice due** (within 30 days of the last day to give notice), **ended** but still open, or **closed**. Its owners are told, under the bell and by email where it is set up, and it is on their Home:
+
+| When | What |
+|---|---|
+| 30 days before the last day to give notice | Give notice, or let it carry on |
+| 60 days before it ends | Renew it, or let it end |
+| After it has ended, while it is still open | The same people, then the unit's steward after 7 days and its leader after 21 |
+
+An agreement that has ended stays open, and what it imposes still binds its scopes, until someone records its new end date (**Edit**) or **closes** it with the reason. That way nothing it imposed drops out of a scope unnoticed. Agreements are in search, in the **Connections** picture (what each covers, and the agreements that cover a record), and in exports; Tidy lists an open one that covers nothing.
+
 ## Readiness
 
 For a scope and a framework, each requirement that applies is in exactly one state. It is worked out and never typed in.

@@ -1462,6 +1462,79 @@ DOCUMENT_EXCEPTIONS = [
     },
 ]
 
+# Agreements, with their dates in days from the build. The data use agreement imposes its
+# own terms on the scope that holds the backups of the cohort's data; the genomic data
+# certification names a published framework the enclave already meets; the backup vaulting
+# agreement's notice date is near, and is on the security leader's Home; the imaging pilot's
+# memorandum ended and was closed.
+AGREEMENTS = [
+    {
+        "key": "cohort_dua",
+        "name": "Open Cohort Trust data use agreement",
+        "kind": "data_use",
+        "parties": "Open Cohort Trust",
+        "reference": "OCT-DUA-2025-117",
+        "unit": "PS",
+        "owner": "PS",
+        "made": 380,
+        "starts": -631,
+        "ends": 465,
+        "notice_days": 90,
+        "renews": True,
+        "terms": "own",
+        "summary": "Lets Population Sciences use the trust's cohort data for the approved study, on the trust's terms.",
+        "covers": ["info_open_cohort", "storage", "backup"],
+    },
+    {
+        "key": "genomic_cert",
+        "name": "Genomic data access certification",
+        "kind": "data_use",
+        "parties": "Genome Commons Repository",
+        "reference": "GCR-CERT-8841",
+        "unit": "RC",
+        "owner": "rc_dir",
+        "made": 200,
+        "starts": -400,
+        "ends": 48,
+        "renews": False,
+        "terms": "nist-800-171",
+        "summary": "The repository's conditions for controlled-access genomic data: held only in a system that meets SP 800-171.",
+        "covers": ["info_genomic"],
+        "scopes": ["Controlled-access data enclave"],
+    },
+    {
+        "key": "vault_baa",
+        "name": "Offsite backup vaulting",
+        "kind": "business_associate",
+        "parties": "Stonebridge Data Vaulting",
+        "reference": "SDV-2024-0391",
+        "unit": "IT",
+        "owner": "ciso",
+        "made": 640,
+        "starts": -700,
+        "ends": 75,
+        "notice_days": 60,
+        "renews": True,
+        "summary": "Stonebridge keeps the offsite copy of the backups, which hold patient records, as a business associate.",
+        "covers": ["backup"],
+    },
+    {
+        "key": "imaging_mou",
+        "name": "Imaging pilot data sharing",
+        "kind": "memorandum",
+        "parties": "Calder Bay University",
+        "unit": "IMG",
+        "owner": "IMG",
+        "made": 500,
+        "starts": -500,
+        "ends": -120,
+        "renews": False,
+        "summary": "Shared de-identified images with the university's imaging group for a one-year pilot.",
+        "covers": [],
+        "closed": (110, "Ended on its date; the pilot finished and was not renewed."),
+    },
+]
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (
