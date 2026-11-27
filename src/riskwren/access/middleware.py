@@ -15,11 +15,14 @@ from riskwren.auth import sessions
 from riskwren.people import accounts
 
 SAFE = {"GET", "HEAD", "OPTIONS"}
-# Changes that need no CSRF token because there is no session yet, or it is being ended.
+# Changes that need no CSRF token because there is no session yet, or it is being ended, or
+# the route never acts on a session: one answered through a link carries its own token.
 NO_TOKEN = {
     ("POST", "/api/v1/session"),
     ("POST", "/api/v1/session/demo"),
     ("DELETE", "/api/v1/session"),
+    ("PUT", "/api/v1/respond"),
+    ("POST", "/api/v1/respond/submit"),
 }
 MAX_BODY = 32 * 1024 * 1024  # a little over the largest file anyone may send
 

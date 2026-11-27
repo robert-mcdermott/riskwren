@@ -19,7 +19,18 @@ Wave 5, *Third parties*.
   assessors, tier it. The tier recorded is a judgment by a named person: a different tier from
   the rules' needs a reason, and both are kept. Lists show,
   sort, and cut by tier, and Tidy lists third parties not yet tiered.
-- **A Third parties menu,** with third parties and services, and a new guide,
+- **Contacts** at third parties: the people who can be asked. They are not accounts.
+- **Due diligence reviews** (`DDR`): a questionnaire, the one the third party's tier names, sent
+  to a contact through a link that needs no account. The link is a long random token kept only
+  as a digest, carried after `#` so that no server logs it, reaching that questionnaire and
+  nothing else, and ending when it expires, is withdrawn or replaced, or has been used. The
+  contact can save to finish later. The answers the questionnaire marks as concerns are listed
+  first, and the reviewer records the conclusion: approved, approved with conditions, or not
+  approved. Answers to read, and answers late, wait on the review's owners' Home.
+- **Three due diligence questionnaires,** short, standard, and full, written for organizations
+  in the United States. A choice or a yes-or-no question can mark an answer as a concern.
+- **A link sent by email is cleared once sent,** so the token is not kept in the outbox.
+- **A Third parties menu,** with third parties, services, and due diligence, and a new guide,
   [Third parties](docs/third-parties.md).
 
 ### Changed

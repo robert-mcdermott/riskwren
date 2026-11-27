@@ -93,7 +93,12 @@ from riskwren.db.models.risk import (
     ScoringMethod,
 )
 from riskwren.db.models.system import ChainHead, Counter, Event
-from riskwren.db.models.third_parties import TierAssessment
+from riskwren.db.models.third_parties import (
+    RespondentLink,
+    ThirdPartyContact,
+    ThirdPartyReview,
+    TierAssessment,
+)
 from riskwren.db.models.tidy import Handover, NotDuplicate, SavedView
 
 __all__ = [
@@ -157,6 +162,7 @@ __all__ = [
     "RecordOwner",
     "Reminder",
     "Requirement",
+    "RespondentLink",
     "Response",
     "Risk",
     "RiskAnalysis",
@@ -183,6 +189,8 @@ __all__ = [
     "System",
     "TestResult",
     "ThirdParty",
+    "ThirdPartyContact",
+    "ThirdPartyReview",
     "TierAssessment",
     "TreatmentPlan",
 ]

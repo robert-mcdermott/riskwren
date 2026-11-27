@@ -242,6 +242,27 @@ def _agreements(session: Session, today: date) -> Iterator[Due]:
             )  # fmt: skip
 
 
+def _reviews(session: Session, horizon: date) -> Iterator[Due]:
+    """Due diligence answers wanted by a date. The contact has no account, so it is the
+    review's owners who are told, and who chase."""
+    from riskwren.db.models import ThirdPartyReview
+
+    for review in session.scalars(
+        select(ThirdPartyReview).where(
+            ThirdPartyReview.status == "sent",
+            ThirdPartyReview.due_on.is_not(None),
+            ThirdPartyReview.due_on <= horizon,
+        )
+    ):
+        assert review.due_on is not None
+        yield Due(
+            "review_answers", review.id, review.due_on,
+            f"the answers to {review.ref} {review.name}", f"/reviews/{review.ref}",
+            tuple(notices.owners(session, "third_party_review", review.id)), review.org_unit_id,
+            escalates=False, late="Answers late",
+        )  # fmt: skip
+
+
 def _readings(session: Session, horizon: date) -> Iterator[Due]:
     """Indicators whose next reading is due. A reading nobody takes is an indicator that
     warns of nothing."""
@@ -310,6 +331,7 @@ def send(session: Session, *, today: date | None = None) -> dict[str, int]:
         *_readings(session, horizon),
         *_documents(session, horizon),
         *_agreements(session, today),
+        *_reviews(session, horizon),
     ]
     for due in everything:
         stage = stage_of(due, today, plan)

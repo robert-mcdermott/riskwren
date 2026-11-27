@@ -508,38 +508,6 @@
         "title": "AnswerBody",
         "type": "object"
       },
-      "AnswersBody": {
-        "properties": {
-          "code": {
-            "description": "The requirement's code",
-            "title": "Code",
-            "type": "string"
-          },
-          "framework": {
-            "description": "The framework's key",
-            "title": "Framework",
-            "type": "string"
-          },
-          "note": {
-            "anyOf": [
-              {
-                "maxLength": 400,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Note"
-          }
-        },
-        "required": [
-          "framework",
-          "code"
-        ],
-        "title": "AnswersBody",
-        "type": "object"
-      },
       "AudienceBody": {
         "properties": {
           "everyone": {
@@ -805,6 +773,32 @@
         "title": "ClosureBody",
         "type": "object"
       },
+      "ConcludeBody": {
+        "properties": {
+          "conclusion": {
+            "description": "approved, conditions, or declined",
+            "title": "Conclusion",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "conclusion"
+        ],
+        "title": "ConcludeBody",
+        "type": "object"
+      },
       "ConfirmBody": {
         "properties": {
           "confirm": {
@@ -828,6 +822,73 @@
           "confirm"
         ],
         "title": "ConfirmBody",
+        "type": "object"
+      },
+      "ContactBody": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Their role there",
+            "title": "Role"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "active, or left",
+            "title": "Status"
+          }
+        },
+        "title": "ContactBody",
         "type": "object"
       },
       "ControlBody": {
@@ -3755,31 +3816,6 @@
         "title": "ResultBody",
         "type": "object"
       },
-      "ReviewBody": {
-        "properties": {
-          "confirm": {
-            "description": "True to confirm the result; false to return it",
-            "title": "Confirm",
-            "type": "boolean"
-          },
-          "note": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Note"
-          }
-        },
-        "required": [
-          "confirm"
-        ],
-        "title": "ReviewBody",
-        "type": "object"
-      },
       "RiskBody": {
         "description": "A risk. On a change, send only what changes, with the ``version`` you were editing.",
         "properties": {
@@ -4108,6 +4144,44 @@
           }
         },
         "title": "ScopeBody",
+        "type": "object"
+      },
+      "SendBody": {
+        "properties": {
+          "contact_id": {
+            "description": "The contact to send it to",
+            "title": "Contact Id",
+            "type": "integer"
+          },
+          "days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How long the link lasts, 1 to 90 days",
+            "title": "Days"
+          },
+          "due_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the answers are wanted",
+            "title": "Due On"
+          }
+        },
+        "required": [
+          "contact_id"
+        ],
+        "title": "SendBody",
         "type": "object"
       },
       "ServiceBody": {
@@ -5357,6 +5431,31 @@
         "title": "AssessmentBody",
         "type": "object"
       },
+      "riskwren__api__routers__assessments__ReviewBody": {
+        "properties": {
+          "confirm": {
+            "description": "True to confirm the result; false to return it",
+            "title": "Confirm",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "confirm"
+        ],
+        "title": "ReviewBody",
+        "type": "object"
+      },
       "riskwren__api__routers__campaigns__AnswersIn": {
         "properties": {
           "answers": {
@@ -5411,6 +5510,38 @@
           "reliance"
         ],
         "title": "LinkBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__documents__AnswersBody": {
+        "properties": {
+          "code": {
+            "description": "The requirement's code",
+            "title": "Code",
+            "type": "string"
+          },
+          "framework": {
+            "description": "The framework's key",
+            "title": "Framework",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "framework",
+          "code"
+        ],
+        "title": "AnswersBody",
         "type": "object"
       },
       "riskwren__api__routers__documents__DecisionBody": {
@@ -5752,6 +5883,110 @@
           "to"
         ],
         "title": "MoveBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__third_parties__AnswersBody": {
+        "properties": {
+          "answers": {
+            "additionalProperties": true,
+            "description": "The answers, by question key",
+            "title": "Answers",
+            "type": "object"
+          }
+        },
+        "required": [
+          "answers"
+        ],
+        "title": "AnswersBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__third_parties__ReviewBody": {
+        "properties": {
+          "due_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the answers are wanted",
+            "title": "Due On"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "questionnaire": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The key of the questionnaire",
+            "title": "Questionnaire"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "ReviewBody",
         "type": "object"
       },
       "riskwren__api__routers__treatment__ActionBody": {
@@ -8626,6 +8861,60 @@
         ]
       }
     },
+    "/api/v1/contacts/{contact_id}": {
+      "patch": {
+        "operationId": "change_contact_api_v1_contacts__contact_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contact_id",
+            "required": true,
+            "schema": {
+              "title": "Contact Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Change Contact Api V1 Contacts  Contact Id  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change a contact, or say they have left",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/control-library": {
       "get": {
         "operationId": "show_library_api_v1_control_library_get",
@@ -10818,7 +11107,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AnswersBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__documents__AnswersBody"
               }
             }
           },
@@ -18048,6 +18337,107 @@
         ]
       }
     },
+    "/api/v1/respond": {
+      "get": {
+        "operationId": "respond_view_api_v1_respond_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Respond View Api V1 Respond Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "What the holder of a link is asked (no account; the link in a header)",
+        "tags": [
+          "third parties"
+        ]
+      },
+      "put": {
+        "operationId": "respond_save_api_v1_respond_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__AnswersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Respond Save Api V1 Respond Put"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save the answers to finish later (no account; the link in a header)",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/respond/submit": {
+      "post": {
+        "operationId": "respond_submit_api_v1_respond_submit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__AnswersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Respond Submit Api V1 Respond Submit Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send the answers (no account; the link in a header)",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/responses/{response_id}": {
       "get": {
         "operationId": "response_api_v1_responses__response_id__get",
@@ -18110,7 +18500,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReviewBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__assessments__ReviewBody"
               }
             }
           },
@@ -18143,6 +18533,595 @@
         "summary": "Confirm a test result, or return it",
         "tags": [
           "assessments"
+        ]
+      }
+    },
+    "/api/v1/reviews": {
+      "get": {
+        "operationId": "list_reviews_api_v1_reviews_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "A status, or open for those not done",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A status, or open for those not done",
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "third_party",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Third Party"
+            }
+          },
+          {
+            "in": "query",
+            "name": "late",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Late",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; start with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "-updated_at",
+              "description": "A field name; start with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Reviews Api V1 Reviews Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find due diligence reviews",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}": {
+      "get": {
+        "operationId": "show_review_api_v1_reviews__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Review Api V1 Reviews  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One review, with its link, answers, and concerns",
+        "tags": [
+          "third parties"
+        ]
+      },
+      "patch": {
+        "operationId": "update_review_api_v1_reviews__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__ReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Review Api V1 Reviews  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change a review not yet sent",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}/cancel": {
+      "post": {
+        "operationId": "cancel_review_api_v1_reviews__ref__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cancel Review Api V1 Reviews  Ref  Cancel Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel a review not yet answered",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}/conclude": {
+      "post": {
+        "operationId": "conclude_review_api_v1_reviews__ref__conclude_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConcludeBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Conclude Review Api V1 Reviews  Ref  Conclude Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record what was concluded from the answers",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}/history": {
+      "get": {
+        "operationId": "review_history_api_v1_reviews__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Review History Api V1 Reviews  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that has happened to a review",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}/owners": {
+      "put": {
+        "operationId": "set_review_owners_api_v1_reviews__ref__owners_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Review Owners Api V1 Reviews  Ref  Owners Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a review's owners",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}/send": {
+      "post": {
+        "operationId": "send_review_api_v1_reviews__ref__send_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Send Review Api V1 Reviews  Ref  Send Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send the questionnaire to a contact through a new link",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/reviews/{ref}/withdraw": {
+      "post": {
+        "operationId": "withdraw_link_api_v1_reviews__ref__withdraw_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Withdraw Link Api V1 Reviews  Ref  Withdraw Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Withdraw the link, so it no longer opens anything",
+        "tags": [
+          "third parties"
         ]
       }
     },
@@ -24601,6 +25580,60 @@
         ]
       }
     },
+    "/api/v1/third-parties/{ref}/contacts": {
+      "post": {
+        "operationId": "add_contact_api_v1_third_parties__ref__contacts_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Contact Api V1 Third Parties  Ref  Contacts Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a contact at a third party",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/third-parties/{ref}/history": {
       "get": {
         "operationId": "third_party_history_api_v1_third_parties__ref__history_get",
@@ -24803,6 +25836,60 @@
         "summary": "Set a third party's owners",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/reviews": {
+      "post": {
+        "operationId": "start_review_api_v1_third_parties__ref__reviews_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__ReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Review Api V1 Third Parties  Ref  Reviews Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start a due diligence review",
+        "tags": [
+          "third parties"
         ]
       }
     },

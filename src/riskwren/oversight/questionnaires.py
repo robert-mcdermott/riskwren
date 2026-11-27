@@ -120,6 +120,16 @@ def _question_problems(question: Mapping[str, Any], seen: set[str], where: str) 
         found.append(f"{where}: only a choice has options.")
     if "required" in question and not isinstance(question["required"], bool):
         found.append(f"{where}: required is true or false.")
+    # An answer marked as a concern is one a reviewer looks at first (due diligence).
+    if "concern_if" in question and (
+        kind != "yes_no" or not isinstance(question["concern_if"], bool)
+    ):
+        found.append(f"{where}: only a yes or no question marks a concern, as true or false.")
+    if any(
+        isinstance(option, Mapping) and not isinstance(option.get("concern", False), bool)
+        for option in question.get("options") or []
+    ):
+        found.append(f"{where}: an option's concern is true or false.")
     found += _condition_problems(question.get("show_when"), seen, where)
     return found
 

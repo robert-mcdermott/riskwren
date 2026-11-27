@@ -322,6 +322,10 @@ def send_queued(db: Database, config: Config, sender: Sender) -> tuple[int, int]
             else:
                 row.status, row.sent_at, row.last_error = "sent", utc_now(), None
                 sent += 1
+            if row.kind == LINK and row.status in ("sent", "failed"):
+                # It carried a link that lets whoever holds it answer as someone: once it has
+                # gone, or will not go, its words are not kept.
+                row.body_text, row.body_html = CLEARED, None
     return sent, failed
 
 
@@ -383,3 +387,69 @@ def send_test(db: Database, config: Config, account: Account, sender: Sender | N
     row = OutboxMessage(to_address=account.email, subject=f"{how.product}: test message",
                         body_text=text, body_html=page)  # fmt: skip
     (sender or SmtpSender(config.mail)).send(_message(row, config.mail, how.product))
+
+
+# --- Links to people without accounts -------------------------------------------------------
+
+LINK = "link"  # the kind of message that carries a respondent link; cleared once sent
+CLEARED = "(Cleared once sent: it carried a link to answer a questionnaire.)"
+
+
+def queue_link(session: Session, config: Config, review: Any, url: str) -> bool:
+    """Send a contact the link to a questionnaire. Returns whether a message was queued.
+    The message holds the token, so its words are cleared once it has gone (``send_queued``)."""
+    from riskwren.db.models import ThirdParty, ThirdPartyContact
+
+    contact = session.get(ThirdPartyContact, review.contact_id)
+    party = session.get(ThirdParty, review.third_party_id)
+    if contact is None or party is None:
+        return False
+    how = look(session, config)
+    asker = session.get(Account, review.created_by) if review.created_by else None
+    who = how.organization or how.product
+    due = f"{review.due_on.day} {review.due_on:%B %Y}" if review.due_on else None
+    lines = [
+        f"Dear {contact.name},",
+        "",
+        f"{who} asks {party.name} to answer a short set of questions about how it protects the "
+        "information and systems it handles for us." + (f" Please answer by {due}." if due else ""),
+        "",
+        "Open this link to answer. You do not need an account, and you can save your answers "
+        "and come back to them with the same link:",
+        "",
+        url,
+        "",
+        "The link is for you alone: anyone who has it can answer in your name until it expires.",
+    ]
+    if asker is not None:
+        lines += ["", f"If you have a question, reply to {asker.display_name} at {asker.email}."]
+    lines += [
+        "",
+        "--",
+        f"Sent by {how.product}" + (f" for {how.organization}" if how.organization else "") + ".",
+    ]
+    text = "\n".join(lines)
+    escape = html.escape
+    page = (
+        '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:15px;'
+        'line-height:1.5;color:#1c1b19;max-width:36em">'
+        + "".join(
+            f'<p><a href="{escape(url, quote=True)}" style="color:#0f5876;font-weight:600">'
+            "Open the questionnaire</a></p>"
+            if line == url
+            else (f"<p>{escape(line)}</p>" if line else "")
+            for line in lines
+        )
+        + "</div>"
+    )
+    now = utc_now()
+    session.add(
+        OutboxMessage(
+            account_id=None, to_address=contact.email,
+            subject=" ".join(f"Questions from {who} for {party.name}".split())[:300],
+            body_text=text, body_html=page, kind=LINK, status="queued", attempts=0,
+            created_at=now, send_after=now,
+        )
+    )  # fmt: skip
+    session.flush()
+    return True

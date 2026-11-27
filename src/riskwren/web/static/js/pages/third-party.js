@@ -16,7 +16,8 @@ const editRecord = async (...args) => (await import("../components/record-forms.
 const openTiering = async (...args) => (await import("../components/tiering.js")).openTiering(...args);
 const tieringDetail = async (...args) => (await import("../components/tiering.js")).tieringDetail(...args);
 
-const TABS = [["overview", "Overview"], ["tiering", "Tiering"], ["history", "History"]];
+const TABS = [["overview", "Overview"], ["tiering", "Tiering"], ["diligence", "Due diligence"], ["history", "History"]];
+const dueDiligenceTab = async (...args) => (await import("../components/third-party-dd.js")).dueDiligenceTab(...args);
 
 /** A tier as a pill: the tier's name, and nothing louder; it is not a rating. */
 export function tierPill(tierLabel) {
@@ -111,6 +112,10 @@ export function thirdPartyPage(main, params) {
       let body;
       if (tab === "history") body = card({ flush: true }, timeline(data.history));
       else if (tab === "tiering") body = tieringTab(record, data, ctx);
+      else if (tab === "diligence") {
+        body = h("div");
+        dueDiligenceTab(record, ctx).then((node) => body.append(node));
+      }
       else body = overview(record, ctx);
       return h("div", { class: "stack" }, recordHeader(record, { badges, actions: edit }), tabBar(TABS, tab), body);
     },

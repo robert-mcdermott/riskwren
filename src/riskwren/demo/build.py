@@ -1719,6 +1719,105 @@ class Builder:
         yield self._on(146)
         self._tier("cloud", self.cast["ciso"])
 
+    def _sound(self, document: dict[str, Any], contact: str) -> dict[str, Any]:
+        """A sound answer to every question: yes where no is the concern, the first answer
+        that is not a concern, and a few words where words are asked for."""
+        out: dict[str, Any] = {}
+        for section in document["sections"]:
+            for question in section["questions"]:
+                kind, key = question["type"], question["key"]
+                if kind == "yes_no":
+                    out[key] = question.get("concern_if") is not True and "concern_if" in question
+                elif kind in ("choice", "choices"):
+                    good = [o["key"] for o in question["options"] if not o.get("concern")]
+                    out[key] = good[0] if kind == "choice" else good[:1]
+                elif key == "security_contact":
+                    out[key] = contact
+        return out
+
+    def _story_due_diligence(self) -> Script:
+        """Contacts at the suppliers that matter most, and due diligence at every stage:
+        reviews concluded over the year, one answered and waiting for the security leader,
+        one half answered, one whose answers are late, one whose link ran out, and one not
+        yet sent."""
+        from riskwren.db.models import Questionnaire, QuestionnaireVersion
+        from riskwren.thirdparty import contacts, respondent, reviews
+
+        yield self._on(430)
+        people: dict[str, list[int]] = {}
+        for party, listed in c.CONTACTS.items():
+            _, party_id, _ = self.things[party]
+            with self.act(self.cast["ciso"]) as (session, who):
+                record = session.get(ThirdParty, party_id)
+                people[party] = [
+                    contacts.add(session, who, record,
+                                 {"name": name, "email": email, "role": role}).id
+                    for name, email, role in listed
+                ]  # fmt: skip
+            self.tally("contacts at third parties", len(listed))
+        steps: list[tuple[float, int, str, dict[str, Any]]] = []
+        for index, spec in enumerate(c.REVIEWS):
+            for step in ("started", "sent", "saved", "answered", "concluded"):
+                if step in spec:
+                    steps.append((float(spec[step]), index, step, spec))  # type: ignore[arg-type]
+        refs: dict[int, str] = {}
+        tokens: dict[int, str] = {}
+        order = {"started": 0, "sent": 1, "saved": 2, "answered": 3, "concluded": 4}
+        for days, index, step, spec in sorted(steps, key=lambda s: (-s[0], s[1], order[s[2]])):
+            yield self._on(days)
+            party = str(spec["party"])
+            by = self.cast[str(spec["by"])]
+            _, party_id, _ = self.things[party]
+            if step == "started":
+                with self.act(by) as (session, who):
+                    made = reviews.start(session, who, session.get(ThirdParty, party_id), {})
+                    refs[index] = made.ref
+                self.tally("due diligence reviews")
+            elif step == "sent":
+                due = spec.get("due")
+                with self.act(by) as (session, who):
+                    review = reviews.find(session, refs[index])
+                    tokens[index] = reviews.send(
+                        session, who, review, contact_id=people[party][0],
+                        due_on=self.day(-float(due)).isoformat() if due is not None else None,
+                        days=int(spec.get("link_days", 30)),  # type: ignore[arg-type]
+                    )  # fmt: skip
+            elif step in ("saved", "answered"):
+                with self.db.read() as session:
+                    link = respondent.find(session, tokens[index])
+                    actor = respondent.actor_for(session, link)
+                    review = reviews.find(session, refs[index])
+                    asked = session.get(Questionnaire, review.questionnaire_id)
+                    version = session.scalars(
+                        select(QuestionnaireVersion).where(
+                            QuestionnaireVersion.questionnaire_id == asked.id,
+                            QuestionnaireVersion.number == review.version_number,
+                        )
+                    ).one()
+                    contact = c.CONTACTS[party][0]
+                    answers = {
+                        **self._sound(version.document, f"{contact[0]}, {contact[1]}"),
+                        **dict(spec.get("answers") or {}),
+                    }  # type: ignore[arg-type]
+                if step == "saved":
+                    half = dict(list(answers.items())[: len(answers) // 2])
+                    with self.db.write(actor) as session:
+                        respondent.save(session, respondent.find(session, tokens[index]), half,
+                                        submit=False)  # fmt: skip
+                else:
+                    with self.db.write(actor) as session:
+                        respondent.save(session, respondent.find(session, tokens[index]),
+                                        answers, submit=True)  # fmt: skip
+            else:
+                with self.act(by) as (session, who):
+                    reviews.conclude(
+                        session,
+                        who,
+                        reviews.find(session, refs[index]),
+                        str(spec["conclusion"]),
+                        spec.get("note"),
+                    )  # type: ignore[arg-type]
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -2968,7 +3067,7 @@ class Builder:
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
-            self._story_governance, self._story_third_parties,
+            self._story_governance, self._story_third_parties, self._story_due_diligence,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

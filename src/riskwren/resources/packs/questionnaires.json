@@ -901,6 +901,900 @@
           }
         ]
       }
+    },
+    {
+      "key": "due-diligence-short",
+      "title": "Due diligence: short",
+      "summary": "Eight questions for a third party with little at stake: how it protects what it holds, and what it does when something goes wrong.",
+      "purpose": "due_diligence",
+      "document": {
+        "sections": [
+          {
+            "key": "about",
+            "title": "About you",
+            "questions": [
+              {
+                "key": "security_contact",
+                "label": "Who answers for information security, and how can they be reached?",
+                "type": "text",
+                "required": true,
+                "help": "A name or role, and an email address."
+              },
+              {
+                "key": "certifications",
+                "label": "Which independent reports or certifications cover the service you provide to us?",
+                "type": "choices",
+                "required": true,
+                "help": "Choose each that is current. You can be asked for a copy.",
+                "options": [
+                  {
+                    "key": "soc2_type2",
+                    "label": "SOC 2 Type II report"
+                  },
+                  {
+                    "key": "soc2_type1",
+                    "label": "SOC 2 Type I report"
+                  },
+                  {
+                    "key": "iso27001",
+                    "label": "ISO/IEC 27001 certificate"
+                  },
+                  {
+                    "key": "hitrust",
+                    "label": "HITRUST certification"
+                  },
+                  {
+                    "key": "fedramp",
+                    "label": "FedRAMP authorization"
+                  },
+                  {
+                    "key": "pci",
+                    "label": "PCI DSS attestation of compliance"
+                  },
+                  {
+                    "key": "pentest",
+                    "label": "A penetration test by an independent firm in the last 12 months"
+                  },
+                  {
+                    "key": "none",
+                    "label": "None of these",
+                    "concern": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "protection",
+            "title": "Protecting our information",
+            "questions": [
+              {
+                "key": "mfa",
+                "label": "Does everyone who can reach our information or systems sign in with a second factor?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "encryption",
+                "label": "Is our information encrypted when it is stored and when it is sent?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "access_removed",
+                "label": "Is a person's access removed when they leave, or no longer need it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "breach_notice",
+                "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "return_destroy",
+                "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "more",
+            "title": "Anything else",
+            "questions": [
+              {
+                "key": "notes",
+                "label": "Is there anything else we should know?",
+                "type": "long_text",
+                "required": false
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "due-diligence-standard",
+      "title": "Due diligence: standard",
+      "summary": "A security questionnaire for a third party that holds confidential information or reaches systems.",
+      "purpose": "due_diligence",
+      "document": {
+        "sections": [
+          {
+            "key": "about",
+            "title": "About you",
+            "questions": [
+              {
+                "key": "security_contact",
+                "label": "Who answers for information security, and how can they be reached?",
+                "type": "text",
+                "required": true,
+                "help": "A name or role, and an email address."
+              },
+              {
+                "key": "certifications",
+                "label": "Which independent reports or certifications cover the service you provide to us?",
+                "type": "choices",
+                "required": true,
+                "help": "Choose each that is current. You can be asked for a copy.",
+                "options": [
+                  {
+                    "key": "soc2_type2",
+                    "label": "SOC 2 Type II report"
+                  },
+                  {
+                    "key": "soc2_type1",
+                    "label": "SOC 2 Type I report"
+                  },
+                  {
+                    "key": "iso27001",
+                    "label": "ISO/IEC 27001 certificate"
+                  },
+                  {
+                    "key": "hitrust",
+                    "label": "HITRUST certification"
+                  },
+                  {
+                    "key": "fedramp",
+                    "label": "FedRAMP authorization"
+                  },
+                  {
+                    "key": "pci",
+                    "label": "PCI DSS attestation of compliance"
+                  },
+                  {
+                    "key": "pentest",
+                    "label": "A penetration test by an independent firm in the last 12 months"
+                  },
+                  {
+                    "key": "none",
+                    "label": "None of these",
+                    "concern": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "program",
+            "title": "Your security program",
+            "questions": [
+              {
+                "key": "policy",
+                "label": "Do you have written information security policies, approved by your leadership and reviewed each year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "training",
+                "label": "Do your staff complete security awareness training when they join and each year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "background",
+                "label": "Are staff who can reach our information checked before they start, as the law allows?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "access",
+            "title": "Access",
+            "questions": [
+              {
+                "key": "mfa",
+                "label": "Does everyone who can reach our information or systems sign in with a second factor?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "privileged",
+                "label": "Is administrator access limited to named people, and reviewed at least every quarter?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "access_removed",
+                "label": "Is a person's access removed within a day of their leaving, or no longer needing it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "sso",
+                "label": "Can our people sign in to your service with our own identity provider?",
+                "type": "yes_no",
+                "required": true
+              }
+            ]
+          },
+          {
+            "key": "data",
+            "title": "Our information",
+            "questions": [
+              {
+                "key": "encryption_rest",
+                "label": "Is our information encrypted where it is stored?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "encryption_transit",
+                "label": "Is it encrypted whenever it is sent over a network?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "us_only",
+                "label": "Is our information stored and reached only from within the United States?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "locations",
+                "label": "Where is it stored or reached from, outside the United States?",
+                "type": "text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.us_only",
+                  "op": "eq",
+                  "value": false
+                }
+              },
+              {
+                "key": "return_destroy",
+                "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "operations",
+            "title": "Operations",
+            "questions": [
+              {
+                "key": "patching",
+                "label": "How soon are critical security updates applied to the systems that hold our information?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "week",
+                    "label": "Within a week"
+                  },
+                  {
+                    "key": "month",
+                    "label": "Within a month"
+                  },
+                  {
+                    "key": "longer",
+                    "label": "Longer, or it varies",
+                    "concern": true
+                  }
+                ]
+              },
+              {
+                "key": "logging",
+                "label": "Are access to our information and changes to your systems logged, and the logs kept at least a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "backups",
+                "label": "Is our information backed up, and is restoring it tested at least once a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "incidents",
+            "title": "Incidents",
+            "questions": [
+              {
+                "key": "ir_plan",
+                "label": "Do you have an incident response plan, tested in the last year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "breach_notice",
+                "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "breach_last",
+                "label": "Have you had a security incident that had to be reported to customers or regulators in the last three years?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": true
+              },
+              {
+                "key": "breach_detail",
+                "label": "What happened, and what changed afterwards?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.breach_last",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "others",
+            "title": "Others you use",
+            "questions": [
+              {
+                "key": "subprocessors",
+                "label": "Do others you use (subcontractors or cloud providers) hold or reach our information?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "subprocessor_list",
+                "label": "Who are they, and what does each do?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.subprocessors",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              {
+                "key": "subprocessor_terms",
+                "label": "Do they agree to terms at least as strict as yours with us?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false,
+                "show_when": {
+                  "field": "answers.subprocessors",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "due-diligence-full",
+      "title": "Due diligence: full",
+      "summary": "The full security questionnaire, for a third party that holds restricted or regulated information or is relied on for critical work.",
+      "purpose": "due_diligence",
+      "document": {
+        "sections": [
+          {
+            "key": "about",
+            "title": "About you",
+            "questions": [
+              {
+                "key": "security_contact",
+                "label": "Who answers for information security, and how can they be reached?",
+                "type": "text",
+                "required": true,
+                "help": "A name or role, and an email address."
+              },
+              {
+                "key": "certifications",
+                "label": "Which independent reports or certifications cover the service you provide to us?",
+                "type": "choices",
+                "required": true,
+                "help": "Choose each that is current. You can be asked for a copy.",
+                "options": [
+                  {
+                    "key": "soc2_type2",
+                    "label": "SOC 2 Type II report"
+                  },
+                  {
+                    "key": "soc2_type1",
+                    "label": "SOC 2 Type I report"
+                  },
+                  {
+                    "key": "iso27001",
+                    "label": "ISO/IEC 27001 certificate"
+                  },
+                  {
+                    "key": "hitrust",
+                    "label": "HITRUST certification"
+                  },
+                  {
+                    "key": "fedramp",
+                    "label": "FedRAMP authorization"
+                  },
+                  {
+                    "key": "pci",
+                    "label": "PCI DSS attestation of compliance"
+                  },
+                  {
+                    "key": "pentest",
+                    "label": "A penetration test by an independent firm in the last 12 months"
+                  },
+                  {
+                    "key": "none",
+                    "label": "None of these",
+                    "concern": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "governance",
+            "title": "Governance",
+            "questions": [
+              {
+                "key": "policy",
+                "label": "Do you have written information security policies, approved by your leadership and reviewed each year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "security_lead",
+                "label": "Is a named person accountable for information security across your organization?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "risk_assessment",
+                "label": "Do you assess the risks to the information you hold at least once a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "training",
+                "label": "Do your staff complete security awareness training when they join and each year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "background",
+                "label": "Are staff who can reach our information checked before they start, as the law allows?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "insurance",
+                "label": "Do you carry cyber liability insurance?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "access",
+            "title": "Access",
+            "questions": [
+              {
+                "key": "mfa",
+                "label": "Does everyone who can reach our information or systems sign in with a second factor?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "mfa_admin",
+                "label": "Do administrators use a second factor that resists phishing, such as a security key?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "privileged",
+                "label": "Is administrator access limited to named people, and reviewed at least every quarter?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "access_review",
+                "label": "Is everyone's access to our information reviewed at least twice a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "access_removed",
+                "label": "Is a person's access removed within a day of their leaving, or no longer needing it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "sso",
+                "label": "Can our people sign in to your service with our own identity provider?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "remote_into_us",
+                "label": "Will your staff reach our network or systems remotely?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "remote_how",
+                "label": "How, and how is that access controlled and recorded?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.remote_into_us",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "data",
+            "title": "Our information",
+            "questions": [
+              {
+                "key": "encryption_rest",
+                "label": "Is our information encrypted where it is stored, with keys you manage separately from the data?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "encryption_transit",
+                "label": "Is it encrypted whenever it is sent over a network?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "segregated",
+                "label": "Is our information kept apart from other customers' so that none of them can reach it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "us_only",
+                "label": "Is our information stored and reached only from within the United States?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "locations",
+                "label": "Where is it stored or reached from, outside the United States?",
+                "type": "text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.us_only",
+                  "op": "eq",
+                  "value": false
+                }
+              },
+              {
+                "key": "use_limited",
+                "label": "Is our information used only to provide the service to us, and never to train models or for other customers?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "return_destroy",
+                "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "health",
+            "title": "Health information",
+            "questions": [
+              {
+                "key": "phi",
+                "label": "Will you create, receive, keep, or send protected health information on our behalf?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "baa",
+                "label": "Will you sign a business associate agreement with us?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false,
+                "show_when": {
+                  "field": "answers.phi",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              {
+                "key": "hipaa_assessment",
+                "label": "Have you assessed your compliance with the HIPAA Security Rule in the last year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false,
+                "show_when": {
+                  "field": "answers.phi",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "development",
+            "title": "Building and changing your service",
+            "questions": [
+              {
+                "key": "sdlc",
+                "label": "Is security reviewed as your service is designed and changed, with code reviewed before release?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "pentest",
+                "label": "Has an independent firm tested your service for weaknesses in the last 12 months, and were the serious findings fixed?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "change",
+                "label": "Are changes to the systems that hold our information approved and recorded?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "operations",
+            "title": "Operations",
+            "questions": [
+              {
+                "key": "patching",
+                "label": "How soon are critical security updates applied to the systems that hold our information?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "week",
+                    "label": "Within a week"
+                  },
+                  {
+                    "key": "month",
+                    "label": "Within a month"
+                  },
+                  {
+                    "key": "longer",
+                    "label": "Longer, or it varies",
+                    "concern": true
+                  }
+                ]
+              },
+              {
+                "key": "vuln_scanning",
+                "label": "Do you scan those systems for weaknesses at least every month?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "malware",
+                "label": "Do your computers and servers have protection against malicious software that is kept current?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "logging",
+                "label": "Are access to our information and changes to your systems logged, and the logs kept at least a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "monitoring",
+                "label": "Are the logs watched for signs of attack at all hours?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              }
+            ]
+          },
+          {
+            "key": "incidents",
+            "title": "Incidents",
+            "questions": [
+              {
+                "key": "ir_plan",
+                "label": "Do you have an incident response plan, tested in the last year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "breach_notice",
+                "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "breach_last",
+                "label": "Have you had a security incident that had to be reported to customers or regulators in the last three years?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": true
+              },
+              {
+                "key": "breach_detail",
+                "label": "What happened, and what changed afterwards?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.breach_last",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "continuity",
+            "title": "Continuity",
+            "questions": [
+              {
+                "key": "backups",
+                "label": "Is our information backed up to a separate place, and is restoring it tested at least once a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "bc_plan",
+                "label": "Do you have a plan to keep the service running through a disaster, tested in the last year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false
+              },
+              {
+                "key": "recovery",
+                "label": "How soon could the service be running again after losing its main site?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "day",
+                    "label": "Within a day"
+                  },
+                  {
+                    "key": "week",
+                    "label": "Within a week"
+                  },
+                  {
+                    "key": "longer",
+                    "label": "Longer, or it is not known",
+                    "concern": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "others",
+            "title": "Others you use",
+            "questions": [
+              {
+                "key": "subprocessors",
+                "label": "Do others you use (subcontractors or cloud providers) hold or reach our information?",
+                "type": "yes_no",
+                "required": true
+              },
+              {
+                "key": "subprocessor_list",
+                "label": "Who are they, and what does each do?",
+                "type": "long_text",
+                "required": true,
+                "show_when": {
+                  "field": "answers.subprocessors",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              {
+                "key": "subprocessor_terms",
+                "label": "Do they agree to terms at least as strict as yours with us?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false,
+                "show_when": {
+                  "field": "answers.subprocessors",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              {
+                "key": "subprocessor_review",
+                "label": "Do you review their security at least once a year?",
+                "type": "yes_no",
+                "required": true,
+                "concern_if": false,
+                "show_when": {
+                  "field": "answers.subprocessors",
+                  "op": "eq",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "more",
+            "title": "Anything else",
+            "questions": [
+              {
+                "key": "notes",
+                "label": "Is there anything else we should know?",
+                "type": "long_text",
+                "required": false
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

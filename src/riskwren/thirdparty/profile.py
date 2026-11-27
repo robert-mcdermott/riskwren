@@ -17,7 +17,7 @@ from riskwren.access.principal import Principal
 from riskwren.db.models import ThirdParty
 from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import THIRD_PARTY
-from riskwren.thirdparty import services, tiering
+from riskwren.thirdparty import contacts, reviews, services, tiering
 
 UNTIERED = "none"
 
@@ -44,6 +44,12 @@ def _detail(session: Session, principal: Principal, third_party: ThirdParty) -> 
             "at": latest.assessed_at,
         },
         "can_tier": tiering.may_tier(session, principal, third_party),
+        # Its contacts' addresses are for those who keep it, assessors, and those who read
+        # everything; anyone else sees none.
+        "contacts": [reviews.contact_view(row) for row in contacts.of(session, third_party)]
+        if contacts.may_read(session, principal, third_party)
+        else None,
+        "reviews": reviews.of(session, principal, third_party),
     }
 
 

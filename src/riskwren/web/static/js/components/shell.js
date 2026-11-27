@@ -59,6 +59,7 @@ export const NAV = [
     items: [
       { href: "/third-parties", label: "Third parties", iconName: "third_party" },
       { href: "/services", label: "Services", iconName: "service" },
+      { href: "/reviews", label: "Due diligence", iconName: "file" },
     ],
   },
   {

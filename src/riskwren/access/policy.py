@@ -239,6 +239,23 @@ POLICIES.update(
         ("GET", "/api/v1/tiers"): Needs.MEMBER,
         ("GET", "/api/v1/third-parties/{ref}/tiering"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/tiering"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/contacts"): Needs.MEMBER,
+        ("PATCH", "/api/v1/contacts/{contact_id}"): Needs.MEMBER,
+        ("GET", "/api/v1/reviews"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/reviews"): Needs.MEMBER,
+        ("GET", "/api/v1/reviews/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/reviews/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/reviews/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/reviews/{ref}/history"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/send"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/withdraw"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/conclude"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/cancel"): Needs.MEMBER,
+        # Someone without an account, holding a link: each route finds the link by the token
+        # in its header and reaches that link's questionnaire and nothing else.
+        ("GET", "/api/v1/respond"): Needs.PUBLIC,
+        ("PUT", "/api/v1/respond"): Needs.PUBLIC,
+        ("POST", "/api/v1/respond/submit"): Needs.PUBLIC,
     }
 )
 

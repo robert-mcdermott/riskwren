@@ -12,7 +12,7 @@ These guides describe RiskWren 0.3.0. Read them in this order if you are new, or
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
 | 6 | [Policies](policies.md) | Whoever writes, approves, or keeps the organization's policies | Policies, standards, procedures, and guidelines; writing a version; approval; publishing; comparing versions; review; what a document governs; exceptions to a document; who a document applies to; the policy library; acknowledgment |
-| 7 | [Third parties](third-parties.md) | Whoever looks after the organization's suppliers and partners, most often the security office | Third parties and their services; what each reaches and handles; tiering by the program's rules |
+| 7 | [Third parties](third-parties.md) | Whoever looks after the organization's suppliers and partners, most often the security office | Third parties and their services; what each reaches and handles; tiering by the program's rules; contacts; due diligence questionnaires sent through a link that needs no account; reviewing the answers and their concerns |
 | 8 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, committee sessions, when someone leaves, reminders, the dashboards, the history, appearance |
 | 9 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
 | 10 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
@@ -61,6 +61,8 @@ These two are written from the code, so they always match the version they ship 
 | Who has not yet acknowledged the acceptable use policy? | [Who has acknowledged it](policies.md#who-has-acknowledged-it) |
 | Which suppliers hold our restricted information, and through what? | [Third parties and their services](third-parties.md#third-parties-and-their-services) |
 | Why is this supplier Tier 1? | [Tiering](third-parties.md#tiering) |
+| How do I send a supplier a security questionnaire without giving them an account? | [Send it](third-parties.md#send-it) |
+| Is the link we send a supplier safe? | [Send it](third-parties.md#send-it) |
 | How do I change appetite, the scales, or the review cadence? | [Shape the program](running-the-program.md#shape-the-program) |
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |

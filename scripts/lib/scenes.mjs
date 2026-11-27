@@ -216,6 +216,29 @@ export const SCENES = [
   { name: "service", as: "member", path: async (page) => `/services/${await first("/api/v1/services?q=participant+surveys")(page)}` },
   { name: "service-new", as: "bio_mgr", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=coldline")(page)}`,
     step: click("Add a service") },
+  { name: "reviews", as: "ciso", path: "/reviews?status=open" },
+  { name: "review-answered", as: "ciso", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=tallyfield")(page)}` },
+  { name: "review-conclude", as: "ciso", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=tallyfield")(page)}`,
+    step: click("Conclude") },
+  { name: "review-concluded", as: "auditor", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=quillon")(page)}` },
+  { name: "review-late", as: "ciso", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=lakeshore")(page)}` },
+  { name: "review-history", as: "auditor", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=tallyfield")(page)}?tab=history` },
+  { name: "third-party-diligence", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=tallyfield")(page)}?tab=diligence` },
+  { name: "third-party-contact", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=tallyfield")(page)}?tab=diligence`,
+    step: click("Add a contact") },
+  { name: "review-send", as: "ciso", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=genome")(page)}`,
+    step: click("Send it") },
+  // The page a contact sees, through a link sent just now.
+  { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
+      const me = (await (await fetch("/api/v1/session")).json()).data;
+      const review = (await (await fetch("/api/v1/reviews?q=genome")).json()).data[0];
+      const party = (await (await fetch("/api/v1/third-parties/" + review.third_party.ref)).json()).data;
+      const sent = await (await fetch("/api/v1/reviews/" + review.ref + "/send", { method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": me.csrf_token },
+        body: JSON.stringify({ contact_id: party.contacts[0].id }) })).json();
+      const url = new URL(sent.meta.link.url);
+      // A visit that differed only after "#" would not load the page again.
+      return url.pathname + "?visit=" + Date.now() + url.hash; })()`) },
   { name: "objectives", as: "president", path: "/objectives" },
   { name: "objective", as: "cro", path: async (page) => `/objectives/${await first("/api/v1/objectives?q=trust")(page)}` },
   { name: "objective-new", as: "president", path: "/objectives", step: click("Add an objective") },

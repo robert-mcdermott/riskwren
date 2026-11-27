@@ -2,7 +2,7 @@
 
 This guide is for whoever looks after the organization's suppliers, service providers, and partners: most often the security office, which asks how each handles the organization's information, and the units that rely on each.
 
-A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, and how much is at stake with it.
+A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, and what it says about itself when asked.
 
 ## Third parties and their services
 
@@ -47,3 +47,50 @@ The tier recorded is a judgment by a named person, like every rating in RiskWren
 The list of third parties sorts by tier, and can be cut to one tier or to those **not tiered**. A third party with no tier is listed in **Tidy** as missing one.
 
 The tiers, their review cadences, and their rules are part of the program. Their rules are written in the same condition language as a questionnaire's, over the answers and what the inventory says, and travel with the program when it is exported and imported. The questions are the built-in questionnaire **Third-party tiering**, which can be edited like any other under **Admin → Questionnaires**.
+
+## Due diligence
+
+A **review** (`DDR-0001`) asks a third party about itself: a questionnaire, sent to one of its contacts through a link, answered without an account, and read by someone here who records what they concluded. **Third parties → Due diligence** lists them all, and each third party's **Due diligence** tab lists its own, with its contacts.
+
+### Contacts
+
+A **contact** is a person at the third party who can be asked: a name, an email address, and their role there. Contacts are not accounts and never sign in. Those who keep the third party, and assessors, add them on its **Due diligence** tab, and say when one has left; the tab, and their addresses, are shown to those people and to those who read everything.
+
+### Start a review
+
+**Start a review** on the third party's **Due diligence** tab. The questionnaire is the one its tier names, as shipped:
+
+| Tier | Questionnaire |
+|---|---|
+| Tier 1 | **Due diligence: full**, about forty-five questions: governance, access, the organization's information, health information, building and changing the service, operations, incidents, continuity, and the others it uses |
+| Tier 2 | **Due diligence: standard**, about twenty-five questions on the same ground |
+| Tier 3 | **Due diligence: short**, eight questions |
+| Tier 4 | None: choose one if a review is wanted at all |
+
+The questionnaires are written for organizations in the United States: they ask about a business associate agreement where health information is involved, about notice of an incident within 72 hours, and where the information is held. They can be edited, or others added, under **Admin → Questionnaires**. A review records the tier when it was started, and asks the version of the questionnaire in use when it was first sent.
+
+### Send it
+
+**Send it** chooses the contact, the date the answers are wanted by (three weeks on, unless another is given), and how long the link lasts (30 days unless said, at most 90). The link is shown once, to copy, and is sent to the contact by email where [email](configuration.md#email) is set up.
+
+The link is the contact's way in, and nothing else is:
+
+- It is a long random token. Only a digest of it is kept, so nobody can read it back from the database, and a message that carried it is cleared once it has been sent.
+- The token follows a `#` in the address. Browsers never send that part to a server, so it is not in any server's or proxy's logs.
+- It opens one thing: the questionnaire of that review, as that contact. It reaches no other page, record, or route, and the contact has no account.
+- It stops working when it expires, when it is withdrawn (**Withdraw the link**), when the review is sent again with a new one, when the review is cancelled, and once the answers have been sent with it.
+- Guessing at links is slowed the way guessing at passwords is.
+
+![What a contact sees through the link: who is asking, by when, and the questions, with nothing else of the app](img/respond-light.webp)
+
+The contact sees who is asking, by when, and the questions, which show and hide as they answer like any questionnaire's. They can **save to finish later**, with the same link, and **send the answers**, which cannot be changed after. The history names them as acting by link.
+
+### Review the answers
+
+When the answers come in, the review's owners are told, and it waits on their Home. The review shows the answers as they were asked. Some answers are marked by the questionnaire as **concerns**: no second factor, critical updates applied only after a month or more, an incident reported in the last three years, information held outside the United States, no independent report. They are listed first, with how many of the answers the questionnaire marks are concerns. They are what to look at, and decide nothing.
+
+![A survey host's answers, with the five concerns among them listed first](img/review-answered-light.webp)
+
+**Conclude** records what was concluded: **approved**, **approved with conditions**, or **not approved**. Conditions, and a refusal, say what must change, or why.
+
+A review whose answers are late, or whose link expired or was withdrawn before anyone answered, waits on its owners' Home until it is sent again or cancelled.

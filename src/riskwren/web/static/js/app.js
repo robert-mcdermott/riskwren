@@ -31,6 +31,11 @@ async function boot() {
   }
   applyBranding(meta);
 
+  // Someone answering through a link they were sent: one page, and no account.
+  if (window.location.pathname === "/respond") {
+    (await import("./pages/respond.js")).respondPage(root, meta);
+    return;
+  }
   let me = null;
   try {
     me = (await peek("/api/v1/session")).data;
@@ -85,6 +90,8 @@ async function boot() {
     if (type !== "third_party") route(`/${path}/:ref`, page("record", "recordPage", type));
   }
   route("/third-parties/:ref", page("third-party", "thirdPartyPage"));
+  route("/reviews", page("reviews", "reviewList"));
+  route("/reviews/:ref", page("reviews", "reviewPage"));
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   route("/search", page("find", "searchPage"));
   route("/tidy", page("find", "tidyPage"));

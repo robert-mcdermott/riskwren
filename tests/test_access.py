@@ -389,8 +389,24 @@ for _route in (
     ("GET", "/api/v1/tiers"),
     ("GET", "/api/v1/third-parties/{ref}/tiering"),
     ("POST", "/api/v1/third-parties/{ref}/tiering"),
+    ("POST", "/api/v1/third-parties/{ref}/contacts"),
+    ("PATCH", "/api/v1/contacts/{contact_id}"),
+    ("GET", "/api/v1/reviews"),
+    ("POST", "/api/v1/third-parties/{ref}/reviews"),
+    ("GET", "/api/v1/reviews/{ref}"),
+    ("PATCH", "/api/v1/reviews/{ref}"),
+    ("PUT", "/api/v1/reviews/{ref}/owners"),
+    ("GET", "/api/v1/reviews/{ref}/history"),
+    ("POST", "/api/v1/reviews/{ref}/send"),
+    ("POST", "/api/v1/reviews/{ref}/withdraw"),
+    ("POST", "/api/v1/reviews/{ref}/conclude"),
+    ("POST", "/api/v1/reviews/{ref}/cancel"),
 ):
     REACH[_route] = EVERYONE
+# Through a link, without an account: reached by anyone, and answered by the link.
+for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
+               ("POST", "/api/v1/respond/submit")):  # fmt: skip
+    REACH[_route] = EVERYONE | {"nobody"}
 RUNNERS = {"manager", "assessor"}
 REACH[("GET", "/api/v1/campaigns")] = EVERYONE
 REACH[("POST", "/api/v1/campaigns")] = RUNNERS
@@ -525,6 +541,9 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 path = path.replace("{ref}", "ISS-9999")
             if template.startswith("/api/v1/exceptions"):
                 path = path.replace("{ref}", "EXC-9999")
+            if template.startswith("/api/v1/reviews"):
+                path = path.replace("{ref}", "DDR-9999")
+            path = path.replace("{contact_id}", "9999")
             for record_path, prefix in RECORD_PATHS.items():
                 if template.startswith(f"/api/v1/{record_path}"):
                     # A record that is not there: reached, and answered with "not found".

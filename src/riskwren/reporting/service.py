@@ -502,6 +502,29 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/agreements/{agreement.ref}", agreement.ends_on, ref=agreement.ref,
             )  # fmt: skip
 
+    # Due diligence: answers to read, and answers that are late or have no link to come by.
+    from riskwren.thirdparty import reviews
+
+    for review, state in reviews.waiting_on(session, principal):
+        if state == "answered":
+            add(
+                "review_answers", f"Read the answers: {review.name}",
+                f"{review.ref} · the concerns among them are listed first",
+                f"/reviews/{review.ref}", None, ref=review.ref,
+            )  # fmt: skip
+        elif state == "late":
+            add(
+                "review_chase", f"Chase the answers: {review.name}",
+                f"{review.ref} · they were wanted by now", f"/reviews/{review.ref}",
+                review.due_on, ref=review.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "review_chase", f"Send a new link: {review.name}",
+                f"{review.ref} · the link stopped working before anyone answered",
+                f"/reviews/{review.ref}", review.due_on, ref=review.ref,
+            )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 

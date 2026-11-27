@@ -218,3 +218,11 @@
 .reasons > li { padding-left: var(--space-3); border-left: 3px solid var(--border-strong); }
 .tier-by { margin-top: var(--space-3); }
 .tier-by { margin-top: var(--space-3); }
+
+/* The page someone without an account answers through a link: no menus, one column. */
+.respond { min-height: 100vh; background: var(--bg); }
+.respond-top { padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border); }
+.respond-top .sign-in-brand { margin-bottom: 0; font-size: var(--text-xl); }
+.respond-main { max-width: 46rem; margin: 0 auto; padding: var(--space-7) var(--space-5) var(--space-10); display: grid; gap: var(--space-5); }
+.respond-main h1 { margin: 0; }
+.respond-actions { padding-top: var(--space-3); }

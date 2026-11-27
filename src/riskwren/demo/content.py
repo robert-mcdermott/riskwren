@@ -798,6 +798,71 @@ TIERING_JUDGED: dict[str, tuple[str, str]] = {
 # institute's through a service on record.
 UNTIERED = ("funder1", "funder2", "funder3", "pharma1", "hospital", "univ2", "sub1")
 
+# The people at third parties who answer questionnaires. They are not accounts.
+CONTACTS: dict[str, list[tuple[str, str, str]]] = {
+    "recordco": [("Dana Whitcombe", "dana.whitcombe@pellham.example", "Director of information security")],
+    "cloud": [("Priya Raman", "trust@quillon.example", "Customer trust team"),
+              ("Marcus Hale", "marcus.hale@quillon.example", "Account manager")],
+    "financeco": [("Ines Okafor", "security@ledgerwell.example", "Security and compliance manager")],
+    "edcco": [("Tomasz Wierzbicki", "t.wierzbicki@castellan.example", "Head of quality and security")],
+    "backupco": [("Ruth Calloway", "compliance@stonebridge.example", "Compliance officer")],
+    "surveyco": [("Ana Ruiz", "ana.ruiz@tallyfield.example", "Security lead")],
+    "trackco": [("Kenji Mori", "kenji.mori@specimenledger.example", "Chief technology officer")],
+    "labref": [("Helen Ashdown", "privacy@lakeshorelab.example", "Privacy and security officer")],
+    "soc": [("Femi Adeyemi", "femi@lanternwatch.example", "Service delivery manager")],
+    "genomevault": [("Lars Nygaard", "access@genomecommons.example", "Data access committee")],
+    "elnco": [("Sophie Brandt", "security@foliobench.example", "Security engineer")],
+    "hrco": [("Olivia Grant", "trust@peoplebook.example", "Trust and safety")],
+}  # fmt: skip
+
+# Due diligence reviews: the third party, who keeps the review, the questionnaire (by tier
+# unless named), and when each step happened, in days before the build. ``saved`` is when
+# the contact saved some answers without sending them. ``answers`` departs from a sound
+# answer to every question; ``link_days`` is how long the link lasted.
+REVIEWS: list[dict[str, object]] = [
+    {"party": "elnco", "by": "assess1", "started": 420, "sent": 418, "answered": 409,
+     "concluded": 404, "conclusion": "approved", "note": None},
+    {"party": "recordco", "by": "ciso", "started": 335, "sent": 332, "answered": 318,
+     "concluded": 311, "conclusion": "approved", "note": None,
+     "answers": {"phi": True, "baa": True, "hipaa_assessment": True, "subprocessors": True,
+                 "subprocessor_list": "A hosting provider for the servers, and a support desk for out-of-hours calls.",
+                 "subprocessor_terms": True, "subprocessor_review": True,
+                 "certifications": ["soc2_type2", "hitrust", "pentest"]}},
+    {"party": "cloud", "by": "ciso", "started": 302, "sent": 300, "answered": 291,
+     "concluded": 286, "conclusion": "conditions",
+     "note": "Administrators of the institute's tenant to use security keys by the end of June; their own staff already do.",
+     "answers": {"mfa_admin": False, "certifications": ["soc2_type2", "iso27001", "fedramp"],
+                 "subprocessors": True, "subprocessor_list": "Data centre operators in three regions.",
+                 "subprocessor_terms": True, "subprocessor_review": True}},
+    {"party": "financeco", "by": "assess1", "started": 262, "sent": 260, "answered": 251,
+     "concluded": 246, "conclusion": "approved", "note": None},
+    {"party": "edcco", "by": "ciso", "started": 204, "sent": 201, "answered": 188,
+     "concluded": 181, "conclusion": "conditions",
+     "note": "Restores to be tested before the next trial starts, and the result sent to Clinical Research.",
+     "answers": {"backups": False, "phi": True, "baa": True, "hipaa_assessment": True,
+                 "recovery": "week"}},
+    {"party": "backupco", "by": "ciso", "started": 158, "sent": 156, "answered": 149,
+     "concluded": 145, "conclusion": "approved", "note": None,
+     "answers": {"phi": True, "baa": True, "hipaa_assessment": True}},
+    # Answered last week, with four concerns: waiting for the security leader.
+    {"party": "surveyco", "by": "ciso", "started": 33, "sent": 31, "saved": 15, "answered": 6,
+     "answers": {"us_only": False, "locations": "Survey responses are processed by our team in Dublin, Ireland.",
+                 "breach_last": True,
+                 "breach_detail": "In 2025 a misconfigured export exposed one customer's survey links for two days. Exports now need a second person's approval.",
+                 "patching": "longer", "subprocessors": True,
+                 "subprocessor_list": "A cloud hosting provider and an email delivery service.",
+                 "subprocessor_terms": True, "subprocessor_review": False,
+                 "phi": True, "baa": True, "hipaa_assessment": False}},
+    # Sent, with some answers saved and not yet sent.
+    {"party": "trackco", "by": "assess1", "started": 13, "sent": 12, "saved": 3, "due": -9},
+    # Answers late: the date has passed and the link still works.
+    {"party": "labref", "by": "ciso", "started": 44, "sent": 40, "due": 19, "link_days": 60},
+    # The link ran out before anyone answered.
+    {"party": "soc", "by": "assess1", "started": 22, "sent": 20, "due": -1, "link_days": 14},
+    # Started, not yet sent.
+    {"party": "genomevault", "by": "ciso", "started": 2},
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",
