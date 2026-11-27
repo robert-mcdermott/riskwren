@@ -367,6 +367,19 @@ def in_scope(scope: Scope) -> Any:
     return or_(_about("scope", [scope.id]), _about("control", used))
 
 
+def _span(value: Any) -> tuple[Any, Any] | None:
+    """A ``from..to`` filter as the first and last moment it covers, both days counted."""
+    from datetime import UTC, datetime, timedelta
+
+    from riskwren.insight.portfolio import parse_range
+
+    days = parse_range(value)
+    if days is None:
+        return None
+    start = datetime.combine(days[0], datetime.min.time(), tzinfo=UTC)
+    return start, datetime.combine(days[1], datetime.min.time(), tzinfo=UTC) + timedelta(days=1)
+
+
 def _conditions(session: Session, principal: Principal, filters: Mapping[str, Any]) -> list[Any]:
     found: list[Any] = []
     status = filters.get("status")
@@ -376,6 +389,17 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         found.append(Issue.status == status)
     if filters.get("overdue"):
         found += [Issue.status.in_(LIVE), Issue.due_on < utc_now().date()]
+    for name, column in (("raised", Issue.created_at), ("closed", Issue.closed_at)):
+        if filters.get(name):
+            window = _span(filters[name])
+            if window is None:
+                return [Issue.id < 0]
+            found += [column >= window[0], column < window[1]]
+    if filters.get("root_cause"):
+        found.append(Issue.root_cause == str(filters["root_cause"]))
+    if filters.get("framework"):
+        about = select(Requirement.id).join(Framework, Framework.id == Requirement.framework_id)
+        found.append(_about("requirement", about.where(Framework.key == str(filters["framework"]))))
     age = AGES.get(str(filters.get("age") or ""))
     if age is not None:
         # How long ago it was raised, in days: a band of the aging table.

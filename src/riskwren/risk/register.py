@@ -77,6 +77,19 @@ def _rating_order(name: str) -> Callable[[Session, Any], Any]:
     return column
 
 
+def _span(value: Any) -> tuple[Any, Any] | None:
+    """A ``from..to`` filter as the first and last moment it covers, both days counted."""
+    from datetime import UTC, datetime, timedelta
+
+    from riskwren.insight.portfolio import parse_range
+
+    days = parse_range(value)
+    if days is None:
+        return None
+    start = datetime.combine(days[0], datetime.min.time(), tzinfo=UTC)
+    return start, datetime.combine(days[1], datetime.min.time(), tzinfo=UTC) + timedelta(days=1)
+
+
 def _conditions(session: Session, principal: Principal, filters: Mapping[str, Any]) -> list[Any]:
     found: list[Any] = []
     if filters.get("category"):
@@ -112,6 +125,11 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
                 )
             )
         )
+    if filters.get("added"):
+        added = _span(filters["added"])
+        if added is None:
+            return [Risk.id < 0]
+        found += [Risk.created_at >= added[0], Risk.created_at < added[1]]
     if filters.get("above_appetite"):
         found.append(Risk.standing.in_(("treated", "accepted", "needs_decision")))
     if filters.get("overdue"):

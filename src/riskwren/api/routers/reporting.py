@@ -122,3 +122,18 @@ def show_measures(request: Request) -> dict[str, Any]:
     principal = current(request)
     with reading(request) as session:
         return envelope(measures.overview(session, principal))
+
+
+@router.get(
+    "/portfolio", summary="Risk and compliance by unit, category, framework, or third party"
+)
+def show_portfolio(
+    request: Request,
+    by: str = Query(default="unit", description="unit, category, framework, third_party, causes"),
+    period: str = Query(default="quarter", description="quarter, half, or year"),
+) -> dict[str, Any]:
+    from riskwren.insight import portfolio
+
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(portfolio.view(session, principal, by, period))

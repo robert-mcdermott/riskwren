@@ -321,6 +321,17 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         ]
     if filters.get("about") in ("control", "requirement", "document"):
         found.append(ExceptionRequest.subject_type == filters["about"])
+    if filters.get("framework"):
+        from riskwren.db.models import Framework, Requirement
+
+        found += [
+            ExceptionRequest.subject_type == "requirement",
+            ExceptionRequest.subject_id.in_(
+                select(Requirement.id)
+                .join(Framework, Framework.id == Requirement.framework_id)
+                .where(Framework.key == str(filters["framework"]))
+            ),
+        ]
     return found
 
 

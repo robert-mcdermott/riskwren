@@ -137,6 +137,10 @@ def list_issues(
     age: str | None = Query(
         default=None, description="Days since it was raised: 0-30, 31-90, 91-180, or 181+"
     ),
+    raised: str | None = Query(default=None, description="Raised in a period: FROM..TO"),
+    closed: str | None = Query(default=None, description="Closed in a period: FROM..TO"),
+    root_cause: str | None = None,
+    framework: str | None = Query(default=None, description="About a framework's requirements"),
     owner: int | None = None,
     mine: bool = MINE,
     sort: str = Query(default="due_on", description="A field name; prefix with - for descending"),
@@ -145,7 +149,8 @@ def list_issues(
 ) -> dict[str, Any]:
     filters = {"q": q, "unit": unit, "status": status, "severity": severity,
                "source_kind": source_kind, "about": about, "overdue": overdue, "age": age,
-               "owner": owner, "mine": mine}  # fmt: skip
+               "raised": raised, "closed": closed, "root_cause": root_cause,
+               "framework": framework, "owner": owner, "mine": mine}  # fmt: skip
     return list_records(request, ISSUE, filters, sort, limit, cursor)
 
 
@@ -251,6 +256,7 @@ def list_exceptions(
     ),
     scope: str | None = Query(default=None, description="A scope's reference"),
     document: str | None = Query(default=None, description="A document's reference"),
+    framework: str | None = Query(default=None, description="About a framework's requirements"),
     about: str | None = Query(default=None, description="control, requirement, or document"),
     owner: int | None = None,
     mine: bool = MINE,
@@ -261,7 +267,7 @@ def list_exceptions(
     cursor: str | None = None,
 ) -> dict[str, Any]:
     filters = {"q": q, "unit": unit, "state": state, "scope": scope, "document": document,
-               "about": about, "owner": owner, "mine": mine}  # fmt: skip
+               "about": about, "framework": framework, "owner": owner, "mine": mine}  # fmt: skip
     return list_records(request, EXCEPTION, filters, sort, limit, cursor)
 
 

@@ -12558,6 +12558,24 @@
             }
           },
           {
+            "description": "About a framework's requirements",
+            "in": "query",
+            "name": "framework",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "About a framework's requirements",
+              "title": "Framework"
+            }
+          },
+          {
             "description": "control, requirement, or document",
             "in": "query",
             "name": "about",
@@ -15970,6 +15988,76 @@
             }
           },
           {
+            "description": "Raised in a period: FROM..TO",
+            "in": "query",
+            "name": "raised",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Raised in a period: FROM..TO",
+              "title": "Raised"
+            }
+          },
+          {
+            "description": "Closed in a period: FROM..TO",
+            "in": "query",
+            "name": "closed",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Closed in a period: FROM..TO",
+              "title": "Closed"
+            }
+          },
+          {
+            "in": "query",
+            "name": "root_cause",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Root Cause"
+            }
+          },
+          {
+            "description": "About a framework's requirements",
+            "in": "query",
+            "name": "framework",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "About a framework's requirements",
+              "title": "Framework"
+            }
+          },
+          {
             "in": "query",
             "name": "owner",
             "required": false,
@@ -17800,6 +17888,65 @@
         "summary": "Cancel a treatment plan, with the reason",
         "tags": [
           "treatment"
+        ]
+      }
+    },
+    "/api/v1/portfolio": {
+      "get": {
+        "operationId": "show_portfolio_api_v1_portfolio_get",
+        "parameters": [
+          {
+            "description": "unit, category, framework, third_party, causes",
+            "in": "query",
+            "name": "by",
+            "required": false,
+            "schema": {
+              "default": "unit",
+              "description": "unit, category, framework, third_party, causes",
+              "title": "By",
+              "type": "string"
+            }
+          },
+          {
+            "description": "quarter, half, or year",
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "quarter",
+              "description": "quarter, half, or year",
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Portfolio Api V1 Portfolio Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Risk and compliance by unit, category, framework, or third party",
+        "tags": [
+          "reporting"
         ]
       }
     },
@@ -20769,6 +20916,24 @@
               "default": false,
               "title": "In Doubt",
               "type": "boolean"
+            }
+          },
+          {
+            "description": "Raised in a period: FROM..TO",
+            "in": "query",
+            "name": "added",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Raised in a period: FROM..TO",
+              "title": "Added"
             }
           },
           {

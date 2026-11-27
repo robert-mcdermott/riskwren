@@ -252,6 +252,11 @@ export const SCENES = [
   { name: "issue-finding", as: "ciso", path: async (page) => `/issues/${await first("/api/v1/issues?q=phished")(page)}` },
   { name: "graph-subcontractor", as: "ciso", path: async (page) => `/graph/${await first("/api/v1/third-parties?q=quillon")(page)}` },
   { name: "measures", as: "cro", path: "/measures" },
+  { name: "portfolio", as: "cro", path: "/portfolio" },
+  { name: "portfolio-framework", as: "ciso", path: "/portfolio?by=framework" },
+  { name: "portfolio-third-party", as: "ciso", path: "/portfolio?by=third_party&period=year" },
+  { name: "portfolio-causes", as: "auditor", path: "/portfolio?by=causes&period=year" },
+  { name: "portfolio-member", as: "member", path: "/portfolio?by=category" },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

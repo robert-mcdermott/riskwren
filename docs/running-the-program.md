@@ -336,6 +336,22 @@ Each measure has a **trend**: the organization's figure from a snapshot the sche
 
 ![Measures: each figure with what it counts, its trend over the quarter, and how far it moved](img/measures-light.webp)
 
+### Portfolio
+
+**Reports → Portfolio** cuts the register and compliance the ways leadership asks, over the last quarter, half year, or year:
+
+| View | Each row | Its figures |
+|---|---|---|
+| By unit | Each unit beneath the organization, with everything beneath it | Open risks, above appetite, needing a decision, risks added in the period; open and overdue issues, issues raised and closed in the period; exceptions in force |
+| By category | Each family of risk, with its appetite | Open risks, above appetite, needing a decision, ratings in doubt, reviews overdue, risks added in the period |
+| By framework | Each framework a scope is held to, with those scopes | How much of what applies is verified or in place; open and overdue issues about its requirements, issues raised and closed in the period; exceptions to its requirements in force |
+| By third party | Each third party in the two highest tiers | Open risks that concern it, open issues about it, issues raised in the period, sharing no agreement covers; its next review |
+| Issues and their causes | | Issues closed in the period by why they happened, raised in the period by what found them, open now by how long ago they were raised, and a year of issues raised and closed month by month |
+
+As everywhere, each figure counts only what you may see, and opens its list with the same filters: the lists of risks and issues can be cut to a period (`added`, `raised`, `closed`), a root cause, or a framework's requirements.
+
+![The portfolio by unit: each unit's risks, issues, and exceptions, with what was added, raised, and closed in the quarter](img/portfolio-light.webp)
+
 The calendar is caught up every hour by [scheduled work](configuration.md#scheduled-work): when an acceptance expires or a plan runs late, the risk's standing is updated, and the history records that as done by the system. Reading the register catches it up as well, so a figure is never behind the date even where the scheduler is turned off.
 
 ## The history

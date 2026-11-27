@@ -77,6 +77,7 @@ export const NAV = [
       { href: "/compliance", label: "Compliance", iconName: "shield-check" },
       { href: "/dashboard", label: "Risk", iconName: "chart" },
       { href: "/measures", label: "Measures", iconName: "chart", when: "read_all" },
+      { href: "/portfolio", label: "Portfolio", iconName: "grid" },
       { href: "/tidy", label: "Tidy", iconName: "check" },
       { href: "/sessions", label: "Committee sessions", iconName: "session" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },

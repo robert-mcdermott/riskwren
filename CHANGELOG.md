@@ -15,6 +15,11 @@ Wave 6, *Insight*.
   may see it, opening the list it counts. A daily snapshot, taken by the scheduler, gives each
   a trend over the last quarter. **Reports → Measures**, for managers, auditors, and
   administrators.
+- **The portfolio:** the register and compliance by unit, category, framework, and third
+  party over the last quarter, half year, or year, and issues by root cause, source, and age
+  with a year month by month. Every figure opens its list. **Reports → Portfolio**.
+- **Lists cut to a period:** risks by when they were added, issues by when they were raised
+  or closed, issues by root cause, and issues and exceptions about a framework's requirements.
 
 ## 0.5.0 (2026-11-27)
 

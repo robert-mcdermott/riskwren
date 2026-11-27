@@ -33,14 +33,16 @@ The wave is done when, on a fresh checkout:
 
 **Done:** sixteen measures are defined in `riskwren.insight.measures`, in five groups, each with what it counts in words, the record type and filters of the list it opens (or, for the stops, the coverage page), and whether fewer is better. A figure is worked out by the list's own conditions for the person asking (`reporting.count`, the action search, or the stops they may see), so it equals the length of the list it opens. The scheduler's new job, Measures, takes a snapshot every six hours of each measure for the whole organization (`measure_snapshot`, one row per measure and day, unaudited, the day's earlier one replaced). **Reports → Measures** shows each with its figure, a line of the last quarter's snapshots with its first and last figures in words, and how far it moved, marked better or worse by its direction; it is for those who read everything, since the trends are the organization's. The demo takes a snapshot each week of its last half year as its history happens, and one on the day it is built. The acceptance tests are `tests/test_measures.py::test_each_figure_is_the_length_of_the_list_it_opens` and `::test_a_snapshot_taken_twice_in_a_day_keeps_one`.
 
-### Slice 2: Portfolio ☐
+### Slice 2: Portfolio ☑
 
 **Goal:** the register and compliance, cut every way leadership asks.
 
-- [ ] Views by unit, category, framework, and third party, over a chosen period, each figure drilling down to records
-- [ ] Issues by root cause, age, and source over time
+- [x] Views by unit, category, framework, and third party, over a chosen period, each figure drilling down to records
+- [x] Issues by root cause, age, and source over time
 
 **Acceptance:** every figure in a view opens exactly the records it counts.
+
+**Done:** `riskwren.insight.portfolio` builds five views over the last quarter, half year, or year: by unit (the units beneath the organization), by category (each family of risk), by framework (each framework a scope the person may see is held to, with how much of what applies is verified or in place), by third party (those in the two highest tiers, with their next review and the sharing no agreement covers), and issues by root cause, source, and age, with twelve months raised and closed. Each figure is `reporting.count` over the list's own conditions for the person, with the list's path and filters; rows with nothing in them are left out. New list filters make each figure openable: risks `added`, issues `raised` and `closed` (each `FROM..TO`, both days counted), issues `root_cause` and `framework`, and exceptions `framework`. **Reports → Portfolio** is open to everyone, counting only what each may see. The acceptance test is `tests/test_portfolio.py::test_every_figure_opens_exactly_the_records_it_counts`, which opens every figure of every view and period as three roles.
 
 ### Slice 3: Leadership report ☐
 

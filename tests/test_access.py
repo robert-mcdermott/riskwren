@@ -442,6 +442,7 @@ for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/measures")] = {"admin", "manager", "auditor"}
+REACH[("GET", "/api/v1/portfolio")] = EVERYONE
 REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():
