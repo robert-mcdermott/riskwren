@@ -1076,6 +1076,16 @@ ENGAGEMENTS = [
          (219, "auditor2", "it_mgr", "The backup job history for research storage for the last twelve months, as exported from the backup console.", 10,
           (214, "Exported the job history for every night of the twelve months and attached the summary report."), 212),
      ],
+     "findings": [
+         # raised (days ago), by, name, what was found, severity, owner, the action plan
+         # (title, due days after raising, done days ago), and its closure (proposed days ago,
+         # what was done, why it happened, confirmed by audit days ago)
+         (188, "auditor2", "Empty backups go unnoticed", "Two of twelve sampled nightly backups of research storage finished with no data, and nobody was told.", "high", "it_mgr",
+          [("Alert the on-call engineer when any backup finishes with no data", 25, 152)],
+          (149, "Every backup job now alerts the on-call engineer if it finishes with no data; tested by emptying a job on purpose.", "technology", 141)),
+         (188, "auditor", "No full restore of research storage in two years", "Partial restores are done on request, but research storage has not been restored in full since the cluster moved.", "moderate", "it_mgr",
+          [("Restore research storage in full to the test system, and record how long it takes", 70, None)], None),
+     ],
      "summary": "Backups of research storage are taken as scheduled, but two empty backups went unnoticed, a full restore has not been tested in two years, and one person who has left could still delete backups. Management has agreed to check every backup, test a full restore this year, and review backup administrators each quarter.",
      "opinion": "needs_improvement"},
     {"name": "Clinical systems: access and change", "lead": "auditor2", "members": ["auditor"],
@@ -1089,7 +1099,7 @@ ENGAGEMENTS = [
           "Read fifteen changes to the electronic health record and their tickets.",
           "Each change was approved and tested; one emergency change was approved the next day, as the procedure allows.", "auditor", "auditor2", None),
      ],
-     "requests": [],
+     "requests": [], "findings": [],
      "summary": "Access to the clinic's systems is approved before it is given, and changes are approved and tested as the procedure says.",
      "opinion": "effective"},
     {"name": "Trial data vendor oversight", "lead": "auditor", "members": ["auditor2"],
@@ -1110,6 +1120,7 @@ ENGAGEMENTS = [
           (101, "One condition: a tested restore before the next trial starts. It is an open finding with the vendor, due next month; the report we rely on is attached."), None),
          (20, "auditor2", "ciso", "The business associate agreement with Castellan Trial Systems, or the reason none is needed.", 14, None, None),
      ],
+     "findings": [],
      "summary": None, "opinion": None},
 ]  # fmt: skip
 

@@ -2123,6 +2123,7 @@ class Builder:
 
         from riskwren.db.models import AuditRequest, Engagement, ReviewNote, Workpaper
         from riskwren.internal_audit import engagements
+        from riskwren.internal_audit import findings as audit_findings
         from riskwren.internal_audit import requests as audit_requests
 
         def find(session: Session, name: str) -> Engagement:
@@ -2139,6 +2140,14 @@ class Builder:
             for key in ("reporting", "reported"):
                 if spec[key]:
                     steps.append((spec[key], order, ("advance", spec)))
+            for index, raised in enumerate(spec["findings"]):
+                steps.append((raised[0], order, ("finding", spec, index)))
+                for done in raised[6]:
+                    if done[2] is not None:
+                        steps.append((done[2], order, ("finish", spec, index)))
+                if raised[7]:
+                    steps.append((raised[7][0], order, ("propose", spec, index)))
+                    steps.append((raised[7][3], order, ("confirm", spec, index)))
             for index, asked in enumerate(spec["requests"]):
                 steps.append((asked[0], order, ("ask", spec, index)))
                 if asked[5]:
@@ -2165,6 +2174,40 @@ class Builder:
                     engagements.advance(session, who, found, {"summary": spec["summary"],
                                                               "opinion": spec["opinion"]})  # fmt: skip
                 self.tally(f"engagements {found.status}")
+            elif what[0] in ("finding", "finish", "propose", "confirm"):
+                _, by, name, summary, severity, owner, plan, closure = spec["findings"][what[2]]
+                if what[0] == "finding":
+                    with self.act(self.cast[by]) as (session, who):
+                        found = find(session, spec["name"])
+                        issue = audit_findings.raise_finding(session, who, found, {
+                            "name": name, "summary": summary, "severity": severity,
+                            "owner_id": self.cast[owner]})  # fmt: skip
+                        issue_id = issue.id
+                    with self.act(self.cast[owner]) as (session, who):
+                        for title, due_in, _ in plan:
+                            issues.add_action(session, who, session.get(Issue, issue_id), title=title,
+                                              owner_id=self.cast[owner],
+                                              due_on=self.today + timedelta(days=due_in))  # fmt: skip
+                    self.tally("audit findings")
+                    continue
+                with self.db.read() as session:
+                    issue_id = session.scalars(select(Issue.id).where(Issue.name == name)).one()
+                if what[0] == "finish":
+                    with self.act(self.cast[owner]) as (session, who):
+                        for action in session.scalars(select(Action).where(
+                                Action.source_type == "issue", Action.source_id == issue_id)):  # fmt: skip
+                            treatment.update_action(session, who, action, {"status": "done"})
+                elif what[0] == "propose":
+                    with self.act(self.cast[owner]) as (session, who):
+                        issues.propose(session, who, session.get(Issue, issue_id),
+                                       note=closure[1], root_cause=closure[2])  # fmt: skip
+                else:
+                    with self.act(self.cast["auditor2" if by == "auditor" else "auditor"]) as (
+                        session,
+                        who,
+                    ):
+                        issues.validate(session, who, session.get(Issue, issue_id), confirm=True,
+                                        note="Seen alerting on a test job.")  # fmt: skip
             elif what[0] in ("ask", "answer", "accept"):
                 _, by, of, text, due_in, answered, _ = spec["requests"][what[2]]
                 if what[0] == "ask":

@@ -2009,49 +2009,6 @@
         "title": "ExternalRefBody",
         "type": "object"
       },
-      "FindingBody": {
-        "properties": {
-          "name": {
-            "maxLength": 400,
-            "title": "Name",
-            "type": "string"
-          },
-          "owner_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Who here puts it right",
-            "title": "Owner Id"
-          },
-          "severity": {
-            "description": "critical, high, moderate, or low",
-            "title": "Severity",
-            "type": "string"
-          },
-          "summary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Summary"
-          }
-        },
-        "required": [
-          "name",
-          "severity"
-        ],
-        "title": "FindingBody",
-        "type": "object"
-      },
       "FrameworkBody": {
         "description": "A framework of the organization's own. On a change, send only what changes.",
         "properties": {
@@ -6412,6 +6369,54 @@
         "title": "AnswerBody",
         "type": "object"
       },
+      "riskwren__api__routers__internal_audit__FindingBody": {
+        "properties": {
+          "name": {
+            "description": "The finding, in a line",
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "owner_id": {
+            "description": "The manager who answers for putting it right",
+            "title": "Owner Id",
+            "type": "integer"
+          },
+          "severity": {
+            "description": "critical, high, moderate, or low",
+            "title": "Severity",
+            "type": "string"
+          },
+          "subjects": {
+            "description": "Controls or risks it is about",
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What was found",
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "name",
+          "severity",
+          "owner_id"
+        ],
+        "title": "FindingBody",
+        "type": "object"
+      },
       "riskwren__api__routers__internal_audit__PlanBody": {
         "properties": {
           "ends_on": {
@@ -6811,6 +6816,49 @@
           "answers"
         ],
         "title": "AnswersBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__third_parties__FindingBody": {
+        "properties": {
+          "name": {
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who here puts it right",
+            "title": "Owner Id"
+          },
+          "severity": {
+            "description": "critical, high, moderate, or low",
+            "title": "Severity",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "name",
+          "severity"
+        ],
+        "title": "FindingBody",
         "type": "object"
       },
       "riskwren__api__routers__third_parties__ReviewBody": {
@@ -9710,6 +9758,50 @@
           }
         },
         "summary": "Close a plan whose period is over",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/plans/{ref}/committee-report": {
+      "get": {
+        "operationId": "committee_report_api_v1_audit_plans__ref__committee_report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Committee Report Api V1 Audit Plans  Ref  Committee Report Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A plan's engagements, findings by severity, and what is past its date",
         "tags": [
           "internal audit"
         ]
@@ -13459,6 +13551,60 @@
           }
         },
         "summary": "Drop a planned engagement, with the reason",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/findings": {
+      "post": {
+        "operationId": "raise_finding_api_v1_engagements__ref__findings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__FindingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Raise Finding Api V1 Engagements  Ref  Findings Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise a finding as an issue",
         "tags": [
           "internal audit"
         ]
@@ -21712,7 +21858,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FindingBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__FindingBody"
               }
             }
           },

@@ -300,6 +300,8 @@ POLICIES.update(
         ("POST", "/api/v1/audit/requests/{request_id}/answer"): Needs.MEMBER,
         ("POST", "/api/v1/audit/requests/{request_id}/accept"): Needs.AUDIT,
         ("POST", "/api/v1/audit/requests/{request_id}/return"): Needs.AUDIT,
+        ("POST", "/api/v1/engagements/{ref}/findings"): Needs.AUDIT,
+        ("GET", "/api/v1/audit/plans/{ref}/committee-report"): Needs.MEMBER,
         # Dossiers and a scope's plans hold what the person may see, checked by the record.
         ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
         ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,
@@ -464,7 +466,8 @@ POLICIES.update(
         ("POST", "/api/v1/issues/{ref}/actions"): Needs.MEMBER,
         ("POST", "/api/v1/issues/{ref}/due-date"): Needs.MEMBER,
         ("POST", "/api/v1/issues/{ref}/closure"): Needs.MEMBER,
-        ("POST", "/api/v1/issues/{ref}/validation"): Needs.ASSESS,
+        # Assessors and managers confirm closures; auditors confirm their own findings.
+        ("POST", "/api/v1/issues/{ref}/validation"): Needs.MEMBER,
         ("POST", "/api/v1/issues/{ref}/cancellation"): Needs.ASSESS,
         ("POST", "/api/v1/issues/{ref}/reopening"): Needs.ASSESS,
         ("GET", "/api/v1/scopes/{ref}/plan-of-action"): Needs.MEMBER,

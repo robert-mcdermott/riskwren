@@ -6,6 +6,7 @@ import { button, h } from "../core/dom.js";
 import { date } from "../core/format.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { banner, checkbox, field, section, select, submit } from "../components/form.js";
+import { issueStatus, SEVERITY, severityPill } from "../components/issue.js";
 import { personField } from "../components/people-picker.js";
 import { openOverlay } from "../components/overlay.js";
 import { toast } from "../components/toast.js";
@@ -182,6 +183,7 @@ export function planPage(main, { ref }) {
     load: async () => (await get(`/api/v1/audit/plans/${ref}`, null, { fresh: true })).data,
     view: (plan, reload) => {
       const actions = h("div", { class: "row-sm wrap" },
+        h("a", { class: "btn", href: `/audit/plans/${plan.ref}/committee-report` }, "Committee report"),
         plan.can.work ? button("Plan an engagement", { kind: "btn-primary", iconName: "plus", onclick: () => engagementForm(plan, reload) }) : null,
         plan.can.approve ? button("Approve the plan", { onclick: () => ask("Approve the plan", "On whose authority, and when", { required: false, run: (note) => post(`/api/v1/audit/plans/${plan.ref}/approve`, { note: note || null }), done: reload }) }) : null,
         plan.can.close ? button("Close the plan", { kind: "btn-ghost", onclick: async () => { await post(`/api/v1/audit/plans/${plan.ref}/close`); toast("Closed."); reload(); } }) : null);
@@ -371,6 +373,7 @@ export function engagementPage(main, { ref }) {
             data.started_on ? h("p", { class: "subtle" }, `Started ${date(data.started_on)}${data.fieldwork_on ? `; fieldwork from ${date(data.fieldwork_on)}` : ""}${data.reported_on ? `; reported ${date(data.reported_on)}` : ""}.`) : null)),
         data.report ? card({ title: `Report: ${data.report.opinion_label}` }, h("p", {}, data.report.summary)) : null,
         data.scope_note ? card({ title: "What it covers" }, h("p", {}, data.scope_note)) : null,
+        data.restricted ? null : findingsCard(data, reload),
         data.restricted ? null : requestsCard(data, reload),
         data.restricted ? null : data.workpapers.length ? h("div", { class: "stack" }, h("h2", {}, "Program of work"), data.workpapers.map((paper) => workpaper(data, paper, reload)))
           : data.status !== "planned" && data.status !== "dropped" ? emptyState({ iconName: "file", title: "No steps yet", text: "Plan the work as steps; each has a workpaper." }) : null);
@@ -456,6 +459,80 @@ export function requestPage(main, { id }) {
           more.node, h("div", { class: "row" }, go)));
       }
       return h("div", { class: "stack-lg" }, header, asked, form, answered);
+    },
+  });
+}
+
+
+// --- Findings and the committee report ---------------------------------------------------
+
+function findingForm(engagement, onDone) {
+  openOverlay({ title: "Raise a finding", subtitle: `${engagement.ref} · ${engagement.name}. It is an issue in the register, shared with management to agree its action plan; internal audit confirms its closure.`,
+    render: (body, footer, close) => {
+      const name = field("Finding", { required: true, maxlength: 200, hint: "In a line, such as “Backups are not checked”." });
+      const summary = field("What was found", { type: "textarea", rows: 4 });
+      const severity = select("Severity", Object.entries(SEVERITY).map(([key, [label]]) => [key, label]), { value: "moderate", hint: "Its date follows from its severity, as for any issue." });
+      const owner = personField("Answers for putting it right", { hint: "The manager who agrees and owns the action plan." });
+      const problem = banner();
+      const go = button("Raise it", { kind: "btn-primary" });
+      go.addEventListener("click", async () => {
+        const done = await submit({ button: go, banner: problem, fields: { name, summary, severity, owner_id: owner },
+          run: () => post(`/api/v1/engagements/${engagement.ref}/findings`, { name: name.input.value, summary: summary.input.value || null,
+            severity: severity.input.value, owner_id: owner.value() }) });
+        if (!done) return;
+        close();
+        toast("Raised. Its owner is told.");
+        onDone();
+      });
+      body.append(h("div", { class: "stack-lg" }, problem, name.node, summary.node, severity.node, owner.node));
+      footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
+function findingsCard(engagement, reload) {
+  const raising = engagement.can.work && ["fieldwork", "reporting"].includes(engagement.status);
+  if (!engagement.findings.length && !raising) return null;
+  return card({ title: "Findings", flush: engagement.findings.length > 0, actions: raising ? button("Raise a finding", { kind: "btn-sm", onclick: () => findingForm(engagement, reload) }) : null },
+    engagement.findings.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Finding"), h("th", { scope: "col" }, "Severity"), h("th", { scope: "col" }, "Due"), h("th", { scope: "col" }, "Where it stands"))),
+      h("tbody", {}, engagement.findings.map((item) => h("tr", {},
+        h("td", {}, h("a", { class: "cell-main", href: `/issues/${item.ref}` }, item.name), h("div", { class: "cell-sub mono" }, item.ref)),
+        h("td", {}, severityPill(item.severity)), h("td", {}, date(item.due_on)), h("td", {}, issueStatus(item)))))))
+      : h("p", { class: "muted" }, "None raised yet."));
+}
+
+export function committeeReport(main, { ref }) {
+  return show(main, {
+    title: `${ref} committee report`,
+    load: async () => (await get(`/api/v1/audit/plans/${ref}/committee-report`, null, { fresh: true })).data,
+    view: (data) => {
+      const counted = Object.entries(data.counts).filter(([, n]) => n).map(([key, n]) => `${n} ${data.statuses[key].toLowerCase()}`).join(", ");
+      return h("div", { class: "stack-lg" },
+        h("a", { class: "back-link no-print", href: `/audit/plans/${data.plan.ref}` }, data.plan.name),
+        pageHeader({ eyebrow: `Report to the audit committee · ${date(data.on)}`, title: data.plan.name,
+          lede: `${date(data.plan.starts_on)} to ${date(data.plan.ends_on)}. ${data.plan.approved_by ? `Approved by ${data.plan.approved_by} on ${date(data.plan.approved_at)}.` : "Not yet approved."} Engagements: ${counted || "none"}.`,
+          actions: button("Print", { kind: "btn-secondary no-print", onclick: () => window.print() }) }),
+        card({ title: "Engagements", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
+          h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Engagement"), h("th", { scope: "col" }, "What it audits"), h("th", { scope: "col" }, "Where it stands"),
+            h("th", { scope: "col" }, "Opinion"), h("th", { scope: "col", class: "numeric" }, "Findings"), h("th", { scope: "col", class: "numeric" }, "Still open"))),
+          h("tbody", {}, data.engagements.map((row) => h("tr", {},
+            h("td", {}, h("a", { class: "cell-main", href: `/audit/engagements/${row.ref}` }, row.name), h("div", { class: "cell-sub mono" }, row.ref)),
+            h("td", {}, row.entity.name, h("div", { class: "cell-sub" }, row.entity.kind_label)),
+            h("td", {}, row.status_label, row.reported_on ? h("div", { class: "cell-sub" }, date(row.reported_on)) : null),
+            h("td", {}, row.opinion ?? h("span", { class: "subtle" }, "—")),
+            h("td", { class: "numeric" }, String(row.findings)), h("td", { class: "numeric" }, String(row.open)))))))),
+        card({ title: "Findings by severity", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
+          h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Severity"), h("th", { scope: "col", class: "numeric" }, "Open"), h("th", { scope: "col", class: "numeric" }, "Closed"))),
+          h("tbody", {}, data.severities.map((row) => h("tr", {}, h("td", {}, severityPill(row.key)),
+            h("td", { class: "numeric" }, String(row.open)), h("td", { class: "numeric" }, String(row.closed)))))))),
+        card({ title: "Past their date" },
+          data.late_findings.length || data.late_actions.length ? h("div", { class: "stack" },
+            data.late_findings.length ? h("div", {}, h("h3", {}, "Findings"), h("ul", { class: "plain-list stack-sm" }, data.late_findings.map((item) =>
+              h("li", {}, h("a", { class: "mono", href: `/issues/${item.ref}` }, item.ref), ` ${item.name} (${item.severity.toLowerCase()}, ${item.unit ?? ""}) — ${item.days} days late`)))) : null,
+            data.late_actions.length ? h("div", {}, h("h3", {}, "Management's actions"), h("ul", { class: "plain-list stack-sm" }, data.late_actions.map((item) =>
+              h("li", {}, h("span", { class: "mono" }, item.ref), ` ${item.title}, for ${item.finding} — ${item.days} days late`)))) : null)
+            : h("p", { class: "muted" }, "Nothing is past its date.")));
     },
   });
 }

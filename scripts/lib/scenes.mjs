@@ -275,6 +275,8 @@ export const SCENES = [
   { name: "audit-engagement", as: "auditor", path: "/audit/engagements/AUD-0003" },
   { name: "audit-engagement-restricted", as: "cro", path: "/audit/engagements/AUD-0003" },
   { name: "audit-engagement-reported", as: "cro", path: "/audit/engagements/AUD-0001" },
+  { name: "audit-committee-report", as: "president", path: "/audit/plans/APL-0001/committee-report" },
+  { name: "audit-finding", as: "cro", path: async (page) => `/issues/${await first("/api/v1/issues?q=full+restore")(page)}` },
   { name: "audit-request", as: "ciso", path: async (page) => `/audit/requests/${await first("/api/v1/home", "(data) => data.items.find((item) => item.kind === 'audit_request').href.split('/').pop()")(page)}` },
   { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },
   { name: "risk-estimate", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=estimate` },

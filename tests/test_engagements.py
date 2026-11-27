@@ -182,3 +182,48 @@ def test_a_request_is_answered_by_the_person_asked_and_accepted_by_the_team(
     with db.read() as session:
         events = session.scalars(select(Event).where(Event.subject_type == "audit_request")).all()
         assert events and all(secret not in str(event.changes) for event in events)
+
+
+def test_a_finding_is_an_issue_that_audit_confirms_closed(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    ref, ids = planned(as_role, people, db)
+    chief, member = as_person(as_role, "Chief Auditor"), as_role("auditor")
+    path = f"/api/v1/engagements/{ref}"
+    chief.post(
+        f"{path}/start", json={"lead": ids["Chief Auditor"], "members": [ids["Auditor Person"]]}
+    )
+    member.post(f"{path}/workpapers", json={"title": "Backups are taken"})
+    early = member.post(f"{path}/findings", json={"name": "x", "severity": "high",
+                        "owner_id": people.accounts["steward"]})  # fmt: skip
+    assert early.status_code == 409  # not during planning
+    chief.post(f"{path}/advance", json={})
+    raised = member.post(f"{path}/findings", json={
+        "name": "Backups are not checked", "summary": "Two empty backups went unnoticed.",
+        "severity": "high", "owner_id": people.accounts["steward"]})  # fmt: skip
+    assert raised.status_code == 201, raised.text
+    finding = raised.json()["data"]["findings"][0]
+    assert finding["severity"] == "high" and finding["status"] == "open"
+    issue = f"/api/v1/issues/{finding['ref']}"
+    shown = as_role("manager").get(issue).json()["data"]
+    assert shown["source"]["engagement"]["ref"] == ref and shown["source_kind"] == "audit"
+
+    steward = as_role("steward")
+    proposed = steward.post(f"{issue}/closure", json={"note": "Every backup is now checked.",
+                            "root_cause": "procedure"})  # fmt: skip
+    assert proposed.status_code == 200, proposed.text
+    assert (
+        as_role("assessor").post(f"{issue}/validation", json={"confirm": True}).status_code == 403
+    )
+    assert as_role("manager").post(f"{issue}/validation", json={"confirm": True}).status_code == 403
+    home = member.get("/api/v1/home").json()["data"]["items"]
+    assert any(item["kind"] == "closure" and finding["ref"] in item["href"] for item in home)
+    closed = member.post(f"{issue}/validation", json={"confirm": True})
+    assert closed.status_code == 200 and closed.json()["data"]["status"] == "closed"
+
+    plan = member.get(path).json()["data"]["plan"]["ref"]
+    report = as_role("manager").get(f"/api/v1/audit/plans/{plan}/committee-report").json()["data"]
+    high = next(row for row in report["severities"] if row["key"] == "high")
+    assert high["closed"] == 1 and high["open"] == 0
+    assert report["engagements"][0]["findings"] == 1 and report["late_findings"] == []
+    assert as_role("steward").get(f"/api/v1/audit/plans/{plan}/committee-report").status_code == 403

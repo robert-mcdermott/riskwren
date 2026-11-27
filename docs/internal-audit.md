@@ -71,6 +71,18 @@ They answer in words, with evidence, or both. The evidence already kept about th
 
 Until an engagement is reported, its work is its team's alone. Others who may read the plans see that it exists, who is on it, and where it stands, and nothing of what it covers, what was done, or what was found; neither does another auditor who is not on its team. The history records every change to a workpaper, a review note, and a request, but keeps their words out of it, so that reading the history does not undo that. Once the report is issued, the whole of it opens to those who read the plans.
 
+## Findings and follow-up
+
+During fieldwork or reporting, the team raises a **finding**: what was found, its severity, and the manager who answers for putting it right. A finding is an issue in the one register everyone works from, marked as coming from internal audit and from which engagement; its date follows from its severity like any other. It is shared with management as soon as it is raised, which is how its action plan is agreed: **management's action plan** is the issue's actions, each with an owner and a date. See [Issues and exceptions](issues-and-exceptions.md).
+
+When management says it is put right, it is **internal audit, not the second line, that confirms it closed**, or sends it back with what is missing: any auditor other than its owner and whoever proposed the closure. It waits on the auditors' home pages. Only auditors withdraw or reopen a finding.
+
+## The committee report
+
+Each plan's **Committee report** is the page for the audit committee: the plan and who approved it; each engagement with what it audits, where it stands, its opinion, and how many findings it raised and how many are still open; the findings by severity, open and closed; and the findings and management's actions past their date. It prints by itself.
+
+![The report to the audit committee: the plan's engagements with their opinions, the findings by severity, and what is past its date](img/audit-committee-report-light.webp)
+
 ## Who sees what
 
 | | Reads the universe and the plans | Changes them |

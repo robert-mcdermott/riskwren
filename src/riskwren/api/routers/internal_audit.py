@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
 from riskwren.api.common import envelope, reading, writing
-from riskwren.internal_audit import engagements, plans, requests, universe
+from riskwren.internal_audit import engagements, findings, plans, requests, universe
 
 router = APIRouter(prefix="/api/v1", tags=["internal audit"])
 
@@ -326,3 +326,34 @@ def return_request(request: Request, request_id: int, body: ReasonBody) -> dict[
         found, engagement = requests.find(session, principal, request_id)
         requests.send_back(session, principal, found, engagement, body.reason)
         return envelope(requests.view(session, principal, found, engagement))
+
+
+# --- Findings and the committee report --------------------------------------------------------
+
+
+class FindingBody(BaseModel):
+    name: str = Field(max_length=400, description="The finding, in a line")
+    summary: str | None = Field(default=None, max_length=20000, description="What was found")
+    severity: str = Field(description="critical, high, moderate, or low")
+    owner_id: int = Field(description="The manager who answers for putting it right")
+    subjects: list[str] = Field(default_factory=list, description="Controls or risks it is about")
+
+
+@router.post("/engagements/{ref}/findings", status_code=201, summary="Raise a finding as an issue")
+def raise_finding(request: Request, ref: str, body: FindingBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        engagement = plans.find_engagement(session, principal, ref)
+        findings.raise_finding(session, principal, engagement, body.model_dump())
+        return envelope(engagements.view(session, principal, engagement))
+
+
+@router.get(
+    "/audit/plans/{ref}/committee-report",
+    summary="A plan's engagements, findings by severity, and what is past its date",
+)
+def committee_report(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        plan = plans.find(session, principal, ref)
+        return envelope(findings.committee_report(session, principal, plan))

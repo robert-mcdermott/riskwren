@@ -54,9 +54,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `audit_request` holds what is asked, of whom, by when, the answer and its evidence, and whether it was accepted or sent back. The team asks while planning or in fieldwork; the person asked, auditor or not, opens and answers it, and is offered the evidence already kept about the thing being audited, and for a scope about the controls it uses, that they may see. Home lists a request for the person asked and an answer to read for the team. The engagement's page lists its requests; a request has a page of its own. The demo has a request answered and accepted, one answered and waiting for the team, and one past its date. The acceptance test is `tests/test_engagements.py::test_a_request_is_answered_by_the_person_asked_and_accepted_by_the_team`.
 
-### Slice 4: Findings and follow-up ☐
+### Slice 4: Findings and follow-up ☑
 
-- [ ] Findings as issues with management's action plan; closure validated by audit; the report issued; the committee report
+- [x] Findings as issues with management's action plan; closure validated by audit; the report issued; the committee report
+
+**Acceptance:** a finding is an issue that says which engagement raised it; management proposes its closure, and only an auditor who neither owns it nor proposed the closure confirms it; the committee report counts it by severity.
+
+**Done:** a finding is raised by the engagement's team during fieldwork or reporting through the register's own `issues.create`, as audit (`source_kind` *audit*, `source_type` *engagement*), in the unit of the thing audited, about the scope when it is one, and handed to the manager named; its date follows from its severity and its actions are management's action plan. `issues.confirms` makes an auditor, not the second line, the one who confirms, withdraws, or reopens a finding, and a proposed closure is told to the engagement's team and waits on auditors' home pages; the validation route is open to everyone and the service decides. The engagement lists its findings; each plan has a committee report of its engagements and opinions, findings by severity, and findings and actions past their date, which prints. The demo's first engagement raised two findings: one put right, proposed closed, and confirmed by audit; one with its action past its date. The acceptance test is `tests/test_engagements.py::test_a_finding_is_an_issue_that_audit_confirms_closed`.
 
 ### Slice 5: Outside auditors ☐
 

@@ -100,6 +100,10 @@ Whoever asked sees it on Home a month before it ends. **Ask again** starts a new
 
 **Compliance → Exceptions** lists them, and can show those waiting to be decided, in force, ended, refused, or withdrawn, and those to a control, a requirement, or a document.
 
+### Findings of internal audit
+
+An issue raised by internal audit from an engagement says so on its page. Its closure is confirmed by an auditor rather than by an assessor or a manager, and only auditors withdraw or reopen it. See [Findings and follow-up](internal-audit.md#findings-and-follow-up).
+
 ## The plan of action
 
 A scope's **Plan of action** tab lists the open issues that bear on it: those about the scope itself, and those about any control it uses or inherits. They are listed most severe first, each with its owner, its milestones (the actions, with who and when), and its date.
