@@ -268,6 +268,10 @@ export const SCENES = [
     path: async (page) => `/as-of/${await first("/api/v1/risks?q=ransomware")(page)}?on=${daysAgo(120)}` },
   { name: "as-of-third-parties", as: "ciso", path: `/as-of?type=third_party&on=${daysAgo(200)}&live=false` },
   { name: "check-dossier", as: "auditor", path: "/check-dossier" },
+  { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },
+  { name: "risk-estimate", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=estimate` },
+  { name: "scenarios", as: "ciso", path: "/scenarios" },
+  { name: "scenario", as: "ciso", path: async (page) => `/scenarios/${await first("/api/v1/scenarios?q=ransomware")(page)}` },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

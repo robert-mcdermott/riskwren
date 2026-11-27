@@ -240,3 +240,18 @@
 /* As of a date: what has changed since, marked without color alone (it also says "Now" or "Changed"). */
 .as-of-changed { background: var(--info-soft); }
 .as-of-fields th[scope="row"] { text-transform: none; letter-spacing: 0; font-size: inherit; font-weight: 600; color: var(--text); background: none; white-space: normal; }
+
+/* The bow-tie: causes, the controls that prevent, the event, the controls that soften, and
+   the consequences, left to right, joined by a line through the middle. */
+.bowtie { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); align-items: center; position: relative; margin-top: var(--space-4); }
+.bowtie::before { content: ""; position: absolute; left: 4%; right: 4%; top: 50%; border-top: 2px solid var(--border-strong); z-index: 0; }
+.bowtie-col { position: relative; z-index: 1; display: grid; gap: var(--space-2); }
+.bowtie-head { margin: 0; font-size: var(--text-s); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
+.bowtie-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.bowtie-item { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-s); padding: var(--space-2) var(--space-3); font-size: var(--text-s); }
+.bowtie-empty { background: var(--surface-1); padding: var(--space-2); text-align: center; font-size: var(--text-s); }
+.bowtie-knot { position: relative; z-index: 1; background: var(--surface-1); border: 2px solid var(--accent); border-radius: var(--radius-m); padding: var(--space-4) var(--space-3); text-align: center; }
+@media (max-width: 900px) {
+  .bowtie { grid-template-columns: minmax(0, 1fr); }
+  .bowtie::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: 0; border-left: 2px solid var(--border-strong); }
+}

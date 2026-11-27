@@ -456,6 +456,13 @@ for _route in (
     ("GET", "/api/v1/scopes/{ref}/security-plan"), ("GET", "/api/v1/scopes/{ref}/oscal/{document}"),
 ):  # fmt: skip
     REACH[_route] = EVERYONE
+for _key in POLICIES:
+    # Scenarios, and a risk's bow-tie and estimate, are decided by the record.
+    if _key[1].startswith("/api/v1/scenarios") or _key[1] in (
+        "/api/v1/risks/{ref}/bow-tie",
+        "/api/v1/risks/{ref}/estimate",
+    ):
+        REACH[_key] = EVERYONE
 REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():

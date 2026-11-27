@@ -79,9 +79,17 @@ The wave is done when, on a fresh checkout:
 
 Not done, and said so: an assessment's tests as OSCAL assessment results, and reading catalogs and profiles in the app (the built-in packs are still built from OSCAL at build time). The OSCAL files are written to the published model but are not checked against its schema in the tests, which have no copy of it.
 
-### Slice 6: Scenarios and ranges ☐
+### Slice 6: Scenarios and ranges ☑
 
-- [ ] Scenarios; estimates in ranges with simulation; the bow-tie view
+**Goal:** a risk told as a story, put in numbers where it is worth it, and drawn.
+
+- [x] Scenarios (RSK-18)
+- [x] Estimates in ranges with a simulation (RSK-19)
+- [x] The bow-tie view (RSK-20)
+
+**Acceptance:** a scenario touches risks and processes and cannot be concluded without its conclusion; an estimate supersedes the last and its simulation is the same every time, with a mean near what its ranges expect; the bow-tie puts each control on the side its link says.
+
+**Done:** `scenario` (`SCN`) is a record of its own, kept by its unit's stewards and leaders and by assessors and managers, with what it assumes, what was concluded and when, and `scenario_subject` rows for the risks and processes it touches. `risk_estimate` holds a risk's frequency and loss as low, likely, and high values with what they assume; a new one supersedes the last. `riskwren.risk.simulation` plays out 10,000 years (PERT for the rate and each loss, Poisson for the count) from a seed made of what is simulated, so the figures can be checked, and returns them with its assumptions in words; a scenario simulates its risks' current estimates together, in one currency. `riskwren.risk.bowtie` reads a risk's cause, event, and consequence, split at lines and semicolons, and its controls in use by what each reduces. A risk's **Bow-tie** and **In numbers** tabs, **Risks → Scenarios**, and the demo's estimates and two scenarios worked through by the security team. The acceptance tests are in `tests/test_scenarios.py`.
 
 ### Slice 7: Release prep ☐
 
@@ -92,6 +100,7 @@ Not done, and said so: an assessment's tests as OSCAL assessment results, and re
 - A measure is defined once, in code, as the same condition a list uses, so a figure and the list behind it cannot disagree (RPT-04).
 - A snapshot records the organization's figure for each measure on a day. It is bookkeeping, not history: it is not in the hash chain, and it can be taken again.
 - An issued leadership report is history: its issue is in the hash chain with its fingerprint. Its figures are kept as counts, not as lists to open, because the lists move on and the report must not. A report is never edited or withdrawn; the next one corrects it.
+- An estimate in ranges does not replace the rating. The register is run by the program's scales, which every risk has; an estimate is for the few worth a figure, and says what it assumes.
 - A dossier's fingerprint is of its manifest, not of the ZIP: the same files packed again are the same dossier, and the manifest is what a person can read.
 - As of is rebuilt backwards from the record as it is now rather than forwards from its creation: it needs only the events after the day, and it still gives the right answer for a field whose history began after the record did (one an upgrade added).
 - Those who lead the whole organization read the reports though they cannot read everything: the report is written for them. It may name restricted risks, which such a leader may already see.

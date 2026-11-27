@@ -303,6 +303,50 @@ def set_risk_objectives(request: Request, ref: str, body: ObjectivesBody) -> dic
         return envelope(records.detail(session, principal, RISK, risk))
 
 
+class EstimateBody(BaseModel):
+    """A risk in numbers: each a low, likely, and high value."""
+
+    frequency_low: float = Field(description="Fewest times a year, such as 0.1 (once a decade)")
+    frequency_likely: float
+    frequency_high: float
+    loss_low: float = Field(description="Least it costs each time, in whole currency units")
+    loss_likely: float
+    loss_high: float
+    currency: str = Field(default="USD", max_length=3)
+    assumptions: str = Field(max_length=8000, description="Where the numbers came from")
+
+
+@router.get("/risks/{ref}/bow-tie", summary="A risk's causes, controls, event, and consequences")
+def risk_bow_tie(request: Request, ref: str) -> dict[str, Any]:
+    from riskwren.risk import bowtie
+
+    principal = current(request)
+    with reading(request) as session:
+        risk = records.load(session, principal, RISK, ref)
+        return envelope(bowtie.view(session, principal, risk))
+
+
+@router.get("/risks/{ref}/estimate", summary="A risk's estimate in ranges and its simulation")
+def risk_estimate(request: Request, ref: str) -> dict[str, Any]:
+    from riskwren.risk import estimates
+
+    principal = current(request)
+    with reading(request) as session:
+        risk = records.load(session, principal, RISK, ref)
+        return envelope(estimates.view(session, principal, risk))
+
+
+@router.post("/risks/{ref}/estimate", status_code=201, summary="Estimate a risk in ranges, anew")
+def estimate_risk(request: Request, ref: str, body: EstimateBody) -> dict[str, Any]:
+    from riskwren.risk import estimates
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        risk = records.load(session, principal, RISK, ref)
+        estimates.record(session, principal, risk, body.model_dump())
+        return envelope(estimates.view(session, principal, risk))
+
+
 @router.put("/risks/{ref}/escalation", summary="Escalate a risk to a higher unit, or take it back")
 def escalate_risk(request: Request, ref: str, body: EscalationBody) -> dict[str, Any]:
     principal = current(request)

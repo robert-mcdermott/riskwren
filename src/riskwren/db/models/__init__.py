@@ -93,6 +93,7 @@ from riskwren.db.models.risk import (
     RiskSubject,
     ScoringMethod,
 )
+from riskwren.db.models.scenarios import RiskEstimate, Scenario, ScenarioSubject
 from riskwren.db.models.system import ChainHead, Counter, Event
 from riskwren.db.models.third_parties import (
     AssuranceResponsibility,
@@ -180,11 +181,14 @@ __all__ = [
     "RiskAssessment",
     "RiskCategory",
     "RiskControl",
+    "RiskEstimate",
     "RiskLibraryEntry",
     "RiskObjective",
     "RiskSubject",
     "RoleGrant",
     "SavedView",
+    "Scenario",
+    "ScenarioSubject",
     "Scope",
     "ScopeFramework",
     "ScopeMember",

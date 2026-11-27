@@ -982,6 +982,46 @@ LEADERSHIP_REPORTS = [
          "or close the issue before the next report."),
 ]  # fmt: skip
 
+# Estimates in ranges, put to the risks the security team most wanted figures for: days ago,
+# the risk by name, how often a year (low, likely, high), each time in dollars, and why.
+ESTIMATES = [
+    (130, "Ransomware reaching research storage", (0.05, 0.2, 0.5), (250_000, 1_200_000, 6_000_000),
+     "Two peer institutes were hit in the last three years; one lost three weeks of research "
+     "computing. Each time: recovery labor and outside responders, grant extensions, and "
+     "re-running lost experiments, from their published costs and our own staffing."),
+    (128, "Ransomware: Information Technology", (0.1, 0.25, 0.6), (150_000, 600_000, 2_500_000),
+     "Central systems are better separated than research storage. The figures follow the "
+     "incident response exercise in the autumn and the vendor's quote for a rebuild."),
+    (40, "Ransomware reaching research storage", (0.05, 0.15, 0.4), (250_000, 900_000, 4_000_000),
+     "Estimated again after research storage was taken off the lab networks: a smaller "
+     "chance, and a faster recovery from the offline copy."),
+]  # fmt: skip
+
+# Scenarios the security team worked through with the units that would be hit.
+SCENARIOS = [
+    {"name": "Ransomware takes research computing down for two weeks", "unit": "SEC",
+     "by": "ciso", "started": 125, "concluded": 112,
+     "summary": "On a Friday night, an attacker who came in through a phished lab account "
+                "encrypts research storage and the cluster's file systems. The backups are "
+                "intact, but restoring everything takes two weeks.",
+     "assumptions": "The offline copy of research storage is no more than a day old. "
+                    "Clinical and administrative systems are not reached. Sequencing and "
+                    "imaging keep their instruments' local disks.",
+     "conclusion": "Two weeks is survivable for most labs, not for the sequencing service, "
+                   "whose sponsors' samples expire. Restore its data first, and test a full "
+                   "restore of research storage this year.",
+     "risks": ["Ransomware reaching research storage", "Ransomware: Information Technology"],
+     "processes": ["Research data storage", "High-performance computing", "Sequencing service"]},
+    {"name": "A supplier holding trial data is breached", "unit": "SEC", "by": "ciso",
+     "started": 20, "concluded": None,
+     "summary": "The electronic data capture vendor tells us an attacker copied a customer "
+                "database that held our trial participants' records.",
+     "assumptions": "The vendor tells us within the 72 hours its agreement requires. The "
+                    "data is identifiable.",
+     "conclusion": None,
+     "risks": [], "processes": ["Trial data management", "Safety reporting"]},
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

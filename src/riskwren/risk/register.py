@@ -243,6 +243,16 @@ def _history_title(event: Event, lookups: Any) -> str | None:
         return (
             f"Now threatens {name}" if event.action == "created" else f"No longer threatens {name}"
         )
+    if event.subject_type == "risk_estimate" and event.action == "created":
+        currency = now("currency") or ""
+        return (
+            f"Estimated in ranges: {now('frequency_likely')} a year, likely, at about "
+            f"{currency} {now('loss_likely'):,} each time"
+            if isinstance(now("loss_likely"), int)
+            else "Estimated in ranges"
+        )
+    if event.subject_type == "risk_estimate":
+        return "An earlier estimate was superseded"
     if event.subject_type == "risk_subject":
         kind = now("subject_type")
         name = lookups.name(kind, now("subject_id")) if kind in TYPES else "a record"

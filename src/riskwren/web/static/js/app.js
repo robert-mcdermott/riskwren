@@ -107,6 +107,8 @@ async function boot() {
   route("/handover/:id", page("find", "handoverPage"));
   route("/objectives", page("objectives", "objectiveList"));
   route("/objectives/:ref", page("objectives", "objectivePage"));
+  route("/scenarios", page("scenarios", "scenarioList"));
+  route("/scenarios/:ref", page("scenarios", "scenarioPage"));
   route("/sessions", page("sessions", "sessionList"));
   route("/sessions/:ref", page("sessions", "sessionPage"));
   route("/agreements", page("agreements", "agreementList"));

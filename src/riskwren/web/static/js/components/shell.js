@@ -20,6 +20,7 @@ export const NAV = [
     items: [
       { href: "/risks", label: "Register", iconName: "risk" },
       { href: "/objectives", label: "Objectives", iconName: "objective" },
+      { href: "/scenarios", label: "Scenarios", iconName: "risk" },
       { href: "/heat-map", label: "Heat map", iconName: "grid" },
       { href: "/indicators", label: "Indicators", iconName: "chart" },
       { href: "/risk-analyses", label: "Analyses", iconName: "scope" },

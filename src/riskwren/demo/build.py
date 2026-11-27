@@ -2008,6 +2008,58 @@ class Builder:
                 leadership.issue(session, who, summary=summary)
             self.tally("leadership reports")
 
+    def _story_scenarios(self) -> Script:
+        """Estimates in ranges on the risks the security team wanted figures for, and the
+        scenarios it worked through with the units that would be hit."""
+        from riskwren.db.models import Process, Risk
+        from riskwren.risk import estimates, scenarios
+        from riskwren.risk.register import RISK
+
+        plan = sorted(
+            [(days, "estimate", item) for days, *item in c.ESTIMATES]
+            + [(s["started"], "start", s) for s in c.SCENARIOS]
+            + [(s["concluded"], "conclude", s) for s in c.SCENARIOS if s["concluded"]],
+            key=lambda step: -step[0],
+        )
+        made: dict[str, str] = {}
+        for days, what, item in plan:
+            yield self._on(days, hour=11)
+            if what == "estimate":
+                name, frequency, loss, why = item
+                with self.db.read() as session:
+                    found = session.scalars(select(Risk).where(Risk.name == name)).first()
+                    if found is None:
+                        continue
+                    owners = records.owners_of(session, RISK, [found.id]).get(found.id, [])
+                    keeper = next((o["account_id"] for o in owners if o["kind"] == "owner"),
+                                  self.cast["cro"])  # fmt: skip
+                    risk_id = found.id
+                with self.act(keeper) as (session, who):
+                    risk = session.get(Risk, risk_id)
+                    estimates.record(session, who, risk, {
+                        "frequency_low": frequency[0], "frequency_likely": frequency[1],
+                        "frequency_high": frequency[2], "loss_low": loss[0],
+                        "loss_likely": loss[1], "loss_high": loss[2], "assumptions": why})  # fmt: skip
+                self.tally("estimates")
+            elif what == "start":
+                with self.act(self.cast[item["by"]]) as (session, who):
+                    scenario = records.create(session, who, scenarios.SCENARIO, {
+                        "name": item["name"], "org_unit_id": self.units[item["unit"]],
+                        "summary": item["summary"], "assumptions": item["assumptions"]})  # fmt: skip
+                    refs = [risk.ref for risk in session.scalars(
+                        select(Risk).where(Risk.name.in_(item["risks"] or [""])))]  # fmt: skip
+                    refs += [process.ref for process in session.scalars(
+                        select(Process).where(Process.name.in_(item["processes"] or [""])))]  # fmt: skip
+                    scenarios.set_subjects(session, who, scenario, refs)
+                    made[item["name"]] = scenario.ref
+                self.tally("scenarios")
+            else:
+                with self.act(self.cast[item["by"]]) as (session, who):
+                    scenario = records.load(session, who, scenarios.SCENARIO, made[item["name"]])
+                    records.update(session, who, scenarios.SCENARIO, scenario, {
+                        "status": "concluded", "conclusion": item["conclusion"]},
+                        version=scenario.version)  # fmt: skip
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3259,7 +3311,7 @@ class Builder:
             self._story_documents, self._story_agreements, self._story_framework_update,
             self._story_governance, self._story_third_parties, self._story_due_diligence,
             self._story_assurance, self._story_coverage, self._story_lifecycle,
-            self._story_measures, self._story_leadership,
+            self._story_measures, self._story_leadership, self._story_scenarios,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

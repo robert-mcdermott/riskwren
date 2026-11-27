@@ -34,6 +34,13 @@ Wave 6, *Insight*.
   page that prints by itself, and in OSCAL 1.1.2; its plan of action and milestones in OSCAL.
 - `riskwren verify` also checks every leadership report against the fingerprint the history
   took when it was issued.
+- **Scenarios:** what might happen, told on purpose, with what it assumes, the risks and
+  processes it touches, and what was concluded. **Risks → Scenarios**.
+- **Estimates in ranges:** a risk's frequency and loss as low, likely, and high values, with
+  a reproducible simulation of a year's loss and its assumptions in words; a scenario adds
+  up its risks'. A risk's **In numbers** tab.
+- **The bow-tie:** a risk's causes, preventive controls, event, mitigating controls, and
+  consequences on one diagram, with a table behind it. A risk's **Bow-tie** tab.
 - **Lists cut to a period:** risks by when they were added, issues by when they were raised
   or closed, issues by root cause, and issues and exceptions about a framework's requirements.
 
