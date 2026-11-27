@@ -467,6 +467,42 @@ COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ("review", "Review", "A review of a supplier, a system, or a process"),
         ("observation", "Observation", "Somebody noticed it and said so"),
     ),
+    # What protected information an incident involved, in a breach assessment. Each suggests
+    # the rules that may require it to be notified.
+    "protected_information": items(
+        (
+            "health",
+            "Health information",
+            "Identifiable health information a covered entity or its business associate holds",
+        ),
+        (
+            "personal",
+            "Personal information under a state's law",
+            "A name with a Social Security, license, or account number, or another identifier a "
+            "state's breach law names",
+        ),
+        (
+            "financial",
+            "Customer financial information",
+            "Information about customers of a financial product or service",
+        ),
+        (
+            "participant",
+            "Research participants' information",
+            "Identifiable information about people in a study",
+        ),
+        (
+            "controlled",
+            "Controlled or covered defense information",
+            "Controlled unclassified information, or covered defense information under a contract",
+        ),
+        (
+            "credentials",
+            "Sign-in credentials",
+            "Usernames with passwords, or keys that unlock accounts",
+        ),
+        ("other", "Other", "None of these"),
+    ),
     # What an incident, a near miss, or a concern is about, given at triage.
     "incident_categories": items(
         (
@@ -830,6 +866,13 @@ CATEGORIES = [
     ),
 ]  # fmt: skip
 
+# Privacy: which classes of data need a privacy impact assessment of each process and system
+# that handles them, and how often it is done again.
+PRIVACY: dict[str, Any] = {
+    "impact_assessment_classes": ["restricted"],
+    "impact_assessment_months": 36,
+}
+
 PACK: dict[str, Any] = {
     "pack": {
         "key": "default-program",
@@ -848,6 +891,7 @@ PACK: dict[str, Any] = {
     "authority": AUTHORITY,
     "tiering": TIERING,
     "sharing": SHARING,
+    "privacy": PRIVACY,
 }
 
 # --- The risk library -------------------------------------------------------------------

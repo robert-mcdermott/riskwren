@@ -399,6 +399,7 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             "attestation": "Attest", "self_assessment": "Look again at",
             "completeness": "Check the records of", "profile": "Describe the security of",
             "evidence": "Provide evidence for", "acknowledgment": "Read and acknowledge",
+            "privacy_impact": "Assess the privacy impact of",
         }[campaign.kind]  # fmt: skip
         href = (
             f"/library/{item.subject_ref}" if campaign.kind == "acknowledgment"
@@ -561,6 +562,17 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"{incident.ref} · a {kind}, {incident.severity or 'not yet rated'}",
                 f"/incidents/{incident.ref}", None, ref=incident.ref,
             )  # fmt: skip
+
+    # Notifications an incident's handler still has to make, by the rules that apply.
+    from riskwren.incidents import breach
+
+    for incident, duty in breach.waiting_on(session, principal):
+        add(
+            "incident_notify", f"Notify {duty['to'][0].lower()}{duty['to'][1:]}",
+            f"{incident.ref} · {incident.name} · {duty['regime_label']}"
+            + (", if it is a breach" if duty["if_breach"] else ""),
+            f"/incidents/{incident.ref}?tab=breach", duty["due_at"].date(), ref=incident.ref,
+        )  # fmt: skip
 
     # Third parties due for review: on their tier's cadence, or because something happened.
     from riskwren.thirdparty import lifecycle

@@ -1,4 +1,4 @@
-"""Incidents (INC-01 to INC-04): what happened, nearly happened, or worries someone.
+"""Incidents (INC-01 to INC-05): what happened, nearly happened, or worries someone.
 
 Anyone signed in reports one in a short form; where the organization opens it, anyone may
 report a concern through a link without a name, and follow it up with a code. Each report is
@@ -8,6 +8,7 @@ triaged: given a category, a severity, the records it concerns, and someone to h
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import (
     Boolean,
@@ -25,7 +26,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from riskwren.db.base import Base
 from riskwren.db.models.compliance import SEVERITIES
 from riskwren.db.models.inventory import RecordMixin, one_of
-from riskwren.db.types import UtcDateTime
+from riskwren.db.types import JsonType, UtcDateTime
 
 INCIDENT_KINDS = ("incident", "near_miss", "concern")
 INCIDENT_STATUSES = ("reported", "handling", "closed")
@@ -122,3 +123,67 @@ class IncidentMember(Base):
         UniqueConstraint("incident_id", "account_id", name="uq_incident_member"),
         Index("ix_incident_member_account_id", "account_id"),
     )
+
+
+BREACH_CONCLUSIONS = ("undecided", "notify", "no_notification")
+
+
+class BreachAssessment(Base):
+    """Whether an incident involving protected information must be notified (INC-05): what
+    was involved and when it was discovered, the factors weighed, any exception, and the
+    conclusion, with the rules that apply. Never edited: a new one supersedes the last."""
+
+    __tablename__ = "breach_assessment"
+    __audit_parent__ = ("incident", "incident_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("incident.id", ondelete="CASCADE"))
+    discovered_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    # Keys of the protected_information vocabulary.
+    information: Mapped[list[str]] = mapped_column(JsonType, default=list)
+    people: Mapped[int | None] = mapped_column(Integer)
+    most_in_one_state: Mapped[int | None] = mapped_column(Integer)
+    # Rendered unusable, unreadable, or indecipherable to anyone not allowed to see it.
+    secured: Mapped[bool] = mapped_column(Boolean, default=False)
+    exception: Mapped[str | None] = mapped_column(String(40))
+    # {factor: {"level": low | moderate | high, "note": str}}
+    factors: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict)
+    conclusion: Mapped[str] = mapped_column(String(24), default="undecided")
+    rationale: Mapped[str | None] = mapped_column(Text)
+    # [{"key": ..., "name": ..., "days": ...}]: the rules that apply, with any of the
+    # organization's own (a state's law, a contract) named and timed.
+    regimes: Mapped[list[dict[str, Any]]] = mapped_column(JsonType, default=list)
+    assessed_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    assessed_by_name: Mapped[str] = mapped_column(String(200))
+    assessed_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    superseded_by: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (
+        CheckConstraint(one_of("conclusion", BREACH_CONCLUSIONS), name="conclusion"),
+        Index("ix_breach_assessment_incident_id", "incident_id"),
+    )
+
+
+class BreachNotification(Base):
+    """A notification made about an incident: to whom, under which rule, when, and how.
+    Never edited."""
+
+    __tablename__ = "breach_notification"
+    __audit_parent__ = ("incident", "incident_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("incident.id", ondelete="CASCADE"))
+    # The rule it was made under, as the assessment names it: "hipaa", or "state:Washington".
+    regime: Mapped[str] = mapped_column(String(120))
+    duty: Mapped[str] = mapped_column(String(40))
+    recipient: Mapped[str] = mapped_column(String(200))
+    count: Mapped[int | None] = mapped_column(Integer)
+    sent_on: Mapped[date] = mapped_column(Date)
+    method: Mapped[str | None] = mapped_column(String(200))
+    reference: Mapped[str | None] = mapped_column(String(200))
+    note: Mapped[str | None] = mapped_column(Text)
+    recorded_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    recorded_by_name: Mapped[str] = mapped_column(String(200))
+    recorded_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (Index("ix_breach_notification_incident_id", "incident_id"),)

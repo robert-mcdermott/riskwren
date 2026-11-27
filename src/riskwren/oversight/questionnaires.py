@@ -28,7 +28,10 @@ from riskwren.db.models import Questionnaire, QuestionnaireVersion, Response
 from riskwren.events import audit
 
 TYPES = ("yes_no", "choice", "choices", "text", "long_text", "number", "date")
-PURPOSES = ("attestation", "self_assessment", "completeness", "due_diligence", "review", "other")
+PURPOSES = (
+    "attestation", "self_assessment", "completeness", "due_diligence", "review",
+    "privacy_impact", "other",
+)  # fmt: skip
 KEY = re.compile(r"[a-z][a-z0-9_]{0,39}")
 NAME = re.compile(r"[a-z][a-z0-9-]{1,59}")
 TEXT_LIMIT, LONG_TEXT_LIMIT = 500, 10_000

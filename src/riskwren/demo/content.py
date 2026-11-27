@@ -1198,6 +1198,22 @@ INCIDENTS = [
                 "participants' names and dates of birth. It should have had study numbers only.",
      "triage": (23, "assess2", "privacy", "high", [("system", "Electronic data capture")],
                 "assess2"),
+     # Whether it must be notified: still being decided, and the clock is running.
+     "breach": (22, "assess2", {
+         "information": ["participant", "personal"], "people": 38, "most_in_one_state": 31,
+         "factors": {
+             "nature": ("moderate", "Names and dates of birth, with the study the person is in."),
+             "recipient": ("low", "The sponsor, bound by the clinical trial agreement."),
+             "acquired": ("high", "The sponsor's coordinator opened the file."),
+             "mitigated": ("moderate", "Deleted, and confirmed in writing; backups take a week to "
+                                       "roll off."),
+         },
+         "conclusion": "undecided",
+         "regimes": [{"key": "contract", "name": "The sponsor's clinical trial agreement", "days": 5},
+                     {"key": "state", "name": "Washington", "days": 30}],
+     }),
+     "notified": [(21, "assess2", "contract:The sponsor's clinical trial agreement", "party",
+                   "The sponsor's privacy office, by email", "Email")],
      "said": [(22, "assess2", False, "The sponsor's privacy office confirmed in writing that "
                                      "the file was deleted from the inbox and from backups."),
               (22, "assess2", True, "Thank you for reporting it the same day. We are working "
@@ -1235,6 +1251,15 @@ INCIDENTS = [
      "triage": (6, "assess1", "security", "high",
                 [("system", "Endpoint management"), ("system", "Genomics sample manager")],
                 "sec_mgr"),
+     "breach": (5, "sec_mgr", {
+         "information": ["participant"], "people": 212, "secured": True,
+         "factors": {"nature": ("low", "Sample identifiers, with no names or dates of birth.")},
+         "conclusion": "no_notification",
+         "rationale": "The disk was encrypted and the laptop was locked; endpoint management "
+                      "shows the encryption key was never used after it was taken. It is not a "
+                      "breach of unsecured information.",
+         "regimes": [{"key": "contract", "name": "The genomics data use agreement", "days": 10}],
+     }),
      "said": [(6, "sec_mgr", False, "Endpoint management shows the disk was encrypted and the "
                                     "laptop last checked in at 7:12 pm. Remote wipe sent."),
               (5, "sec_mgr", True, "Thank you. Please file a police report and send us its "
@@ -1251,6 +1276,30 @@ INCIDENTS = [
      "summary": "Freezer 12 rose to minus 62 at 2 am. The monitor showed the alarm, but no page "
                 "reached whoever was on call. The morning shift moved its boxes to the spare."},
 ]  # fmt: skip
+
+# Privacy impact assessments: a campaign started some days ago over every process and system
+# that handles restricted information; some answered, one reviewed. Answers by system name.
+PRIVACY_CAMPAIGN = 40
+PRIVACY_ANSWERS = {
+    "Scheduling system": (36, {
+        "information": ["contact", "health"], "whose": ["patients"], "how_many": 18000,
+        "purpose": "Booking appointments and sending reminders.", "basis": "care",
+        "least": True, "shared": True, "shared_with": "The supplier hosts it.",
+        "agreement": "business_associate", "access": True,
+        "retention": "Seven years after the last visit, then deleted.", "deidentified": "cannot",
+        "harms": "Someone could learn that a person is a patient here.",
+        "reduced": "Only clinic staff sign in, with the organization's single sign-on.",
+    }, "ciso", "Nothing to change. Reviewed with the clinic's privacy lead."),
+    "Survey platform": (30, {
+        "information": ["contact", "health", "research"], "whose": ["participants"],
+        "how_many": 2600, "purpose": "Population study questionnaires.", "basis": "protocol",
+        "least": False, "least_why": "It keeps email addresses after the survey closes.",
+        "shared": True, "shared_with": "The survey supplier hosts it.", "agreement": "none",
+        "access": True, "retention": "Until the study ends.", "deidentified": "partly",
+        "harms": "Participants' answers about their health could be linked to their email.",
+        "reduced": "Answers are exported with study numbers only.",
+    }, None, None),
+}  # fmt: skip
 
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {

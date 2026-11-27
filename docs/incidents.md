@@ -56,6 +56,48 @@ Those handling an incident, and those who see all of it, write on it under **Wha
 
 When it is done, **Close** asks how it ended, and the reporter is told it is closed. Its handlers close it, or those who triage it. Those who triage it can **Reopen** it.
 
+## Breach assessment
+
+An incident that may involve protected information is assessed for whether it must be notified, on its **Breach assessment** tab, by those who handle or triage it. Do it as soon as protected information may be involved: the clock runs from when the breach was **discovered**, the first day it was known, or would have been known with reasonable care, to anyone working for the organization.
+
+An assessment records:
+
+| | |
+|---|---|
+| When it was discovered | A day and a time. Every deadline counts from it |
+| The protected information involved | Health information, personal information under a state's law, customer financial information, research participants' information, controlled or covered defense information, sign-in credentials, or other. The list is a program vocabulary |
+| How many people | About how many it concerns, and the most of them living in any one state |
+| Whether it was secured | Encrypted or destroyed, so as to be unusable, unreadable, or indecipherable to anyone not allowed to see it |
+| An exception | Unintentional access in good faith by someone working for the organization; an inadvertent disclosure between two people allowed to see it; or a disclosure to someone who could not reasonably have kept it |
+| The four factors | What was involved, who used or received it, whether it was actually taken or seen, and how far the risk has been reduced: each low, moderate, or high, with why |
+| The conclusion | It must be notified, it need not be, or not yet decided; and why |
+| The rules that apply | Those built in, and any state's law or contract, named, with the days or hours it allows |
+
+Beside it is **what the factors point to**. A use or disclosure that was not allowed is presumed a breach, to be notified, unless the information was secured, an exception applies, or the factors show a low probability that it was compromised. That is the HIPAA Breach Notification Rule's test, and a sound one for other information too. The conclusion is yours, and the reason you give is what a regulator will ask about.
+
+An assessment is never edited. **Assess it again** as more is learned: the new one supersedes the last, and the history keeps both.
+
+### What is due, and by when
+
+From the assessment, **What is due** lists every notification the rules that apply require, to whom, and by when, soonest first. While the conclusion is not yet decided, it shows what would be due if it is a breach: the clock is running. Once it is concluded that it need not be notified, nothing is due.
+
+| Rule | Notify | By |
+|---|---|---|
+| HIPAA Breach Notification Rule | Each individual affected | 60 days after discovery |
+| | The Secretary of Health and Human Services | 500 or more people: 60 days after discovery. Fewer: 60 days after the end of the year it was discovered |
+| | Prominent media outlets, where more than 500 residents of one state are affected | 60 days after discovery |
+| HIPAA, as a business associate | The covered entity | 60 days after discovery |
+| FTC Safeguards Rule | The Federal Trade Commission, where 500 or more consumers' unencrypted information is involved | 30 days after discovery |
+| DFARS 252.204-7012 | The Department of Defense, through DIBNet | 72 hours after discovery |
+| A state's breach law | Each resident affected, and whoever else the law names | As long as you say the law allows |
+| A contract or agreement | The party it names | As long as you say it allows |
+
+These are the outer limits; each rule asks for notice without unreasonable delay. States' laws differ in what they cover, whom they require to be told, and how long they allow: name each that applies, and check what it says. A delay a law enforcement official asks for is recorded in the assessment's reasons; the dates shown do not move for it.
+
+Each notification still to make waits on the home page of whoever handles the incident, overdue first. **Record a notification** says which rule and whom it was for, who was notified, when it was sent, how many people were told, how, and any reference a regulator gave. Notifications are never edited, and each is in the history.
+
+![A breach assessment: what is due under each rule and by when, one notification made, and the assessment with what its factors point to](img/incident-breach-light.webp)
+
 ## Restricted cases
 
 Some incidents must be kept to a few: a concern about how someone behaves, about the people who lead a unit, or one that may become a matter for lawyers. **Restrict it**, under **Who sees it** on the incident, makes it a restricted case. It is then known only to:

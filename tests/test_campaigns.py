@@ -356,7 +356,7 @@ def test_campaigns_through_the_api(as_role: Clients, people: People, db: Databas
         owned(session, manager, people.units["HALE"], "Freezers alarmed", people.accounts["member"])
     boss, member = as_role("manager"), as_role("member")
     listed = boss.get("/api/v1/campaigns").json()["data"]
-    assert listed["campaigns"] == [] and listed["can_start"] and len(listed["kinds"]) == 6
+    assert listed["campaigns"] == [] and listed["can_start"] and len(listed["kinds"]) == 7
     assert member.get("/api/v1/campaigns").json()["data"]["can_start"] is False
     ask = {"kind": "attestation", "name": "Attest", "due_on": "2099-01-01"}
     assert member.post("/api/v1/campaigns", json=ask).status_code == 403

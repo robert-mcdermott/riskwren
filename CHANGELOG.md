@@ -20,6 +20,17 @@ Wave 8, *Incidents and resilience*.
 - **Restricted cases:** an incident can be kept to those named on it, its handlers, and its
   reporter. Nobody else learns that it exists, those who read everything included: lists,
   search, counts, the history of everything, and their notices leave it out.
+- **Breach assessment:** whether an incident involving protected information must be
+  notified: when it was discovered, what was involved, the four factors, any exception, and the
+  conclusion, with the rules that apply. What each rule requires, to whom, and by when follows
+  from it (the HIPAA Breach Notification Rule, as a covered entity or a business associate,
+  the FTC Safeguards Rule, DFARS 252.204-7012, and any state's law or contract named), each
+  notification is recorded, and what is still to send waits on the handler's home page.
+- **Privacy impact assessments:** a built-in questionnaire, asked by a new kind of campaign of
+  every process and system whose data class the program's new `privacy` rule names, with the
+  answers' concerns flagged, a review, and **Compliance → Privacy impact**.
+- **Two frameworks, loaded on request:** the HIPAA Breach Notification Rule (45 CFR Part 164
+  Subpart D) and the NIST Privacy Framework 1.0.
 - **Reporting without a name,** closed until an administrator opens it under **Admin →
   Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
   name, or address, with a follow-up code shown once.
@@ -41,6 +52,7 @@ Wave 8, *Incidents and resilience*.
 - **Reports → History leaves out restricted incident cases** for managers, auditors, and
   administrators who are not named on them. Their events stay in the chain that
   `riskwren verify` checks.
+- **Protected information** is a new vocabulary, and the program pack has a `privacy` rule.
 - **Incident categories** are a new vocabulary, editable under **Admin → Program →
   Vocabularies**. The menu has a new group, **Incidents**.
 - In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),

@@ -15,7 +15,7 @@ import { show } from "./page.js";
 import { tabBar } from "./record.js";
 
 const PURPOSES = { attestation: "Attestation", self_assessment: "Self-assessment", completeness: "Completeness check",
-  due_diligence: "Due diligence", review: "Review", other: "Other" };
+  due_diligence: "Due diligence", review: "Review", privacy_impact: "Privacy impact", other: "Other" };
 const TYPES = { yes_no: "Yes or no", choice: "One of a list", choices: "Any of a list", text: "A line of text",
   long_text: "A paragraph", number: "A number", date: "A date" };
 const STARTER = { sections: [{ key: "first", title: "First section", questions: [{ key: "question_1", label: "", type: "yes_no", required: true }] }] };

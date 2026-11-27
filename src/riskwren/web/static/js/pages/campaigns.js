@@ -169,7 +169,8 @@ export function campaignPage(main, params) {
 }
 
 const ASKS = { attestation: "Does this control still operate as described?", self_assessment: "Look at this risk again.", completeness: "Are this unit's records complete?",
-  profile: "How is this system protected?", evidence: "Evidence is wanted for this control." };
+  profile: "How is this system protected?", evidence: "Evidence is wanted for this control.",
+  privacy_impact: "What does this handle about people, and what could go wrong for them?" };
 
 export function campaignItem(main, params) {
   return show(main, {

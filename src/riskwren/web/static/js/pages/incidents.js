@@ -238,14 +238,16 @@ function conversation(record, reload) {
 }
 
 export function incidentPage(main, params) {
-  const tab = query().get("tab") === "history" ? "history" : "overview";
+  const tab = ["history", "breach"].includes(query().get("tab")) ? query().get("tab") : "overview";
   return show(main, {
     title: params.ref,
     load: async () => {
       const base = `/api/v1/incidents/${params.ref}`;
       const [record, unitIndex, vocab] = await Promise.all([get(base, null, { fresh: true }), units(), vocabularies()]);
       const entries = tab === "history" && record.data.everything ? await get(`${base}/history`, null, { fresh: true }) : null;
-      return { record: record.data, units: unitIndex, vocab, history: entries?.data ?? [] };
+      const breach = tab === "breach" && record.data.everything
+        ? await Promise.all([get(`${base}/breach`, null, { fresh: true }), import("./incident-breach.js")]) : null;
+      return { record: record.data, units: unitIndex, vocab, history: entries?.data ?? [], breach };
     },
     view: (data, reload) => {
       const record = data.record;
@@ -309,8 +311,9 @@ export function incidentPage(main, params) {
           ownersCard({ ...record, orphaned: record.orphaned && record.triaged != null },
             { vocab: data.vocab, units: data.units, reload, ownersTitle: "Who handles it" })));
       return h("div", { class: "stack" }, header,
-        tabBar([["overview", "Overview"], ["history", "History"]], tab),
-        tab === "history" ? card({ flush: true }, timeline(data.history)) : overview);
+        tabBar([["overview", "Overview"], ["breach", "Breach assessment"], ["history", "History"]], tab),
+        tab === "history" ? card({ flush: true }, timeline(data.history))
+          : data.breach ? data.breach[1].breachTab(record, data.breach[0].data, data.vocab, reload) : overview);
     },
   });
 }

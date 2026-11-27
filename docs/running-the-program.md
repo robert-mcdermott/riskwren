@@ -156,7 +156,7 @@ A leader's limit is set with the role. A sensible start: unit leaders at moderat
 
 ### Change the program with a pack
 
-The scoring method, cadences, the acceptance table, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
+The scoring method, cadences, the acceptance table, the privacy rule, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
 
 ```bash
 uv run riskwren program export --output program.json    # write the one in force
@@ -214,6 +214,7 @@ A campaign asks a set of people for one thing by a date, and shows who has answe
 | **System security profile** | The owners of systems | What each system holds, who can reach it, and who patches, backs up, and watches it |
 | **Evidence request** | The owners of controls | A named piece of evidence for each control |
 | **Acknowledgment** | The people a document applies to | Read the version in force, and say they have |
+| **Privacy impact assessment** | The owners of processes and systems that handle restricted information | What each handles about people, why, who else sees it, how long it is kept, and what could go wrong for them ([below](#privacy-impact-assessments)) |
 
 Choose what to ask, give it a name and a date, and say what it is about: everything in a unit and beneath it, or, for controls, only those a compliance scope uses. Before it starts, the form says how many people would be asked about how many things. Each person is told once, with a count, and finds each thing on their **Home**.
 
@@ -242,8 +243,23 @@ Answers are kept as given, and some need someone else to act. Those people are t
 | Someone else should own this control | The unit's stewards |
 | A risk no longer stands, or its rating is no longer right | The unit's stewards, assessors, and managers |
 | A unit's records need attention | The assessors and managers who cover it |
+| A privacy impact assessment is answered | The assessors and managers who cover its unit, to review it; with concerns, it says so |
 
 An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
+
+### Privacy impact assessments
+
+A process or a system that handles a class of data the program names needs a privacy impact assessment: what it handles about people, whose information it is and how much, why and on what basis, who else sees it and what covers that, how long it is kept, and what could go wrong for the people it is about. To begin with the class is **restricted**, and an assessment is done again every 36 months; both are set in the program pack's `privacy` rule:
+
+```json
+"privacy": {"impact_assessment_classes": ["restricted"], "impact_assessment_months": 36}
+```
+
+**Compliance → Privacy impact** lists every process and system in use that needs one, and where each stands: never assessed, asked, answered and waiting for review, reviewed, or due again. A **Privacy impact assessment** campaign asks the owner of each that has none current; one that is current, asked, or waiting for review is not asked again.
+
+When an owner answers, the assessors and managers for its unit are told. The answers are checked for what wants a closer look: more collected than the purpose needs, sharing outside the organization with nothing covering it, more people able to see it than need to, and information not de-identified though it could be. The record's **Privacy** tab shows the last assessment, its concerns, and its answers; one of those who assess for its unit reads it and **Reviews it**, saying what was made of it. The review, and the answers, are kept with the record.
+
+![A system's privacy impact assessment: answered, with the concerns in its answers, waiting for review](img/system-privacy-light.webp)
 
 ## Committee sessions
 

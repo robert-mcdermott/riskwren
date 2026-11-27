@@ -80,6 +80,7 @@ async function boot() {
   route("/evidence/:ref", page("evidence", "evidencePage"));
   route("/assessments", page("assessments", "assessmentList"));
   route("/assessments/:ref", page("assessments", "assessmentPage"));
+  route("/privacy", page("privacy", "privacyPage"));
   route("/incidents", page("incidents", "incidentList"));
   route("/incidents/new", page("incidents", "incidentNew", meta));
   route("/incidents/:ref", page("incidents", "incidentPage"));

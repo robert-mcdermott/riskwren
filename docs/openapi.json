@@ -689,6 +689,102 @@
         "title": "BrandingBody",
         "type": "object"
       },
+      "BreachBody": {
+        "properties": {
+          "conclusion": {
+            "default": "undecided",
+            "description": "undecided, notify, or no_notification",
+            "title": "Conclusion",
+            "type": "string"
+          },
+          "discovered_at": {
+            "description": "When it was discovered: the clock starts then",
+            "title": "Discovered At",
+            "type": "string"
+          },
+          "exception": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "workforce, authorized, or could_not_retain",
+            "title": "Exception"
+          },
+          "factors": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FactorBody"
+            },
+            "title": "Factors",
+            "type": "object"
+          },
+          "information": {
+            "description": "From the protected_information vocabulary",
+            "items": {
+              "type": "string"
+            },
+            "title": "Information",
+            "type": "array"
+          },
+          "most_in_one_state": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The most of them living in any one state or jurisdiction",
+            "title": "Most In One State"
+          },
+          "people": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "About how many people it concerns",
+            "title": "People"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "regimes": {
+            "items": {
+              "$ref": "#/components/schemas/RegimeBody"
+            },
+            "title": "Regimes",
+            "type": "array"
+          },
+          "secured": {
+            "default": false,
+            "description": "Unusable, unreadable, or indecipherable",
+            "title": "Secured",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "discovered_at"
+        ],
+        "title": "BreachBody",
+        "type": "object"
+      },
       "CallReviewBody": {
         "properties": {
           "event": {
@@ -2107,6 +2203,36 @@
         "title": "ExternalRefBody",
         "type": "object"
       },
+      "FactorBody": {
+        "properties": {
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "low, moderate, or high",
+            "title": "Level"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "FactorBody",
+        "type": "object"
+      },
       "FrameworkBody": {
         "description": "A framework of the organization's own. On a change, send only what changes.",
         "properties": {
@@ -3523,6 +3649,85 @@
         "title": "NewUnit",
         "type": "object"
       },
+      "NotificationBody": {
+        "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "duty": {
+            "description": "Whom the rule says to notify, such as individuals",
+            "title": "Duty",
+            "type": "string"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "recipient": {
+            "maxLength": 400,
+            "title": "Recipient",
+            "type": "string"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "regime": {
+            "description": "A rule the assessment names, such as hipaa or state:Ohio",
+            "title": "Regime",
+            "type": "string"
+          },
+          "sent_on": {
+            "description": "The day it was sent",
+            "title": "Sent On",
+            "type": "string"
+          }
+        },
+        "required": [
+          "regime",
+          "duty",
+          "recipient",
+          "sent_on"
+        ],
+        "title": "NotificationBody",
+        "type": "object"
+      },
       "ObjectiveBody": {
         "description": "An objective. On a change, send only what changes, with the ``version`` you had.",
         "properties": {
@@ -4278,6 +4483,57 @@
           "value"
         ],
         "title": "ReadingBody",
+        "type": "object"
+      },
+      "RegimeBody": {
+        "properties": {
+          "days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a state or a contract: days allowed",
+            "title": "Days"
+          },
+          "hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a state or a contract: or hours",
+            "title": "Hours"
+          },
+          "key": {
+            "description": "hipaa, hipaa_business_associate, ftc_safeguards, dfars, state, or contract",
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a state or a contract",
+            "title": "Name"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "RegimeBody",
         "type": "object"
       },
       "RequestAnswerBody": {
@@ -6819,6 +7075,24 @@
           }
         },
         "title": "ReportBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__incidents__ReviewBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "ReviewBody",
         "type": "object"
       },
       "riskwren__api__routers__internal_audit__AnswerBody": {
@@ -18126,6 +18400,102 @@
         ]
       }
     },
+    "/api/v1/incidents/{ref}/breach": {
+      "get": {
+        "operationId": "show_breach_api_v1_incidents__ref__breach_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Breach Api V1 Incidents  Ref  Breach Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Whether it must be notified, and by when",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "post": {
+        "operationId": "assess_breach_api_v1_incidents__ref__breach_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BreachBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Assess Breach Api V1 Incidents  Ref  Breach Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assess whether it must be notified",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
     "/api/v1/incidents/{ref}/case": {
       "put": {
         "operationId": "set_incident_case_api_v1_incidents__ref__case_put",
@@ -18328,6 +18698,60 @@
           }
         },
         "summary": "Write about an incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/notifications": {
+      "post": {
+        "operationId": "record_notification_api_v1_incidents__ref__notifications_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Notification Api V1 Incidents  Ref  Notifications Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record a notification",
         "tags": [
           "incidents"
         ]
@@ -21875,6 +22299,83 @@
         "summary": "Risk and compliance by unit, category, framework, or third party",
         "tags": [
           "reporting"
+        ]
+      }
+    },
+    "/api/v1/privacy": {
+      "get": {
+        "operationId": "privacy_overview_api_v1_privacy_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Privacy Overview Api V1 Privacy Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The processes and systems that need a privacy impact assessment",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/privacy/reviews/{item_id}": {
+      "post": {
+        "operationId": "review_privacy_api_v1_privacy_reviews__item_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__incidents__ReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Review Privacy Api V1 Privacy Reviews  Item Id  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say an answered assessment has been reviewed",
+        "tags": [
+          "incidents"
         ]
       }
     },

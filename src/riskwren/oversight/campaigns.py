@@ -100,9 +100,19 @@ KINDS: dict[str, Kind] = {
         Kind(
             "acknowledgment", "Acknowledgment", "The people a document applies to", "document", None
         ),
+        Kind(
+            "privacy_impact",
+            "Privacy impact assessment",
+            "The owners of processes and systems that handle sensitive information",
+            "privacy",
+            "privacy-impact",
+        ),
     )
 }
-PATHS = {"control": "controls", "risk": "risks", "system": "systems", "document": "library"}
+PATHS = {
+    "control": "controls", "risk": "risks", "system": "systems", "process": "processes",
+    "document": "library",
+}  # fmt: skip
 
 
 # --- Who may --------------------------------------------------------------------------------
@@ -212,6 +222,16 @@ def audience(
             Asked("document", document.id, document.ref, document.name, homes.get(person.id),
                   person.id)
             for person in everyone
+        ]  # fmt: skip
+    if kind.subject == "privacy":
+        # The processes and systems whose data class needs an assessment, and that have no
+        # current one.
+        from riskwren.compliance import privacy
+
+        return [
+            Asked(kind_, row.id, row.ref, row.name, row.org_unit_id,
+                  _first_owner(session, kind_, row.id))
+            for kind_, row in privacy.needing(session, within)
         ]  # fmt: skip
     if kind.subject == "control":
         query = select(Control).where(Control.status == "active").order_by(Control.id)
@@ -548,6 +568,10 @@ def _effect(
             return "stands"
         notices.tell_all(session, [*stewards, *watchers], "campaign", text, href, by=principal)
         return outcome
+    if campaign.kind == "privacy_impact":
+        from riskwren.compliance import privacy
+
+        return privacy.answered(session, principal, item, campaign, said)
     if campaign.kind == "completeness":
         gaps = (
             said.get("complete") in ("mostly", "no")

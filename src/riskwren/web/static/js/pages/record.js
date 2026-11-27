@@ -382,21 +382,25 @@ export function stopsOf(record) {
 // Resilience: a process's needs, and what a system or service delivers.
 const MORE = { process: ["impact", "Business impact"], system: ["recovery", "Recovery"], service: ["recovery", "Recovery"] };
 
+// Privacy impact: for a process or a system whose data class needs an assessment.
+const PRIVACY = new Set(["process", "system"]);
+
 export function recordPage(main, type, params) {
   const meta = TYPES[type];
   const more = MORE[type];
   const wanted = query().get("tab");
-  const tab = wanted === "history" || (more && wanted === more[0]) ? wanted : "overview";
+  const tab = wanted === "history" || (more && wanted === more[0]) || (PRIVACY.has(type) && wanted === "privacy") ? wanted : "overview";
   return show(main, {
     title: params.ref,
     load: async () => {
       const base = `/api/v1/${meta.path}/${params.ref}`;
       const [record, vocab, unitIndex, entries, programData, risks] = await Promise.all([
         get(base, null, { fresh: true }), vocabularies(), units(),
-        tab === "overview" ? null : get(`${base}/${tab}`, null, { fresh: true }),
+        tab === "overview" || tab === "privacy" ? null : get(`${base}/${tab}`, null, { fresh: true }),
         loadProgram(), get("/api/v1/risks", { subject: params.ref, limit: 50 }, { fresh: true })]);
       const views = more && tab === more[0] ? await import("../components/resilience.js") : null;
-      return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [], program: programData, risks: risks.data, views };
+      const privacy = tab === "privacy" ? await import("../components/privacy.js") : null;
+      return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [], program: programData, risks: risks.data, views, privacy };
     },
     view: (data, reload) => {
       const record = data.record;
@@ -407,9 +411,10 @@ export function recordPage(main, type, params) {
       return h("div", { class: "stack" },
         recordHeader(record, { badges: [statusPill(record.status), criticality(data.vocab, record.criticality)], actions: edit }),
         stopsOf(record),
-        tabBar([["overview", "Overview"], ...(more ? [more] : []), ["history", "History"]], tab),
+        tabBar([["overview", "Overview"], ...(more ? [more] : []), ...(record.privacy_impact?.state ? [["privacy", "Privacy"]] : []), ["history", "History"]], tab),
         tab === "history" ? card({ flush: true }, timeline(data.history))
-          : data.views ? data.views.resilienceTab(type, record, data.history, reload) : overview(record, ctx));
+          : data.privacy ? data.privacy.privacyTab(record, reload)
+            : data.views ? data.views.resilienceTab(type, record, data.history, reload) : overview(record, ctx));
     },
   });
 }

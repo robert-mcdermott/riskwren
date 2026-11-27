@@ -63,6 +63,8 @@ from riskwren.db.models.governance import (
     RiskObjective,
 )
 from riskwren.db.models.incidents import (
+    BreachAssessment,
+    BreachNotification,
     Incident,
     IncidentMember,
     IncidentMessage,
@@ -138,6 +140,8 @@ __all__ = [
     "AuditRequest",
     "Baseline",
     "BaselineRequirement",
+    "BreachAssessment",
+    "BreachNotification",
     "Campaign",
     "CampaignItem",
     "ChainHead",

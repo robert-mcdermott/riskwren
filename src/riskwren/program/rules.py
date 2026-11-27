@@ -1,5 +1,6 @@
 """The program's tables of rules: how often things come due, who may accept what, how a
-third party is tiered, and which agreements shared information needs.
+third party is tiered, which agreements shared information needs, and which processes and
+systems need a privacy impact assessment.
 
 Like the vocabularies, each starts from the default program pack and is kept as a setting
 once an organization changes it.
@@ -15,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from riskwren.program import settings, vocab
 
-NAMES = ("cadences", "authority", "tiering", "sharing")
+NAMES = ("cadences", "authority", "tiering", "sharing", "privacy")
 
 
 def get(session: Session, name: str) -> dict[str, Any]:

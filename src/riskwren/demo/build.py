@@ -2320,7 +2320,7 @@ class Builder:
         triaged by the security team and the compliance office, written about, and closed."""
         from riskwren.db.models import Incident, OrgUnit, Risk, System
         from riskwren.events.actor import Actor
-        from riskwren.incidents import anonymous
+        from riskwren.incidents import anonymous, breach
         from riskwren.incidents import reports as incident_reports
 
         steps: list[tuple[float, int, str, Any]] = [(c.ANONYMOUS_OPENED, 9, "open", None)]
@@ -2330,6 +2330,10 @@ class Builder:
                 steps.append((spec["triage"][0], 11, "triage", spec))
             if "restrict" in spec:
                 steps.append((spec["restrict"][0], 12, "restrict", spec))
+            if "breach" in spec:
+                steps.append((spec["breach"][0], 13, "breach", spec))
+            for index, sent in enumerate(spec.get("notified", [])):
+                steps.append((sent[0], 15 + index, "notified", (spec, sent)))
             for index, said in enumerate(spec.get("said", [])):
                 steps.append((said[0], 14 + index, "say", (spec, said)))
             if "closed" in spec:
@@ -2347,6 +2351,13 @@ class Builder:
             if what == "open":
                 with self.act(self.cast["admin"]) as (session, who):
                     anonymous.set_open(session, who, True)
+                continue
+            if what == "notified":
+                spec, (_, by, regime, duty, recipient, method) = item
+                with self.act(self.cast[by]) as (session, who):
+                    breach.notify(session, who, find(session, spec), {
+                        "regime": regime, "duty": duty, "recipient": recipient, "method": method,
+                        "sent_on": self.now.date()})  # fmt: skip
                 continue
             if what == "say":
                 spec, (_, writer, shared, body) = item
@@ -2395,6 +2406,15 @@ class Builder:
                         "handler_id": self.cast[handler],
                         **({"org_unit_id": unit_of(session, moved[0])} if moved else {}),
                     })  # fmt: skip
+            elif what == "breach":
+                _, by, given = spec["breach"]
+                with self.act(self.cast[by]) as (session, who):
+                    incident = find(session, spec)
+                    breach.assess(session, who, incident, {
+                        **given, "discovered_at": incident.created_at,
+                        "factors": {key: {"level": level, "note": note}
+                                    for key, (level, note) in given["factors"].items()},
+                    })  # fmt: skip
             elif what == "restrict":
                 _, by, members = spec["restrict"]
                 with self.act(self.cast[by]) as (session, who):
@@ -2405,6 +2425,44 @@ class Builder:
                 _, by, note = spec["closed"]
                 with self.act(self.cast[by]) as (session, who):
                     incident_reports.close(session, who, find(session, spec), note)
+
+    def _story_privacy(self) -> Script:
+        """The risk office asks for a privacy impact assessment of everything that handles
+        restricted information; some owners answer, and the security leader reviews one."""
+        from riskwren.db.models import Campaign, CampaignItem
+        from riskwren.oversight import campaigns
+
+        yield self._on(c.PRIVACY_CAMPAIGN, hour=10)
+        with self.act(self.cast["cro"]) as (session, who):
+            campaign = campaigns.launch(session, who, {
+                "kind": "privacy_impact", "name": "Privacy impact assessments",
+                "summary": "Everything that handles restricted information, assessed once.",
+                "due_on": (self.now + timedelta(days=60)).date().isoformat()})  # fmt: skip
+            campaign_id = campaign.id
+        for name, (days, answers, reviewer, note) in sorted(
+            c.PRIVACY_ANSWERS.items(), key=lambda pair: -pair[1][0]
+        ):
+            yield self._on(days, hour=14)
+            with self.db.read() as session:
+                item = session.scalars(
+                    select(CampaignItem).where(
+                        CampaignItem.campaign_id == campaign_id, CampaignItem.subject_name == name
+                    )
+                ).first()
+                asked = item.account_id if item else None
+                item_id = item.id if item else None
+            if item_id is None or asked is None or asked in self.departed:
+                continue
+            with self.act(asked) as (session, who):
+                found = session.get(CampaignItem, item_id)
+                campaigns.answer(session, who, found, session.get(Campaign, campaign_id), answers)
+            self.tally("privacy impact assessments")
+            if reviewer:
+                yield self._on(days - 2, hour=11)
+                from riskwren.compliance import privacy
+
+                with self.act(self.cast[reviewer]) as (session, who):
+                    privacy.review(session, who, item_id, note)
 
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
@@ -3659,7 +3717,7 @@ class Builder:
             self._story_assurance, self._story_coverage, self._story_lifecycle,
             self._story_measures, self._story_leadership, self._story_scenarios,
             self._story_internal_audit, self._story_engagements, self._story_outside,
-            self._story_resilience, self._story_incidents,
+            self._story_resilience, self._story_incidents, self._story_privacy,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

@@ -700,6 +700,43 @@
         "description": "Somebody noticed it and said so"
       }
     ],
+    "protected_information": [
+      {
+        "key": "health",
+        "label": "Health information",
+        "description": "Identifiable health information a covered entity or its business associate holds"
+      },
+      {
+        "key": "personal",
+        "label": "Personal information under a state's law",
+        "description": "A name with a Social Security, license, or account number, or another identifier a state's breach law names"
+      },
+      {
+        "key": "financial",
+        "label": "Customer financial information",
+        "description": "Information about customers of a financial product or service"
+      },
+      {
+        "key": "participant",
+        "label": "Research participants' information",
+        "description": "Identifiable information about people in a study"
+      },
+      {
+        "key": "controlled",
+        "label": "Controlled or covered defense information",
+        "description": "Controlled unclassified information, or covered defense information under a contract"
+      },
+      {
+        "key": "credentials",
+        "label": "Sign-in credentials",
+        "description": "Usernames with passwords, or keys that unlock accounts"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these"
+      }
+    ],
     "incident_categories": [
       {
         "key": "security",
@@ -1528,5 +1565,11 @@
         ]
       }
     ]
+  },
+  "privacy": {
+    "impact_assessment_classes": [
+      "restricted"
+    ],
+    "impact_assessment_months": 36
   }
 }

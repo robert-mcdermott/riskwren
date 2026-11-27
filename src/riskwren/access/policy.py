@@ -323,6 +323,13 @@ POLICIES.update(
         ("POST", "/api/v1/incidents/{ref}/reopen"): Needs.ASSESS,
         ("POST", "/api/v1/incidents/{ref}/messages"): Needs.MEMBER,
         ("GET", "/api/v1/incidents/{ref}/history"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/{ref}/breach"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/breach"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/notifications"): Needs.MEMBER,
+        # Privacy impact assessments: where each process and system stands, read by everyone
+        # as the inventory is; reviewed by those who assess.
+        ("GET", "/api/v1/privacy"): Needs.MEMBER,
+        ("POST", "/api/v1/privacy/reviews/{item_id}"): Needs.ASSESS,
         ("GET", "/api/v1/admin/anonymous-reporting"): Needs.CONFIGURE,
         ("PUT", "/api/v1/admin/anonymous-reporting"): Needs.ADMIN,
         # Reporting without a name: no account, and nothing kept of who sent it. Closed

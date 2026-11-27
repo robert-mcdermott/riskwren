@@ -418,6 +418,8 @@ for _route in (
     ("POST", "/api/v1/incidents/{ref}/reopen"),
 ):
     REACH[_route] = {"manager", "assessor"}
+REACH[("GET", "/api/v1/privacy")] = EVERYONE
+REACH[("POST", "/api/v1/privacy/reviews/{item_id}")] = {"manager", "assessor"}
 REACH[("GET", "/api/v1/admin/anonymous-reporting")] = {"admin", "manager"}
 REACH[("PUT", "/api/v1/admin/anonymous-reporting")] = {"admin"}
 for _key in POLICIES:

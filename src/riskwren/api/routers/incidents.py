@@ -21,8 +21,9 @@ from riskwren.api.routers.inventory import (
     show_record_plain,
     update_record,
 )
+from riskwren.compliance import privacy
 from riskwren.events.actor import Actor
-from riskwren.incidents import anonymous, reports
+from riskwren.incidents import anonymous, breach, reports
 from riskwren.incidents.reports import INCIDENT
 from riskwren.inventory import history, records
 
@@ -184,6 +185,100 @@ def incident_history(request: Request, ref: str) -> dict[str, Any]:
         incident = records.load(session, principal, INCIDENT, ref)
         records.require_whole(session, principal, INCIDENT, incident)
         return envelope(history.for_record(session, INCIDENT, incident))
+
+
+# --- Breach assessment and notifications -------------------------------------------------
+
+
+class FactorBody(BaseModel):
+    level: str | None = Field(default=None, description="low, moderate, or high")
+    note: str | None = Field(default=None, max_length=4000)
+
+
+class RegimeBody(BaseModel):
+    key: str = Field(description="hipaa, hipaa_business_associate, ftc_safeguards, dfars, "
+                     "state, or contract")  # fmt: skip
+    name: str | None = Field(default=None, max_length=60, description="For a state or a contract")
+    days: int | None = Field(default=None, description="For a state or a contract: days allowed")
+    hours: int | None = Field(default=None, description="For a state or a contract: or hours")
+
+
+class BreachBody(BaseModel):
+    discovered_at: str = Field(description="When it was discovered: the clock starts then")
+    information: list[str] = Field(
+        default_factory=list, description="From the protected_information vocabulary"
+    )
+    people: int | None = Field(default=None, description="About how many people it concerns")
+    most_in_one_state: int | None = Field(
+        default=None, description="The most of them living in any one state or jurisdiction"
+    )
+    secured: bool = Field(default=False, description="Unusable, unreadable, or indecipherable")
+    exception: str | None = Field(default=None, description="workforce, authorized, or "
+                                  "could_not_retain")  # fmt: skip
+    factors: dict[str, FactorBody] = Field(default_factory=dict)
+    conclusion: str = Field(default="undecided", description="undecided, notify, or "
+                            "no_notification")  # fmt: skip
+    rationale: str | None = Field(default=None, max_length=20000)
+    regimes: list[RegimeBody] = Field(default_factory=list)
+
+
+class NotificationBody(BaseModel):
+    regime: str = Field(description="A rule the assessment names, such as hipaa or state:Ohio")
+    duty: str = Field(description="Whom the rule says to notify, such as individuals")
+    recipient: str = Field(max_length=400)
+    sent_on: str = Field(description="The day it was sent")
+    count: int | None = None
+    method: str | None = Field(default=None, max_length=400)
+    reference: str | None = Field(default=None, max_length=400)
+    note: str | None = Field(default=None, max_length=20000)
+
+
+class ReviewBody(BaseModel):
+    note: str | None = Field(default=None, max_length=20000)
+
+
+@router.get("/incidents/{ref}/breach", summary="Whether it must be notified, and by when")
+def show_breach(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        incident = records.load(session, principal, INCIDENT, ref)
+        return envelope(breach.view(session, principal, incident))
+
+
+@router.post("/incidents/{ref}/breach", summary="Assess whether it must be notified")
+def assess_breach(request: Request, ref: str, body: BreachBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        incident = records.load(session, principal, INCIDENT, ref)
+        breach.assess(session, principal, incident, body.model_dump())
+        return envelope(breach.view(session, principal, incident))
+
+
+@router.post("/incidents/{ref}/notifications", status_code=201, summary="Record a notification")
+def record_notification(request: Request, ref: str, body: NotificationBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        incident = records.load(session, principal, INCIDENT, ref)
+        breach.notify(session, principal, incident, body.model_dump())
+        return envelope(breach.view(session, principal, incident))
+
+
+# --- Privacy impact assessments -----------------------------------------------------------
+
+
+@router.get("/privacy", summary="The processes and systems that need a privacy impact assessment")
+def privacy_overview(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(privacy.overview(session, principal))
+
+
+@router.post("/privacy/reviews/{item_id}", summary="Say an answered assessment has been reviewed")
+def review_privacy(request: Request, item_id: int, body: ReviewBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        item = privacy.review(session, principal, item_id, body.note)
+        return envelope({"item_id": item.id, "outcome": item.outcome, "note": item.note})
 
 
 # --- Reporting without a name -------------------------------------------------------------

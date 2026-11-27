@@ -123,6 +123,7 @@ def export(session: Session) -> dict[str, Any]:
         "authority": rules.get(session, "authority"),
         "tiering": rules.get(session, "tiering"),
         "sharing": rules.get(session, "sharing"),
+        "privacy": rules.get(session, "privacy"),
     }
 
 
@@ -182,6 +183,14 @@ def problems(pack: Any) -> list[str]:
         from riskwren.thirdparty import coverage
 
         found += coverage.problems(pack["sharing"])
+    if "privacy" in pack:
+        privacy = pack["privacy"] if isinstance(pack["privacy"], dict) else {}
+        classes = privacy.get("impact_assessment_classes")
+        months = privacy.get("impact_assessment_months")
+        if not isinstance(classes, list) or not all(isinstance(each, str) for each in classes):
+            found.append("The privacy rule must list the data classes that need an assessment.")
+        if not isinstance(months, int) or not 1 <= months <= 120:
+            found.append("The privacy rule must say every how many months, from 1 to 120.")
     return found
 
 

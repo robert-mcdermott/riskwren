@@ -84,6 +84,15 @@ SOURCES: dict[str, tuple[str, str]] = {
         f"https://www.ecfr.gov/api/versioner/v1/full/{ECFR_DATE}/title-45.xml?part=164&subpart=C",
         "0cd78cafe337e87719da3966e4bfa59e2cb3e322165692c320baf1f64d7cdd1c",
     ),
+    "title-45-part-164-subpart-D.xml": (
+        f"https://www.ecfr.gov/api/versioner/v1/full/{ECFR_DATE}/title-45.xml?part=164&subpart=D",
+        "d95a017bc8193f5d1d318c0ce4ca8d0121924c357e35ef9c23acbdb6864b7216",
+    ),
+    "NIST_PF_1.0_cprt.json": (
+        "https://csrc.nist.gov/extensions/nudp/services/json/nudp/framework/version/pf_1_0_0"
+        "/export/json?element=all",
+        "c20d7fade235a6e2a23abdfab48e091b150ccf82804e89dbb4d1812e0bc96f20",
+    ),
 }
 
 
@@ -607,6 +616,120 @@ def build_hipaa(offline: bool) -> dict[str, Any]:
     }
 
 
+# --- The HIPAA Breach Notification Rule ----------------------------------------------------
+
+LETTER = re.compile(r"^\(([a-z])\)\s*")
+
+
+def build_hipaa_breach(offline: bool) -> dict[str, Any]:
+    """Subpart D, a section at a time. Each lettered paragraph is a standard or a
+    specification of its own; what is beneath it stays in its text, as published."""
+    root = ET.fromstring(fetch("title-45-part-164-subpart-D.xml", offline=offline))  # noqa: S314
+    sections = []
+    for section in root.iter("DIV8"):
+        number = section.get("N", "")
+        head = squeeze("".join(section.find("HEAD").itertext()))  # type: ignore[union-attr]
+        top = node(number, title=head.split(" ", 2)[2].rstrip("."), kind="section")
+        lines: list[str] = []
+        children: list[dict[str, Any]] = []
+        expected = "a"
+        for paragraph in section.findall("P"):
+            text = squeeze("".join(paragraph.itertext()))
+            lettered = LETTER.match(text)
+            if lettered is not None and lettered.group(1) == expected:
+                expected = chr(ord(expected) + 1)
+                rest = text[lettered.end() :]
+                italic = [squeeze("".join(lead.itertext())) for lead in paragraph.findall("I")]
+                title = italic[0].rstrip(".:") if italic and rest.startswith(italic[0]) else None
+                kind = "specification" if title and title.startswith("Implementation") else None
+                if title:
+                    # The heading is the title; the text carries on from it, as published.
+                    rest = rest[len(italic[0]) :].lstrip(" .:\u2014\u2013-")
+                    title = re.sub(r"^Implementation specifications?:\s*", "", title)
+                    kind = kind or ("standard" if title == "Standard" else None)
+                children.append(node(f"{number}({lettered.group(1)})", title=title, kind=kind,
+                                     text=rest))  # fmt: skip
+            elif children:
+                children[-1]["text"] = f"{children[-1]['text']}\n{text}"
+            else:
+                lines.append(text)
+        if lines:
+            top["text"] = "\n".join(lines)
+        if children:
+            top["children"] = children
+            top["group"] = not lines
+        sections.append(top)
+    return {
+        "pack": {
+            **header(
+                "hipaa-breach",
+                "HIPAA Breach Notification Rule",
+                f"45 CFR Part 164 Subpart D, as in force on {ECFR_DATE}",
+                source_url="https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-D",
+                built_from=f"The electronic Code of Federal Regulations, title 45, part 164, "
+                f"subpart D, as of {ECFR_DATE}",
+                summary="Notification in the case of breach of unsecured protected health "
+                "information: to individuals, the media, and the Secretary, by a business "
+                "associate, and the law enforcement delay: sections 164.400 to 164.414.",
+            ),
+            "framework_kind": "regulation",
+            "publisher": "United States Department of Health and Human Services",
+        },
+        "requirements": sections,
+    }
+
+
+# --- The NIST Privacy Framework ---------------------------------------------------------------
+
+
+def build_privacy_framework(offline: bool) -> dict[str, Any]:
+    data = json.loads(fetch("NIST_PF_1.0_cprt.json", offline=offline))["response"]["elements"]
+    elements = {each["element_identifier"]: each for each in data["elements"]}
+    beneath: dict[str, list[str]] = {}
+    for link in data["relationships"]:
+        if link["relationship_identifier"] == "projection":
+            beneath.setdefault(link["source_element_identifier"], []).append(
+                link["dest_element_identifier"]
+            )
+
+    def plain(text: str) -> str:
+        return squeeze(text.replace("\u00a0", " "))
+
+    functions = []
+    for each in data["elements"]:
+        if each["element_type"] != "function":
+            continue
+        categories = []
+        for category_id in beneath.get(each["element_identifier"], []):
+            category = elements[category_id]
+            if category["element_type"] != "category":
+                continue  # the publisher's sort keys and its notes on the CSF
+            outcomes = [
+                node(outcome_id, kind="subcategory", text=plain(elements[outcome_id]["text"]))
+                for outcome_id in beneath.get(category_id, [])
+                if elements[outcome_id]["element_type"] == "subcategory"
+            ]
+            categories.append(node(category_id, title=plain(category["title"]), kind="category",
+                                   group=True, text=plain(category["text"]),
+                                   children=outcomes))  # fmt: skip
+        functions.append(node(each["element_identifier"], title=each["title"].title(),
+                              kind="function", group=True, text=plain(each["text"]),
+                              children=categories))  # fmt: skip
+    return {
+        "pack": header(
+            "nist-privacy",
+            "NIST Privacy Framework",
+            "1.0",
+            source_url="https://www.nist.gov/privacy-framework",
+            built_from="The NIST Cybersecurity and Privacy Reference Tool: the Privacy "
+            "Framework 1.0 core, as exported",
+            summary="Five functions, their categories, and the subcategories under each: the "
+            "outcomes of managing privacy risk arising from data processing.",
+        ),
+        "requirements": functions,
+    }
+
+
 # --- Writing ------------------------------------------------------------------------------
 
 
@@ -624,7 +747,9 @@ def main() -> int:
     parser.add_argument("--offline", action="store_true", help="use only files already fetched")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-    for build in (build_csf, build_800_53, build_800_53_r4, build_800_171, build_hipaa):
+    builders = (build_csf, build_800_53, build_800_53_r4, build_800_171, build_hipaa,
+                build_hipaa_breach, build_privacy_framework)  # fmt: skip
+    for build in builders:
         pack = build(args.offline)
         path = OUT / f"{pack['pack']['key']}.json"
         path.write_text(json.dumps(pack, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")

@@ -42,9 +42,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `incident_member` names people on a case (migration 0041). `riskwren.incidents.reports` decides sight of a restricted case by whether the person is named on it, ahead of every role, in the check and the condition alike; a record type may now hide records from the history of everything (`hidden`), and **Reports → History** leaves out the events of cases the asker is not named on, while the chain keeps them. Restricting a case takes back the notices of those not named on it. When a handler leaves, a restricted case passes to someone else named on it (`stand_in`), never to a unit's stand-in. Its handlers, and its triagers who are named on it, restrict it, change who is named, and lift it. The demo restricts a pharmacy compliance concern to the risk manager and the compliance analyst handling it. The acceptance tests are in `tests/test_incidents.py`. Any later view of incidents beside another record (slice 4) must use the same condition.
 
-### Slice 3: Breach assessment ☐
+### Slice 3: Breach assessment ☑
 
-- [ ] The structured assessment, deadlines, and notifications; privacy impact assessments; privacy and breach framework packs (INC-05, INC-07)
+- [x] The structured assessment, deadlines, and notifications; privacy impact assessments; privacy and breach framework packs (INC-05, INC-07)
+
+**Acceptance:** an assessment records discovery, the information involved, how many people, whether it was secured, any exception, the four factors, and the conclusion with its reason and the rules that apply; what each rule requires and by when follows from it, including the HIPAA threshold of 500 for the Secretary and the media; each notification is recorded and marks its duty done; a process or system whose data class the program names is asked for a privacy impact assessment by campaign, its answers' concerns flagged and reviewed.
+
+**Done:** `breach_assessment` (superseded, never edited) and `breach_notification` (migration 0042, which also lets a campaign ask for a privacy impact assessment). `riskwren.incidents.breach` holds the rules built in (HIPAA as a covered entity and as a business associate, the FTC Safeguards Rule, DFARS 252.204-7012) and those the organization names (a state's law, a contract), works out each duty's due date from discovery, and lists what is still to send on the handler's home page. `riskwren.compliance.privacy` decides which processes and systems need an assessment from the new `privacy` rule, asks for them through a new campaign kind with a built-in questionnaire, flags concerns in the answers, and records a review; a process's or system's **Privacy** tab and **Compliance → Privacy impact** show where each stands. The HIPAA Breach Notification Rule and the NIST Privacy Framework 1.0 are built from the eCFR and from NIST's reference tool, and loaded on request. The demo assesses two incidents and runs a privacy impact campaign. The acceptance tests are `tests/test_breach.py`.
 
 ### Slice 4: Learning and losses ☐
 
