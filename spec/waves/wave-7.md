@@ -2,7 +2,7 @@
 
 **Goal:** give the third line its own workspace on the same record, without compromising its independence. Waves 1 to 6 made a record that the first and second lines keep, and that auditors could read but not touch. Wave 7 gives internal audit what it does with that record: decide what is worth auditing and when, plan a period's work, carry out each engagement with a program of work and workpapers that are reviewed and signed off, ask the audited for what is needed, and turn what is found into issues that management puts right and audit confirms. Work in progress is the audit team's alone until the report is issued.
 
-**Branch:** `wave-7` · **Target version:** `0.7.0` · **Status:** ☐ in progress
+**Branch:** `wave-7` · **Target version:** `0.7.0` · **Status:** ☑ released
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security leader, audit is the most demanding reader of the record: an engagement on access management or third-party risk asks for the same controls, tests, evidence, and issues the security team already keeps. In this wave that means an auditor can draw on that record directly instead of asking for it again; requests name what is needed and are answered with evidence already on file where it exists; and a finding about a security control lands in the same issue register, with the same severity and dates, that the security team already works from.
 
@@ -72,9 +72,11 @@ The wave is done when, on a fresh checkout:
 
 Not done, and said so: the files of evidence are listed, not downloadable, through the link; an outsider who needs one asks for it.
 
-### Slice 6: Release prep ☐
+### Slice 6: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.6.0 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.6.0 on both databases, audits, release, and the site republished
+
+**Done:** a new guide, Internal audit, written slice by slice, in the guides' index and the site's menu; the issue guide says who confirms a finding closed; the README, the guides' index, and the site's home page describe 0.7.0, and the changelog has its upgrade notes. The upgrade from 0.6.0 was run from that release's own code with its demo organization on both databases: migrations 0035 to 0038 applied, every row of every table unchanged, the history still verifies, the universe worked out over the old data, a plan drafted and approved, an engagement started and worked, a request and a finding raised, the committee report, and a scope opened to an outsider through a link; `riskwren verify` passing and a second upgrade changing nothing. The demo's storyline test checks the wave's stories.
 
 ## Notes
 

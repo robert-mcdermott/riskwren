@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.6.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.7.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 

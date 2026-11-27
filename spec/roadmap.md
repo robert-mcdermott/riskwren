@@ -140,7 +140,7 @@ Detail: [waves/wave-5.md](waves/wave-5.md)
 
 Detail: [waves/wave-6.md](waves/wave-6.md)
 
-## Wave 7: Audit (v0.7.0) ☐
+## Wave 7: Audit (v0.7.0) ☑
 
 **Goal:** give the third line its own workspace on the same record, without compromising its independence.
 
@@ -151,7 +151,7 @@ Detail: [waves/wave-6.md](waves/wave-6.md)
 | 3 | Requests | Requests to the audited, answered with evidence | ☑ |
 | 4 | Findings and follow-up | Findings as issues with management action plans; validation by audit; the committee report | ☑ |
 | 5 | Outside auditors | Scoped, time-limited, read-only access with every view recorded | ☑ |
-| 6 | Release prep | Guides, changelog, release | ☐ |
+| 6 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-7.md](waves/wave-7.md)
 

@@ -4,9 +4,30 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## 0.7.0 (unreleased)
+## 0.7.0 (2026-11-27)
 
-Wave 7, *Audit*.
+Wave 7, *Audit*: the third line's own workspace on the same record, without compromising its
+independence. The audit universe ranks every unit, process, system, third party, and scope
+from the register, with its working shown. A period's plan is approved by a named person and
+tracked against. Engagements move through planning, fieldwork, and reporting, with workpapers
+reviewed and signed off by someone other than their preparer, and their work is the team's
+alone until the report is issued. Requests to the audited are answered with evidence already
+on file. Findings are issues in the one register, which internal audit confirms closed. A
+report goes to the audit committee, and an outside auditor can be given one engagement or one
+scope, read-only, with every look recorded.
+
+### Upgrading from 0.6.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0035 to 0038). Every row is
+kept, and the history still verifies. A few things look different afterwards:
+
+- **The menu has a new group, Audit,** with Universe, Plans, and Outside access, for those who
+  read everything and those who lead the whole organization. Only auditors change them.
+- **The universe is there at once,** worked out from the register; nothing needs entering. Every
+  thing in it counts as never audited until audit records an earlier audit or reports one.
+- **Closing an issue raised by internal audit is confirmed by an auditor,** not by the second
+  line. Issues raised before 0.7.0 are unchanged. The route that confirms a closure is now open
+  to everyone signed in, and the issue decides who may.
 
 ### Added
 
