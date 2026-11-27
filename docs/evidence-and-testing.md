@@ -109,6 +109,18 @@ While a test result holds, the control cannot be re-rated by judgment. Otherwise
 
 The assessment's **History** tab tells every test planned, every result recorded, and every confirmation and return, with who did each.
 
+## An attestation is not a test
+
+A control's owner can be asked, in a [campaign](running-the-program.md#campaigns), whether it still operates as described. Their answer is recorded on the control and shown there, apart from its rating: who said it, when, and what they said.
+
+That is the owner's word. It is worth having, and it is a different kind of assurance from a test by someone who does not own the control. RiskWren keeps the two apart by rule:
+
+- **An attestation never makes anything verified.** A control its owner says is working is in place, and the reason given says it rests on an attestation and no test.
+- **An attestation can take a control out of verified.** If a test found a control effective and its owner has since said it operates only partly, or not at all, the requirements it answers drop to in place, and the reason says why. It is not shown as failing, because nobody has tested it; it is no longer something to call verified.
+- An attestation holds for as long as a rating does, twelve months by default.
+
+So a figure that says verified always rests on a test and on evidence. Nobody's say-so is in it.
+
 ## Verified, in practice
 
 A requirement is verified when each control that answers it in the scope is in place, has a confirmed test result of effective that still holds, and has current evidence, either attached to the control or cited by that result.

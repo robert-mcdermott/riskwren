@@ -26,6 +26,8 @@ from riskwren.core.clock import utc_now
 from riskwren.db.models import (
     Acceptance,
     Action,
+    Campaign,
+    CampaignItem,
     Control,
     Evidence,
     ExceptionRequest,
@@ -158,6 +160,30 @@ def due_items(session: Session, today: date, horizon: date) -> Iterator[Due]:
         )  # fmt: skip
 
 
+def _campaign_items(session: Session, horizon: date) -> Iterator[Due]:
+    """What open campaigns still want, each from the person it was asked of."""
+    for item, campaign in session.execute(
+        select(CampaignItem, Campaign)
+        .join(Campaign, Campaign.id == CampaignItem.campaign_id)
+        .where(
+            CampaignItem.status == "pending",
+            Campaign.status == "open",
+            Campaign.due_on <= horizon,
+            CampaignItem.account_id.is_not(None),
+        )
+    ):
+        about = f"{item.subject_ref or ''} {item.subject_name}".strip()
+        yield Due(
+            "campaign_item",
+            item.id,
+            campaign.due_on,
+            f"{campaign.name}: {about}",
+            f"/campaign-items/{item.id}",
+            (item.account_id,),
+            item.org_unit_id,
+        )
+
+
 def _when(days: int) -> str:
     if days == 0:
         return "today"
@@ -195,7 +221,8 @@ def send(session: Session, *, today: date | None = None) -> dict[str, int]:
     def tell(people: Iterable[int | None], kind: str, text: str, href: str) -> int:
         return notices.tell_all(session, people, kind, text, href)
 
-    for due in due_items(session, today, horizon):
+    everything = [*due_items(session, today, horizon), *_campaign_items(session, horizon)]
+    for due in everything:
         stage = stage_of(due, today, plan)
         if stage is None or (due.kind, due.id, due.due_on, stage) in already:
             continue

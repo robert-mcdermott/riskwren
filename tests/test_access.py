@@ -295,6 +295,17 @@ REACH[("GET", "/api/v1/questionnaires/{key}")] = EVERYONE
 REACH[("PATCH", "/api/v1/questionnaires/{key}")] = {"admin", "manager"}
 REACH[("POST", "/api/v1/questionnaires/{key}/responses")] = EVERYONE
 REACH[("GET", "/api/v1/responses/{response_id}")] = EVERYONE
+RUNNERS = {"manager", "assessor"}
+REACH[("GET", "/api/v1/campaigns")] = EVERYONE
+REACH[("POST", "/api/v1/campaigns")] = RUNNERS
+REACH[("POST", "/api/v1/campaigns/preview")] = RUNNERS
+REACH[("GET", "/api/v1/campaigns/{ref}")] = EVERYONE
+REACH[("POST", "/api/v1/campaigns/{ref}/remind")] = RUNNERS
+REACH[("POST", "/api/v1/campaigns/{ref}/close")] = RUNNERS
+REACH[("POST", "/api/v1/campaigns/{ref}/cancel")] = RUNNERS
+REACH[("GET", "/api/v1/campaign-items/{item_id}")] = EVERYONE
+REACH[("POST", "/api/v1/campaign-items/{item_id}/answer")] = EVERYONE
+REACH[("POST", "/api/v1/campaign-items/{item_id}/excuse")] = RUNNERS
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):

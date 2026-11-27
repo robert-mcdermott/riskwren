@@ -49,7 +49,7 @@ if (!args.includes("--all") && !words.length) {
 }
 mkdirSync(out, { recursive: true });
 
-const demo = await startDemo({ port: 8028 });
+const demo = await startDemo();
 const page = await openBrowser();
 try {
   let who = null;

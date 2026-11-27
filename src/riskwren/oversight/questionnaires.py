@@ -434,6 +434,7 @@ def answer(
     subject: tuple[str, int] | None = None,
     complete: bool = True,
     response: Response | None = None,
+    version: QuestionnaireVersion | None = None,
 ) -> Response:
     """Keep someone's answers. A draft may be incomplete and is finished later; a submitted
     response is checked in full and cannot be changed afterwards. A draft begun under an
@@ -448,9 +449,12 @@ def answer(
         version = session.get(QuestionnaireVersion, response.version_id)
         assert version is not None
     else:
-        if row.status != "active":
-            raise Conflict(f"{row.title} is no longer used.")
-        version = version_of(session, row)
+        if version is None:
+            # A campaign asks everyone the version it was launched with; otherwise the
+            # current one, of a questionnaire that is still in use.
+            if row.status != "active":
+                raise Conflict(f"{row.title} is no longer used.")
+            version = version_of(session, row)
     cleaned, errors = clean(version.document, answers, complete=complete)
     if errors:
         raise Invalid("Some answers need another look.", errors)

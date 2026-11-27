@@ -60,10 +60,10 @@ function reminders(when) {
   const days = (count) => plural(count, "day");
   return card({ title: "When reminders go" }, h("div", { class: "stack" },
     h("p", { class: "muted" }, "Actions, risk reviews, issues, evidence, acceptances, exceptions, and control tests each have a date. A reminder is a notice: read under the bell, and sent by email where that is set up."),
-    facts([["Before the date", `${when.soon_days} ${days(when.soon_days)} ahead, to whoever it is waiting on`],
+    facts([["Before the date", `${days(when.soon_days)} ahead, to whoever it is waiting on`],
       ["The day after", "To the same people, as overdue. A test that is overdue also goes to the assessors"],
-      ["Still late", `After ${when.steward_after_days} ${days(when.steward_after_days)}, to the steward of the unit`],
-      ["Later still", `After ${when.leader_after_days} ${days(when.leader_after_days)}, to the unit's leader`]]),
+      ["Still late", `After ${days(when.steward_after_days)}, to the steward of the unit`],
+      ["Later still", `After ${days(when.leader_after_days)}, to the unit's leader`]]),
     h("p", { class: "subtle" }, "Each is said once for a given date. Moving the date starts again. Actions and issues go up to the steward and the leader; the others are for their owners.")));
 }
 

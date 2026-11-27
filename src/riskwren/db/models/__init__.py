@@ -43,7 +43,13 @@ from riskwren.db.models.inventory import (
     ThirdParty,
 )
 from riskwren.db.models.jobs import Job, JobRun, OutboxMessage, Reminder
-from riskwren.db.models.oversight import Questionnaire, QuestionnaireVersion, Response
+from riskwren.db.models.oversight import (
+    Campaign,
+    CampaignItem,
+    Questionnaire,
+    QuestionnaireVersion,
+    Response,
+)
 from riskwren.db.models.people import (
     Account,
     Credential,
@@ -74,6 +80,8 @@ __all__ = [
     "Assessment",
     "Baseline",
     "BaselineRequirement",
+    "Campaign",
+    "CampaignItem",
     "ChainHead",
     "Control",
     "ControlLibraryEntry",

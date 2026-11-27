@@ -58,7 +58,13 @@ def _calendar(db: Database, _config: Config) -> dict[str, int]:
 def _reminders(db: Database, _config: Config) -> dict[str, int]:
     # Reminders are notices, which are not history, so no actor writes them.
     with db.bookkeeping() as session:
-        return reminders.send(session)
+        counts = reminders.send(session)
+    # An evidence request is met when the evidence is attached; nobody has to say so.
+    from riskwren.oversight import campaigns
+
+    with db.write(SCHEDULER, action="job.reminders") as session:
+        counts["evidence_requests_met"] = campaigns.refresh_all(session)
+    return counts
 
 
 def _tidy(db: Database, _config: Config) -> dict[str, int]:

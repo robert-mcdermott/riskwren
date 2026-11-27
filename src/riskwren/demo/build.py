@@ -47,6 +47,8 @@ from riskwren.db.engine import Database
 from riskwren.db.models import (
     Acceptance,
     Action,
+    Campaign,
+    CampaignItem,
     Control,
     ControlTest,
     Evidence,
@@ -60,6 +62,7 @@ from riskwren.db.models import (
 from riskwren.demo import content as c
 from riskwren.inventory import access, links, records
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
+from riskwren.oversight import campaigns
 from riskwren.people import accounts, units
 from riskwren.program import branding, packs, settings
 from riskwren.risk import categories, register
@@ -1805,6 +1808,113 @@ class Builder:
         sample, note = c.TESTS["effective"][0]
         self._result(test_id, testers[test_id], ("effective", "effective", sample, note))
 
+    # --- Campaigns ------------------------------------------------------------------------
+
+    def _on(self, days: float, hour: int = 11) -> datetime:
+        """A working moment that many days before the build, chosen without the dice, so that
+        what is added here leaves every other story as it was."""
+        moment = (self.end - timedelta(days=days)).replace(hour=hour, minute=20)
+        while moment.weekday() >= 5:
+            moment -= timedelta(days=1)
+        return moment
+
+    def _answer(self, campaign_id: int, item_id: int, answers: dict[str, Any]) -> None:
+        with self.db.read() as session:
+            asked = session.get(CampaignItem, item_id).account_id
+        if asked is None or asked in self.departed:
+            return
+        with self.act(asked) as (session, who):
+            campaigns.answer(
+                session, who, session.get(CampaignItem, item_id),
+                session.get(Campaign, campaign_id), answers,
+            )  # fmt: skip
+        self.tally("campaign answers")
+
+    def _story_campaigns(self) -> Script:
+        """Owners asked to look again and to attest. One campaign is closed, one is most of the
+        way through with two owners saying their control is not as described, one has only
+        just asked for evidence."""
+        lead, security = self.cast["risk2"], self.cast["assess1"]
+        spec = c.CAMPAIGNS
+        yield self._on(128)
+        with self.act(lead) as (session, who):
+            made = campaigns.launch(
+                session, who,
+                {"kind": "self_assessment", "name": f"{spec['risks']['name']} {self.end.year}",
+                 "summary": spec["risks"]["summary"], "org_unit_id": self.units["CORES"],
+                 "due_on": self.day(-100).isoformat()},
+            )  # fmt: skip
+            risks_id = made.id
+            asked = [item.id for item in session.scalars(
+                select(CampaignItem).where(CampaignItem.campaign_id == made.id)
+                .order_by(CampaignItem.id)
+            )]  # fmt: skip
+        self.tally("campaigns")
+        stands = {"relevant": True, "changed": ["nothing"], "controls_working": "yes",
+                  "rating_right": True, "plan": "none"}  # fmt: skip
+        for index, item_id in enumerate(asked):
+            if index % 9 == 8:
+                continue  # one in nine never answered
+            if index % 4 == 0:
+                yield self._on(126 - index % 20)
+            said = dict(stands)
+            if index % 7 == 3:
+                said.update(changed=["controls"], what_changed="A control was replaced this year.",
+                            controls_working="partly")  # fmt: skip
+            if index % 11 == 5:
+                said.update(rating_right=False,
+                            rating_note="Lower. The backlog that drove it has been cleared.")  # fmt: skip
+            self._answer(risks_id, item_id, said)
+        yield self._on(96)
+        with self.act(lead) as (session, who):
+            campaigns.end(session, who, session.get(Campaign, risks_id))
+
+        yield self._on(21)
+        with self.db.read() as session:
+            scope_ref = self._scope_named(session, c.SCOPE_PROVIDER["name"]).ref
+            clinic_ref = self._scope_named(session, c.SCOPE_CLINIC["name"]).ref
+        with self.act(security) as (session, who):
+            made = campaigns.launch(
+                session, who,
+                {"kind": "attestation", "name": f"{spec['attest']['name']} {self.end.year}",
+                 "summary": spec["attest"]["summary"], "scope": scope_ref,
+                 "due_on": self.day(6).isoformat()},
+            )  # fmt: skip
+            attest_id = made.id
+            asked_of = {
+                item.subject_id: item.id
+                for item in session.scalars(
+                    select(CampaignItem).where(CampaignItem.campaign_id == made.id)
+                )
+            }
+        self.tally("campaigns")
+        keys = {control_id: key for (key, _unit), control_id in self.controls.items()}
+        fine = {"operates": "yes", "statement_right": True, "evidence": "yes", "owner_right": True}
+        answering = sorted(asked_of.items())[: -spec["attest"]["waiting"]]
+        for index, (control_id, item_id) in enumerate(answering):
+            if index % 5 == 0:
+                yield self._on(19 - index // 5 * 2)
+            key = keys.get(control_id)
+            said = dict(fine)
+            if key in spec["attest"]["said"]:
+                operates, difference = spec["attest"]["said"][key]
+                said.update(operates=operates, difference=difference)
+            elif key == spec["attest"]["not_mine"][0]:
+                said.update(owner_right=False, owner_instead=spec["attest"]["not_mine"][1])
+            elif index % 6 == 4:
+                said.update(evidence="out_of_date", evidence_plan="Before the assessment closes.")
+            self._answer(attest_id, item_id, said)
+
+        yield self._on(3)
+        with self.act(security) as (session, who):
+            campaigns.launch(
+                session, who,
+                {"kind": "evidence", "name": spec["evidence"]["name"],
+                 "wanted": spec["evidence"]["wanted"], "scope": clinic_ref,
+                 "due_on": self.day(25).isoformat()},
+            )  # fmt: skip
+        self.tally("campaigns")
+
     # --- Issues and exceptions ------------------------------------------------------------
 
     def _story_issues_later(self) -> Script:
@@ -2160,7 +2270,7 @@ class Builder:
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
             self._story_agreement, self._story_scopes, self._story_assessment,
-            self._story_issues_later, self._story_exceptions_later,
+            self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

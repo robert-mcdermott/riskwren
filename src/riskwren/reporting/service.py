@@ -368,6 +368,21 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             f"/evidence/{held.ref}", held.valid_until, ref=held.ref,
         )  # fmt: skip
 
+    # What campaigns have asked of them: an attestation, a look at a risk, a check of a unit.
+    from riskwren.oversight import campaigns
+
+    for item, campaign in campaigns.waiting_on(session, principal):
+        about = f"{item.subject_ref or ''} {item.subject_name}".strip()
+        verb = {
+            "attestation": "Attest", "self_assessment": "Look again at",
+            "completeness": "Check the records of", "profile": "Describe the security of",
+            "evidence": "Provide evidence for",
+        }[campaign.kind]  # fmt: skip
+        add(
+            "campaign", f"{verb} {about}", f"{campaign.ref} · {campaign.name}",
+            f"/campaign-items/{item.id}", campaign.due_on, ref=campaign.ref,
+        )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 

@@ -877,6 +877,34 @@ SCOPE_ENCLAVE = {
     "excluded": [],
 }  # fmt: skip
 
+# Campaigns: what was asked, of whom, and what a few of them said.
+CAMPAIGNS = {
+    "attest": {
+        "name": "Central information technology: control attestation",
+        "summary": "Before the assessment closes, each owner confirms that their control still "
+        "operates as its statement says, or tells us what has changed.",
+        # control: what its owner says of it, and why
+        "said": {
+            "session_lock": (
+                "partly",
+                "Screens lock everywhere. Idle sessions on the two older "
+                "terminal servers are not ended, since the upgrade was put back.",
+            ),
+        },
+        "not_mine": ("physical_access", "Facilities took over the data room doors in the spring."),
+        "waiting": 7,
+    },
+    "risks": {
+        "name": "Core Facilities: risk self-assessment",
+        "summary": "A look at every open risk in the cores before the annual plan is set.",
+    },
+    "evidence": {
+        "name": "Clinical systems: evidence for the security rule review",
+        "wanted": "Whatever shows the control operated this quarter: a report, an export, a signed "
+        "log. One item for each control is enough.",
+    },
+}
+
 # Issues at every stage. Each: where it is, what found it, how serious, what is wrong, the
 # detail, and its actions as (what, days from the build that it is due, whether it is done).
 ISSUES = {

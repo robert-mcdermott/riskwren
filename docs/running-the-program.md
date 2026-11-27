@@ -154,9 +154,48 @@ A question, or a whole section, can be asked only when an earlier answer makes i
 
 The **Try it** tab asks the questions and shows how the answers would be kept, without saving anything.
 
+## Campaigns
+
+A campaign asks a set of people for one thing by a date, and shows who has answered. **Compliance → Campaigns → Start a campaign** (an assessor or a manager, for the units they cover).
+
+| Campaign | Asks | For |
+|---|---|---|
+| **Control attestation** | The owners of controls | Does each control still operate as described, is its evidence in date, and are you still the right owner? |
+| **Risk self-assessment** | The owners of risks | Does each risk still stand, what has changed, and are its rating and plan still right? |
+| **Unit completeness check** | The stewards of units | Is everything the unit has on record, with the right owners? |
+| **System security profile** | The owners of systems | What each system holds, who can reach it, and who patches, backs up, and watches it |
+| **Evidence request** | The owners of controls | A named piece of evidence for each control |
+
+Choose what to ask, give it a name and a date, and say what it is about: everything in a unit and beneath it, or, for controls, only those a compliance scope uses. Before it starts, the form says how many people would be asked about how many things. Each person is told once, with a count, and finds each thing on their **Home**.
+
+- **Everyone is asked the same version** of the questionnaire, the one in use when the campaign started. Changing the questionnaire later does not change a campaign under way.
+- Any owner of a control, risk, or system may answer for it, not only the one who was asked. An answer can be saved and finished later.
+- **Something with nobody to ask is still listed**, and shown as such, so that a control whose only owner has left does not pass unnoticed. Name an owner, or **excuse** it with a reason.
+- **An evidence request closes by itself** when evidence collected since the request is attached to the control.
+
+### Following one
+
+A campaign's page shows how far it has got, what those who answered said, **coverage by unit** with the least covered first, and every item with who was asked. Each figure is the count of the list beneath it.
+
+- **Remind** tells everyone who still owes something, once, with how many. The scheduled [reminders](#reminders) do the same as the date approaches, and tell a unit's steward and then its leader about what stays unanswered.
+- **Close** ends a campaign and keeps what was answered. **Cancel it** is for one started in error.
+
+### What an answer sets in motion
+
+Answers are kept as given, and some need someone else to act. Those people are told.
+
+| Answer | Who is told |
+|---|---|
+| A control only partly operates, or does not | The unit's assessors, managers, and stewards |
+| Someone else should own this control | The unit's stewards |
+| A risk no longer stands, or its rating is no longer right | The unit's stewards, assessors, and managers |
+| A unit's records need attention | The assessors and managers who cover it |
+
+An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
+
 ## Reminders
 
-Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, and the next test of each control.
+Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, and what a campaign has asked.
 
 | When | Who is told |
 |---|---|
@@ -166,7 +205,7 @@ Everything with a date reminds whoever it is waiting on: actions, risk reviews, 
 | Still late after 21 days | The unit's leader |
 
 - Each of these is said **once** for a given date. Moving the date starts again.
-- Actions and issues go up to the steward and the leader. The rest are for their owners: nobody else can renew a person's evidence or review their risk for them.
+- Actions, issues, and what a campaign has asked go up to the steward and the leader. The rest are for their owners: nobody else can renew a person's evidence or review their risk for them.
 - Something found already long overdue, as on the first day after an upgrade, is told once to whoever it has reached, and not to everyone below as well.
 - A reminder is a notice. It is read under the bell, and sent by email where [email is set up](configuration.md#email).
 

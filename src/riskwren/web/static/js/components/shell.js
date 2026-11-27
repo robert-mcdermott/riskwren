@@ -38,6 +38,7 @@ export const NAV = [
       { href: "/assessments", label: "Assessments", iconName: "assessment" },
       { href: "/issues", label: "Issues", iconName: "issue" },
       { href: "/exceptions", label: "Exceptions", iconName: "exception" },
+      { href: "/campaigns", label: "Campaigns", iconName: "bell", when: ["assess", "read_all"] },
     ],
   },
   {
@@ -72,7 +73,7 @@ export const NAV = [
 ];
 
 export function visibleNav() {
-  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || can(item.when)) }))
+  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || [item.when].flat().some((need) => can(need))) }))
     .filter((group) => group.items.length);
 }
 

@@ -123,6 +123,14 @@ def _detail(session: Session, principal: Principal, control: Control) -> dict[st
     due = next_test_on(session, control) if control.status == "active" else None
     return {
         "next_test_on": due,
+        # The owner's word, shown apart from the rating. It is not a test.
+        "attested": {
+            "operates": control.attested_operates,
+            "at": control.attested_at,
+            "by": control.attested_by_name,
+        }
+        if control.attested_at
+        else None,
         "test_due": due is not None and due <= utc_now().date(),
         "library_key": control.library_key,
         "rating": next(iter(ratings(session, control)), None),

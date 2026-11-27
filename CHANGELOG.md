@@ -10,6 +10,9 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 - Risks are brought up to date with the calendar every hour by a scheduled job, as well as
   when the register is read.
+- The accessibility audit and the screenshot capture start their demo on a port the
+  operating system says is free. A fixed port could already belong to something else on
+  the machine, which would then have been audited in its place.
 - `riskwren doctor` reports how people sign in, whether email is set up, and whether
   scheduled work is being done.
 
@@ -54,6 +57,19 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   an answer is always read against the version it was given to, so it reads as it was asked.
 - **One condition language,** evaluated by the server and by the browser with the same
   rules, held together by shared test cases. No expression is ever run as code.
+- **Campaigns.** An assessor or manager asks a set of people for one thing by a date: owners
+  to attest that their controls still operate, owners to look again at their risks, stewards
+  to check a unit's records, owners to describe how a system is protected, or owners for a
+  named piece of evidence. A campaign is about a unit and what lies beneath it, or the
+  controls a scope uses. Its page shows how far it has got, what was answered, coverage by
+  unit, and every item, including anything with nobody to ask.
+- **Answers that set things in motion.** An owner who says a control does not operate as
+  described, that a risk's rating is no longer right, or that a unit's records need
+  attention is heard by the people who have to act. An evidence request closes by itself
+  when the evidence is attached.
+- **Attestation, shown apart from a test.** What a control's owner last said of it is on the
+  control with who and when. It never makes a requirement verified, and it takes one out of
+  verified when the owner says, after a test, that the control no longer operates.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
 

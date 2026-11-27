@@ -58,6 +58,18 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("PATCH", "/api/v1/questionnaires/{key}"): Needs.CONFIGURE,
     ("POST", "/api/v1/questionnaires/{key}/responses"): Needs.MEMBER,
     ("GET", "/api/v1/responses/{response_id}"): Needs.MEMBER,
+    # Campaigns: assessors and managers run them; whoever is asked answers. What a person
+    # may see of a campaign is decided where it is read.
+    ("GET", "/api/v1/campaigns"): Needs.MEMBER,
+    ("POST", "/api/v1/campaigns"): Needs.ASSESS,
+    ("POST", "/api/v1/campaigns/preview"): Needs.ASSESS,
+    ("GET", "/api/v1/campaigns/{ref}"): Needs.MEMBER,
+    ("POST", "/api/v1/campaigns/{ref}/remind"): Needs.ASSESS,
+    ("POST", "/api/v1/campaigns/{ref}/close"): Needs.ASSESS,
+    ("POST", "/api/v1/campaigns/{ref}/cancel"): Needs.ASSESS,
+    ("GET", "/api/v1/campaign-items/{item_id}"): Needs.MEMBER,
+    ("POST", "/api/v1/campaign-items/{item_id}/answer"): Needs.MEMBER,
+    ("POST", "/api/v1/campaign-items/{item_id}/excuse"): Needs.ASSESS,
     # People
     ("GET", "/api/v1/accounts"): Needs.MEMBER,  # the people picker; members see names only
     ("POST", "/api/v1/accounts"): Needs.ADMIN,

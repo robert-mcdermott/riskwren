@@ -24,6 +24,7 @@ PREFIXES = {
     "EV": "Evidence",
     "ISS": "Issue",
     "EXC": "Exception",
+    "CMP": "Campaign",
     "IND": "Indicator",
     "POL": "Policy document",
     "AGR": "Agreement",

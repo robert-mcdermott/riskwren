@@ -100,3 +100,10 @@
 .editor-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--space-3); }
 .editor-rule { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
 @media (max-width: 720px) { .editor-grid, .editor-rule { grid-template-columns: minmax(0, 1fr); } }
+
+/* Campaigns */
+.owed-icon[data-kind="campaign"] { color: var(--info); background: var(--info-soft); }
+.coverage-bar { display: block; height: 8px; border-radius: var(--radius-full); background: var(--surface-3); overflow: hidden; min-width: 80px; }
+.coverage-bar i { display: block; height: 100%; background: var(--ok); }
+.pad { padding: var(--space-4) var(--space-5); }
+.pad-x { padding: 0 var(--space-5); }

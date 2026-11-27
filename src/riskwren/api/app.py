@@ -15,6 +15,7 @@ from riskwren.api.problems import install_problem_handlers
 from riskwren.api.routers import (
     assessments,
     branding,
+    campaigns,
     controls,
     evidence,
     exchange,
@@ -42,6 +43,7 @@ from riskwren.home import DataHome
 ROUTERS = (
     system, session, sso, people, branding, inventory, risks, controls, treatment, frameworks,
     scopes, evidence, assessments, issues, exchange, reporting, operations, questionnaires,
+    campaigns,
 )  # fmt: skip
 
 
