@@ -1135,6 +1135,28 @@ OUTSIDE = [
      "kind": "scope", "ref": "SCP-0001", "days": 14},
 ]  # fmt: skip
 
+# Business impact: what the critical processes cannot afford to lose (days ago, process, impacts
+# over time, back within hours, loses at most hours, the least it needs), and what the systems
+# they rely on can deliver (days ago, system, back within, loses at most, what it rests on).
+IMPACT = [
+    (60, "Research data storage", [("4h", 2), ("1d", 3), ("3d", 4), ("1w", 5)], 72, 24,
+     "The storage administrators, the backup service, and the cluster network."),
+    (55, "Medication dispensing", [("4h", 4), ("1d", 5)], 4, 1,
+     "Two pharmacists, the dispensing cabinets or the paper override procedure, and the clinical record."),
+    (50, "Clinical laboratory testing", [("4h", 3), ("1d", 4), ("3d", 5)], 8, 1,
+     "The laboratory information system, the chemistry analyzers, and their technologists."),
+    (45, "Sequencing service", [("1d", 2), ("3d", 3), ("1w", 4), ("1m", 5)], 168, 24,
+     "One sequencer, the sample manager, and research storage."),
+]  # fmt: skip
+CAPABILITY = [
+    (58, "Research storage", 24, 24, "Replicated to the second data center; failed over in a test in June."),
+    (58, "Backup service", 120, 24, "Partial restores only; a full restore of research storage was last done two years ago and took five days."),
+    (52, "Dispensing cabinets", 2, 0, "Each cabinet runs on its own when the network is down; tested in the spring drill."),
+    (52, "Clinical record system", 4, 0, "The supplier's hosted service: four hours and no loss, in the contract."),
+    (48, "Laboratory information system", 12, 1, "Restored to the standby server in last year's exercise in twelve hours."),
+    (44, "Genomics sample manager", 24, 4, "Nightly backups, restored on request."),
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

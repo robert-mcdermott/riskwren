@@ -51,6 +51,16 @@ A record says what it relies on:
 
 A link is made once, from either end, and can be read from both. A lab can say that its work relies on central storage without anyone in central computing doing anything.
 
+### Business impact and recovery
+
+A process's **Business impact** tab says what the organization cannot afford to lose: how much its loss hurts as time goes on (after four hours, a day, three days, a week, and a month, from negligible to severe), how soon it must be back (its recovery time), how much information it can afford to lose (its recovery point), and the least it needs to run. An analysis is a judgment by a named person and is never edited: analysing again supersedes it, and every one is kept.
+
+A system's or a service's **Recovery** tab says what it can actually deliver: what it can be restored within, how much information it can lose, and what that rests on (a restore tested on a date, a supplier's contract, a design never tried), with the processes that rely on it and what each needs.
+
+The process's tab then checks each system and service it relies on against what it needs, and lists every **shortfall**: one that cannot be back in time, one that would lose more information than the process can afford, and one whose capability nobody has said. **Reports → Resilience** lists every analysed process, those with the most shortfalls first.
+
+![A process's business impact: what it needs, how much its loss hurts over time, and a shortfall in what it relies on](img/process-impact-light.webp)
+
 ### Connections
 
 Every record has a **Connections** link beside its name. It opens a picture of everything joined to the record: its links in both directions, the risks that bear on it, the controls that reduce them, the scopes it is in, and the evidence, issues, and exceptions about it. A list beside the picture says the same in full. See [Connections](compliance.md#connections).

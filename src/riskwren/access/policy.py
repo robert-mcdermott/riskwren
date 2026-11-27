@@ -308,6 +308,14 @@ POLICIES.update(
         # An outside auditor has no account: their link, in a header, opens one engagement or
         # scope, read-only, and each use is recorded.
         ("GET", "/api/v1/outside"): Needs.PUBLIC,
+        # Resilience: read with the record, changed by those who keep it.
+        ("GET", "/api/v1/resilience"): Needs.MEMBER,
+        ("GET", "/api/v1/processes/{ref}/impact"): Needs.MEMBER,
+        ("POST", "/api/v1/processes/{ref}/impact"): Needs.MEMBER,
+        ("GET", "/api/v1/systems/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/systems/{ref}/recovery"): Needs.MEMBER,
+        ("GET", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
         # Dossiers and a scope's plans hold what the person may see, checked by the record.
         ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
         ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,

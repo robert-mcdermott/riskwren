@@ -277,6 +277,9 @@ export const SCENES = [
   { name: "audit-engagement-reported", as: "cro", path: "/audit/engagements/AUD-0001" },
   { name: "audit-committee-report", as: "president", path: "/audit/plans/APL-0001/committee-report" },
   { name: "audit-outside", as: "auditor", path: "/audit/outside" },
+  { name: "resilience", as: "cro", path: "/resilience" },
+  { name: "process-impact", as: "cro", path: async (page) => `/processes/${await first("/api/v1/processes?q=research+data+storage")(page)}?tab=impact` },
+  { name: "system-recovery", as: "cro", path: async (page) => `/systems/${await first("/api/v1/systems?q=backup+service")(page)}?tab=recovery` },
   { name: "outside-page", as: "auditor", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;
       const made = await fetch("/api/v1/audit/outside", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": me.csrf_token },

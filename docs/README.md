@@ -78,6 +78,7 @@ These two are written from the code, so they always match the version they ship 
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |
 | How do I run a security risk analysis over a scope? | [Risk analyses](the-register.md#risk-analyses) |
+| If research storage is lost, can the backups bring it back in time? | [Business impact and recovery](the-register.md#business-impact-and-recovery) |
 | What should internal audit look at next year, and why? | [The universe](internal-audit.md#the-universe) |
 | What would two weeks of ransomware cost us, in dollars, and how sure are we? | [Estimates in ranges](the-register.md#estimates-in-ranges), [Scenarios](the-register.md#scenarios) |
 | Which controls stand between the causes of this risk and what follows it? | [The bow-tie](the-register.md#the-bow-tie) |

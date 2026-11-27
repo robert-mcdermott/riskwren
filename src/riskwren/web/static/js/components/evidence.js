@@ -7,33 +7,22 @@ import { options, unitOptions } from "../core/lookups.js";
 import { banner, checkbox, field, select, submit } from "./form.js";
 import { openOverlay } from "./overlay.js";
 import { section } from "./form.js";
-import { ownUnits } from "../core/session.js";
-import { session } from "../core/session.js";
+import { evidenceUnits, freshness, STATES } from "./evidence-state.js";
 import { toast } from "./toast.js";
 import { card, pill } from "./ui.js";
 
 export const KINDS = [["file", "A file"], ["link", "A link"], ["note", "A note of what was seen"], ["attestation", "An attestation"]];
 const KIND_LABELS = { file: "File", link: "Link", note: "Note", attestation: "Attestation" };
-const STATES = { current: ["Current", "ok"], expiring: ["Expires soon", "warn"], stale: ["No longer counts", "danger"] };
 const today = () => new Date().toISOString().slice(0, 10);
 
+export { evidenceUnits, freshness };
+
 export const kindLabel = (kind) => KIND_LABELS[kind] ?? kind;
-export const freshness = (state) => pill(STATES[state]?.[0] ?? state, STATES[state]?.[1] ?? "");
 export const stateOptions = (blank) => [["", blank], ...Object.entries(STATES).map(([key, [text]]) => [key, text])];
 
 export function fileSize(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
   return bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-/** The units a person may add evidence for: where they work, and where they have a role. */
-export function evidenceUnits() {
-  const me = session();
-  const kept = ownUnits();
-  if (kept === null) return null;
-  const scoped = Object.values(me.units ?? {});
-  if (scoped.some((units) => units === null)) return null;
-  return new Set([...kept, ...(me.member_units ?? []), ...scoped.flat()]);
 }
 
 /** Add an evidence item, or change one. With a subject, the new item is attached to it. */

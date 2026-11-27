@@ -4,6 +4,18 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.8.0 (unreleased)
+
+Wave 8, *Incidents and resilience*.
+
+### Added
+
+- **Business impact and recovery:** a process's business impact analysis (how its loss hurts
+  over time, how soon it must be back, how much information it can lose, and the least it
+  needs), what each system and service can deliver and what that rests on, and every shortfall
+  between them. A process's **Business impact** tab, a system's or service's **Recovery** tab,
+  and **Reports → Resilience**.
+
 ## 0.7.0 (2026-11-27)
 
 Wave 7, *Audit*: the third line's own workspace on the same record, without compromising its

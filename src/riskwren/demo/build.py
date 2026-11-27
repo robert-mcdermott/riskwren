@@ -2277,6 +2277,44 @@ class Builder:
                     outside.package(session, found)
                     outside.record_view(session, found)
 
+    def _story_resilience(self) -> Script:
+        """The risk office facilitates business impact analyses of the critical processes, and
+        those who keep the systems say what each can deliver."""
+        from riskwren.db.models import Process, System
+        from riskwren.resilience import analyse, record_capability
+
+        steps = sorted([(spec[0], "impact", spec) for spec in c.IMPACT]
+                       + [(spec[0], "capability", spec) for spec in c.CAPABILITY],
+                       key=lambda step: -step[0])  # fmt: skip
+        for days, what, spec in steps:
+            yield self._on(days, hour=10)
+            with self.act(self.cast["cro"]) as (session, who):
+                if what == "impact":
+                    _, name, impacts, back, loss, minimum = spec
+                    process = session.scalars(select(Process).where(Process.name == name)).one()
+                    analyse(
+                        session,
+                        who,
+                        process,
+                        {
+                            "impacts": [{"after": a, "level": lv} for a, lv in impacts],
+                            "recovery_hours": back,
+                            "data_loss_hours": loss,
+                            "minimum": minimum,
+                        },
+                    )
+                    self.tally("impact analyses")
+                else:
+                    _, name, back, loss, basis = spec
+                    system = session.scalars(select(System).where(System.name == name)).one()
+                    record_capability(
+                        session,
+                        who,
+                        "system",
+                        system,
+                        {"recovery_hours": back, "data_loss_hours": loss, "basis": basis},
+                    )
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3530,6 +3568,7 @@ class Builder:
             self._story_assurance, self._story_coverage, self._story_lifecycle,
             self._story_measures, self._story_leadership, self._story_scenarios,
             self._story_internal_audit, self._story_engagements, self._story_outside,
+            self._story_resilience,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

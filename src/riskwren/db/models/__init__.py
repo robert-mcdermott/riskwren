@@ -95,6 +95,7 @@ from riskwren.db.models.people import (
     SignInRequest,
 )
 from riskwren.db.models.program import Setting
+from riskwren.db.models.resilience import ImpactAnalysis, RecoveryCapability
 from riskwren.db.models.risk import (
     Risk,
     RiskAssessment,
@@ -157,6 +158,7 @@ __all__ = [
     "FrameworkMapping",
     "Handover",
     "Identity",
+    "ImpactAnalysis",
     "Implementation",
     "Indicator",
     "IndicatorReading",
@@ -187,6 +189,7 @@ __all__ = [
     "QuestionnaireVersion",
     "RecordLink",
     "RecordOwner",
+    "RecoveryCapability",
     "Reminder",
     "Requirement",
     "RespondentLink",

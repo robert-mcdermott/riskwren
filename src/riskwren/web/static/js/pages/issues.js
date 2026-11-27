@@ -7,7 +7,7 @@ import { date, plural, relative } from "../core/format.js";
 import { label, options, unitOptions, units, vocabularies } from "../core/lookups.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { session } from "../core/session.js";
-import { evidenceUnits, freshness } from "../components/evidence.js";
+import { evidenceUnits, freshness } from "../components/evidence-state.js";
 import { banner, checkbox, field, section, select, submit } from "../components/form.js";
 import { ISSUE_STATUS, issueDue, issueStatus, recordPicker, SEVERITY, severityPill } from "../components/issue.js";
 import { openOverlay } from "../components/overlay.js";
