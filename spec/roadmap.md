@@ -76,7 +76,7 @@ It waited until the main screens had settled; screenshots taken during wave 1 wo
 
 Decision record: [ADR-0009](decisions/0009-documentation-toolchain.md)
 
-## Wave 3: Keeping watch (v0.3.0) ◐
+## Wave 3: Keeping watch (v0.3.0) ☑
 
 **Goal:** a register that stays true without a central team chasing it.
 
@@ -89,7 +89,7 @@ Decision record: [ADR-0009](decisions/0009-documentation-toolchain.md)
 | 5 | Indicators | Indicators with thresholds, readings, and trends, linked to risks; breaches raise notices | ☑ |
 | 6 | Find and tidy | Search across all records, saved views, completeness, duplicates, and reassignment when someone leaves | ☑ |
 | 7 | Program editors | Editing the taxonomy, scoring method, appetite, cadences, and vocabularies in the app with an impact preview; structured risk assessments over a scope | ☑ |
-| 8 | Release prep | Guides, changelog, release | ☐ |
+| 8 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-3.md](waves/wave-3.md)
 

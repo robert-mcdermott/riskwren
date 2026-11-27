@@ -1,17 +1,17 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.2.1. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.3.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
 | | Guide | For | Covers |
 |---|---|---|---|
 | 1 | [Getting started](getting-started.md) | Whoever installs RiskWren | Installing, `init`, `doctor`, `serve`, first sign-in, the demo organization, units and people |
-| 2 | [The register](the-register.md) | Everyone who owns, assesses, or reads a risk | The inventory, risks and their three ratings, controls, what the controls suggest, plans, actions, and acceptance |
+| 2 | [The register](the-register.md) | Everyone who owns, assesses, or reads a risk | The inventory, risks and their three ratings, controls, what the controls suggest, plans, actions, and acceptance; risk analyses, search, saved views, what a record is missing, and indicators |
 | 3 | [Compliance](compliance.md) | Security and compliance leads, and the stewards of what must comply | Frameworks, mapping controls to requirements, scopes, inherited controls, readiness, the compliance dashboard, connections |
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
-| 6 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, appetite, the scoring method, cadences, who may accept what, program packs, the dashboards, the history, appearance |
+| 6 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, when someone leaves, reminders, the dashboards, the history, appearance |
 | 7 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
 | 8 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
 
@@ -69,7 +69,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.2.1 is the register and compliance: an inventory, risks, controls, and treatment; frameworks, scopes, evidence, tests, issues, and exceptions. It signs in with local accounts and sends no email: notices are in the app. Single sign-on, email, reminders, attestations, and scheduled jobs arrive in the next release, and until then dates are caught up when the register is read. Policies, supplier reviews, audits, and incidents follow in later ones. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.3.0 is the register, compliance, and the means of keeping both current: sign-in with local accounts or single sign-on, scheduled reminders with optional email, campaigns, indicators, search, and a program edited in the app. It does not yet hold policies or obligations, review suppliers, run audits, or handle incidents; those follow in later releases. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

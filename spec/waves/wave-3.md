@@ -2,7 +2,7 @@
 
 **Goal:** a register that stays true without a central team chasing it. Waves 1 and 2 made a register worth keeping. Wave 3 makes it keep itself: people sign in with the identity they already have, the app knows what is due and says so, owners are asked on a schedule to confirm what they own, and anything on record can be found.
 
-**Branch:** `wave-3` · **Target version:** `0.3.0` · **Status:** ◐ in progress
+**Branch:** `wave-3` · **Target version:** `0.3.0` · **Status:** ☑ released as v0.3.0
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). In this wave that means: sign-in under the organization's own multi-factor authentication and offboarding, test and evidence cadences that follow from what a control protects, and attestation that is never mistaken for a test.
 
@@ -120,9 +120,11 @@ Local accounts stay the default and are never removed: an evaluation or a small 
 
 **Not done in the app:** who may accept what, the number of levels and ratings, and how much a control may reduce a rating. They are changed with a program pack, where everything that names a rating can be changed together.
 
-### Slice 8: Release prep ☐
+### Slice 8: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.2.1 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.2.1 on both databases, audits, release, and the site republished
+
+**Done:** the guides, the README, and the product site's home page describe 0.3.0, with pictures of the new screens taken from the demo organization. An installation built by the released 0.2.1 code, with its demo organization in it, was upgraded by this code on SQLite and on PostgreSQL: migrations 0013 to 0020 applied, every row was kept, the history verified, the built-in questionnaires were loaded, and the screens new in this wave answered over the upgraded data, including a preview of a changed matrix and the handing on of what a disabled account owned. The whole suite passes on both databases, the accessibility audit passes over every scene, and the built site passes its own audit.
 
 ## Notes
 

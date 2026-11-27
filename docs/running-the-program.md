@@ -95,6 +95,8 @@ Three things can move a risk without anyone touching it: the **matrix** gives it
 
 Nothing has changed at that point. **Publish** makes the change, and changes exactly the risks listed. **Cancel** leaves everything as it was, draft included; **Discard** drops the draft.
 
+![Before publishing a change to appetite: each open risk whose standing would change, and what it would become](img/program-preview-light.webp)
+
 What is published is recorded in the history, and each risk that moved says so in its own history, with the line that changed.
 
 ### Categories
@@ -222,6 +224,8 @@ Choose what to ask, give it a name and a date, and say what it is about: everyth
 
 A campaign's page shows how far it has got, what those who answered said, **coverage by unit** with the least covered first, and every item with who was asked. Each figure is the count of the list beneath it.
 
+![An attestation campaign: how many have answered, what they said, and coverage by unit](img/campaign-light.webp)
+
 - **Remind** tells everyone who still owes something, once, with how many. The scheduled [reminders](#reminders) do the same as the date approaches, and tell a unit's steward and then its leader about what stays unanswered.
 - **Close** ends a campaign and keeps what was answered. **Cancel it** is for one started in error.
 
@@ -249,6 +253,8 @@ Nothing they answered for is left without an owner:
 - **What they shared with someone else** is left as it is: the other owner still answers for it.
 
 The stand-in is a holding place, not a decision. **Reports → Tidy → From people who have left** lists each person with things still to pass on, and their page lists every one with who has it now. Choose who takes it and **Pass on**: everything ticked changes hands in one step, the new owner is told, and the stand-in is released. A stand-in who should keep something passes it to themselves.
+
+![What a person who has left held: each thing, who is standing in, and the box to pass it on](img/handover-light.webp)
 
 An administrator can pass on anything. A steward or a manager can pass on what belongs to their own units. The same page works for someone who has not left: **Admin → People**, the person, **What they hold**. Use it to move what a person holds when they change jobs.
 

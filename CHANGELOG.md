@@ -4,28 +4,33 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## Unreleased
+## 0.3.0 (2026-11-26)
 
-### Changed
+Wave 3, *Keeping watch*: a register that stays true without a central team chasing it.
+People sign in with the identity they already have, the app knows what is due and says so,
+owners are asked on a schedule to confirm what they own, a number that warns of a risk is
+watched, and anything on record can be found, tidied, and passed on. The program itself is
+edited in the app, with a preview of every risk a change would move.
 
-- **Disabling an account leaves nothing without an owner.** What the person alone answered
-  for (records, open actions, treatment plans, and what campaigns were waiting on them for)
-  passes to the steward of its unit, who is told, until someone is named for good. Before,
-  such records were shown as having nobody answering for them.
-- **Publishing a scoring method re-reads the register.** Every open risk takes its ratings
-  from the matrix now in force, then its standing and its next review, whether the method
-  is published in the app or loaded from a program pack. Before, a risk kept the rating its
-  last assessment gave it until it was assessed again. Each assessment still keeps the
-  rating it was given and the version it was made under.
-- **A list's search needs every word, in any order.** Before, the words had to appear
-  together as typed.
-- Risks are brought up to date with the calendar every hour by a scheduled job, as well as
-  when the register is read.
-- The accessibility audit and the screenshot capture start their demo on a port the
-  operating system says is free. A fixed port could already belong to something else on
-  the machine, which would then have been audited in its place.
-- `riskwren doctor` reports how people sign in, whether email is set up, and whether
-  scheduled work is being done.
+### Upgrading from 0.2.1
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0014 to 0020). Every row is
+kept, and the history still verifies. The upgrade loads the four built-in questionnaires.
+Three things behave differently afterwards:
+
+- **Reminders start.** The server now runs scheduled work, and the first pass tells people
+  about everything already nearly due or late, once each. To hold that back, set
+  `scheduler = false` under `[server]` before starting the server, and run
+  `riskwren jobs run reminders` when you are ready. Nothing is emailed unless email is set
+  up; see [Configuration](docs/configuration.md#email).
+- **Disabling an account passes on what it owned.** Accounts already disabled are not
+  touched: what they alone owned still shows on Home as needing an owner, and under
+  Reports → Tidy.
+- **A risk's rating follows the scoring method in force.** Nothing changes at upgrade. The
+  next time a scoring method is published or a program pack is loaded, every open risk is
+  read again from it.
+
+Sign-in is unchanged: local accounts, until an administrator sets up single sign-on.
 
 ### Added
 
@@ -117,6 +122,39 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   considered, what was decided, and why.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
+
+### Changed
+
+- **Disabling an account leaves nothing without an owner.** What the person alone answered
+  for (records, open actions, treatment plans, and what campaigns were waiting on them for)
+  passes to the steward of its unit, who is told, until someone is named for good. Before,
+  such records were shown as having nobody answering for them.
+- **Publishing a scoring method re-reads the register.** Every open risk takes its ratings
+  from the matrix now in force, then its standing and its next review, whether the method
+  is published in the app or loaded from a program pack. Before, a risk kept the rating its
+  last assessment gave it until it was assessed again. Each assessment still keeps the
+  rating it was given and the version it was made under.
+- **A list's search needs every word, in any order.** Before, the words had to appear
+  together as typed.
+- Risks are brought up to date with the calendar every hour by a scheduled job, as well as
+  when the register is read.
+- The accessibility audit and the screenshot capture start their demo on a port the
+  operating system says is free. A fixed port could already belong to something else on
+  the machine, which would then have been audited in its place.
+- `riskwren doctor` reports how people sign in, whether email is set up, and whether
+  scheduled work is being done.
+
+### Known limits
+
+- Single sign-on has been tested against the stand-in provider in
+  `scripts/dev_identity_provider.py`, which speaks the same protocol, and not yet against a
+  live Microsoft Entra ID tenant.
+- Email has been tested against a test server, not through an organization's mail service.
+- Two records that are the same thing can be found, and not yet merged.
+- The questionnaire editor writes a condition with one part. A condition with several parts
+  is written in the questionnaire's document.
+- Who may accept what, the number of levels and ratings, and how much a control may reduce
+  a rating are changed with a program pack, not in the app.
 
 ## 0.2.1 (2026-11-26)
 

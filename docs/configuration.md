@@ -301,7 +301,7 @@ uv sync
 uv run riskwren db upgrade
 ```
 
-`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.1.0, that is the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. Back up first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
+`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.2.1, that is the four built-in questionnaires; the [changelog](../CHANGELOG.md) says what behaves differently afterwards. Coming from 0.1.0, that is also the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. Back up first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
 
 ## Run behind a reverse proxy
 

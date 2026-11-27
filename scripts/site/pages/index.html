@@ -106,6 +106,50 @@
   {{shot:home-ciso|Home for the security leader: figures for what needs attention, then the list of what is waiting on them}}
 </section>
 
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">Keeping watch</p>
+    <h2 id="ask-the-owners">Ask the owners, and see who has answered</h2>
+    <p>A campaign asks every control owner to attest, every risk owner to look again, or for a named piece of evidence, by a date. Its page shows who has answered, unit by unit, and reminds those who have not.</p>
+    <p>What an owner says of a control is shown apart from its rating. It never makes a requirement verified, and it takes one out of verified when the owner says the control no longer operates.</p>
+    <p><a class="more" href="running-the-program.html#campaigns">Campaigns</a></p>
+  </div>
+  {{shot:campaign|An attestation campaign most of the way through: how many have answered, what they said, and coverage by unit}}
+</section>
+
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Early warning</p>
+    <h2 id="a-number-that-warns">A number that warns before the risk arrives</h2>
+    <p>An indicator is a number someone already reads: servers patched within thirty days, days to remove a leaver's access. Give it a warning level and a limit, and record what it stands at.</p>
+    <p>Past the limit, its owners and the owners of every risk it warns of are told, and those risks are marked for another look. Nothing is fetched: a person reads the number and records it.</p>
+    <p><a class="more" href="the-register.html#indicators">Indicators</a></p>
+  </div>
+  {{shot:indicator-breached|An indicator past its limit: the readings charted against its warning level and its limit, and getting worse}}
+</section>
+
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">The program</p>
+    <h2 id="see-what-a-change-would-do">See what a change would do before you make it</h2>
+    <p>The matrix, appetite, and the review cadences are edited in the app. A change is held as a draft, and a preview lists every open risk whose rating, standing, or next review would move.</p>
+    <p>The preview is the change itself, made and undone, so publishing changes exactly the risks it listed. Judgments already made keep the rating they were given.</p>
+    <p><a class="more" href="running-the-program.html#see-what-a-change-would-do-before-you-make-it">Shape the program</a></p>
+  </div>
+  {{shot:program-preview|Before publishing a change to appetite: the seven open risks whose standing would change, each with what it would become}}
+</section>
+
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Risk analysis</p>
+    <h2 id="each-thing-against-each-threat">Each thing against each threat, with a report</h2>
+    <p>A risk analysis takes what is in a scope and a list of threats, and asks of each pair whether it applies. The answer is that it does not, that a risk on the register covers it, or that a risk is raised for the thing's owner.</p>
+    <p>It closes when every question has an answer. What it considered, what was decided, and why stay on record as its report.</p>
+    <p><a class="more" href="the-register.html#risk-analyses">Risk analyses</a></p>
+  </div>
+  {{shot:analysis|A finished risk analysis of a clinic's systems: eighty questions answered, three risks raised, and each thing it looked at}}
+</section>
+
 <section class="section">
   <h2 id="also-in-it">Also in it</h2>
   <div class="rest">
@@ -142,6 +186,18 @@
       <p>Roles are held over units. A figure never counts a record its reader could not open, and evidence is more closely held than the register.</p>
     </div>
     <div>
+      <h3 id="sign-in-your-way">Sign in your way</h3>
+      <p>Local accounts out of the box. Optional single sign-on by OpenID Connect, built to work with Microsoft Entra ID, with roles and units taken from the provider.</p>
+    </div>
+    <div>
+      <h3 id="it-knows-what-is-due">It knows what is due</h3>
+      <p>Whoever a thing is waiting on is reminded before its date and when it passes, then their steward, then their leader. Email is optional.</p>
+    </div>
+    <div>
+      <h3 id="found-and-tidied">Found, and kept in order</h3>
+      <p>One search across every kind of record, saved views of any list, what each record is missing, and likely duplicates. When someone leaves, nothing is left without an owner.</p>
+    </div>
+    <div>
       <h3 id="open-and-yours">Open and yours</h3>
       <p>Apache 2.0 with no paid edition. SQLite on a laptop or PostgreSQL on a server, five runtime dependencies, and your own name and colors.</p>
     </div>
@@ -175,5 +231,5 @@ uv run riskwren --config demo/riskwren.toml serve</code></pre></div>
 
 <section class="section">
   <h2 id="where-it-stands">Where it stands</h2>
-  <p>These pages describe version {{version}}: the register and compliance. It signs in with local accounts and sends no email; notices are in the app. Single sign-on, email, reminders, and attestations come next, then policies, supplier reviews, audits, and incidents. The <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a> says what comes in what order, and the <a href="changelog.html">changelog</a> lists what is in each release.</p>
+  <p>These pages describe version {{version}}: the register, compliance, and the means of keeping both current. It signs in with local accounts or, if you set it up, single sign-on, and sends email only if you ask it to. Policies and obligations come next, then supplier reviews, reporting, audits, and incidents. The <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a> says what comes in what order, and the <a href="changelog.html">changelog</a> lists what is in each release.</p>
 </section>

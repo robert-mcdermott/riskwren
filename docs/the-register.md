@@ -232,7 +232,11 @@ Open a thing to work through it. For each threat there are three answers, each w
 
 Risks already on the register that were started from the same threat, in the thing's unit or about the thing itself, are offered first. **None of the others apply** answers the rest for one thing at once.
 
+![One thing in a risk analysis: each threat with what happens and what follows, and the answers to choose from](img/analysis-asset-light.webp)
+
 The analysis page shows how far it has got, each thing with its count, and the risks raised and looked at again. Whoever leads it has **Carry on** on Home until it is finished. It can be closed only when every question has an answer and with a few sentences on what it found, so the report passes over nothing in silence.
+
+![A finished risk analysis: how far it got, each thing it looked at, and the risks it raised](img/analysis-light.webp)
 
 **Report** lists everything considered, thing by thing, with what was decided, why, by whom, and when, and prints. It keeps the names things had on the day, so it still reads if one is later renamed or retired. A closed analysis can be reopened by those who work it.
 
@@ -244,6 +248,8 @@ Press **⌘K** (or Ctrl K), or use the box at the top of every page, and type a 
 - Every word you type has to be on the record, in any order. Part of a word is enough.
 - Results are grouped by kind, the closest match first. A reference typed exactly is its own best answer.
 - You find only what you may open. A record you could not see on its own list is not in a search either, and is not counted.
+
+![Search results for a word, grouped by kind of record, the closest match first](img/search-light.webp)
 
 ### Saved views
 
@@ -271,6 +277,8 @@ Only records still in use are counted: a retired system or a closed risk is not 
 
 **Reports → Tidy** counts, for each kind, how many records are missing something and what. Each figure opens the list it counts, and any list can be cut the same way from its address with `missing=`, so it can be saved as a view.
 
+![Reports, Tidy: who has left with things to pass on, and what each kind of record is missing](img/tidy-light.webp)
+
 ### The same thing written down twice
 
 As you type the name of a new process, system, third party, information asset, risk, control, or issue, records already here that it might be are shown under the box. Open one in a new tab before adding another.
@@ -290,6 +298,8 @@ An indicator is a number someone already reads, kept where the risks it warns of
 RiskWren does not fetch the number. An owner, or the unit's steward, reads it where it lives and records it on the indicator's page, with the day it was read and a note if one is wanted. A second reading for the same day corrects the first, and the history keeps both.
 
 Each reading is placed against the levels: **within its limits**, **past its warning level**, or **past its limit**. The page charts the readings against both levels and says whether the indicator is getting worse, getting better, or holding steady; a move of less than a twentieth of the distance between the warning level and the limit is steady.
+
+![An indicator past its limit: its readings charted against the warning level and the limit](img/indicator-breached-light.webp)
 
 When the newest reading passes the limit:
 
