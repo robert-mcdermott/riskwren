@@ -208,7 +208,7 @@ function shell({ name, title, body, headings, description, ver, prev, next }) {
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:type" content="website">
-<meta property="og:image" content="${SITE}${IMAGES}/compliance-light.webp">
+<meta property="og:image" content="${SITE}assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
 <link rel="stylesheet" href="assets/tokens.css">
@@ -363,6 +363,8 @@ export function build(out) {
   writeFileSync(join(out, "assets", "tokens.css"),
     readFileSync(join(STATIC, "css", "tokens.css"), "utf8") + readFileSync(join(STATIC, "css", "palettes.css"), "utf8"));
   cpSync(join(STATIC, "img", "wren-mark.svg"), join(out, "assets", "wren-mark.svg"));
+  // The picture a shared link shows, the same as the repository's (scripts/social-preview.mjs).
+  cpSync(join(REPO, ".github", "social-preview.png"), join(out, "assets", "social-preview.png"));
   if (existsSync(join(DOCS, IMAGES))) cpSync(join(DOCS, IMAGES), join(out, IMAGES), { recursive: true });
 
   const order = MENU.flatMap(([, items]) => items);
