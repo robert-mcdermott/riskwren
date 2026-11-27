@@ -205,3 +205,10 @@
 .diff td:last-child mark { background: var(--ok-soft); color: var(--ok); border-radius: 2px; font-weight: 600; }
 .diff .diff-none { background: var(--surface-2); }
 .diff-folded td { color: var(--text-subtle); text-align: center; background: var(--surface-2); }
+
+/* Committee sessions */
+.agenda > li { display: grid; gap: var(--space-2); }
+.agenda-row { align-items: flex-start; }
+.agenda-number { min-width: 1.6em; font-variant-numeric: tabular-nums; color: var(--text-muted); font-weight: 600; }
+.agenda .decision { margin-left: calc(1.6em + var(--space-3)); padding: var(--space-2) var(--space-3); border-left: 3px solid var(--border-strong); background: var(--surface-2); border-radius: var(--radius-s); }
+.agenda .decision p { margin: var(--space-1) 0 0; }

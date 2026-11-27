@@ -407,6 +407,34 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
             select(ControlRequirement).where(ControlRequirement.note.like("Suggested by%"))
         ).all()
         assert session.scalars(select(SuggestionSetAside)).all()
+        # The strategic plan's objectives, each named by the risks that threaten it; and the
+        # committee: two sessions held with their decisions, the next one coming up.
+        from riskwren.db.models import CommitteeItem, CommitteeSession, Objective
+        from riskwren.inventory import records as record_service
+        from riskwren.risk import objectives
+        from riskwren.risk.register import RISK
+
+        aims = session.scalars(select(Objective)).all()
+        assert len(aims) == 5
+        assert all(objectives.risks_of(session, reader, aim)["risks"] for aim in aims)
+        meetings = session.scalars(
+            select(CommitteeSession).order_by(CommitteeSession.held_on)
+        ).all()
+        assert [meeting.status for meeting in meetings] == ["held", "held", "planned"]
+        assert meetings[-1].held_on > TODAY and meetings[0].minutes
+        decided = session.scalars(
+            select(CommitteeItem).where(CommitteeItem.outcome.is_not(None))
+        ).all()
+        assert len(decided) >= 8
+        about = next(item for item in decided if item.subject_type == "risk")
+        risk = session.get(RISK.model, about.subject_id)
+        shown = record_service.detail(session, reader, RISK, risk)["decisions"]
+        held_in = session.get(CommitteeSession, about.session_id).ref
+        assert held_in in {row["session"]["ref"] for row in shown}
+        coming = session.scalars(
+            select(CommitteeItem).where(CommitteeItem.session_id == meetings[-1].id)
+        ).all()
+        assert len(coming) >= 4 and not any(item.outcome for item in coming)
     assert built.counts["acceptances refused"] == 1
 
 

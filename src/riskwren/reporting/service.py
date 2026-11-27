@@ -466,6 +466,16 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/documents/{document.ref}", document.next_review_on, ref=document.ref,
             )  # fmt: skip
 
+    # Committee sessions this person keeps, coming up within a fortnight.
+    from riskwren.oversight import sessions as committee_sessions
+
+    for meeting in committee_sessions.coming_up(session, principal):
+        add(
+            "session", f"Prepare the agenda: {meeting.name}",
+            f"{meeting.ref} · {meeting.committee}", f"/sessions/{meeting.ref}", meeting.held_on,
+            ref=meeting.ref,
+        )  # fmt: skip
+
     # Agreements whose notice date or end draws near, or has passed while they are open.
     from riskwren.compliance import agreements
 

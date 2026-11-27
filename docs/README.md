@@ -7,12 +7,12 @@ These guides describe RiskWren 0.3.0. Read them in this order if you are new, or
 | | Guide | For | Covers |
 |---|---|---|---|
 | 1 | [Getting started](getting-started.md) | Whoever installs RiskWren | Installing, `init`, `doctor`, `serve`, first sign-in, the demo organization, units and people |
-| 2 | [The register](the-register.md) | Everyone who owns, assesses, or reads a risk | The inventory, risks and their three ratings, controls, what the controls suggest, plans, actions, and acceptance; risk analyses, search, saved views, what a record is missing, and indicators |
+| 2 | [The register](the-register.md) | Everyone who owns, assesses, or reads a risk | The inventory, risks and their three ratings, controls, what the controls suggest, plans, actions, and acceptance; the objectives a risk threatens; risk analyses, search, saved views, what a record is missing, and indicators |
 | 3 | [Compliance](compliance.md) | Security and compliance leads, and the stewards of what must comply | Frameworks, new versions and moving a scope to one, mapping controls to requirements and the crosswalks a publisher suggests, scopes, inherited controls, agreements and the terms they impose, readiness, the compliance dashboard, connections |
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
 | 6 | [Policies](policies.md) | Whoever writes, approves, or keeps the organization's policies | Policies, standards, procedures, and guidelines; writing a version; approval; publishing; comparing versions; review; what a document governs; exceptions to a document; who a document applies to; the policy library; acknowledgment |
-| 7 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, when someone leaves, reminders, the dashboards, the history, appearance |
+| 7 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, committee sessions, when someone leaves, reminders, the dashboards, the history, appearance |
 | 8 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
 | 9 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
 
@@ -40,6 +40,8 @@ These two are written from the code, so they always match the version they ship 
 | What is the difference between in place and verified? | [Readiness](compliance.md#readiness) |
 | A team relies on a control somebody else runs. How is that recorded? | [Inherited controls](compliance.md#inherited-controls) |
 | How do I enter a data use agreement or a sponsor's requirements? | [A framework of your own](compliance.md#a-framework-of-your-own) |
+| Which of the strategic plan's aims are most at risk? | [The objectives it threatens](the-register.md#the-objectives-it-threatens) |
+| How does a committee's decision reach the record it was about? | [Committee sessions](running-the-program.md#committee-sessions) |
 | Which scopes does an agreement bind, and when must it be renewed? | [Agreements](compliance.md#agreements) |
 | A framework has a new version. What changed, and how does a scope move to it? | [A new version of a framework](compliance.md#a-new-version-of-a-framework) |
 | Why can I not record this test result, or confirm it? | [Independence, and a second pair of eyes](evidence-and-testing.md#independence-and-a-second-pair-of-eyes) |

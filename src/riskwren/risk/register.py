@@ -87,6 +87,19 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
         # Risks that sit at exactly this level: its own, and those escalated to it.
         unit = int(filters["at"])
         found.append(or_(Risk.org_unit_id == unit, Risk.escalated_to_unit_id == unit))
+    if filters.get("objective"):
+        from riskwren.db.models import Objective, RiskObjective
+
+        objective = session.scalars(
+            select(Objective).where(Objective.ref == str(filters["objective"]).strip().upper())
+        ).first()
+        found.append(
+            Risk.id.in_(
+                select(RiskObjective.risk_id).where(
+                    RiskObjective.objective_id == (objective.id if objective else -1)
+                )
+            )
+        )
     if filters.get("subject"):
         record_type, record = find_any(session, str(filters["subject"]))
         if not access.can_see(session, principal, record_type, record):
@@ -172,7 +185,14 @@ def _detail(session: Session, principal: Principal, risk: Risk) -> dict[str, Any
         },
         "can_escalate": can_escalate(session, principal, risk),
         "indicators": _indicators(session, principal, risk),
+        "objectives": _objectives(session, principal, risk),
     }
+
+
+def _objectives(session: Session, principal: Principal, risk: Risk) -> list[dict[str, Any]]:
+    from riskwren.risk import objectives
+
+    return objectives.objectives_of(session, principal, risk)
 
 
 def _indicators(session: Session, principal: Principal, risk: Risk) -> list[dict[str, Any]]:
@@ -198,6 +218,13 @@ def _history_title(event: Event, lookups: Any) -> str | None:
         return "An earlier assessment was superseded"
     if event.subject_type == "risk" and (event.context or {}).get("op") == "program.change":
         return "Changed when the program was changed"
+    if event.subject_type == "risk_objective":
+        from riskwren.risk import objectives  # noqa: F401  so that objectives can be named
+
+        name = lookups.name("objective", now("objective_id")) or "an objective"
+        return (
+            f"Now threatens {name}" if event.action == "created" else f"No longer threatens {name}"
+        )
     if event.subject_type == "risk_subject":
         kind = now("subject_type")
         name = lookups.name(kind, now("subject_id")) if kind in TYPES else "a record"

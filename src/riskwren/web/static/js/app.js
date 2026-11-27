@@ -88,6 +88,10 @@ async function boot() {
   route("/search", page("find", "searchPage"));
   route("/tidy", page("find", "tidyPage"));
   route("/handover/:id", page("find", "handoverPage"));
+  route("/objectives", page("objectives", "objectiveList"));
+  route("/objectives/:ref", page("objectives", "objectivePage"));
+  route("/sessions", page("sessions", "sessionList"));
+  route("/sessions/:ref", page("sessions", "sessionPage"));
   route("/agreements", page("agreements", "agreementList"));
   route("/agreements/:ref", page("agreements", "agreementPage"));
   route("/library", page("library", "libraryList"));

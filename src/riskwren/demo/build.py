@@ -50,8 +50,11 @@ from riskwren.db.engine import Database
 from riskwren.db.models import (
     Acceptance,
     Action,
+    Agreement,
     Campaign,
     CampaignItem,
+    CommitteeItem,
+    CommitteeSession,
     Control,
     ControlTest,
     Evidence,
@@ -63,6 +66,7 @@ from riskwren.db.models import (
     Risk,
     RiskAnalysis,
     RiskAnalysisItem,
+    RiskCategory,
     Scope,
     TreatmentPlan,
 )
@@ -70,11 +74,15 @@ from riskwren.demo import content as c
 from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.oversight import campaigns
+from riskwren.oversight import sessions as sessions_service
+from riskwren.oversight.sessions import SESSION
 from riskwren.people import accounts, handover, units
 from riskwren.policy import documents, governs, library
 from riskwren.program import branding, packs, settings
 from riskwren.risk import analysis, categories, indicators, register
+from riskwren.risk import objectives as risk_objectives
 from riskwren.risk.indicators import INDICATOR
+from riskwren.risk.objectives import OBJECTIVE
 from riskwren.risk.register import RISK
 from riskwren.treatment import service as treatment
 
@@ -1652,6 +1660,127 @@ class Builder:
                     )
                     agreements.close(session, who, agreement, why)
 
+    def _story_governance(self) -> Script:
+        """The strategic plan's objectives, named by the risks that threaten them; and the risk
+        and compliance committee: two sessions held, with decisions and minutes, and the next
+        one coming up with its agenda half built."""
+        spec = c.GOVERNANCE
+        president, cro = self.cast["president"], self.cast["cro"]
+        yield self._on(spec["adopted"])
+        made: dict[str, str] = {}
+        with self.act(president) as (session, who):
+            for objective in c.OBJECTIVES:
+                record = records.create(
+                    session, who, OBJECTIVE,
+                    {"name": objective["name"], "summary": objective["summary"],
+                     "measure": objective["measure"], "period": spec["period"],
+                     "org_unit_id": self.units["NMI"]},
+                )  # fmt: skip
+                made[objective["name"]] = record.ref
+                self.tally("objectives")
+        yield self._on(spec["named"])
+        with self.act(cro) as (session, who):
+            keys = {
+                row.id: (row.key, row.parent_id) for row in session.scalars(select(RiskCategory))
+            }
+            for risk in session.scalars(
+                select(Risk).where(Risk.status == "open").order_by(Risk.id)
+            ).all():
+                own, parent = keys.get(risk.category_id, (None, None))
+                both = {own, keys.get(parent, (None, None))[0]}
+                wanted = [
+                    made[objective["name"]]
+                    for objective in c.OBJECTIVES
+                    if both & set(objective["categories"])
+                ]
+                if wanted:
+                    risk_objectives.set_objectives(session, who, risk, wanted)
+                    self.tally("risks that name an objective")
+        discussed: set[int] = set()
+        for spec_session in c.SESSIONS:
+            yield self._on(spec_session["planned"])
+            meets = self.day(spec_session["meets"])
+            with self.act(cro) as (session, who):
+                meeting = records.create(
+                    session, who, SESSION,
+                    {"name": f"{spec['committee']}, {meets:%B %Y}", "committee": spec["committee"],
+                     "held_on": meets.isoformat(), "org_unit_id": self.units["NMI"],
+                     "summary": "The quarterly meeting of the institute's risk and compliance "
+                     "committee."},
+                )  # fmt: skip
+                meeting_id = meeting.id
+                self.tally("committee sessions")
+                ranked = session.scalars(
+                    select(Risk)
+                    .where(Risk.status == "open", Risk.residual_rating.in_(("critical", "high")))
+                    .order_by(Risk.residual_rating != "critical", Risk.id)
+                ).all()
+                chosen = [risk for risk in ranked if risk.id not in discussed][
+                    : spec_session["risks"]
+                ]
+                for risk in chosen:
+                    discussed.add(risk.id)
+                    sessions_service.add_item(
+                        session, who, meeting,
+                        {"record": risk.ref, "note": "Above appetite. Accept it, or fund what "
+                         "would bring it down?"},
+                    )  # fmt: skip
+                for kind, name, note, _decided in spec_session["items"]:
+                    self._agenda_item(session, who, meeting, kind, name, note)
+            if spec_session.get("later"):
+                days, extra = spec_session["later"]
+                yield self._on(days)
+                with self.act(cro) as (session, who):
+                    meeting = session.get(CommitteeSession, meeting_id)
+                    for kind, name, note, _decided in extra:
+                        self._agenda_item(session, who, meeting, kind, name, note)
+            if not spec_session["held"]:
+                continue
+            yield self._on(-spec_session["meets"])
+            with self.act(cro) as (session, who):
+                meeting = session.get(CommitteeSession, meeting_id)
+                items = session.scalars(
+                    select(CommitteeItem)
+                    .where(CommitteeItem.session_id == meeting.id)
+                    .order_by(CommitteeItem.position)
+                ).all()
+                named = {name: decided for _kind, name, _note, decided in spec_session["items"]}
+                turn = 0
+                for item in items:
+                    decided = next(
+                        (value for name, value in named.items() if item.title.endswith(name)),
+                        None,
+                    )
+                    if decided is None and item.subject_type == "risk":
+                        decided = c.RISK_DECISIONS[turn % len(c.RISK_DECISIONS)]
+                        turn += 1
+                    if decided is not None:
+                        sessions_service.decide(session, who, meeting, item.id, *decided)
+                        self.tally("committee decisions")
+                sessions_service.mark_held(session, who, meeting)
+                records.update(
+                    session,
+                    who,
+                    SESSION,
+                    meeting,
+                    {"attendees": spec["attendees"], "minutes": spec_session["minutes"]},
+                    version=meeting.version,
+                )
+
+    def _agenda_item(
+        self, session: Session, who: Principal, meeting: Any, kind: str, name: str,
+        note: str | None,
+    ) -> None:  # fmt: skip
+        """An item on a session's agenda: a record found by its name, or a topic."""
+        models = {"agreement": Agreement, "document": PolicyDocument,
+                  "exception": ExceptionRequest}  # fmt: skip
+        if kind == "topic":
+            sessions_service.add_item(session, who, meeting, {"title": name, "note": note})
+            return
+        record = session.scalars(select(models[kind]).where(models[kind].name == name)).first()
+        if record is not None:
+            sessions_service.add_item(session, who, meeting, {"record": record.ref, "note": note})
+
     def _story_framework_update(self) -> Script:
         """The trial data platform was set up on SP 800-53 Rev. 4, loaded beside Rev. 5 for
         it. It has not moved yet. Crosswalks the publisher's mapping between SP 800-171 and
@@ -2780,6 +2909,7 @@ class Builder:
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
+            self._story_governance,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

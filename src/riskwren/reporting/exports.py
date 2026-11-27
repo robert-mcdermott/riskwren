@@ -46,6 +46,11 @@ KNOWN: dict[str, list[tuple[str, str]]] = {
         ("working", "new_version"), ("next_review_on", "next_review_on"),
         ("review_state", "review"), ("controls", "controls"), ("requirements", "requirements"),
     ],
+    "objective": [("status", "status"), ("period", "period"), ("risks", "risks")],
+    "committee_session": [
+        ("committee", "committee"), ("held_on", "held_on"), ("status", "status"),
+        ("items", "items"), ("decided", "decided"),
+    ],
     "agreement": [
         ("kind", "kind"), ("parties", "parties"), ("reference", "reference"),
         ("status", "status"), ("starts_on", "starts_on"), ("ends_on", "ends_on"),

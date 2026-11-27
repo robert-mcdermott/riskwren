@@ -1568,6 +1568,126 @@ SCOPE_TRIALS = {
     ],
 }  # fmt: skip
 
+# The strategic plan's objectives, adopted by the President, and the risk categories whose
+# risks threaten each: a category's own key, or the key of a category beneath it.
+GOVERNANCE = {
+    "period": "Strategic plan 2026 to 2030",
+    "adopted": 330,  # days ago
+    "named": 320,
+    "committee": "Risk and compliance committee",
+    "attendees": "The President and Director (chair), the Chief Operating Officer, the Chief "
+    "Scientific Officer, the Chief Information Officer, the Chief Information Security Officer, "
+    "and the Chief Risk and Compliance Officer (secretary). Apologies from the Chief Financial "
+    "Officer.",
+}
+OBJECTIVES = [
+    {
+        "name": "Grow the population cohort to 40,000 participants",
+        "summary": "The cohort is the institute's longest-running study, and most of Population "
+        "Sciences rests on it.",
+        "measure": "Enrolled participants, counted each June; consent withdrawals under one in a "
+        "hundred a year.",
+        "categories": ["human_subjects", "data_quality", "partnerships"],
+    },
+    {
+        "name": "Bring two new therapies into first-in-human trials",
+        "summary": "The translational program's aim for the plan's five years.",
+        "measure": "Two investigational new drug applications cleared, and the first participant "
+        "dosed in each.",
+        "categories": ["clinical", "integrity", "scientific_direction"],
+    },
+    {
+        "name": "Keep the trust of participants and patients",
+        "summary": "People give the institute their samples, their data, and their care. They do "
+        "so only while they trust it.",
+        "measure": "No reportable breach of participant or patient information; complaints "
+        "answered within ten working days.",
+        "categories": ["privacy", "confidentiality", "patient_safety", "reputation",
+                       "supplier_security"],
+    },
+    {
+        "name": "Sustain sponsored research funding",
+        "summary": "Federal and foundation awards fund most of the research.",
+        "measure": "Award income held at or above the plan's baseline each year; no costs "
+        "disallowed on audit.",
+        "categories": ["financial", "grants", "funding_environment"],
+    },
+    {
+        "name": "Run research infrastructure people can rely on",
+        "summary": "The cores, the cluster, and the freezer farm that every lab depends on.",
+        "measure": "Core services available nineteen days in twenty; no irreplaceable samples "
+        "lost.",
+        "categories": ["operations", "availability", "supplier_dependence"],
+    },
+]  # fmt: skip
+
+# The committee's sessions, in days from the build. Each agenda takes the open risks rated
+# highest that it has not yet discussed, then the items named. The third is still to come.
+RISK_DECISIONS = [
+    ("approved", "Fund the treatment plan as proposed. The owner reports progress at the next "
+     "session."),
+    ("deferred", "Bring it back with the cost of the second option before anything is agreed."),
+    ("approved", "Accept the residual risk for twelve months. The owner tells the committee at "
+     "once if anything changes."),
+    ("noted", None),
+]  # fmt: skip
+SESSIONS = [
+    {
+        "planned": 190, "meets": -170, "held": True,
+        "risks": 3,
+        "items": [
+            ("topic", "The risk appetite, reviewed",
+             "Does the appetite for information and technology still stand at moderate?",
+             ("approved", "The appetite stands as it is for another year.")),
+            ("topic", "Next year's internal audit plan", None,
+             ("approved", "Adopted, with research data management added in the second half.")),
+        ],
+        "minutes": "# Minutes\n\nThe chair opened the meeting and the minutes of the last "
+        "session were agreed.\n\n## Risks above appetite\n\nThe committee went through the "
+        "risks rated highest, with their owners. Decisions are recorded against each risk.\n\n"
+        "## Matters arising\n\n- The security office will report on the tabletop exercise at "
+        "the next session.\n- Finance will bring the cost of a second freezer site.",
+    },
+    {
+        "planned": 95, "meets": -78, "held": True,
+        "risks": 2,
+        "items": [
+            ("agreement", "Genomic data access certification",
+             "It ends in the new year. Renew it on the repository's terms, or move the data out?",
+             ("approved", "Renew it. Research Computing to confirm the enclave still meets "
+              "SP 800-171 before the renewal is signed.")),
+            ("document", "Incident response procedure",
+             "What changed after the spring exercise.",
+             ("noted", None)),
+            ("topic", "The tabletop exercise: what it found", None,
+             ("noted", "Three findings, each raised as an issue with an owner and a date.")),
+        ],
+        "minutes": "# Minutes\n\nThe chair opened the meeting. The actions from the last "
+        "session were reviewed: both are done.\n\n## The tabletop exercise\n\nThe Chief "
+        "Information Security Officer described the exercise and its three findings. The "
+        "committee thanked the teams who took part.\n\n## Renewals\n\nThe genomic data "
+        "certification is to be renewed, subject to the enclave's assessment.",
+    },
+    {
+        "planned": 20, "meets": 12, "held": False,
+        "risks": 2,
+        "items": [
+            ("topic", "The trial data platform: moving to SP 800-53 Rev. 5",
+             "Agree a date for the move, and who reviews what changed.", None),
+        ],
+        "later": (
+            3,
+            [
+                ("exception", "Chemistry analyzer patching",
+                 "The laboratory asks to patch on the maker's schedule. The security leader "
+                 "wants the committee's view before deciding.", None),
+                ("document", "Information security policy",
+                 "Version 3 waits for the President's approval: what it changes.", None),
+            ],
+        ),
+    },
+]  # fmt: skip
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (

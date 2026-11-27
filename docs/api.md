@@ -140,6 +140,9 @@ Every route requires a signed-in account except those marked public. What a rout
 | `POST /documents/{ref}/draft/submit` · `/decision` · `/withdraw` · `/publish` | Send it to named people to approve; approve it or return it; take it back; publish it |
 | `POST /documents/{ref}/review` · `/retire` · `/reinstate` | Review it and keep it as it is; take it out of use; put it back |
 | `GET /documents/{ref}/versions/{id}` · `GET …/versions/{id}/file` · `GET /documents/{ref}/compare?from=&to=` | One version; its file; two versions side by side |
+| `GET` · `POST /objectives` · `GET` · `PATCH /objectives/{ref}` · `PUT /objectives/{ref}/owners` · `GET /objectives/{ref}/history` · `PUT /risks/{ref}/objectives` | Strategic objectives, each with the risks that name it; the objectives a risk threatens |
+| `GET` · `POST /sessions` · `GET` · `PATCH /sessions/{ref}` · `PUT /sessions/{ref}/owners` · `GET /sessions/{ref}/history` · `POST /sessions/{ref}/held` · `/cancel` | Committee sessions, with their agenda, decisions, attendees, and minutes |
+| `POST /sessions/{ref}/items` · `PATCH` · `DELETE /sessions/{ref}/items/{id}` · `POST …/items/{id}/move` · `POST …/items/{id}/decision` | Put an item on the agenda (a record's reference, or a topic), change it, take it off, move it, and record the decision, which shows on the record (`decisions` on any record) |
 | `GET` · `POST /framework-packs` | The frameworks that ship and which are loaded; load one by its key, or a whole pack (those who run the program) |
 | `GET /frameworks/{key}/changes?from=` · `GET /frameworks/{key}/change?from=&code=` · `POST /frameworks/{key}/versions` | What changed from an earlier version, and what uses it; one requirement in both, with the words that differ; start a new version of a framework of your own |
 | `POST /scopes/{ref}/frameworks/{key}/move` | Move a scope to a later version, carrying its decisions, exceptions, and the organization's crosswalks where the code is unchanged |

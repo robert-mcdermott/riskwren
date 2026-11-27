@@ -46,6 +46,12 @@ from riskwren.db.models.documents import (
     PolicyDocument,
     PolicyVersion,
 )
+from riskwren.db.models.governance import (
+    CommitteeItem,
+    CommitteeSession,
+    Objective,
+    RiskObjective,
+)
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.inventory import (
     ExternalRef,
@@ -100,6 +106,8 @@ __all__ = [
     "Campaign",
     "CampaignItem",
     "ChainHead",
+    "CommitteeItem",
+    "CommitteeSession",
     "Control",
     "ControlLibraryEntry",
     "ControlRating",
@@ -131,6 +139,7 @@ __all__ = [
     "Membership",
     "NotDuplicate",
     "Notice",
+    "Objective",
     "OrgUnit",
     "OutboxMessage",
     "PolicyAcknowledgment",
@@ -154,6 +163,7 @@ __all__ = [
     "RiskCategory",
     "RiskControl",
     "RiskLibraryEntry",
+    "RiskObjective",
     "RiskSubject",
     "RoleGrant",
     "SavedView",

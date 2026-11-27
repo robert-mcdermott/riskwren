@@ -37,6 +37,11 @@ control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement c
 - **Documents in the web of records:** in the Connections picture, in search, in Tidy (a
   policy, standard, or procedure that governs nothing is listed as missing it), and with
   what each governs in the export of the document list.
+- **Strategic objectives** (`OBJ`). A risk names the objectives it threatens, and each
+  objective shows exactly the risks that name it, with how each stands.
+- **Committee sessions** (`SES`): an agenda drawn from the register, the decision taken on
+  each item, and the minutes. A decision shows on the record it was about, and its owners are
+  told.
 - **New versions of a framework, loaded beside the old.** What changed is listed by code
   (changed, with the words that differ; added; withdrawn, with where each went), with what
   uses the old version. Nothing changes until a scope is moved; then its decisions and
@@ -71,6 +76,8 @@ control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement c
 
 - A rule a later release adds to the program's cadences is taken from the default program
   until the organization sets it, so a table saved earlier still has it.
+- A leader may change a record of a kind leaders keep, such as an objective or a document, without
+  being refused for its unit.
 - The **Policies** menu has **Policy library** for everyone, and **Documents** for those who
   write and keep them.
 

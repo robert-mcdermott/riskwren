@@ -245,6 +245,18 @@ Answers are kept as given, and some need someone else to act. Those people are t
 
 An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
 
+## Committee sessions
+
+**Reports → Committee sessions** holds the meetings of the risk and compliance committees. A unit's leaders, or a manager, plan one: its committee, the day it meets, and the unit it answers to. Whoever plans it is its owner, and sees it on Home in the fortnight before it meets.
+
+- **The agenda** is drawn from the register: a risk, an issue, an exception, a control, a document, an agreement, a scope, an objective, or an assessment, each with what the committee is asked; or a topic of its own. Items are put in order, and taken off until something is decided about them.
+- **A decision** is recorded on each item: noted, approved, declined, or deferred, with what was decided. It **shows on the record it was about**, under **Committee decisions**, and that record's owners are told. A decided item stays on the agenda, and a session where anything was decided cannot be cancelled.
+- **The minutes** say who was present and what else was said, in the same simple Markdown as documents. The decisions are not repeated there: they are kept with their items.
+
+![A held session: the agenda drawn from the register, and the decision recorded on each item](img/session-held-light.webp)
+
+The register's records and their sessions are joined both ways in the **Connections** picture, and the list of sessions can be cut to those that discussed a record.
+
 ## When someone leaves
 
 Disable the account under **Admin → People**, or with [`riskwren users disable`](cli.md#riskwren-users-disable). The person is signed out and cannot sign in. Everything they did stays in the history under their name.

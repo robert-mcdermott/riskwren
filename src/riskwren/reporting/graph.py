@@ -18,6 +18,7 @@ from riskwren.access.principal import Principal
 from riskwren.db.models import (
     AgreementCoverage,
     Assessment,
+    CommitteeItem,
     ControlTest,
     DocumentControl,
     EvidenceLink,
@@ -27,6 +28,7 @@ from riskwren.db.models import (
     PolicyDocument,
     RecordLink,
     RiskControl,
+    RiskObjective,
     RiskSubject,
     ScopeMember,
 )
@@ -145,6 +147,27 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
         add("covered_by", "Covered by agreements", "agreement", session.scalars(
             select(AgreementCoverage.agreement_id).where(
                 AgreementCoverage.subject_type == key, AgreementCoverage.subject_id == record_id
+            )
+        ))  # fmt: skip
+    if key == "risk":
+        add("threatens", "Threatens", "objective", session.scalars(
+            select(RiskObjective.objective_id).where(RiskObjective.risk_id == record_id)
+        ))  # fmt: skip
+    if key == "objective":
+        add("threatened_by", "Threatened by", "risk", session.scalars(
+            select(RiskObjective.risk_id).where(RiskObjective.objective_id == record_id)
+        ))  # fmt: skip
+    if key == "committee_session":
+        for subject_type, subject_id in session.execute(
+            select(CommitteeItem.subject_type, CommitteeItem.subject_id)
+            .where(CommitteeItem.session_id == record_id, CommitteeItem.subject_id.is_not(None))
+            .order_by(CommitteeItem.position)
+        ):
+            found.append(("agenda", "On the agenda", subject_type, subject_id))
+    else:
+        add("discussed_in", "Discussed in", "committee_session", session.scalars(
+            select(CommitteeItem.session_id).where(
+                CommitteeItem.subject_type == key, CommitteeItem.subject_id == record_id
             )
         ))  # fmt: skip
     if key == "evidence":

@@ -66,6 +66,10 @@ class SubjectsBody(BaseModel):
     subjects: list[str] = Field(description="References of the records the risk concerns")
 
 
+class ObjectivesBody(BaseModel):
+    objectives: list[str] = Field(description="References of the objectives the risk threatens")
+
+
 class EscalationBody(BaseModel):
     unit_id: int | None = Field(description="A unit above the risk's own; null takes it back down")
     reason: str | None = None
@@ -283,6 +287,17 @@ def set_risk_subjects(request: Request, ref: str, body: SubjectsBody) -> dict[st
     with writing(request, principal.actor) as session:
         risk = records.load(session, principal, RISK, ref)
         register.set_subjects(session, principal, risk, body.subjects)
+        return envelope(records.detail(session, principal, RISK, risk))
+
+
+@router.put("/risks/{ref}/objectives", summary="Say which objectives a risk threatens")
+def set_risk_objectives(request: Request, ref: str, body: ObjectivesBody) -> dict[str, Any]:
+    from riskwren.risk import objectives
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        risk = records.load(session, principal, RISK, ref)
+        objectives.set_objectives(session, principal, risk, body.objectives)
         return envelope(records.detail(session, principal, RISK, risk))
 
 

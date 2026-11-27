@@ -136,6 +136,16 @@ A steward or leader can escalate a risk to a unit above its own, with a reason. 
 
 Close a risk when it no longer applies, with the reason. It leaves the open register and stays findable, with its whole history.
 
+### The objectives it threatens
+
+**Risks → Objectives** holds the organization's strategic objectives: what it means to achieve, over what period, and how it will know. A unit's leaders, or a manager, add them; the President's strategic plan is the usual source.
+
+A risk names the objectives it threatens, under **Objectives it threatens** on the risk (those who keep the risk). Each objective then lists exactly the risks that name it, with how each stands, and the list of objectives shows how many open risks threaten each, by rating. That is the register read against the strategic plan: which aims are most at risk, and from what.
+
+![An objective, with the risks that threaten it, their residual ratings, and how each stands](img/objective-light.webp)
+
+The register can be cut to the risks that threaten one objective. A risk's history keeps each objective it came to name, or stopped naming.
+
 ## Controls
 
 A control is something the organization does to make a risk less likely or less harmful. It has a statement of what is done, an owner, a unit, a kind (preventive, detective, corrective, or directive), and how often it happens.

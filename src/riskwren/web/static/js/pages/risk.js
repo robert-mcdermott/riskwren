@@ -1,10 +1,11 @@
 // One risk: how much is at stake, whether it is in order, the reasoning, and its history.
 
-import { get, patch } from "../core/api.js";
+import { get, patch, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date } from "../core/format.js";
 import { program as loadProgram, units, vocabularies } from "../core/lookups.js";
 import { query } from "../core/router.js";
+import { banner, checkbox, submit } from "../components/form.js";
 import { openOverlay } from "../components/overlay.js";
 import { recordChip } from "../components/record.js";
 import { flags, journey, rating, reasons, standingPill } from "../components/risk.js";
@@ -18,6 +19,30 @@ import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./reco
 
 const TABS = [["overview", "Overview"], ["controls", "Controls"], ["treatment", "Treatment"], ["assessments", "Assessments"], ["history", "History"]];
 const KIND_TITLES = { inherent: "Inherent rating", residual: "Residual rating", target: "Target rating" };
+
+function editObjectives({ risk, onDone }) {
+  openOverlay({ title: "Objectives it threatens", subtitle: `${risk.ref} · ${risk.name}`,
+    render: async (body, footer, close) => {
+      const all = (await get("/api/v1/objectives", { status: "active", limit: 200, sort: "name" }, { fresh: true })).data;
+      const chosen = new Set(risk.objectives.map((each) => each.ref));
+      const boxes = all.map((objective) => checkbox(objective.name, { checked: chosen.has(objective.ref), value: objective.ref,
+        hint: [objective.ref, objective.period].filter(Boolean).join(" · ") }));
+      const problem = banner();
+      const save = button("Save", { kind: "btn-primary" });
+      save.addEventListener("click", async () => {
+        const done = await submit({ button: save, banner: problem,
+          run: () => put(`/api/v1/risks/${risk.ref}/objectives`, { objectives: boxes.filter((box) => box.input.checked).map((box) => box.input.value) }) });
+        if (!done) return;
+        close();
+        toast("Saved.");
+        onDone();
+      });
+      body.append(h("div", { class: "stack" }, problem, all.length ? h("div", { class: "stack-sm" }, boxes.map((box) => box.node))
+        : h("p", { class: "muted" }, "No objectives are on record yet. A unit's leaders, or a manager, add them under Risks → Objectives.")));
+      footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
 
 function showReasons(program, risk, kind) {
   openOverlay({
@@ -53,6 +78,9 @@ function overview(risk, ctx) {
         ? "Choose a rating to see the judgment behind it."
         : "Not assessed yet. Start with the inherent risk: how likely and how bad, if the controls were not there.")),
       card({ title: "What could go wrong" }, h("div", { class: "statement" }, facts(statement))),
+      card({ title: "Objectives it threatens", actions: risk.can.edit ? button("Change", { kind: "btn-sm", onclick: () => editObjectives({ risk, onDone: ctx.reload }) }) : null },
+        risk.objectives.length ? h("div", { class: "stack-sm" }, risk.objectives.map((objective) => h("div", {}, recordChip(objective))))
+          : h("p", { class: "muted" }, "Names no objective yet. Say which of the organization's aims it puts in doubt.")),
       card({ title: "Concerns", actions: risk.can.edit ? button("Edit", { kind: "btn-sm", onclick: () => editSubjects({ risk, onDone: ctx.reload }) }) : null },
         concerns.length ? h("div", { class: "stack-sm" }, concerns.map((record) => h("div", {}, recordChip(record))))
           : h("p", { class: "muted" }, "Not attached to a process, system, or third party yet."),
