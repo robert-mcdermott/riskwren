@@ -341,6 +341,9 @@ export function timeline(entries) {
       ])) : null))));
 }
 
+// The kinds of record a dossier is taken of: a ZIP of everything known, with a manifest that verifies.
+const DOSSIERS = new Set(["scope", "risk", "third_party"]);
+
 /** The top of every record page: where it came from, what it is, and its badges. */
 export function recordHeader(record, { badges = [], actions = null } = {}) {
   const meta = TYPES[record.type];
@@ -355,7 +358,8 @@ export function recordHeader(record, { badges = [], actions = null } = {}) {
           record.restricted ? h("span", { class: "pill" }, icon("lock"), "Restricted") : null,
           h("span", { class: "subtle" }, `Updated ${relative(record.updated_at)}`),
           h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
-          h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"))),
+          h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"),
+          DOSSIERS.has(record.type) ? h("a", { class: "connections-link", href: `/api/v1/dossiers/${record.ref}`, download: "" }, icon("download", "icon icon-sm"), "Dossier") : null)),
       actions),
     missingNote(record),
   ];

@@ -402,6 +402,20 @@ Because every change holds each value before and after, any record and any regis
 
 What is rebuilt is what the history holds: a record's own fields and its owners. A record's links, its assessments, and its other parts have their own records and history; a value the history keeps hidden is not shown. A field that an upgrade added has no history from before that upgrade, so for days before it, it shows the value it was given then. As everywhere, you see only the records you may see now.
 
+### Dossiers
+
+A **dossier** is everything known about a scope, a risk, or a third party as one ZIP file: what an auditor, a sponsor, or a regulator asks for, in a form that proves itself. **Dossier** at the top of the record's page takes one.
+
+| Every dossier holds | A scope's also holds | A risk's also holds | A third party's also holds |
+|---|---|---|---|
+| `index.html`, a page to read and print: the record, what is in the package, and its history; `record.json`, the record as it stands; `history.json`, every change to it | Its members and implementations; each framework's statement; the security plan, as a page and in OSCAL; the plan of action, as data and in OSCAL; its evidence and that of the controls it uses, with their files | Its treatment: response, plans and their actions, acceptances; the issues about it | Its due diligence reviews with their answers and concerns; its reports and certificates with their reviews and files; its agreements; the sharing no agreement covers; the issues and risks about it |
+
+`manifest.json` lists every other file with its size and SHA-256, and has a **fingerprint**: the SHA-256 of the manifest written canonically (keys sorted, no spaces, UTF-8), without the fingerprint itself. Taking a dossier is recorded in the history with that fingerprint. Anyone can check a file without RiskWren, since its hash is what `shasum -a 256` prints; **Reports → Check a dossier** checks all of it at once (every listed file there and unchanged, nothing added, the fingerprint the manifest's own) and says who took it and when, if this installation's history recorded it. `uv run riskwren check-dossier FILE` does the same on the server, for a dossier of any size and without the database.
+
+A dossier holds only what the person taking it may see. A file they may not open is left out; so is a file missing from the data home, or one that would take the package past 200 MB of files, and the manifest and `index.html` list what was left out and why.
+
+`uv run riskwren verify` now also checks every leadership report against the fingerprint the history took when it was issued.
+
 ## Appearance
 
 **Admin → Appearance** makes the product yours, with a live preview:

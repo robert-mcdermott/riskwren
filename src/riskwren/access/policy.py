@@ -269,6 +269,11 @@ POLICIES.update(
         # As of a day: what each person may see, rebuilt from the history.
         ("GET", "/api/v1/as-of"): Needs.MEMBER,
         ("GET", "/api/v1/as-of/{ref}"): Needs.MEMBER,
+        # Dossiers and a scope's plans hold what the person may see, checked by the record.
+        ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
+        ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/security-plan"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/oscal/{document}"): Needs.MEMBER,
         # The portfolio counts only what each person may see, as the dashboards do.
         ("GET", "/api/v1/portfolio"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/call-review"): Needs.MEMBER,

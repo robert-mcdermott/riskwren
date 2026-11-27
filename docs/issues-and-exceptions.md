@@ -104,7 +104,7 @@ Whoever asked sees it on Home a month before it ends. **Ask again** starts a new
 
 A scope's **Plan of action** tab lists the open issues that bear on it: those about the scope itself, and those about any control it uses or inherits. They are listed most severe first, each with its owner, its milestones (the actions, with who and when), and its date.
 
-It prints, and it is the document a reviewer asks for: what is wrong, who is fixing it, and by when.
+It prints, and it is the document a reviewer asks for: what is wrong, who is fixing it, and by when. **OSCAL** downloads it as a plan of action and milestones in the open assessment language; see [The security plan and OSCAL](compliance.md#the-security-plan-and-oscal).
 
 ![A scope's Plan of action tab: its open issues, most severe first, each with its owner, milestones, and date](img/scope-plan-light.webp)
 

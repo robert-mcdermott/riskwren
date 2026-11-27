@@ -65,9 +65,19 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `riskwren.insight.as_of` takes the record as it is now and undoes every event about its own row after the end of the chosen day (UTC), newest first, using each change's before-value; an event that created it means it did not exist yet. Owners are rebuilt the same way from the events about its owner rows. A register (risks, controls, issues, exceptions, third parties) is rebuilt in one pass over the events after the day, shows what was open or in use then unless asked for everything, and says for each column what it was then and, where it has changed, what it is now; risks are ordered by their rating then. Values are named as the history names them. Visibility is the person's now. **Reports → As of a date** and an **As of a date** link on every record's header. The acceptance tests are `tests/test_as_of.py::test_a_record_and_the_register_as_they_stood` and `::test_rebuilding_backwards_agrees_with_the_history_forwards`, which compares the two directions on every day each risk changed.
 
-### Slice 5: Dossier and open formats ☐
+### Slice 5: Dossier and open formats ☑
 
-- [ ] A complete, verifiable package for a scope, a risk, or a third party; export in the open assessment language; the security plan document
+**Goal:** what an auditor or a sponsor asks for, in a form that proves itself, and in the format federal programs read.
+
+- [x] A complete, verifiable package for a scope, a risk, or a third party
+- [x] Export in the open assessment language: a scope's system security plan and its plan of action and milestones
+- [x] The security plan document, in the customary order
+
+**Acceptance:** a dossier's manifest verifies, and any change to it (a file edited, added, or taken out, or the manifest itself) is found; a scope's OSCAL plan names every requirement with a well-formed control id and stable identifiers, and its security plan is in the customary order.
+
+**Done:** `riskwren.insight.dossier` builds a ZIP of the record (`record.json`), its history, and what belongs to its kind: for a scope its members, implementations, each framework's statement, the security plan as a page and in OSCAL, the plan of action as data and in OSCAL, and its evidence and that of the controls it uses with their files; for a risk its treatment and issues; for a third party its reviews, reports and certificates with their files, agreements, stops, issues, and risks. `index.html` reads and prints the whole of it. `manifest.json` lists every file with its size and SHA-256 and carries the SHA-256 of itself written canonically; the history records the dossier being taken with that fingerprint. Checking one (`POST /dossiers/check`, **Reports → Check a dossier**, or `riskwren check-dossier`, which needs no database) finds a missing, changed, or added file, a manifest that is not its own, and a name that points outside the package, and refuses one too large to unpack. A dossier holds what its taker may see; files left out are listed with the reason. `riskwren.insight.oscal` writes OSCAL 1.1.2 with name-based UUIDs, control ids as the published catalogs name them, implementation status from readiness, and what the model has no place for as properties in `urn:riskwren:oscal`. The security plan is a page served as a download. `riskwren verify` now checks leadership reports too. The acceptance tests are in `tests/test_dossier.py`.
+
+Not done, and said so: an assessment's tests as OSCAL assessment results, and reading catalogs and profiles in the app (the built-in packs are still built from OSCAL at build time). The OSCAL files are written to the published model but are not checked against its schema in the tests, which have no copy of it.
 
 ### Slice 6: Scenarios and ranges ☐
 
@@ -82,5 +92,6 @@ The wave is done when, on a fresh checkout:
 - A measure is defined once, in code, as the same condition a list uses, so a figure and the list behind it cannot disagree (RPT-04).
 - A snapshot records the organization's figure for each measure on a day. It is bookkeeping, not history: it is not in the hash chain, and it can be taken again.
 - An issued leadership report is history: its issue is in the hash chain with its fingerprint. Its figures are kept as counts, not as lists to open, because the lists move on and the report must not. A report is never edited or withdrawn; the next one corrects it.
+- A dossier's fingerprint is of its manifest, not of the ZIP: the same files packed again are the same dossier, and the manifest is what a person can read.
 - As of is rebuilt backwards from the record as it is now rather than forwards from its creation: it needs only the events after the day, and it still gives the right answer for a field whose history began after the record did (one an upgrade added).
 - Those who lead the whole organization read the reports though they cannot read everything: the report is written for them. It may name restricted risks, which such a leader may already see.

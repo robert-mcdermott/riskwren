@@ -431,7 +431,48 @@ def _verify_documents(config: Config, db: Database) -> int:
             f"{found['checked']} published versions"
         )  # fmt: skip
         print(f"Documents: {versions} match what the history says was published.")
+    return _verify_reports(db)
+
+
+def _verify_reports(db: Database) -> int:
+    """Every leadership report against the fingerprint the history took when it was issued."""
+    from sqlalchemy import select
+
+    from riskwren.db.models import LeadershipReport
+    from riskwren.insight import leadership
+
+    try:
+        with db.read() as session:
+            reports = session.scalars(select(LeadershipReport).order_by(LeadershipReport.id))
+            failed = [row.ref for row in reports if not leadership.verify(session, row)["verified"]]
+            count = session.scalar(select(sqlalchemy.func.count()).select_from(LeadershipReport))
+    finally:
+        db.dispose()
+    for ref in failed:
+        print(f"Leadership report {ref} no longer matches its fingerprint.", file=sys.stderr)
+    if failed:
+        return EXIT_ERROR
+    if count:
+        said = "1 leadership report matches" if count == 1 else f"{count} leadership reports match"
+        print(f"Reports: {said} what the history says was issued.")
     return EXIT_OK
+
+
+def cmd_check_dossier(args: argparse.Namespace) -> int:
+    from riskwren.insight import dossier
+
+    found = dossier.verify(Path(args.file).read_bytes())
+    manifest = found["manifest"] or {}
+    record = manifest.get("record") or {}
+    if found["verified"]:
+        print(f"The dossier of {record.get('ref')} {record.get('name')} is whole and unchanged: "
+              f"{manifest.get('files')} files, taken {manifest.get('taken_at')} by "
+              f"{manifest.get('taken_by')}.")  # fmt: skip
+        print(f"Fingerprint: {manifest.get('fingerprint')}")
+        return EXIT_OK
+    for problem in found["problems"]:
+        print(problem, file=sys.stderr)
+    return EXIT_ERROR
 
 
 def cmd_verify(args: argparse.Namespace) -> int:
@@ -741,11 +782,21 @@ def build_parser() -> argparse.ArgumentParser:
         "verify",
         help="check that the history has not been altered",
         description="Recompute the hash chain over every event in the history and report the "
-        "first one that does not hold, then check every published version of a document "
-        "against the fingerprint the history took when it was published. Exits with 1 if "
-        "either does not hold.",
+        "first one that does not hold, then check every published version of a document, and "
+        "every leadership report, against the fingerprint the history took when it was "
+        "published or issued. Exits with 1 if any does not hold.",
     )
     verify.set_defaults(handler=cmd_verify)
+
+    check = commands.add_parser(
+        "check-dossier",
+        help="check that a dossier is whole and unchanged",
+        description="Check a dossier taken from RiskWren: every file its manifest lists is "
+        "there with the size and SHA-256 it lists, nothing else is, and the manifest's "
+        "fingerprint is its own. Needs no database. Exits with 1 if it does not hold.",
+    )
+    check.add_argument("file", help="the dossier's ZIP file")
+    check.set_defaults(handler=cmd_check_dossier)
 
     held = commands.add_parser(
         "frameworks",

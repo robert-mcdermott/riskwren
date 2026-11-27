@@ -5,12 +5,14 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query, Request, Response
 from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
 from riskwren.api.common import envelope, reading, writing
 from riskwren.api.routers.inventory import UNIT
+from riskwren.core.clock import utc_now
+from riskwren.core.errors import Invalid, NotFound
 from riskwren.inventory import records
 from riskwren.reporting import service as reporting
 from riskwren.treatment import service as treatment
@@ -247,3 +249,104 @@ def record_as_of(request: Request, ref: str, on: date | None = ON_DAY) -> dict[s
     with reading(request) as session:
         record_type, _ = find_any(session, ref)
         return envelope(as_of.record_view(session, principal, record_type, ref, on))
+
+
+# --- Dossiers, the security plan, and OSCAL -------------------------------------------------
+
+
+def _attachment(data: bytes, name: str, media_type: str) -> Response:
+    from riskwren.api.routers.evidence import DOWNLOAD_HEADERS
+
+    return Response(
+        data,
+        media_type=media_type,
+        headers={**DOWNLOAD_HEADERS, "Content-Disposition": f'attachment; filename="{name}"'},
+    )
+
+
+@router.get(
+    "/dossiers/{ref}",
+    summary="A dossier of a scope, a risk, or a third party: a ZIP with a manifest that verifies",
+    response_class=Response,
+)
+def take_dossier(request: Request, ref: str) -> Response:
+    from riskwren.insight import dossier
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        data, _, record = dossier.build(
+            session, principal, ref.strip().upper(), request.app.state.home.files
+        )
+        name = f"{record.ref}-dossier-{utc_now().date().isoformat()}.zip"
+    return _attachment(data, name, "application/zip")
+
+
+@router.post("/dossiers/check", summary="Check that a dossier is whole and unchanged")
+async def check_dossier(request: Request) -> dict[str, Any]:
+    """Send the dossier's ZIP file as the request body, up to 32 MB; for a larger one, the
+    command line's ``riskwren check-dossier`` checks it."""
+    from starlette.concurrency import run_in_threadpool
+
+    from riskwren.insight import dossier
+
+    data = await request.body()
+
+    def check() -> dict[str, Any]:
+        current(request)
+        with reading(request) as session:
+            return envelope(dossier.verify(data, session))
+
+    return await run_in_threadpool(check)
+
+
+@router.get(
+    "/scopes/{ref}/security-plan",
+    summary="A scope's system security plan, as a page that prints by itself",
+    response_class=Response,
+)
+def security_plan(request: Request, ref: str) -> Response:
+    from riskwren.compliance.scopes import SCOPE
+    from riskwren.insight import dossier
+
+    principal = current(request)
+    with reading(request) as session:
+        scope = records.load(session, principal, SCOPE, ref)
+        data = dossier.security_plan(session, principal, scope)
+        name = f"{scope.ref}-security-plan.html"
+    return _attachment(data, name, "text/html; charset=utf-8")
+
+
+@router.get(
+    "/scopes/{ref}/oscal/{document}",
+    summary="A scope in OSCAL: its system security plan (ssp) or its plan of action (poam)",
+    response_class=Response,
+)
+def scope_oscal(
+    request: Request,
+    ref: str,
+    document: str,
+    framework: str | None = Query(default=None, description="For ssp: the framework's key"),
+) -> Response:
+    from riskwren.compliance import scopes
+    from riskwren.compliance.scopes import SCOPE
+    from riskwren.insight import dossier, oscal
+
+    principal = current(request)
+    with reading(request) as session:
+        scope = records.load(session, principal, SCOPE, ref)
+        held = [row["key"] for row in scopes.held_to(session, scope)]
+        if document == "poam":
+            content = oscal.poam(session, principal, scope)
+            name = f"{scope.ref}-poam.json"
+        elif document == "ssp":
+            key = framework or (held[0] if len(held) == 1 else None)
+            if key not in held:
+                raise Invalid(
+                    "Say which framework the plan is against.",
+                    {"framework": f"One of: {', '.join(held) or 'none is held'}."},
+                )
+            content = oscal.ssp(session, principal, scope, key)
+            name = f"{scope.ref}-ssp-{key}.json"
+        else:
+            raise NotFound("There is no such OSCAL document: ask for ssp or poam.")
+    return _attachment(dossier.as_json(content), name, "application/json")

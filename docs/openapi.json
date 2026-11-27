@@ -12014,6 +12014,65 @@
         ]
       }
     },
+    "/api/v1/dossiers/check": {
+      "post": {
+        "description": "Send the dossier's ZIP file as the request body, up to 32 MB; for a larger one, the\ncommand line's ``riskwren check-dossier`` checks it.",
+        "operationId": "check_dossier_api_v1_dossiers_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Dossier Api V1 Dossiers Check Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check that a dossier is whole and unchanged",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/dossiers/{ref}": {
+      "get": {
+        "operationId": "take_dossier_api_v1_dossiers__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A dossier of a scope, a risk, or a third party: a ZIP with a manifest that verifies",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/evidence": {
       "get": {
         "operationId": "list_evidence_api_v1_evidence_get",
@@ -23320,6 +23379,68 @@
         ]
       }
     },
+    "/api/v1/scopes/{ref}/oscal/{document}": {
+      "get": {
+        "operationId": "scope_oscal_api_v1_scopes__ref__oscal__document__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "document",
+            "required": true,
+            "schema": {
+              "title": "Document",
+              "type": "string"
+            }
+          },
+          {
+            "description": "For ssp: the framework's key",
+            "in": "query",
+            "name": "framework",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "For ssp: the framework's key",
+              "title": "Framework"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A scope in OSCAL: its system security plan (ssp) or its plan of action (poam)",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/scopes/{ref}/owners": {
       "put": {
         "operationId": "set_scope_owners_api_v1_scopes__ref__owners_put",
@@ -23556,6 +23677,41 @@
         "summary": "Say whether a requirement applies within a scope",
         "tags": [
           "scopes"
+        ]
+      }
+    },
+    "/api/v1/scopes/{ref}/security-plan": {
+      "get": {
+        "operationId": "security_plan_api_v1_scopes__ref__security_plan_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A scope's system security plan, as a page that prints by itself",
+        "tags": [
+          "reporting"
         ]
       }
     },

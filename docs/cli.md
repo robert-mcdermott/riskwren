@@ -19,6 +19,7 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 | [`riskwren db`](#riskwren-db) | Look after the database schema |
 | [`riskwren users`](#riskwren-users) | Manage accounts from the command line |
 | [`riskwren verify`](#riskwren-verify) | Check that the history has not been altered |
+| [`riskwren check-dossier`](#riskwren-check-dossier) | Check that a dossier is whole and unchanged |
 | [`riskwren frameworks`](#riskwren-frameworks) | See and load what the organization is held to |
 | [`riskwren program`](#riskwren-program) | Move the program between installations |
 | [`riskwren doctor`](#riskwren-doctor) | Check that this installation is healthy |
@@ -129,7 +130,15 @@ Show an account's roles, or with --set replace the roles granted in RiskWren. Ro
 
 ## `riskwren verify`
 
-Recompute the hash chain over every event in the history and report the first one that does not hold, then check every published version of a document against the fingerprint the history took when it was published. Exits with 1 if either does not hold.
+Recompute the hash chain over every event in the history and report the first one that does not hold, then check every published version of a document, and every leadership report, against the fingerprint the history took when it was published or issued. Exits with 1 if any does not hold.
+
+## `riskwren check-dossier`
+
+Check a dossier taken from RiskWren: every file its manifest lists is there with the size and SHA-256 it lists, nothing else is, and the manifest's fingerprint is its own. Needs no database. Exits with 1 if it does not hold.
+
+| Option | Meaning |
+|---|---|
+| `FILE` | the dossier's ZIP file |
 
 ## `riskwren frameworks`
 

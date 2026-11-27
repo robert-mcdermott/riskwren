@@ -27,6 +27,13 @@ Wave 6, *Insight*.
 - **As of a date:** any record, and the register of risks, controls, issues, exceptions, or
   third parties, as it stood at the end of a chosen day, rebuilt from the history, with what
   has changed since. **Reports → As of a date**, and **As of a date** on every record.
+- **Dossiers:** a scope, a risk, or a third party with everything known about it, as one ZIP
+  with a page to read and print and a manifest of every file's SHA-256 whose fingerprint the
+  history records. **Reports → Check a dossier** and `riskwren check-dossier` check one.
+- **The security plan and OSCAL:** a scope's system security plan in the customary order, as a
+  page that prints by itself, and in OSCAL 1.1.2; its plan of action and milestones in OSCAL.
+- `riskwren verify` also checks every leadership report against the fingerprint the history
+  took when it was issued.
 - **Lists cut to a period:** risks by when they were added, issues by when they were raised
   or closed, issues by root cause, and issues and exceptions about a framework's requirements.
 

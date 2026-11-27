@@ -451,6 +451,11 @@ REACH[("GET", "/api/v1/leadership-reports/next")] = {"manager"}
 REACH[("POST", "/api/v1/leadership-reports")] = {"manager"}
 REACH[("GET", "/api/v1/as-of")] = EVERYONE
 REACH[("GET", "/api/v1/as-of/{ref}")] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/dossiers/{ref}"), ("POST", "/api/v1/dossiers/check"),
+    ("GET", "/api/v1/scopes/{ref}/security-plan"), ("GET", "/api/v1/scopes/{ref}/oscal/{document}"),
+):  # fmt: skip
+    REACH[_route] = EVERYONE
 REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():

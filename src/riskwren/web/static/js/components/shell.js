@@ -80,6 +80,7 @@ export const NAV = [
       { href: "/portfolio", label: "Portfolio", iconName: "grid" },
       { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "reports" },
       { href: "/as-of", label: "As of a date", iconName: "history" },
+      { href: "/check-dossier", label: "Check a dossier", iconName: "check" },
       { href: "/tidy", label: "Tidy", iconName: "check" },
       { href: "/sessions", label: "Committee sessions", iconName: "session" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },

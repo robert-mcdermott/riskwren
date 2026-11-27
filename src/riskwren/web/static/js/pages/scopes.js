@@ -394,7 +394,9 @@ function requirementsTab(scope, found, reload) {
     scope.held_to.length > 1 ? filterSelect("framework", scope.held_to.map((held) => [held.key === scope.held_to[0].key ? "" : held.key, held.title]), "Framework") : null,
     filterSelect("state", [["", `Every requirement (${found.applicable + counts.excluded})`], ...Object.entries(STATES).map(([key, [text]]) => [key, `${text} (${counts[key]})`])], "State"),
     button("Print", { class: "btn no-print", onclick: () => window.print() }),
-    h("span", { class: "no-print" }, exportButton("statement", { scope: scope.ref, framework: chosen, state: query().get("state"), q: query().get("q") })));
+    h("span", { class: "no-print" }, exportButton("statement", { scope: scope.ref, framework: chosen, state: query().get("state"), q: query().get("q") })),
+    h("a", { class: "btn no-print", href: `/api/v1/scopes/${scope.ref}/security-plan`, download: "" }, icon("download", "icon icon-sm"), "Security plan"),
+    h("a", { class: "btn no-print", href: `/api/v1/scopes/${scope.ref}/oscal/ssp?framework=${encodeURIComponent(chosen)}`, download: "" }, icon("download", "icon icon-sm"), "OSCAL"));
   const rows = found.requirements;
   const table = rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
     h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Requirement"), h("th", { scope: "col" }, "Here"), h("th", { scope: "col" }, "Answered by"), h("th", { scope: "col", class: "no-print" }, h("span", { class: "sr-only" }, "Actions")))),

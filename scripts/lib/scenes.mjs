@@ -267,6 +267,7 @@ export const SCENES = [
   { name: "as-of-record", as: "cro",
     path: async (page) => `/as-of/${await first("/api/v1/risks?q=ransomware")(page)}?on=${daysAgo(120)}` },
   { name: "as-of-third-parties", as: "ciso", path: `/as-of?type=third_party&on=${daysAgo(200)}&live=false` },
+  { name: "check-dossier", as: "auditor", path: "/check-dossier" },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;
