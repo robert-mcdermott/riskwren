@@ -125,6 +125,7 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Evidence and testing](docs/evidence-and-testing.md) | Control owners and assessors |
 | [Issues and exceptions](docs/issues-and-exceptions.md) | Whoever fixes, checks, or decides |
 | [Policies](docs/policies.md) | Whoever writes, approves, or keeps the organization's policies |
+| [Third parties](docs/third-parties.md) | Whoever looks after the organization's suppliers and partners |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
 | [API](docs/api.md) | Anyone connecting another system |

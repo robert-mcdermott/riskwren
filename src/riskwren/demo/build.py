@@ -68,6 +68,7 @@ from riskwren.db.models import (
     RiskAnalysisItem,
     RiskCategory,
     Scope,
+    ThirdParty,
     TreatmentPlan,
 )
 from riskwren.demo import content as c
@@ -84,6 +85,8 @@ from riskwren.risk import objectives as risk_objectives
 from riskwren.risk.indicators import INDICATOR
 from riskwren.risk.objectives import OBJECTIVE
 from riskwren.risk.register import RISK
+from riskwren.thirdparty import tiering
+from riskwren.thirdparty.services import SERVICE
 from riskwren.treatment import service as treatment
 
 SETTING = "demo"
@@ -1660,6 +1663,62 @@ class Builder:
                     )
                     agreements.close(session, who, agreement, why)
 
+    def _service(self, spec: tuple[Any, ...]) -> None:
+        """A service a third party provides, with the systems it reaches and the information
+        it handles, added by its unit's steward."""
+        key, name, party, code, kind, criticality, data_class, reaches, handles = spec
+        unit = self.units[code]
+        with self.act(self.steward(unit)) as (session, who):
+            made = records.create(
+                session, who, SERVICE,
+                {"name": name, "kind": kind, "criticality": criticality, "data_class": data_class,
+                 "org_unit_id": unit, "third_party": self.things[party][2]},
+                checked=True,
+            )  # fmt: skip
+            self.things[key] = (SERVICE, made.id, made.ref)
+            for relation, targets in (("reaches", reaches), ("handles", handles)):
+                for target in targets:
+                    target_type, target_id, _ = self.things[target]
+                    links.add(session, who, SERVICE, made, relation, target_type,
+                              session.get(target_type.model, target_id))  # fmt: skip
+                    self.tally("links")
+        self.tally("services")
+
+    def _tier(self, party: str, by: int | None = None) -> None:
+        """Tier a third party from what the inventory suggests and what its keeper knows."""
+        _, party_id, _ = self.things[party]
+        with self.db.read() as session:
+            unit = session.get(ThirdParty, party_id).org_unit_id
+        with self.act(by or self.steward(unit)) as (session, who):
+            record = session.get(ThirdParty, party_id)
+            known = tiering.facts(session, record)
+            answers: dict[str, Any] = {"information": "none", "access": ["no_access"],
+                                       "dependency": "little"}  # fmt: skip
+            answers.update(tiering.suggest(known))
+            answers.update(c.TIERING_ANSWERS.get(party, {}))
+            tier, why = c.TIERING_JUDGED.get(party, (None, None))
+            tiering.record(session, who, record, answers, tier, why)
+        self.tally("tierings")
+
+    def _story_third_parties(self) -> Script:
+        """What each supplier and partner provides, what each service reaches and handles, and
+        each third party's tier from the program's rules, on answers the inventory mostly
+        suggested. One keeper recorded a different tier from the rules', with the reason; the
+        supplier of identity was tiered again when the institute moved its email there; and
+        a few sponsors and partners are not tiered yet."""
+        yield self._on(560)
+        for spec in c.SERVICES:
+            self._service(spec)
+        tiered = [key for key in c.TIERING_ANSWERS if key not in c.UNTIERED]
+        for index, party in enumerate(tiered):
+            if index % 6 == 0:
+                yield self._on(540 - index * 6)
+            self._tier(party)
+        yield self._on(150)
+        self._service(c.LATER_SERVICE)
+        yield self._on(146)
+        self._tier("cloud", self.cast["ciso"])
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -2909,7 +2968,7 @@ class Builder:
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
-            self._story_governance,
+            self._story_governance, self._story_third_parties,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

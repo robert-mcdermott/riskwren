@@ -230,8 +230,17 @@ def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], N
     return found
 
 
-for _path in ("processes", "systems", "third-parties", "information"):
+for _path in ("processes", "systems", "third-parties", "information", "services"):
     POLICIES.update(record_policies(_path))
+
+# Third parties as a program. Who may tier one is decided where it is written.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/tiers"): Needs.MEMBER,
+        ("GET", "/api/v1/third-parties/{ref}/tiering"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/tiering"): Needs.MEMBER,
+    }
+)
 
 # The risk register
 POLICIES.update(record_policies("risks", links=False))

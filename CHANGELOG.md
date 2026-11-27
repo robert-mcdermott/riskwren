@@ -4,6 +4,29 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.5.0 (unreleased)
+
+Wave 5, *Third parties*.
+
+### Added
+
+- **Services** (`SVC`): what a third party provides, in the inventory beside it, with the
+  systems each reaches and the information each handles. Processes rely on services, and
+  systems are supplied by them. A third party's page lists its services, and both are in the
+  Connections picture.
+- **Tiering.** A few questions, answered partly from the inventory, give a third party's tier
+  by the program's rules, with each reason that applies. Those who keep a third party, and
+  assessors, tier it. The tier recorded is a judgment by a named person: a different tier from
+  the rules' needs a reason, and both are kept. Lists show,
+  sort, and cut by tier, and Tidy lists third parties not yet tiered.
+- **A Third parties menu,** with third parties and services, and a new guide,
+  [Third parties](docs/third-parties.md).
+
+### Changed
+
+- A kind of link a release adds, or a pair of records it may now join, reaches an installation
+  that has renamed its kinds of link.
+
 ## 0.4.0 (2026-11-27)
 
 Wave 4, *Policy and obligations*: the organization's own word, and what it has promised

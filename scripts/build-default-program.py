@@ -170,6 +170,37 @@ VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ("sponsor", "Sponsor or funder"),
         ("subrecipient", "Subrecipient", "Receives funds the organization passes through"),
     ),
+    # What a third party provides. A service is what reaches systems and handles information.
+    "service_kinds": items(
+        (
+            "software_service",
+            "Software as a service",
+            "An application it runs and the organization uses",
+        ),
+        (
+            "hosting",
+            "Hosting or infrastructure",
+            "Computing, storage, or networks it runs for the organization",
+        ),
+        ("data_service", "Data processing or analysis", "Work it does on the organization's data"),
+        ("laboratory", "Laboratory or testing", "Tests, sequencing, or analysis of specimens"),
+        (
+            "clinical",
+            "Clinical service",
+            "Care, or a service to patients, given on the organization's behalf",
+        ),
+        ("maintenance", "Maintenance and support", "Keeping equipment or systems working"),
+        ("professional", "Professional services", "Advice, audit, legal, or consulting work"),
+        ("staffing", "Staffing", "People who work alongside the organization's own"),
+        (
+            "supply",
+            "Goods and supplies",
+            "Things delivered, with no access to systems or information",
+        ),
+        ("logistics", "Logistics", "Moving or storing specimens, equipment, or records"),
+        ("collaboration", "Research collaboration", "Shared work under a protocol or an award"),
+        ("funding", "Funding", "Money the organization receives, with its terms"),
+    ),
     "information_kinds": items(
         ("research_data", "Research data", "Data produced or collected by research"),
         ("participant_data", "Participant data", "About people who take part in research"),
@@ -190,7 +221,7 @@ LINK_KINDS: list[dict[str, Any]] = [
         "key": "relies_on",
         "label": "Relies on",
         "reverse": "Supports",
-        "between": [["process", "system"]],
+        "between": [["process", "system"], ["process", "service"]],
     },
     {
         "key": "performed_by",
@@ -202,7 +233,7 @@ LINK_KINDS: list[dict[str, Any]] = [
         "key": "supplied_by",
         "label": "Supplied by",
         "reverse": "Supplies",
-        "between": [["system", "third_party"]],
+        "between": [["system", "third_party"], ["system", "service"]],
     },
     {
         "key": "holds",
@@ -221,6 +252,18 @@ LINK_KINDS: list[dict[str, Any]] = [
         "label": "Is shared with",
         "reverse": "Receives",
         "between": [["information", "third_party"]],
+    },
+    {
+        "key": "reaches",
+        "label": "Reaches",
+        "reverse": "Is reached by",
+        "between": [["service", "system"]],
+    },
+    {
+        "key": "handles",
+        "label": "Handles",
+        "reverse": "Is handled by",
+        "between": [["service", "information"]],
     },
     {
         "key": "depends_on",
@@ -472,6 +515,140 @@ AUTHORITY: dict[str, Any] = {
     }
 }
 
+# How a third party is tiered (TPR-02). A tiering asks the questions of the questionnaire
+# named here, with answers suggested from the inventory. The tiers are read in order: the
+# first with a rule that holds is the one suggested, with every rule of it that holds as the
+# reasons. The last tier has no rules: it is what a third party is when nothing above holds.
+# Each rule is in the one condition language, over ``answers`` and ``facts`` (what the
+# inventory says). ``review_months`` is how often a third party of the tier is reviewed;
+# none means only when something calls for it.
+REGULATED = ["health", "participant", "controlled", "cards", "identifiers", "students", "export"]
+TIERING: dict[str, Any] = {
+    "questionnaire": "third-party-tiering",
+    "tiers": [
+        {
+            "key": "tier_1",
+            "label": "Tier 1",
+            "description": "Holds or can see restricted or regulated information, has privileged "
+            "access to systems, or is relied on for critical work and reaches information or "
+            "systems.",
+            "review_months": 12,
+            "rules": [
+                {
+                    "reason": "It holds, receives, or can see restricted information.",
+                    "when": {"field": "answers.information", "op": "eq", "value": "restricted"},
+                },
+                {
+                    "reason": "Some of the information is regulated, such as identifiable health "
+                    "information or controlled-access data.",
+                    "when": {
+                        "field": "answers.regulated",
+                        "op": "contains_any",
+                        "value": REGULATED,
+                    },
+                },
+                {
+                    "reason": "It has administrator or privileged access to the organization's systems.",
+                    "when": {"field": "answers.access", "op": "contains", "value": "privileged"},
+                },
+                {
+                    "reason": "Critical work stops without it, and it reaches the organization's "
+                    "information or systems.",
+                    "when": {
+                        "all": [
+                            {"field": "answers.dependency", "op": "eq", "value": "stops"},
+                            {
+                                "any": [
+                                    {
+                                        "field": "answers.information",
+                                        "op": "in",
+                                        "value": ["confidential", "restricted"],
+                                    },
+                                    {
+                                        "field": "answers.access",
+                                        "op": "contains_any",
+                                        "value": ["remote", "accounts", "integration"],
+                                    },
+                                ]
+                            },
+                        ]
+                    },
+                },
+            ],
+        },
+        {
+            "key": "tier_2",
+            "label": "Tier 2",
+            "description": "Holds confidential information, reaches systems, holds records about "
+            "many people, or is relied on for critical work.",
+            "review_months": 24,
+            "rules": [
+                {
+                    "reason": "It holds, receives, or can see confidential information.",
+                    "when": {"field": "answers.information", "op": "eq", "value": "confidential"},
+                },
+                {
+                    "reason": "It reaches the organization's network, accounts, or systems.",
+                    "when": {
+                        "field": "answers.access",
+                        "op": "contains_any",
+                        "value": ["remote", "accounts", "integration"],
+                    },
+                },
+                {
+                    "reason": "It holds records about 500 or more people.",
+                    "when": {"field": "answers.people", "op": "eq", "value": "many"},
+                },
+                {
+                    "reason": "Critical work stops without it.",
+                    "when": {"field": "answers.dependency", "op": "eq", "value": "stops"},
+                },
+            ],
+        },
+        {
+            "key": "tier_3",
+            "label": "Tier 3",
+            "description": "Holds internal information, works on the premises, passes work to "
+            "others, or would be missed.",
+            "review_months": 36,
+            "rules": [
+                {
+                    "reason": "It holds, receives, or can see internal information.",
+                    "when": {"field": "answers.information", "op": "eq", "value": "internal"},
+                },
+                {
+                    "reason": "It works on the premises, or has unescorted access to them.",
+                    "when": {
+                        "field": "answers.access",
+                        "op": "contains_any",
+                        "value": ["on_site", "physical"],
+                    },
+                },
+                {
+                    "reason": "Work would slow without it.",
+                    "when": {"field": "answers.dependency", "op": "eq", "value": "slows"},
+                },
+                {
+                    "reason": "It passes the organization's information or access on to others.",
+                    "when": {"field": "answers.subcontractors", "op": "eq", "value": True},
+                },
+                {
+                    "reason": "The information is held or reached from outside the United States.",
+                    "when": {"field": "answers.offshore", "op": "eq", "value": True},
+                },
+            ],
+        },
+        {
+            "key": "tier_4",
+            "label": "Tier 4",
+            "description": "Little is at stake: no information beyond what is public, no access, "
+            "and easily replaced.",
+            "review_months": None,
+            "rules": [],
+        },
+    ],
+}
+
 # --- The risk taxonomy ------------------------------------------------------------------
 
 
@@ -577,6 +754,7 @@ PACK: dict[str, Any] = {
     "scoring_method": SCORING_METHOD,
     "cadences": CADENCES,
     "authority": AUTHORITY,
+    "tiering": TIERING,
 }
 
 # --- The risk library -------------------------------------------------------------------

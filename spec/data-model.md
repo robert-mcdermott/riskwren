@@ -195,7 +195,7 @@ Free labels, for whatever the vocabularies do not cover, kept as a list on the r
 |---|---|
 | 3 | `job`, `campaign`, `campaign_item`, `attestation`, `questionnaire`, `questionnaire_version`, `response`, `indicator`, `indicator_reading`, `mail_outbox`, `saved_view`, `search_doc`, `identity`, `provider_mapping` |
 | 4 | `policy_document`, `policy_version`, `policy_approval` (slice 1), `policy_audience`, `policy_acknowledgment` (slice 2), `document_control`, `document_requirement` (slice 3; `exception_request` may be to a document), `agreement`, `agreement_coverage` (slice 4; `scope_framework.agreement_id` says which agreement imposes a framework), `framework.follows`, `framework_mapping`, `suggestion_set_aside` (slice 5; `control_requirement.source` may be `carried`), `objective`, `risk_objective`, `committee_session`, `committee_item` (slice 6) |
-| 5 | `service` (what a third party provides), `third_party_contact`, `tier_assessment`, `review` (due diligence), `respondent_link`, `assurance_review` |
+| 5 | `service` (what a third party provides; `SVC`), `tier_assessment` (slice 1; `third_party.tier` copies the latest), `third_party_contact`, `review` (due diligence), `respondent_link`, `assurance_review` |
 | 6 | `measure_snapshot`, `report`, `scenario`, `estimate` |
 | 7 | `audit_entity`, `audit_plan`, `engagement`, `workpaper`, `request_item`, `external_access` |
 | 8 | `incident`, `case`, `case_member`, `breach_assessment`, `notification`, `loss_event`, `impact_analysis`, `continuity_plan`, `plan_version`, `exercise`, `site` |

@@ -80,10 +80,11 @@ async function boot() {
   route("/actions", page("actions", "actionList"));
   route("/risks", page("risks", "riskRegister"));
   route("/risks/:ref", page("risk", "riskPage"));
-  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"]]) {
+  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"], ["service", "services"]]) {
     route(`/${path}`, page("records", "recordList", type));
-    route(`/${path}/:ref`, page("record", "recordPage", type));
+    if (type !== "third_party") route(`/${path}/:ref`, page("record", "recordPage", type));
   }
+  route("/third-parties/:ref", page("third-party", "thirdPartyPage"));
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   route("/search", page("find", "searchPage"));
   route("/tidy", page("find", "tidyPage"));

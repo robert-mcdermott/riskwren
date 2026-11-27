@@ -12,7 +12,7 @@ import { segments } from "../components/charts.js";
 import { banner, checkbox, field, section, select, submit } from "../components/form.js";
 import { openOverlay } from "../components/overlay.js";
 import { hrefOf, statusPill, TYPES } from "../components/record.js";
-import { ownUnits } from "../components/record-forms.js";
+import { ownUnits } from "../core/session.js";
 import { rating } from "../components/risk.js";
 import { listTools } from "../components/tidy.js";
 import { toast } from "../components/toast.js";

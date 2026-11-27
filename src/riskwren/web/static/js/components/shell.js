@@ -55,11 +55,17 @@ export const NAV = [
     ],
   },
   {
+    heading: "Third parties",
+    items: [
+      { href: "/third-parties", label: "Third parties", iconName: "third_party" },
+      { href: "/services", label: "Services", iconName: "service" },
+    ],
+  },
+  {
     heading: "Inventory",
     items: [
       { href: "/processes", label: "Processes", iconName: "process" },
       { href: "/systems", label: "Systems", iconName: "system" },
-      { href: "/third-parties", label: "Third parties", iconName: "third_party" },
       { href: "/information", label: "Information", iconName: "information" },
     ],
   },

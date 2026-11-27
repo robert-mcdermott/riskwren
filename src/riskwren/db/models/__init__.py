@@ -59,6 +59,7 @@ from riskwren.db.models.inventory import (
     Process,
     RecordLink,
     RecordOwner,
+    Service,
     System,
     ThirdParty,
 )
@@ -92,6 +93,7 @@ from riskwren.db.models.risk import (
     ScoringMethod,
 )
 from riskwren.db.models.system import ChainHead, Counter, Event
+from riskwren.db.models.third_parties import TierAssessment
 from riskwren.db.models.tidy import Handover, NotDuplicate, SavedView
 
 __all__ = [
@@ -172,6 +174,7 @@ __all__ = [
     "ScopeMember",
     "ScopeRequirement",
     "ScoringMethod",
+    "Service",
     "SessionToken",
     "Setting",
     "SignInRequest",
@@ -180,5 +183,6 @@ __all__ = [
     "System",
     "TestResult",
     "ThirdParty",
+    "TierAssessment",
     "TreatmentPlan",
 ]

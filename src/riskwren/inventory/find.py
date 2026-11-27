@@ -18,8 +18,8 @@ from riskwren.inventory.registry import TYPES, RecordType
 # The order the kinds are shown in when nothing else ranks them.
 ORDER = (
     "risk", "control", "document", "agreement", "issue", "system", "process", "third_party",
-    "information", "scope", "evidence", "assessment", "exception", "indicator", "objective",
-    "committee_session",
+    "service", "information", "scope", "evidence", "assessment", "exception", "indicator",
+    "objective", "committee_session",
 )  # fmt: skip
 ACTIONS = "action"
 LOOKED_AT = 60  # of each kind, before ranking

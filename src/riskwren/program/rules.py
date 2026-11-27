@@ -1,4 +1,5 @@
-"""The program's tables of rules: how often things come due, and who may accept what.
+"""The program's tables of rules: how often things come due, who may accept what, and how a
+third party is tiered.
 
 Like the vocabularies, each starts from the default program pack and is kept as a setting
 once an organization changes it.
@@ -14,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from riskwren.program import settings, vocab
 
-NAMES = ("cadences", "authority")
+NAMES = ("cadences", "authority", "tiering")
 
 
 def get(session: Session, name: str) -> dict[str, Any]:

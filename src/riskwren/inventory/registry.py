@@ -123,7 +123,7 @@ THIRD_PARTY = register(
             Field("notes", "Notes", "long"),
         ),
         open=True,
-        sorts=THING_SORTS,
+        sorts=(*THING_SORTS, "tier"),
         filters=THING_FILTERS,
     )
 )

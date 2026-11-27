@@ -87,7 +87,7 @@ function editOwners(record, ctx) {
 }
 
 // The kinds of record whose forms take external references.
-const CARRIES = new Set(["process", "system", "third_party", "information", "risk", "control", "scope"]);
+const CARRIES = new Set(["process", "system", "third_party", "information", "risk", "control", "scope", "service"]);
 
 /** Change what a record is called in other systems. */
 function editExternal(record, ctx) {
@@ -285,7 +285,7 @@ export function linksCard(record, ctx) {
 }
 
 /** The risks that concern this record, as far as the viewer may see them. */
-function risksCard(ctx) {
+export function risksCard(ctx) {
   const risks = ctx.risks;
   return card({ title: "Risks", flush: risks.length > 0 },
     risks.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
@@ -318,6 +318,7 @@ function overview(record, ctx) {
     glance.push(["Hosting", label(v, "hosting", record.hosting)], ["Lifecycle", label(v, "lifecycles", record.lifecycle)], ["Address", outside(record.url)]);
   }
   if (record.type === "third_party") glance.push(["Website", outside(record.website)]);
+  if (record.third_party) glance.unshift(["Provided by", recordChip(record.third_party)]);
   if (record.tags?.length) glance.push(["Tags", record.tags.join(", ")]);
   return h("div", { class: "split" },
     h("div", { class: "stack-lg" }, about, risksCard(ctx), linksCard(record, ctx)),

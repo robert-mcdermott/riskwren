@@ -37,7 +37,29 @@ def get(session: Session, name: str) -> list[dict[str, Any]]:
     """Every value of a vocabulary, in order, retired ones included."""
     if name not in DEFAULTS:
         raise KeyError(name)
-    return settings.get(session, _setting(name), None) or [dict(item) for item in DEFAULTS[name]]
+    stored = settings.get(session, _setting(name), None)
+    if not stored:
+        return [dict(item) for item in DEFAULTS[name]]
+    if name in LABELS_ONLY:
+        return _with_release(name, stored)
+    return stored
+
+
+def _with_release(name: str, stored: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """A list whose values the software gives meaning to, as an organization saved it, with
+    what a later release added: values it did not have, and for a kind of link, the pairs of
+    records it may now join. Its own names and meanings stay."""
+    have = {item["key"]: dict(item) for item in stored}
+    for item in DEFAULTS[name]:
+        mine = have.get(item["key"])
+        if mine is None:
+            have[item["key"]] = dict(item)
+        elif "between" in item:
+            pairs = [list(pair) for pair in mine.get("between", [])]
+            mine["between"] = pairs + [list(p) for p in item["between"] if list(p) not in pairs]
+    order = [item["key"] for item in stored]
+    order += [item["key"] for item in DEFAULTS[name] if item["key"] not in order]
+    return [have[key] for key in order]
 
 
 def all_(session: Session) -> dict[str, list[dict[str, Any]]]:

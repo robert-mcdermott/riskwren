@@ -282,6 +282,7 @@ RECORD_PATHS = {
     "systems": "SYS",
     "third-parties": "TP",
     "information": "INF",
+    "services": "SVC",
     "risks": "RSK",
     "controls": "CTL",
     "scopes": "SCP",
@@ -385,6 +386,9 @@ for _route in (
     ("GET", "/api/v1/library"),
     ("GET", "/api/v1/library/{ref}"),
     ("POST", "/api/v1/library/{ref}/acknowledge"),
+    ("GET", "/api/v1/tiers"),
+    ("GET", "/api/v1/third-parties/{ref}/tiering"),
+    ("POST", "/api/v1/third-parties/{ref}/tiering"),
 ):
     REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}

@@ -31,6 +31,7 @@ from riskwren.db.models import (
     RiskObjective,
     RiskSubject,
     ScopeMember,
+    Service,
 )
 from riskwren.inventory import access, links, records
 from riskwren.inventory.registry import TYPES, RecordType
@@ -202,6 +203,14 @@ def _edges(session: Session, key: str, record_id: int) -> list[Edge]:
             found.append(("assesses", "Assesses", "scope", row.scope_id))
         add("tests", "Tests", "control", session.scalars(
             select(ControlTest.control_id).where(ControlTest.assessment_id == record_id)
+        ))  # fmt: skip
+    if key == "service":
+        row = session.get(Service, record_id)
+        if row is not None:
+            found.append(("provided_by", "Provided by", "third_party", row.third_party_id))
+    if key == "third_party":
+        add("provides", "Provides", "service", session.scalars(
+            select(Service.id).where(Service.third_party_id == record_id).order_by(Service.name)
         ))  # fmt: skip
     if key == "exception":
         row = session.get(ExceptionRequest, record_id)

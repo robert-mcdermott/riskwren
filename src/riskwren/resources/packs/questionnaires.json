@@ -4,7 +4,7 @@
     "kind": "questionnaires",
     "title": "Built-in questionnaires",
     "version": "1",
-    "pack_version": "0.3.0",
+    "pack_version": "0.5.0",
     "publisher": "The RiskWren Authors",
     "license": "Apache-2.0"
   },
@@ -687,6 +687,215 @@
                 "label": "Do its logs go to central security monitoring?",
                 "type": "yes_no",
                 "required": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "third-party-tiering",
+      "title": "Third-party tiering",
+      "summary": "A few questions about what a third party holds, how it reaches the organization, and what relies on it. The answers set its tier by the program's rules.",
+      "purpose": "tiering",
+      "document": {
+        "sections": [
+          {
+            "key": "information",
+            "title": "Information",
+            "questions": [
+              {
+                "key": "information",
+                "label": "What is the most sensitive of the organization's information it will hold, receive, or be able to see?",
+                "type": "choice",
+                "required": true,
+                "help": "Count every service it provides. The classes are the organization's own.",
+                "options": [
+                  {
+                    "key": "none",
+                    "label": "None"
+                  },
+                  {
+                    "key": "public",
+                    "label": "Public only"
+                  },
+                  {
+                    "key": "internal",
+                    "label": "Internal"
+                  },
+                  {
+                    "key": "confidential",
+                    "label": "Confidential"
+                  },
+                  {
+                    "key": "restricted",
+                    "label": "Restricted"
+                  }
+                ]
+              },
+              {
+                "key": "regulated",
+                "label": "Is any of it one of these?",
+                "type": "choices",
+                "show_when": {
+                  "field": "answers.information",
+                  "op": "in",
+                  "value": [
+                    "internal",
+                    "confidential",
+                    "restricted"
+                  ]
+                },
+                "options": [
+                  {
+                    "key": "health",
+                    "label": "Identifiable health information, as HIPAA defines it"
+                  },
+                  {
+                    "key": "participant",
+                    "label": "Identifiable information about research participants"
+                  },
+                  {
+                    "key": "controlled",
+                    "label": "Data held under another party's terms, such as controlled-access genomic data"
+                  },
+                  {
+                    "key": "cards",
+                    "label": "Payment card numbers"
+                  },
+                  {
+                    "key": "identifiers",
+                    "label": "Government identifiers, such as Social Security numbers"
+                  },
+                  {
+                    "key": "students",
+                    "label": "Student education records, as FERPA defines them"
+                  },
+                  {
+                    "key": "export",
+                    "label": "Export-controlled information"
+                  },
+                  {
+                    "key": "none_of_these",
+                    "label": "None of these"
+                  }
+                ]
+              },
+              {
+                "key": "people",
+                "label": "About how many people does it hold records about?",
+                "type": "choice",
+                "show_when": {
+                  "field": "answers.information",
+                  "op": "in",
+                  "value": [
+                    "internal",
+                    "confidential",
+                    "restricted"
+                  ]
+                },
+                "help": "A breach of health information about 500 or more people must be reported at once, and to the press.",
+                "options": [
+                  {
+                    "key": "none",
+                    "label": "It holds no records about people"
+                  },
+                  {
+                    "key": "few",
+                    "label": "Fewer than 500"
+                  },
+                  {
+                    "key": "many",
+                    "label": "500 or more"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "access",
+            "title": "Access",
+            "questions": [
+              {
+                "key": "access",
+                "label": "How will it reach the organization?",
+                "type": "choices",
+                "required": true,
+                "options": [
+                  {
+                    "key": "privileged",
+                    "label": "Administrator or privileged access to the organization's systems"
+                  },
+                  {
+                    "key": "remote",
+                    "label": "Remote access to the network or to systems"
+                  },
+                  {
+                    "key": "accounts",
+                    "label": "Accounts in the organization's identity system"
+                  },
+                  {
+                    "key": "integration",
+                    "label": "A connection that sends or receives the organization's data"
+                  },
+                  {
+                    "key": "on_site",
+                    "label": "Work on the premises"
+                  },
+                  {
+                    "key": "physical",
+                    "label": "Unescorted access to laboratories, the clinic, or equipment rooms"
+                  },
+                  {
+                    "key": "no_access",
+                    "label": "None of these"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "dependence",
+            "title": "Dependence",
+            "questions": [
+              {
+                "key": "dependency",
+                "label": "If it stopped tomorrow, what would happen to the work that relies on it?",
+                "type": "choice",
+                "required": true,
+                "options": [
+                  {
+                    "key": "stops",
+                    "label": "Critical research, care, or operations would stop within a day"
+                  },
+                  {
+                    "key": "slows",
+                    "label": "Work would slow, and could be kept going another way for weeks"
+                  },
+                  {
+                    "key": "little",
+                    "label": "Little: it could be replaced without much trouble"
+                  }
+                ]
+              },
+              {
+                "key": "subcontractors",
+                "label": "Does it pass the organization's information or access on to others it uses?",
+                "type": "yes_no"
+              },
+              {
+                "key": "offshore",
+                "label": "Is any of the organization's information held or reached from outside the United States?",
+                "type": "yes_no",
+                "show_when": {
+                  "field": "answers.information",
+                  "op": "in",
+                  "value": [
+                    "internal",
+                    "confidential",
+                    "restricted"
+                  ]
+                }
               }
             ]
           }

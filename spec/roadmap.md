@@ -115,12 +115,14 @@ Detail: [waves/wave-4.md](waves/wave-4.md)
 
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
-| 1 | Services and tiering | What each third party provides and touches; tiering by rule with reasons | ☐ |
+| 1 | Services and tiering | What each third party provides and touches; tiering by rule with reasons | ☑ |
 | 2 | Due diligence | Questionnaires by tier, sent through an expiring link to a contact with no account; review and scoring | ☐ |
 | 3 | Assurance documents | Reports and certificates with validity; a structured review of scope, exceptions, and the organization's own responsibilities | ☐ |
 | 4 | Coverage | Agreements joined to services, systems, and information; the stop for regulated information with no covering agreement | ☐ |
 | 5 | Lifecycle | Findings tracked with the third party, re-assessment by tier and by event, offboarding, subcontractors | ☐ |
 | 6 | Release prep | Guides, changelog, release | ☐ |
+
+Detail: [waves/wave-5.md](waves/wave-5.md)
 
 ## Wave 6: Insight (v0.6.0) ☐
 

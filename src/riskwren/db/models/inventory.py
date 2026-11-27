@@ -100,10 +100,32 @@ class ThirdParty(ThingMixin, Base):
     kind: Mapped[str] = mapped_column(String(40))
     website: Mapped[str | None] = mapped_column(String(300))
     notes: Mapped[str | None] = mapped_column(Text)
+    # A copy of the latest tiering's tier, kept here so that lists can show and sort by it.
+    # The tiering is the authority (``tier_assessment``).
+    tier: Mapped[str | None] = mapped_column(String(24))
 
     __table_args__ = (
         CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
         Index("ix_third_party_org_unit_id", "org_unit_id"),
+    )
+
+
+class Service(ThingMixin, Base):
+    """What a third party provides: a hosted application, a maintenance contract, a
+    laboratory test sent out. It is what reaches the organization's systems and handles its
+    information, so a supplier of three services may hold restricted information through
+    one and nothing through the others."""
+
+    __tablename__ = "service"
+    __subject__ = "service"
+
+    kind: Mapped[str] = mapped_column(String(40))
+    third_party_id: Mapped[int] = mapped_column(ForeignKey("third_party.id"))
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
+        Index("ix_service_org_unit_id", "org_unit_id"),
+        Index("ix_service_third_party_id", "third_party_id"),
     )
 
 

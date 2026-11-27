@@ -393,6 +393,68 @@
         "description": "Receives funds the organization passes through"
       }
     ],
+    "service_kinds": [
+      {
+        "key": "software_service",
+        "label": "Software as a service",
+        "description": "An application it runs and the organization uses"
+      },
+      {
+        "key": "hosting",
+        "label": "Hosting or infrastructure",
+        "description": "Computing, storage, or networks it runs for the organization"
+      },
+      {
+        "key": "data_service",
+        "label": "Data processing or analysis",
+        "description": "Work it does on the organization's data"
+      },
+      {
+        "key": "laboratory",
+        "label": "Laboratory or testing",
+        "description": "Tests, sequencing, or analysis of specimens"
+      },
+      {
+        "key": "clinical",
+        "label": "Clinical service",
+        "description": "Care, or a service to patients, given on the organization's behalf"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance and support",
+        "description": "Keeping equipment or systems working"
+      },
+      {
+        "key": "professional",
+        "label": "Professional services",
+        "description": "Advice, audit, legal, or consulting work"
+      },
+      {
+        "key": "staffing",
+        "label": "Staffing",
+        "description": "People who work alongside the organization's own"
+      },
+      {
+        "key": "supply",
+        "label": "Goods and supplies",
+        "description": "Things delivered, with no access to systems or information"
+      },
+      {
+        "key": "logistics",
+        "label": "Logistics",
+        "description": "Moving or storing specimens, equipment, or records"
+      },
+      {
+        "key": "collaboration",
+        "label": "Research collaboration",
+        "description": "Shared work under a protocol or an award"
+      },
+      {
+        "key": "funding",
+        "label": "Funding",
+        "description": "Money the organization receives, with its terms"
+      }
+    ],
     "information_kinds": [
       {
         "key": "research_data",
@@ -449,6 +511,10 @@
           [
             "process",
             "system"
+          ],
+          [
+            "process",
+            "service"
           ]
         ]
       },
@@ -471,6 +537,10 @@
           [
             "system",
             "third_party"
+          ],
+          [
+            "system",
+            "service"
           ]
         ]
       },
@@ -504,6 +574,28 @@
           [
             "information",
             "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "reaches",
+        "label": "Reaches",
+        "reverse": "Is reached by",
+        "between": [
+          [
+            "service",
+            "system"
+          ]
+        ]
+      },
+      {
+        "key": "handles",
+        "label": "Handles",
+        "reverse": "Is handled by",
+        "between": [
+          [
+            "service",
+            "information"
           ]
         ]
       },
@@ -1121,5 +1213,185 @@
         "needs_limit": true
       }
     }
+  },
+  "tiering": {
+    "questionnaire": "third-party-tiering",
+    "tiers": [
+      {
+        "key": "tier_1",
+        "label": "Tier 1",
+        "description": "Holds or can see restricted or regulated information, has privileged access to systems, or is relied on for critical work and reaches information or systems.",
+        "review_months": 12,
+        "rules": [
+          {
+            "reason": "It holds, receives, or can see restricted information.",
+            "when": {
+              "field": "answers.information",
+              "op": "eq",
+              "value": "restricted"
+            }
+          },
+          {
+            "reason": "Some of the information is regulated, such as identifiable health information or controlled-access data.",
+            "when": {
+              "field": "answers.regulated",
+              "op": "contains_any",
+              "value": [
+                "health",
+                "participant",
+                "controlled",
+                "cards",
+                "identifiers",
+                "students",
+                "export"
+              ]
+            }
+          },
+          {
+            "reason": "It has administrator or privileged access to the organization's systems.",
+            "when": {
+              "field": "answers.access",
+              "op": "contains",
+              "value": "privileged"
+            }
+          },
+          {
+            "reason": "Critical work stops without it, and it reaches the organization's information or systems.",
+            "when": {
+              "all": [
+                {
+                  "field": "answers.dependency",
+                  "op": "eq",
+                  "value": "stops"
+                },
+                {
+                  "any": [
+                    {
+                      "field": "answers.information",
+                      "op": "in",
+                      "value": [
+                        "confidential",
+                        "restricted"
+                      ]
+                    },
+                    {
+                      "field": "answers.access",
+                      "op": "contains_any",
+                      "value": [
+                        "remote",
+                        "accounts",
+                        "integration"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "key": "tier_2",
+        "label": "Tier 2",
+        "description": "Holds confidential information, reaches systems, holds records about many people, or is relied on for critical work.",
+        "review_months": 24,
+        "rules": [
+          {
+            "reason": "It holds, receives, or can see confidential information.",
+            "when": {
+              "field": "answers.information",
+              "op": "eq",
+              "value": "confidential"
+            }
+          },
+          {
+            "reason": "It reaches the organization's network, accounts, or systems.",
+            "when": {
+              "field": "answers.access",
+              "op": "contains_any",
+              "value": [
+                "remote",
+                "accounts",
+                "integration"
+              ]
+            }
+          },
+          {
+            "reason": "It holds records about 500 or more people.",
+            "when": {
+              "field": "answers.people",
+              "op": "eq",
+              "value": "many"
+            }
+          },
+          {
+            "reason": "Critical work stops without it.",
+            "when": {
+              "field": "answers.dependency",
+              "op": "eq",
+              "value": "stops"
+            }
+          }
+        ]
+      },
+      {
+        "key": "tier_3",
+        "label": "Tier 3",
+        "description": "Holds internal information, works on the premises, passes work to others, or would be missed.",
+        "review_months": 36,
+        "rules": [
+          {
+            "reason": "It holds, receives, or can see internal information.",
+            "when": {
+              "field": "answers.information",
+              "op": "eq",
+              "value": "internal"
+            }
+          },
+          {
+            "reason": "It works on the premises, or has unescorted access to them.",
+            "when": {
+              "field": "answers.access",
+              "op": "contains_any",
+              "value": [
+                "on_site",
+                "physical"
+              ]
+            }
+          },
+          {
+            "reason": "Work would slow without it.",
+            "when": {
+              "field": "answers.dependency",
+              "op": "eq",
+              "value": "slows"
+            }
+          },
+          {
+            "reason": "It passes the organization's information or access on to others.",
+            "when": {
+              "field": "answers.subcontractors",
+              "op": "eq",
+              "value": true
+            }
+          },
+          {
+            "reason": "The information is held or reached from outside the United States.",
+            "when": {
+              "field": "answers.offshore",
+              "op": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      {
+        "key": "tier_4",
+        "label": "Tier 4",
+        "description": "Little is at stake: no information beyond what is public, no access, and easily replaced.",
+        "review_months": null,
+        "rules": []
+      }
+    ]
   }
 }

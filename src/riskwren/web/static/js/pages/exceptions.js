@@ -10,7 +10,7 @@ import { banner, field, submit } from "../components/form.js";
 import { EXCEPTION_STATE, exceptionState } from "../components/issue.js";
 import { openOverlay } from "../components/overlay.js";
 import { recordChip, TYPES } from "../components/record.js";
-import { section } from "../components/record-forms.js";
+import { section } from "../components/form.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader } from "../components/ui.js";
 import { exportButton } from "../components/exchange.js";

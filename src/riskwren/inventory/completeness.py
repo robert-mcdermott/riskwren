@@ -75,7 +75,7 @@ def _no_links(record_type: RecordType) -> Callable[[Any], Any]:
 # or an exception has a life of its own, and says what it lacks in its own words.
 DESCRIBED = (
     "process", "system", "third_party", "information", "risk", "control", "indicator", "document",
-    "agreement",
+    "agreement", "service",
 )  # fmt: skip
 
 

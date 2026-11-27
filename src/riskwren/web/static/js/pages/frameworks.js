@@ -11,7 +11,7 @@ import { statePill } from "../components/control.js";
 import { coveragePill, mapCrosswalk } from "../components/crosswalk.js";
 import { kindPill } from "../components/document.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
-import { section } from "../components/record-forms.js";
+import { section } from "../components/form.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
 import { exportButton } from "../components/exchange.js";
