@@ -53,6 +53,7 @@ These two are written from the code, so they always match the version they ship 
 | How do I put it behind a proxy? | [Run behind a reverse proxy](configuration.md#run-behind-a-reverse-proxy) |
 | How do I send notices and reminders by email? | [Email](configuration.md#email) |
 | How do I ask every control owner to attest, and see who has? | [Campaigns](running-the-program.md#campaigns) |
+| How do I get warning of a risk before it happens? | [Indicators](the-register.md#indicators) |
 | Does an owner saying a control works make it verified? | [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test) |
 | How do I change the questions people are asked, without changing what they already answered? | [Questionnaires](running-the-program.md#questionnaires) |
 | Who is reminded of what, and when does it go to their steward? | [Reminders](running-the-program.md#reminders) |

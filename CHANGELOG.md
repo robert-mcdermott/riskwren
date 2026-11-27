@@ -70,6 +70,14 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Attestation, shown apart from a test.** What a control's owner last said of it is on the
   control with who and when. It never makes a requirement verified, and it takes one out of
   verified when the owner says, after a test, that the control no longer operates.
+- **Indicators.** A number someone already reads, with which way is worse, a warning level,
+  a limit, how often it is read, and where it is read from. Readings are recorded by hand,
+  placed against the levels, charted, and given a trend. An indicator is linked to the risks
+  it warns of and shown on each of them.
+- **A breach is heard.** A reading past its limit tells the indicator's owners and the
+  owners of each risk it warns of, and marks those risks' ratings as in doubt until they are
+  assessed again. Readings that fall due are on Home and in the reminders, and the risk
+  dashboard counts indicators by where they stand.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
 

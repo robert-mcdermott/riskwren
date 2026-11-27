@@ -877,6 +877,43 @@ SCOPE_ENCLAVE = {
     "excluded": [],
 }  # fmt: skip
 
+# Indicators: numbers the institute already watches. Each: the unit that reads it, what it
+# is counted in, which way is worse, the warning level, the limit, how often it is read, where
+# it is read from, the library risks it warns of, and its readings, oldest first, one for each
+# period up to now. None means nobody has read it yet.
+INDICATORS = [
+    ("Servers patched within 30 days", "IT", "%", "down", 95, 90, "monthly",
+     "The patch compliance report in the endpoint management console, on the first of the month.",
+     ["ransomware", "unsupported_systems"],
+     [97, 98, 97, 96, 97, 96, 96, 95, 96, 94, 94, 93, 92, 91, 89]),
+    ("Days to remove a leaver's access", "IT", "days", "up", 2, 5, "monthly",
+     "Leavers in the personnel system against the day each account was disabled, averaged.",
+     ["access_not_removed", "compromised_account"],
+     [1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 2, 3, 3, 4]),
+    ("Accounts with no second factor", "IT", "accounts", "up", 10, 25, "monthly",
+     "The identity service's report of accounts exempt from the second factor.",
+     ["compromised_account"],
+     [44, 41, 37, 30, 26, 22, 19, 15, 12, 9, 8, 6, 6, 5]),
+    ("Staff with security training in date", "SEC", "%", "down", 92, 85, "monthly",
+     "The learning system's completion report for the security module.",
+     ["compromised_account", "health_information_breach"],
+     [94, 93, 93, 92, 93, 92, 91, 91, 92, 91, 91, 90, 91, 91]),
+    ("Critical vulnerabilities open past 30 days", "SEC", None, "up", 5, 15, "monthly",
+     "The vulnerability scanner's ageing report, filtered to critical findings.",
+     ["ransomware", "exposed_storage"],
+     [3, 2, 4, 3, 2, 3, 5, 4, 6, 7, 6, 8, 9, 9]),
+    ("People who entered a password in the phishing exercise", "SEC", "%", "up", 8, 12,
+     "quarterly", "The result of each quarter's simulated phishing message.",
+     ["compromised_account"],
+     [14, 12, 11, 11, 9]),
+    ("Freezer alarms not answered within 15 minutes", "BIO", None, "up", 1, 3, "quarterly",
+     "The monitoring system's alarm log, counted by the repository manager.",
+     ["specimen_loss"],
+     [0, 1, 0]),
+    ("Restore tests passed", "IT", "%", "down", 100, 90, "quarterly",
+     "The backup team's quarterly restore log.", ["backup_failure", "research_data_loss"], None),
+]  # fmt: skip
+
 # Campaigns: what was asked, of whom, and what a few of them said.
 CAMPAIGNS = {
     "attest": {

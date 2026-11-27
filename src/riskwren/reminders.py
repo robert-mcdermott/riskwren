@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from sqlalchemy import select
@@ -31,6 +31,7 @@ from riskwren.db.models import (
     Control,
     Evidence,
     ExceptionRequest,
+    Indicator,
     Issue,
     Reminder,
     Risk,
@@ -184,6 +185,30 @@ def _campaign_items(session: Session, horizon: date) -> Iterator[Due]:
         )
 
 
+def _readings(session: Session, horizon: date) -> Iterator[Due]:
+    """Indicators whose next reading is due. A reading nobody takes is an indicator that
+    warns of nothing."""
+    from riskwren.risk import indicators
+
+    for indicator in session.scalars(select(Indicator).where(Indicator.status == "active")):
+        when = indicators.next_due(indicator)
+        # A weekly reading is always nearly due, so nobody is told two weeks ahead of one:
+        # only as it falls due.
+        if when is None or when > min(horizon, utc_now().date() + timedelta(days=2)):
+            continue
+        yield Due(
+            "indicator_reading",
+            indicator.id,
+            when,
+            f"a reading of {indicator.ref} {indicator.name}",
+            f"/indicators/{indicator.ref}",
+            tuple(notices.owners(session, "indicator", indicator.id)),
+            indicator.org_unit_id,
+            escalates=False,
+            late="Reading overdue",
+        )
+
+
 def _when(days: int) -> str:
     if days == 0:
         return "today"
@@ -221,7 +246,11 @@ def send(session: Session, *, today: date | None = None) -> dict[str, int]:
     def tell(people: Iterable[int | None], kind: str, text: str, href: str) -> int:
         return notices.tell_all(session, people, kind, text, href)
 
-    everything = [*due_items(session, today, horizon), *_campaign_items(session, horizon)]
+    everything = [
+        *due_items(session, today, horizon),
+        *_campaign_items(session, horizon),
+        *_readings(session, horizon),
+    ]
     for due in everything:
         stage = stage_of(due, today, plan)
         if stage is None or (due.kind, due.id, due.due_on, stage) in already:

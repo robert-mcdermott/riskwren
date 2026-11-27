@@ -213,9 +213,32 @@ If you may not accept a risk, its page says why and what is needed. An acceptanc
 
 An acceptance covers the rating that was accepted. If the residual rating later rises above it, or the acceptance expires or is withdrawn, the risk needs a decision again. **Acceptances** in the sidebar lists them, soonest to expire first, and can show only those expiring within 30 or 90 days.
 
+## Indicators
+
+An indicator is a number someone already reads, kept where the risks it warns of can see it: servers patched within 30 days, days to remove a leaver's access, people who entered a password in the phishing exercise. **Risks → Indicators → Add an indicator** (a steward or a manager).
+
+- **Which way is worse**, a **warning level**, and a **limit**. Patching is worse as it falls; open vulnerabilities are worse as they rise. The warning level is optional and must be reached before the limit.
+- **How often it is read:** weekly, monthly, quarterly, or annually. **Read from** says where the number comes from, so whoever reads it next reads the same thing.
+- **The risks it warns of.** Any open risk you may see.
+
+RiskWren does not fetch the number. An owner, or the unit's steward, reads it where it lives and records it on the indicator's page, with the day it was read and a note if one is wanted. A second reading for the same day corrects the first, and the history keeps both.
+
+Each reading is placed against the levels: **within its limits**, **past its warning level**, or **past its limit**. The page charts the readings against both levels and says whether the indicator is getting worse, getting better, or holding steady; a move of less than a twentieth of the distance between the warning level and the limit is steady.
+
+When the newest reading passes the limit:
+
+- the indicator's owners and the owners of each risk it warns of are told, once, with the figure;
+- each of those risks that has been assessed is marked **rating in doubt**, with the indicator named as the reason, until someone assesses it again;
+- the risk's page shows the indicator, where it stands, and its trend under **Early warning**.
+
+A reading that is still past the limit the next time does not tell everyone again. One that comes back within the limit and later passes it does.
+
+A reading that falls due is on its owners' Home and is reminded as it falls due and when it is late. An indicator nobody reads warns of nothing, so the list marks the overdue ones. **Reports → Risk** counts indicators by where they stand.
+
 ## Seeing the whole
 
 - **Register** lists risks, with filters for category, residual rating, standing, and unit, a switch for the ones you are named on, and grouping by category or unit.
+- **Indicators** lists every indicator with where it stands, and can show only those past their limit, past their warning level, or never read.
 - **Heat map** places every rated risk on the matrix, for the residual, inherent, or target rating, for a unit and everything beneath it, or for one category. Each cell opens the risks in it.
 - **Reports → Risk** shows where the register stands, and **Reports → Compliance** how ready each scope is against what it is held to. Every figure opens the list it counts. See [Read the dashboards](running-the-program.md#read-the-dashboards).
 - **⌘K** (or Ctrl K) finds any record by name or reference.

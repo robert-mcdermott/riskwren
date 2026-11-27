@@ -295,6 +295,14 @@ REACH[("GET", "/api/v1/questionnaires/{key}")] = EVERYONE
 REACH[("PATCH", "/api/v1/questionnaires/{key}")] = {"admin", "manager"}
 REACH[("POST", "/api/v1/questionnaires/{key}/responses")] = EVERYONE
 REACH[("GET", "/api/v1/responses/{response_id}")] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/indicators"), ("POST", "/api/v1/indicators"),
+    ("GET", "/api/v1/indicators/{ref}"), ("PATCH", "/api/v1/indicators/{ref}"),
+    ("PUT", "/api/v1/indicators/{ref}/owners"), ("GET", "/api/v1/indicators/{ref}/history"),
+    ("POST", "/api/v1/indicators/{ref}/readings"), ("PUT", "/api/v1/indicators/{ref}/risks"),
+    ("GET", "/api/v1/risks/{ref}/indicators"),
+):  # fmt: skip
+    REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}
 REACH[("GET", "/api/v1/campaigns")] = EVERYONE
 REACH[("POST", "/api/v1/campaigns")] = RUNNERS

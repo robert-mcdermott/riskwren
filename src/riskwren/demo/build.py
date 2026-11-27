@@ -54,6 +54,7 @@ from riskwren.db.models import (
     Evidence,
     EvidenceLink,
     ExceptionRequest,
+    Indicator,
     Issue,
     Risk,
     Scope,
@@ -65,7 +66,8 @@ from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PART
 from riskwren.oversight import campaigns
 from riskwren.people import accounts, units
 from riskwren.program import branding, packs, settings
-from riskwren.risk import categories, register
+from riskwren.risk import categories, indicators, register
+from riskwren.risk.indicators import INDICATOR
 from riskwren.risk.register import RISK
 from riskwren.treatment import service as treatment
 
@@ -1808,6 +1810,60 @@ class Builder:
         sample, note = c.TESTS["effective"][0]
         self._result(test_id, testers[test_id], ("effective", "effective", sample, note))
 
+    # --- Indicators -----------------------------------------------------------------------
+
+    def _story_indicators(self) -> Script:
+        """Numbers the institute already watches, read month by month. One has crossed its
+        limit this month, some are past their warning level, one is getting better, one has
+        not been read for two quarters, and one has never been read."""
+        days = {"monthly": 30.4, "quarterly": 91.3}
+        # Everything that happens, in the order it happens: each indicator is set up, then
+        # read once a period up to now.
+        steps: list[tuple[float, int, float | None]] = []
+        for index, spec in enumerate(c.INDICATORS):
+            values = spec[9] or []
+            # The freezer alarms have not been counted for two quarters: the last is long past.
+            late = 200 if spec[1] == "BIO" else 4
+            period = days[spec[6]]
+            steps.append((late + period * len(values) + 26 - index if values else 20, index, None))
+            steps += [
+                (late + period * (len(values) - 1 - at), index, value)
+                for at, value in enumerate(values)
+            ]
+        made: dict[int, tuple[int, int]] = {}
+        for ago, index, value in sorted(steps, key=lambda step: (-step[0], step[1])):
+            yield self._on(ago, hour=9)
+            if value is not None:
+                row_id, keeper = made[index]
+                with self.act(keeper) as (session, who):
+                    indicators.record_reading(
+                        session, who, session.get(Indicator, row_id), value=value
+                    )
+                self.tally("indicator readings")
+                continue
+            name, unit, measure, direction, warn, limit, frequency, source, warns_of, _ = (
+                c.INDICATORS[index]
+            )
+            keeper = self.steward(self.units[unit])
+            with self.act(keeper) as (session, who):
+                row = records.create(
+                    session, who, INDICATOR,
+                    {"name": name, "org_unit_id": self.units[unit], "measure": measure,
+                     "direction": direction, "warn_at": warn, "breach_at": limit,
+                     "frequency": frequency, "source": source},
+                )  # fmt: skip
+                risks = list(
+                    session.scalars(
+                        select(Risk.ref)
+                        .where(Risk.library_key.in_(warns_of), Risk.status == "open")
+                        .order_by(Risk.id)
+                        .limit(3)
+                    )
+                )
+                indicators.set_risks(session, self.principal(self.manager()), row, risks)
+                self.tally("indicators")
+                made[index] = (row.id, keeper)
+
     # --- Campaigns ------------------------------------------------------------------------
 
     def _on(self, days: float, hour: int = 11) -> datetime:
@@ -2271,6 +2327,7 @@ class Builder:
             self._story_escalated, self._story_departure, self._story_power,
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
+            self._story_indicators,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

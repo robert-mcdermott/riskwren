@@ -170,7 +170,16 @@ def _detail(session: Session, principal: Principal, risk: Risk) -> dict[str, Any
             for kind, row in latest(session, risk).items()
         },
         "can_escalate": can_escalate(session, principal, risk),
+        "indicators": _indicators(session, principal, risk),
     }
+
+
+def _indicators(session: Session, principal: Principal, risk: Risk) -> list[dict[str, Any]]:
+    """The indicators that warn of the risk. They build on this module, so they are asked
+    for when needed."""
+    from riskwren.risk import indicators
+
+    return indicators.of_risk(session, principal, risk)
 
 
 def _history_title(event: Event, lookups: Any) -> str | None:

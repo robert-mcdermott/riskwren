@@ -134,6 +134,8 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET` · `POST /campaigns` · `POST /campaigns/preview` | Campaigns you run or may read; start one; count who one would ask |
 | `GET /campaigns/{ref}` · `POST /campaigns/{ref}/remind` · `/close` · `/cancel` | One campaign with its coverage by unit and items; remind those who have not answered; end it |
 | `GET /campaign-items/{id}` · `POST /campaign-items/{id}/answer` · `/excuse` | What one person is asked; answer it, as a draft or in full; take it out of the campaign |
+| `GET` · `POST /indicators` · `GET` · `PATCH /indicators/{ref}` · `PUT /indicators/{ref}/owners` · `GET /indicators/{ref}/history` | Indicators with where each stands; one with its readings, trend, and the risks it warns of |
+| `POST /indicators/{ref}/readings` · `PUT /indicators/{ref}/risks` · `GET /risks/{ref}/indicators` | Record what an indicator stood at on a day; say which risks it warns of; the indicators that warn of a risk |
 | `POST /questionnaires/check` | Check a document without saving it, and see which questions given answers would show |
 | `POST /questionnaires/{key}/responses` · `GET /responses/{id}` | Answer a questionnaire, as a draft or in full; read answers as they were asked |
 | `GET /jobs` · `POST /jobs/{key}/run` · `PUT /jobs/{key}` | Scheduled work: how it is going, run one job now, pause or resume one (administrators) |

@@ -83,6 +83,8 @@ async function boot() {
     route(`/${path}/:ref`, page("record", "recordPage", type));
   }
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
+  route("/indicators", page("indicators", "indicatorList"));
+  route("/indicators/:ref", page("indicators", "indicatorPage"));
   route("/campaigns", page("campaigns", "campaignList"));
   route("/campaigns/:ref", page("campaigns", "campaignPage"));
   route("/campaign-items/:id", page("campaigns", "campaignItem"));

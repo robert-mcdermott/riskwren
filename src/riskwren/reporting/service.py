@@ -124,6 +124,12 @@ def dashboard(session: Session, principal: Principal, *, unit: int | None = None
         asked = {"status": "active", **scope, **filters}
         return {"count": count(session, principal, CONTROL, asked), "filters": asked}
 
+    def indicator_count(**filters: Any) -> dict[str, Any]:
+        from riskwren.risk.indicators import INDICATOR
+
+        asked = {"status": "active", **scope, **filters}
+        return {"count": count(session, principal, INDICATOR, asked), "filters": asked}
+
     def actions(**filters: Any) -> dict[str, Any]:
         asked = {"status": "open", **scope, **filters}
         return {
@@ -202,6 +208,11 @@ def dashboard(session: Session, principal: Principal, *, unit: int | None = None
             ],
             "stale": control_count(stale=True),
         },
+        # Early warning: where the indicators stand. Each count opens its list.
+        "indicators": [
+            {"key": state, **indicator_count(state=state)}
+            for state in ("breach", "warn", "ok", "no_reading")
+        ],
         "top_risks": records.cards(session, RISK, top),
         "heat_map": heat_map(session, principal, unit=unit),
     }
@@ -366,6 +377,16 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             "It no longer counts. Collect it again." if stale
             else "It stops counting soon. Collect it again.",
             f"/evidence/{held.ref}", held.valid_until, ref=held.ref,
+        )  # fmt: skip
+
+    # Indicators of theirs whose next reading is due.
+    from riskwren.risk import indicators
+
+    for indicator in indicators.due(session, principal):
+        add(
+            "reading", f"Record a reading of {indicator.name}",
+            f"{indicator.ref} · read {indicator.frequency}",
+            f"/indicators/{indicator.ref}", indicators.next_due(indicator), ref=indicator.ref,
         )  # fmt: skip
 
     # What campaigns have asked of them: an attestation, a look at a risk, a check of a unit.

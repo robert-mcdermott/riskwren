@@ -10,6 +10,7 @@ import { hrefOf } from "../components/record.js";
 import { flags, rating, STANDING, standingPill } from "../components/risk.js";
 import { card, emptyState, pageHeader } from "../components/ui.js";
 import { heatGrid } from "./heat-map.js";
+import { STATES as INDICATOR_STATES, statePill as indicatorPill } from "../components/indicator.js";
 import { show } from "./page.js";
 import { filterSelect } from "./records.js";
 
@@ -62,6 +63,9 @@ export function dashboard(main) {
           card({ title: "By category" }, bars(board.by_category.map((figure) => ({ label: figure.name, value: figure.count, href: risks(figure), part: figure.above, partLabel: "above appetite" })))),
           card({ title: unitName ? `Within ${unitName}` : "By unit" }, bars(board.by_unit.map((figure) => ({ label: figure.name, value: figure.count, href: risks(figure), part: figure.above, partLabel: "above appetite" })),
             { empty: "No unit beneath this one has an open risk." }))),
+        card({ title: "Early warning", actions: h("a", { href: listHref("/indicators", scope) }, "All indicators") },
+          bars(board.indicators.map((figure) => ({ label: INDICATOR_STATES[figure.key][0], badge: indicatorPill(figure.key), value: figure.count, href: listHref("/indicators", figure.filters) })),
+            { empty: "No indicators yet. An indicator is a number read on a schedule that warns of a risk before it happens." })),
         card({ title: "What is known about the controls", actions: h("a", { href: listHref("/controls", board.controls.total.filters) }, `All ${board.controls.total.count}`) },
           bars([...board.controls.by_state.map((figure) => ({ label: STATES[figure.key][0], badge: statePill(figure.key), value: figure.count, href: listHref("/controls", figure.filters) })),
             { label: STATES.stale[0], badge: statePill("stale"), value: board.controls.stale.count, href: listHref("/controls", board.controls.stale.filters) }]),

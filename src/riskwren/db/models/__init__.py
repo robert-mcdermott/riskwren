@@ -33,6 +33,7 @@ from riskwren.db.models.controls import (
     RiskControl,
     TreatmentPlan,
 )
+from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.inventory import (
     ExternalRef,
     Information,
@@ -99,6 +100,9 @@ __all__ = [
     "Framework",
     "Identity",
     "Implementation",
+    "Indicator",
+    "IndicatorReading",
+    "IndicatorRisk",
     "Information",
     "Issue",
     "IssueSubject",
