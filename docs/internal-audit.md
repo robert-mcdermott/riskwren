@@ -83,6 +83,17 @@ Each plan's **Committee report** is the page for the audit committee: the plan a
 
 ![The report to the audit committee: the plan's engagements with their opinions, the findings by severity, and what is past its date](img/audit-committee-report-light.webp)
 
+## Outside auditors
+
+An external auditor relying on internal audit's work, a regulator, or a sponsor's monitor is not given an account. **Audit → Outside access** gives one of them a link to exactly one thing, read-only, until a date of at most 90 days ahead:
+
+- a **reported engagement**: its report and opinion, what it covered, its team, its program of work with every workpaper, and its findings; or
+- a **scope**: what it is and its boundary, each framework's requirements and where each stands, how each control is done there, its evidence (which items, when collected, and until when they hold), and its plan of action.
+
+The link is a long random token, of which only a digest is kept. It is shown once, to the auditor who gives it, to send on. It follows a `#` in the address, which a browser never sends to a server, so it is in nobody's logs. It opens that one page and nothing else, and stops working on its date or when an auditor withdraws it. **Every time it is used, the history records who looked, at what, and when**, on the engagement or scope itself, and the list says how often and when last.
+
+![Outside access: who has a link to what, until when, and how often they have looked](img/audit-outside-light.webp)
+
 ## Who sees what
 
 | | Reads the universe and the plans | Changes them |
@@ -91,4 +102,5 @@ Each plan's **Committee report** is the page for the audit committee: the plan a
 | Managers and administrators | Yes | No |
 | Leaders of the whole organization | Yes, and may approve a plan | No |
 | An engagement's team | Its work, while it is under way | Its work |
+| Someone outside with a link | One reported engagement or one scope, read-only, until its date | No |
 | Everyone else | No | No |

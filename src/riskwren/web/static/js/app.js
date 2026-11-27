@@ -36,6 +36,11 @@ async function boot() {
     (await import("./pages/respond.js")).respondPage(root, meta);
     return;
   }
+  // Someone outside the organization reading what an auditor opened to them: no account.
+  if (window.location.pathname === "/outside") {
+    (await import("./pages/outside.js")).outsidePage(root, meta);
+    return;
+  }
   let me = null;
   try {
     me = (await peek("/api/v1/session")).data;
@@ -103,6 +108,7 @@ async function boot() {
   route("/audit/plans/:ref/committee-report", page("audit", "committeeReport"));
   route("/audit/engagements/:ref", page("audit", "engagementPage"));
   route("/audit/requests/:id", page("audit", "requestPage"));
+  route("/audit/outside", page("audit", "outsideAccess"));
   route("/as-of", page("as-of", "asOfRegister"));
   route("/as-of/:ref", page("as-of", "asOfRecord"));
   route("/check-dossier", page("check-dossier", "checkDossier"));

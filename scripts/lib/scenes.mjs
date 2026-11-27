@@ -276,6 +276,14 @@ export const SCENES = [
   { name: "audit-engagement-restricted", as: "cro", path: "/audit/engagements/AUD-0003" },
   { name: "audit-engagement-reported", as: "cro", path: "/audit/engagements/AUD-0001" },
   { name: "audit-committee-report", as: "president", path: "/audit/plans/APL-0001/committee-report" },
+  { name: "audit-outside", as: "auditor", path: "/audit/outside" },
+  { name: "outside-page", as: "auditor", path: async (page) => page.evaluate(`(async () => {
+      const me = (await (await fetch("/api/v1/session")).json()).data;
+      const made = await fetch("/api/v1/audit/outside", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": me.csrf_token },
+        body: JSON.stringify({ name: "Dana Reyes", organization: "Halvard & Associates", kind: "engagement", ref: "AUD-0001", days: 7 }) });
+      const url = (await made.json()).meta.link.url;
+      // A visit that differed only after "#" would not load the page again.
+      return "/outside?visit=" + Date.now() + "#" + url.split("#")[1]; })()`) },
   { name: "audit-finding", as: "cro", path: async (page) => `/issues/${await first("/api/v1/issues?q=full+restore")(page)}` },
   { name: "audit-request", as: "ciso", path: async (page) => `/audit/requests/${await first("/api/v1/home", "(data) => data.items.find((item) => item.kind === 'audit_request').href.split('/').pop()")(page)}` },
   { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },

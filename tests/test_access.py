@@ -404,6 +404,7 @@ for _route in (
 ):
     REACH[_route] = EVERYONE
 # Through a link, without an account: reached by anyone, and answered by the link.
+REACH[("GET", "/api/v1/outside")] = EVERYONE | {"nobody"}  # an outsider's link, in a header
 for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
                ("POST", "/api/v1/respond/submit"), ("POST", "/api/v1/respond/files")):  # fmt: skip
     REACH[_route] = EVERYONE | {"nobody"}

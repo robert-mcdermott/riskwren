@@ -92,6 +92,7 @@ export const NAV = [
     items: [
       { href: "/audit/universe", label: "Universe", iconName: "grid", when: "reports" },
       { href: "/audit/plans", label: "Plans", iconName: "file", when: "reports" },
+      { href: "/audit/outside", label: "Outside access", iconName: "key", when: "reports" },
     ],
   },
   {

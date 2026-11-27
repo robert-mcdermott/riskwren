@@ -3388,6 +3388,70 @@
         "title": "OffboardBody",
         "type": "object"
       },
+      "OutsideBody": {
+        "properties": {
+          "days": {
+            "description": "How long it stays open, at most 90 days",
+            "title": "Days",
+            "type": "integer"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "kind": {
+            "description": "engagement (once reported) or scope",
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "description": "The person it is for",
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "organization": {
+            "description": "Whom they are with",
+            "maxLength": 400,
+            "title": "Organization",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "ref": {
+            "description": "The engagement's or the scope's reference",
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "organization",
+          "kind",
+          "ref",
+          "days"
+        ],
+        "title": "OutsideBody",
+        "type": "object"
+      },
       "OwnersBody": {
         "properties": {
           "owners": {
@@ -9554,6 +9618,112 @@
         "summary": "The kinds of report, opinions, and judgments a review uses",
         "tags": [
           "third parties"
+        ]
+      }
+    },
+    "/api/v1/audit/outside": {
+      "get": {
+        "operationId": "list_outside_api_v1_audit_outside_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Outside Api V1 Audit Outside Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Outside access given, and what may be opened",
+        "tags": [
+          "internal audit"
+        ]
+      },
+      "post": {
+        "operationId": "grant_outside_api_v1_audit_outside_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutsideBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Grant Outside Api V1 Audit Outside Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open one engagement or scope to an outsider",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/outside/{access_id}/revoke": {
+      "post": {
+        "operationId": "revoke_outside_api_v1_audit_outside__access_id__revoke_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "access_id",
+            "required": true,
+            "schema": {
+              "title": "Access Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Revoke Outside Api V1 Audit Outside  Access Id  Revoke Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Withdraw outside access",
+        "tags": [
+          "internal audit"
         ]
       }
     },
@@ -19827,6 +19997,27 @@
         "summary": "Set an objective's owners",
         "tags": [
           "objectives and sessions"
+        ]
+      }
+    },
+    "/api/v1/outside": {
+      "get": {
+        "operationId": "outside_view_api_v1_outside_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Outside View Api V1 Outside Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "What an outsider's link opens (no account; the link in a header)",
+        "tags": [
+          "internal audit"
         ]
       }
     },

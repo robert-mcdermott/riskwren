@@ -62,9 +62,15 @@ The wave is done when, on a fresh checkout:
 
 **Done:** a finding is raised by the engagement's team during fieldwork or reporting through the register's own `issues.create`, as audit (`source_kind` *audit*, `source_type` *engagement*), in the unit of the thing audited, about the scope when it is one, and handed to the manager named; its date follows from its severity and its actions are management's action plan. `issues.confirms` makes an auditor, not the second line, the one who confirms, withdraws, or reopens a finding, and a proposed closure is told to the engagement's team and waits on auditors' home pages; the validation route is open to everyone and the service decides. The engagement lists its findings; each plan has a committee report of its engagements and opinions, findings by severity, and findings and actions past their date, which prints. The demo's first engagement raised two findings: one put right, proposed closed, and confirmed by audit; one with its action past its date. The acceptance test is `tests/test_engagements.py::test_a_finding_is_an_issue_that_audit_confirms_closed`.
 
-### Slice 5: Outside auditors ☐
+### Slice 5: Outside auditors ☑
 
-- [ ] Scoped, time-limited, read-only access for a person outside the organization, with every view recorded
+- [x] Scoped, time-limited, read-only access for a person outside the organization, with every view recorded
+
+**Acceptance:** a link opens one reported engagement or one scope, read-only, and nothing else; it stops on its date or when withdrawn; each use is an event in the history naming who looked; the token is never stored.
+
+**Done:** `outside_access` holds the person, whom they are with, why, the one engagement (once reported) or scope it opens, its end at most 90 days ahead, and the digest of its 256-bit token, which is shown once in `meta.link.url` and follows a `#`. Given and withdrawn by auditors (**Audit → Outside access**); `GET /outside` with the token in `X-RiskWren-Access` is the one route it reaches, without an account, slowed against guessing as the due diligence link is, and gone (410) once expired or withdrawn. It returns the engagement as its readers see it, or the scope's statement, controls, evidence, and plan of action; each use writes `outside.viewed` on the engagement or scope with the outsider as the actor, and counts. The page at `/outside` reads it without the app around it. The demo's external auditors have the backups engagement and have looked twice; the sponsor's monitor had the trial data platform for a fortnight last spring. The acceptance tests are `tests/test_outside.py`.
+
+Not done, and said so: the files of evidence are listed, not downloadable, through the link; an outsider who needs one asks for it.
 
 ### Slice 6: Release prep ☐
 

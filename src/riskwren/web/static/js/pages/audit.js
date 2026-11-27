@@ -536,3 +536,60 @@ export function committeeReport(main, { ref }) {
     },
   });
 }
+
+
+// --- Outside access ---------------------------------------------------------------------
+
+function grantForm(data, onDone) {
+  openOverlay({ title: "Give outside access", subtitle: "One reported engagement or one scope, read-only, until a date, through a link. Every time it is used is recorded.",
+    render: (body, footer, close) => {
+      const name = field("For", { required: true, maxlength: 200, hint: "The person, such as the external auditor's manager on the engagement." });
+      const org = field("With", { required: true, maxlength: 200, hint: "Their firm, agency, or sponsor." });
+      const email = field("Email", { type: "email" });
+      const purpose = field("Why", { type: "textarea", rows: 2 });
+      const options = [...data.choices.engagement.map((e) => [`engagement:${e.ref}`, `Engagement ${e.ref} · ${e.name}`]), ...data.choices.scope.map((sc) => [`scope:${sc.ref}`, `Scope ${sc.ref} · ${sc.name}`])];
+      const what = select("Opens", options);
+      const days = field("Days", { type: "number", min: 1, max: data.most_days, value: 30, required: true });
+      const problem = banner();
+      const go = button("Give access", { kind: "btn-primary" });
+      go.addEventListener("click", async () => {
+        const [kind, ref] = what.input.value.split(":");
+        const done = await submit({ button: go, banner: problem, fields: { name, organization: org, email, purpose, ref: what, days },
+          run: () => post("/api/v1/audit/outside", { name: name.input.value, organization: org.input.value, email: email.input.value || null,
+            purpose: purpose.input.value || null, kind, ref, days: Number(days.input.value) }) });
+        if (!done) return;
+        body.replaceChildren(h("div", { class: "stack-lg" },
+          alert("ok", h("strong", {}, "Given. "), "Send this address to them. It is shown this once and kept nowhere; if it is lost, withdraw it and give another."),
+          h("label", { class: "field" }, h("span", { class: "label" }, "Their address"), h("input", { class: "input mono", readonly: true, value: done.meta.link.url, onfocus: (event) => event.target.select() }))));
+        footer.replaceChildren(h("div", { class: "row" }, button("Done", { kind: "btn-primary", onclick: () => { close(); onDone(); } })));
+      });
+      body.append(h("div", { class: "stack-lg" }, problem, name.node, org.node, email.node, what.node, days.node, purpose.node));
+      footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
+const ACCESS_STATE = { open: ["Open", "ok"], expired: ["Ended", ""], withdrawn: ["Withdrawn", ""] };
+
+export function outsideAccess(main) {
+  return show(main, {
+    title: "Outside access",
+    load: async () => (await get("/api/v1/audit/outside", null, { fresh: true })).data,
+    view: (data, reload) => h("div", { class: "stack-lg" },
+      pageHeader({ eyebrow: "Audit", title: "Outside access",
+        lede: "Read-only access for someone outside the organization (an external auditor, a regulator, a sponsor's monitor) to one reported engagement or one scope, until a date, through a link. They have no account, and every time they look is recorded.",
+        actions: data.can_grant ? button("Give outside access", { kind: "btn-primary", iconName: "plus", onclick: () => grantForm(data, reload) }) : null }),
+      data.grants.length ? card({ flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
+        h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "For"), h("th", { scope: "col" }, "Opens"), h("th", { scope: "col" }, "Until"),
+          h("th", { scope: "col" }, "Looked"), h("th", { scope: "col" }, "State"), h("th", { scope: "col", class: "no-print" }, h("span", { class: "sr-only" }, "Actions")))),
+        h("tbody", {}, data.grants.map((row) => h("tr", {},
+          h("td", {}, h("span", { class: "cell-main" }, row.name), h("div", { class: "cell-sub" }, row.organization)),
+          h("td", {}, row.subject ? `${row.subject.ref} ${row.subject.name}` : "", h("div", { class: "cell-sub" }, `Given by ${row.granted_by} on ${date(row.granted_at)}`)),
+          h("td", {}, date(row.expires_at)),
+          h("td", {}, row.views ? `${row.views} time${row.views === 1 ? "" : "s"}, last ${date(row.last_viewed_at)}` : h("span", { class: "subtle" }, "Not yet")),
+          h("td", {}, pill(...ACCESS_STATE[row.state])),
+          h("td", { class: "no-print" }, data.can_grant && row.state === "open" ? button("Withdraw", { kind: "btn-sm btn-ghost", "aria-label": `Withdraw access for ${row.name}`,
+            onclick: async () => { await post(`/api/v1/audit/outside/${row.id}/revoke`); toast("Withdrawn."); reload(); } }) : null)))))))
+        : emptyState({ iconName: "key", title: "Nobody outside has access", text: "Give an external auditor or a regulator a link to one reported engagement or one scope." })),
+  });
+}

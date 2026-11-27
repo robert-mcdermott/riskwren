@@ -6,11 +6,13 @@ from datetime import date
 from typing import Any
 
 from fastapi import APIRouter, Query, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
-from riskwren.api.common import envelope, reading, writing
-from riskwren.internal_audit import engagements, findings, plans, requests, universe
+from riskwren.api.common import database, envelope, reading, writing
+from riskwren.internal_audit import engagements, findings, outside, plans, requests, universe
 
 router = APIRouter(prefix="/api/v1", tags=["internal audit"])
 
@@ -357,3 +359,80 @@ def committee_report(request: Request, ref: str) -> dict[str, Any]:
     with reading(request) as session:
         plan = plans.find(session, principal, ref)
         return envelope(findings.committee_report(session, principal, plan))
+
+
+# --- Outside auditors -------------------------------------------------------------------------
+
+
+class OutsideBody(BaseModel):
+    name: str = Field(max_length=400, description="The person it is for")
+    organization: str = Field(max_length=400, description="Whom they are with")
+    email: str | None = Field(default=None, max_length=400)
+    purpose: str | None = Field(default=None, max_length=4000)
+    kind: str = Field(description="engagement (once reported) or scope")
+    ref: str = Field(description="The engagement's or the scope's reference")
+    days: int = Field(description="How long it stays open, at most 90 days")
+
+
+NO_STORE = {"Cache-Control": "no-store"}
+
+
+@router.get("/audit/outside", summary="Outside access given, and what may be opened")
+def list_outside(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(outside.listing(session, principal))
+
+
+@router.post(
+    "/audit/outside", status_code=201, summary="Open one engagement or scope to an outsider"
+)
+def grant_outside(request: Request, body: OutsideBody) -> Any:
+    from riskwren.api.routers.third_parties import _base_url
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        access, token = outside.grant(session, principal, body.model_dump())
+        url = f"{_base_url(request)}/outside#{token}"
+        found = outside.listing(session, principal)
+        shown = next(row for row in found["grants"] if row["id"] == access.id)
+    # The address is shown this once, and kept nowhere.
+    return JSONResponse(
+        jsonable_encoder({"data": shown, "meta": {"link": {"url": url}}}),
+        status_code=201, headers=NO_STORE,
+    )  # fmt: skip
+
+
+@router.post("/audit/outside/{access_id}/revoke", summary="Withdraw outside access")
+def revoke_outside(request: Request, access_id: int) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        outside.revoke(session, principal, access_id)
+        return envelope(outside.listing(session, principal))
+
+
+@router.get("/outside", summary="What an outsider's link opens (no account; the link in a header)")
+def outside_view(request: Request) -> Any:
+    from riskwren.api.problems import problem
+    from riskwren.api.routers.third_parties import _guessing, _note_guess
+
+    if _guessing(request):
+        return problem(429, "Too many attempts. Wait a few minutes and try again.",
+                       instance=request.url.path)  # fmt: skip
+    token = request.headers.get(outside.HEADER)
+    try:
+        with reading(request) as session:
+            access = outside.find(session, token)
+            actor = outside.actor_for(access)
+    except outside.AccessRefused as refused:
+        if refused.reason is None:
+            _note_guess(request)
+        answer = problem(404 if refused.reason is None else 410, str(refused),
+                         instance=request.url.path)  # fmt: skip
+        answer.headers.update(NO_STORE)
+        return answer
+    with database(request).write(actor) as session:
+        access = outside.find(session, token)
+        shown = outside.package(session, access)
+        outside.record_view(session, access)
+    return JSONResponse(jsonable_encoder(envelope(shown)), headers=NO_STORE)

@@ -10,6 +10,7 @@ from riskwren.db.models.audit import (
     AuditRequest,
     Engagement,
     EngagementMember,
+    OutsideAccess,
     ReviewNote,
     Workpaper,
 )
@@ -174,6 +175,7 @@ __all__ = [
     "Offboarding",
     "OrgUnit",
     "OutboxMessage",
+    "OutsideAccess",
     "PolicyAcknowledgment",
     "PolicyApproval",
     "PolicyAudience",

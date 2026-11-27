@@ -1124,6 +1124,17 @@ ENGAGEMENTS = [
      "summary": None, "opinion": None},
 ]  # fmt: skip
 
+# Outside access: the external auditors, relying on internal audit's backups work this year;
+# and the trial sponsor's monitor, who had the trial data platform for a fortnight last spring.
+OUTSIDE = [
+    {"name": "Dana Reyes", "organization": "Halvard & Associates, the external auditors",
+     "purpose": "Relying on internal audit's work on backups for the year-end audit.",
+     "kind": "engagement", "ref": "AUD-0001", "days": 30},
+    {"name": "Sam Ortiz", "organization": "Verdance Therapeutics, the trial's sponsor",
+     "purpose": "The sponsor's annual review of how trial data is kept.",
+     "kind": "scope", "ref": "SCP-0001", "days": 14},
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

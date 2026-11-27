@@ -223,3 +223,38 @@ class AuditRequest(Base):
         Index("ix_audit_request_engagement_id", "engagement_id"),
         Index("ix_audit_request_assignee_id", "assignee_id", "status"),
     )
+
+
+OUTSIDE_SUBJECTS = ("engagement", "scope")
+
+
+class OutsideAccess(Base):
+    """Read-only access for a person outside the organization (an external auditor, a
+    regulator, a sponsor's monitor) to one reported engagement or one scope, until a date,
+    through a link. Only the link's digest is kept, and every view is in the history."""
+
+    __tablename__ = "outside_access"
+    # How often it was used is bookkeeping; each use is its own event in the history.
+    __audit_skip__ = frozenset({"views", "last_viewed_at"})
+    __audit_redact__ = frozenset({"token_hash"})
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    name: Mapped[str] = mapped_column(String(200))
+    email: Mapped[str | None] = mapped_column(String(254))
+    organization: Mapped[str] = mapped_column(String(200))
+    purpose: Mapped[str | None] = mapped_column(Text)
+    subject_type: Mapped[str] = mapped_column(String(24))
+    subject_id: Mapped[int] = mapped_column(Integer)
+    granted_by: Mapped[int | None] = mapped_column(Integer)
+    granted_by_name: Mapped[str] = mapped_column(String(200))
+    granted_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    expires_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    views: Mapped[int] = mapped_column(Integer, default=0)
+    last_viewed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        CheckConstraint(one_of("subject_type", OUTSIDE_SUBJECTS), name="subject_type"),
+        Index("ix_outside_access_subject", "subject_type", "subject_id"),
+    )

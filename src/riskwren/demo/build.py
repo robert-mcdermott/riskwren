@@ -2259,6 +2259,24 @@ class Builder:
                         found = find(session, spec["name"])
                         engagements.sign_off(session, who, session.get(Workpaper, paper.id), found)
 
+    def _story_outside(self) -> Script:
+        """The external auditors are given the reported backups engagement for a month, and
+        look at it twice; the sponsor's monitor had the trial data platform last spring."""
+        from riskwren.internal_audit import outside
+
+        auditor = self.cast["auditor"]
+        for days, spec, looks in ((150, c.OUTSIDE[1], 0), (12, c.OUTSIDE[0], 2)):
+            yield self._on(days, hour=9)
+            with self.act(auditor) as (session, who):
+                access, token = outside.grant(session, who, spec)
+            self.tally("outside access")
+            for look in range(looks):
+                yield self._on(days - 2 - look * 3, hour=13)
+                with self.db.write(outside.actor_for(access)) as session:
+                    found = outside.find(session, token)
+                    outside.package(session, found)
+                    outside.record_view(session, found)
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3511,7 +3529,7 @@ class Builder:
             self._story_governance, self._story_third_parties, self._story_due_diligence,
             self._story_assurance, self._story_coverage, self._story_lifecycle,
             self._story_measures, self._story_leadership, self._story_scenarios,
-            self._story_internal_audit, self._story_engagements,
+            self._story_internal_audit, self._story_engagements, self._story_outside,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

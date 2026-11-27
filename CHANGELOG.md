@@ -27,6 +27,9 @@ Wave 7, *Audit*.
   with management's action plan as its actions; internal audit, not the second line, confirms
   it closed. **The committee report:** a plan's engagements with their opinions, findings by
   severity, and what is past its date.
+- **Outside auditors:** a link for someone outside the organization to one reported
+  engagement or one scope, read-only, for at most 90 days, kept only as a digest, withdrawn at
+  will, and every use recorded in the history. **Audit → Outside access**.
 - **Requests to the audited:** what an engagement needs, asked of one person by a date and
   on their home page, answered with words and evidence, offered first from what is already on
   file, and accepted by the team or sent back with what is still needed.
