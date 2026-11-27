@@ -20,7 +20,7 @@
 <a class="skip" href="#content">Skip to content</a>
 <header class="top">
   <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
-  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.1</span></a>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.3.0</span></a>
   <div class="search" role="search">
     <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
     <kbd>/</kbd>
@@ -80,15 +80,20 @@
 <h3 id="finish">Finish<a class="anchor" href="#finish" aria-label="Link to this section">#</a></h3>
 <p><strong>Complete</strong> closes an assessment once every test in it has a result that counts. A test that will not be done is taken out first. <strong>Cancel it</strong> abandons an assessment; results already confirmed still count.</p>
 <p>The assessment's <strong>History</strong> tab tells every test planned, every result recorded, and every confirmation and return, with who did each.</p>
+<h2 id="an-attestation-is-not-a-test">An attestation is not a test<a class="anchor" href="#an-attestation-is-not-a-test" aria-label="Link to this section">#</a></h2>
+<p>A control's owner can be asked, in a <a href="running-the-program.html#campaigns">campaign</a>, whether it still operates as described. Their answer is recorded on the control and shown there, apart from its rating: who said it, when, and what they said.</p>
+<p>That is the owner's word. It is worth having, and it is a different kind of assurance from a test by someone who does not own the control. RiskWren keeps the two apart by rule:</p>
+<ul><li><strong>An attestation never makes anything verified.</strong> A control its owner says is working is in place, and the reason given says it rests on an attestation and no test.</li><li><strong>An attestation can take a control out of verified.</strong> If a test found a control effective and its owner has since said it operates only partly, or not at all, the requirements it answers drop to in place, and the reason says why. It is not shown as failing, because nobody has tested it; it is no longer something to call verified.</li><li>An attestation holds for as long as a rating does, twelve months by default.</li></ul>
+<p>So a figure that says verified always rests on a test and on evidence. Nobody's say-so is in it.</p>
 <h2 id="verified-in-practice">Verified, in practice<a class="anchor" href="#verified-in-practice" aria-label="Link to this section">#</a></h2>
 <p>A requirement is verified when each control that answers it in the scope is in place, has a confirmed test result of effective that still holds, and has current evidence, either attached to the control or cited by that result.</p>
 <p>So the working rhythm for a control owner and an assessor is:</p>
 <ol><li>The owner keeps the control's evidence current, renewing it before its date.</li><li>The assessor tests the control once a year and cites that evidence.</li><li>A second assessor confirms the result.</li></ol>
 <p>Miss the first and the requirement drops to in place when the evidence goes stale. Miss the second and it drops when the test is a year old. Neither needs anyone to notice: the scope's Requirements tab and the compliance dashboard say so the same day.</p>
     <nav class="pager" aria-label="Pages"><a class="prev" href="compliance.html"><span>Previous</span>Compliance</a><a class="next" href="issues-and-exceptions.html"><span>Next</span>Issues and exceptions</a></nav>
-    <footer class="foot">Describes RiskWren 0.2.1. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+    <footer class="foot">Describes RiskWren 0.3.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
   </main>
-  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#evidence">Evidence</a></li><li class="l3"><a href="#evidence-stops-counting">Evidence stops counting</a></li><li class="l3"><a href="#attach-it">Attach it</a></li><li class="l3"><a href="#files">Files</a></li><li class="l3"><a href="#who-sees-evidence">Who sees evidence</a></li><li class="l2"><a href="#assessments">Assessments</a></li><li class="l3"><a href="#plan-the-tests">Plan the tests</a></li><li class="l3"><a href="#record-a-result">Record a result</a></li><li class="l3"><a href="#independence-and-a-second-pair-of-eyes">Independence, and a second pair of eyes</a></li><li class="l3"><a href="#what-a-confirmed-result-changes">What a confirmed result changes</a></li><li class="l3"><a href="#finish">Finish</a></li><li class="l2"><a href="#verified-in-practice">Verified, in practice</a></li></ul></aside>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#evidence">Evidence</a></li><li class="l3"><a href="#evidence-stops-counting">Evidence stops counting</a></li><li class="l3"><a href="#attach-it">Attach it</a></li><li class="l3"><a href="#files">Files</a></li><li class="l3"><a href="#who-sees-evidence">Who sees evidence</a></li><li class="l2"><a href="#assessments">Assessments</a></li><li class="l3"><a href="#plan-the-tests">Plan the tests</a></li><li class="l3"><a href="#record-a-result">Record a result</a></li><li class="l3"><a href="#independence-and-a-second-pair-of-eyes">Independence, and a second pair of eyes</a></li><li class="l3"><a href="#what-a-confirmed-result-changes">What a confirmed result changes</a></li><li class="l3"><a href="#finish">Finish</a></li><li class="l2"><a href="#an-attestation-is-not-a-test">An attestation is not a test</a></li><li class="l2"><a href="#verified-in-practice">Verified, in practice</a></li></ul></aside>
 </div>
 </body>
 </html>

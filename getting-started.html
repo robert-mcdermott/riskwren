@@ -20,7 +20,7 @@
 <a class="skip" href="#content">Skip to content</a>
 <header class="top">
   <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
-  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.2.1</span></a>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.3.0</span></a>
   <div class="search" role="search">
     <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
     <kbd>/</kbd>
@@ -62,7 +62,7 @@
 <p>As installed, RiskWren listens only on the machine it runs on. To put it in front of other people, read <a href="configuration.html">Configuration</a> first.</p>
 <h2 id="sign-in-for-the-first-time">Sign in for the first time<a class="anchor" href="#sign-in-for-the-first-time" aria-label="Link to this section">#</a></h2>
 <p>Open the address in a browser and sign in with the email address and password you gave <code>init</code>.</p>
-<p>This release signs in with local accounts: an email address and a password held by RiskWren. Single sign-on comes later; see the <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a>.</p>
+<p>RiskWren signs in with local accounts: an email address and a password that it keeps. Nothing else has to be installed or connected. Signing in with your organization's identity provider, such as Microsoft Entra ID, is optional and can be added at any time: see <a href="configuration.html#single-sign-on">Single sign-on</a>.</p>
 <ul><li>Five failed attempts within fifteen minutes stop sign-in for that account from that address for a few minutes.</li><li>A sign-in ends after 12 hours without activity, and after 7 days in any case. Both are <a href="configuration.html#server">settings</a>.</li><li>To change your password, open the account menu at the top right and choose <strong>Your account</strong>. Changing it signs out your other sessions.</li><li>If you cannot sign in at all, reset the password from the command line: <code>uv run riskwren users reset-password you@example.org</code>.</li></ul>
 <h2 id="set-up-the-organization">Set up the organization<a class="anchor" href="#set-up-the-organization" aria-label="Link to this section">#</a></h2>
 <p>The administrator account sets the installation up. It does not assess or accept risk: that belongs to the roles below, and an administrator who also does that work is given a second role.</p>
@@ -89,7 +89,7 @@ uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0
 <h2 id="next">Next<a class="anchor" href="#next" aria-label="Link to this section">#</a></h2>
 <ul><li>To start recording what you have and what could go wrong, read <a href="the-register.html">The register</a>.</li><li>To set appetite, cadences, and who sees what, read <a href="running-the-program.html">Running the program</a>.</li></ul>
     <nav class="pager" aria-label="Pages"><a class="prev" href="index.html"><span>Previous</span>Overview</a><a class="next" href="the-register.html"><span>Next</span>The register</a></nav>
-    <footer class="foot">Describes RiskWren 0.2.1. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+    <footer class="foot">Describes RiskWren 0.3.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
   </main>
   <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#what-you-need">What you need</a></li><li class="l2"><a href="#install">Install</a></li><li class="l2"><a href="#set-up-the-installation">Set up the installation</a></li><li class="l2"><a href="#check-it">Check it</a></li><li class="l2"><a href="#run-it">Run it</a></li><li class="l2"><a href="#sign-in-for-the-first-time">Sign in for the first time</a></li><li class="l2"><a href="#set-up-the-organization">Set up the organization</a></li><li class="l3"><a href="#units">Units</a></li><li class="l3"><a href="#people-and-roles">People and roles</a></li><li class="l3"><a href="#import-units-and-people">Import units and people</a></li><li class="l3"><a href="#appearance">Appearance</a></li><li class="l2"><a href="#explore-the-demo-organization">Explore the demo organization</a></li><li class="l2"><a href="#next">Next</a></li></ul></aside>
 </div>
