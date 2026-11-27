@@ -1,4 +1,4 @@
-"""Incidents (INC-01 to INC-03): what happened, nearly happened, or worries someone.
+"""Incidents (INC-01 to INC-04): what happened, nearly happened, or worries someone.
 
 Anyone signed in reports one in a short form; where the organization opens it, anyone may
 report a concern through a link without a name, and follow it up with a code. Each report is
@@ -105,3 +105,20 @@ class IncidentMessage(Base):
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
 
     __table_args__ = (Index("ix_incident_message_incident_id", "incident_id"),)
+
+
+class IncidentMember(Base):
+    """Someone named on a restricted case. A restricted case is known to those named on it
+    (its members and its handlers), and to whoever reported it, and to nobody else."""
+
+    __tablename__ = "incident_member"
+    __audit_parent__ = ("incident", "incident_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("incident.id", ondelete="CASCADE"))
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"))
+
+    __table_args__ = (
+        UniqueConstraint("incident_id", "account_id", name="uq_incident_member"),
+        Index("ix_incident_member_account_id", "account_id"),
+    )

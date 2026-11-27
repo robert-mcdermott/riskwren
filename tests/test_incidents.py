@@ -289,3 +289,101 @@ def test_who_sees_a_report_follows_the_rule(db: Database, people: People) -> Non
             assert reports.can_see(session, principal, incident), role
             rows, _ = records.search(session, principal, reports.INCIDENT, {})
             assert [row.id for row in rows] == [made_id], role
+
+
+# --- Restricted cases ---------------------------------------------------------------------
+
+
+def test_a_restricted_case_is_known_only_to_those_named_on_it(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    member = as_role("member")
+    ref = _report(member, kind="concern", name="My supervisor asks for my password")["ref"]
+    as_role("assessor").post(f"/api/v1/incidents/{ref}/triage", json={
+        "category": "conduct", "severity": "moderate",
+        "handler_id": people.accounts["steward"]})  # fmt: skip
+    for role in ("leader", "manager", "auditor", "admin"):
+        assert as_role(role).get(f"/api/v1/incidents/{ref}").status_code == 200, role
+    assert any(ref in n["text"] for n in as_role("manager").get("/api/v1/notices").json()["data"])
+
+    steward = as_role("steward")
+    restricted = steward.put(f"/api/v1/incidents/{ref}/case", json={"restricted": True})
+    assert restricted.status_code == 200, restricted.text
+    case = restricted.json()["data"]["case"]
+    assert case["restricted"] is True
+    assert [m["account_id"] for m in case["members"]] == [people.accounts["steward"]]
+
+    # Nobody else knows it exists: not its unit's leader, not those who triage, not those
+    # who read everything. Not in lists, search, counts, the history, or their notices.
+    for role in ("leader", "manager", "assessor", "auditor", "admin"):
+        client = as_role(role)
+        assert client.get(f"/api/v1/incidents/{ref}").status_code == 404, role
+        page = client.get("/api/v1/incidents").json()
+        assert ref not in [row["ref"] for row in page["data"]], role
+        assert page["meta"]["total"] == 0, role
+        found = client.get("/api/v1/search", params={"q": "supervisor"}).json()["data"]
+        assert found["total"] == 0, role
+        assert all(ref not in n["text"] for n in client.get("/api/v1/notices").json()["data"])
+        assert client.put(f"/api/v1/incidents/{ref}/case",
+                          json={"restricted": False}).status_code == 404, role  # fmt: skip
+    for role in ("manager", "auditor", "admin"):
+        client = as_role(role)
+        assert client.get("/api/v1/history", params={"about": ref}).status_code == 404, role
+        shown = client.get("/api/v1/history", params={"kind": "incident"}).json()["data"]
+        assert all((e.get("record") or {}).get("ref") != ref for e in shown["entries"]), role
+        assert all("supervisor" not in str(e) for e in shown["entries"]), role
+        register = client.get("/api/v1/as-of", params={"type": "incident"}).json()["data"]
+        assert ref not in str(register), role
+    # Those named on it see all of it, and its reporter still sees their report.
+    assert steward.get(f"/api/v1/incidents/{ref}/history").status_code == 200
+    mine = member.get(f"/api/v1/incidents/{ref}").json()["data"]
+    assert mine["everything"] is False and "case" not in mine
+    assert any("being handled" in n["text"] for n in member.get("/api/v1/notices").json()["data"])
+
+    # Naming someone lets them see it, and tells them.
+    steward.put(f"/api/v1/incidents/{ref}/case",
+                json={"restricted": True, "members": [people.accounts["auditor"]]})  # fmt: skip
+    auditor = as_role("auditor")
+    assert auditor.get(f"/api/v1/incidents/{ref}").status_code == 200
+    assert any(
+        "restricted case" in n["text"] for n in auditor.get("/api/v1/notices").json()["data"]
+    )
+    events = auditor.get(f"/api/v1/incidents/{ref}/history").json()["data"]
+    assert any("Named Auditor Person on the case" in str(e.get("title")) for e in events)
+    # The auditor reads it, but does not triage or handle it, so cannot change who sees it.
+    refused = auditor.put(f"/api/v1/incidents/{ref}/case", json={"restricted": False})
+    assert refused.status_code == 403
+
+    # When its handler leaves, it passes to someone else named on it, never to someone who
+    # could not see it.
+    with db.write(ME.actor) as session:
+        accounts.set_status(session, ME, accounts.get(session, people.accounts["steward"]),
+                            "disabled")  # fmt: skip
+    handled = auditor.get(f"/api/v1/incidents/{ref}").json()["data"]
+    assert [o["account_id"] for o in handled["owners"]] == [people.accounts["auditor"]]
+    assert as_role("leader").get(f"/api/v1/incidents/{ref}").status_code == 404
+
+    # Lifting the restriction gives it back to those who would see it.
+    lifted = auditor.put(f"/api/v1/incidents/{ref}/case", json={"restricted": False})
+    assert lifted.status_code == 200, lifted.text
+    assert as_role("leader").get(f"/api/v1/incidents/{ref}").status_code == 200
+
+
+def test_who_may_restrict_a_case(as_role: Clients, people: People) -> None:
+    ref = _report(as_role("member"))["ref"]
+    # Its reporter, its unit's leader, and those who only read cannot; a triager can, before
+    # or after triage.
+    for role in ("member", "leader", "auditor"):
+        refused = as_role(role).put(f"/api/v1/incidents/{ref}/case", json={"restricted": True})
+        assert refused.status_code == 403, role
+    nobody = as_role("assessor").put(f"/api/v1/incidents/{ref}/case",
+                                     json={"restricted": True, "members": [999999]})  # fmt: skip
+    assert nobody.status_code == 422
+    done = as_role("assessor").put(f"/api/v1/incidents/{ref}/case", json={"restricted": True})
+    assert done.status_code == 200
+    # Restricted before triage, it waits only on those named on it.
+    assert as_role("manager").get(f"/api/v1/incidents/{ref}").status_code == 404
+    owed = as_role("manager").get("/api/v1/home").json()["data"]["items"]
+    assert not any(item.get("ref") == ref for item in owed)
+    owed = as_role("assessor").get("/api/v1/home").json()["data"]["items"]
+    assert any(item.get("ref") == ref for item in owed)

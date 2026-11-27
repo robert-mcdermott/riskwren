@@ -2,7 +2,7 @@
 // them. A reporter sees what they reported, where it stands, and what is said to them; those
 // handling it see the rest.
 
-import { get, post } from "../core/api.js";
+import { get, post, put } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date, dateTime, plural } from "../core/format.js";
 import { label, options, unitOptions, units, vocabularies } from "../core/lookups.js";
@@ -12,7 +12,7 @@ import { banner, field, section, select, submit } from "../components/form.js";
 import { recordPicker, severityPill } from "../components/issue.js";
 import { KIND, reportFields } from "../components/incident-report.js";
 import { openOverlay } from "../components/overlay.js";
-import { personField } from "../components/people-picker.js";
+import { peoplePicker, personField } from "../components/people-picker.js";
 import { recordChip } from "../components/record.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
@@ -79,7 +79,7 @@ export function incidentList(main) {
           h("td", {}, KIND[row.kind]?.[0] ?? row.kind),
           h("td", {}, row.category ? label(data.vocab, "incident_categories", row.category) : h("span", { class: "subtle" }, "Not yet")),
           h("td", {}, row.severity ? severityPill(row.severity) : h("span", { class: "subtle" }, "Not yet")),
-          h("td", {}, statusOf(row.status)),
+          h("td", {}, statusOf(row.status), row.restricted ? h("div", { class: "cell-sub" }, "Restricted case") : null),
           h("td", {}, date(row.reported_at), row.anonymous ? h("div", { class: "cell-sub" }, "Without a name") : null))))))
         : emptyState(isFiltering() ? { iconName: "search", title: "Nothing matches", text: "Try fewer words, or clear a filter.", action: button("Clear filters", { onclick: clearFilters }) }
           : { iconName: "alert", title: "Nothing reported that you can see", text: "What you report appears here, with where it stands." });
@@ -140,6 +140,74 @@ function closeForm(record, reload) {
     footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
     footer.hidden = false;
   } });
+}
+
+function caseForm(record, reload) {
+  const case_ = record.case;
+  openOverlay({ title: case_.restricted ? "Who is named on the case" : "Restrict it to those named",
+    subtitle: "A restricted case is known only to those named on it, its handlers, and whoever reported it.",
+    render: (body, footer, close) => {
+      const members = case_.members.map((each) => ({ ...each }));
+      const list = h("ul", { class: "plain-list stack-sm", "aria-label": "People named on the case" });
+      const draw = () => list.replaceChildren(...(members.length ? members.map((person, index) => h("li", { class: "row" },
+        h("span", { class: "grow" }, h("span", { class: "cell-main" }, person.name), h("span", { class: "cell-sub" }, ` ${person.email ?? ""}`)),
+        button("Remove", { kind: "btn-ghost btn-sm", "aria-label": `Remove ${person.name}`, onclick: () => {
+          members.splice(index, 1);
+          draw();
+        } }))) : [h("li", { class: "muted" }, "Nobody besides its handlers, and you.")]));
+      const picker = peoplePicker({ label: "Name someone", exclude: (account) => members.some((each) => each.account_id === account.id),
+        onPick: (account) => {
+          members.push({ account_id: account.id, name: account.display_name, email: account.email });
+          draw();
+        } });
+      draw();
+      const problem = banner();
+      const save = button(case_.restricted ? "Save" : "Restrict it", { kind: "btn-primary" });
+      save.addEventListener("click", async () => {
+        const done = await submit({ button: save, banner: problem,
+          run: () => put(`/api/v1/incidents/${record.ref}/case`, { restricted: true, members: members.map((each) => each.account_id) }) });
+        if (!done) return;
+        close();
+        toast(case_.restricted ? "Saved." : "Restricted. Only those named on it know it exists.");
+        reload();
+      });
+      body.append(h("div", { class: "stack-lg" }, problem,
+        alert("warn", "Everyone not named loses sight of it at once: its unit's leaders and stewards, those who triage, and those who read everything. The notices that told them of it are taken back, though one already sent as email cannot be. You are named too, so that you keep sight of it."),
+        section("Named on the case", list, picker)));
+      footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
+function caseCard(record, reload) {
+  const case_ = record.case;
+  const change = case_.can_change;
+  const lift = () => openOverlay({ title: "Lift the restriction?", render: (body, footer, close) => {
+    const problem = banner();
+    const go = button("Lift it", { kind: "btn-primary" });
+    go.addEventListener("click", async () => {
+      const done = await submit({ button: go, banner: problem,
+        run: () => put(`/api/v1/incidents/${record.ref}/case`, { restricted: false, members: case_.members.map((each) => each.account_id) }) });
+      if (!done) return;
+      close();
+      toast("The restriction is lifted.");
+      reload();
+    });
+    body.append(h("div", { class: "stack" }, problem,
+      h("p", {}, "Its unit's leaders and stewards, those who triage for its unit, and those who read everything will see it, with all that has been written on it and its history.")));
+    footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+    footer.hidden = false;
+  } });
+  return card({ title: "Who sees it", actions: case_.restricted ? pill("Restricted case", "warn") : null },
+    h("div", { class: "stack" },
+      h("p", { class: "muted" }, case_.restricted
+        ? "Only those named here, its handlers, and whoever reported it know it exists."
+        : "Its reporter, its handlers, those who triage for its unit, the unit's leaders and stewards, and those who read everything."),
+      case_.restricted ? (case_.members.length ? h("ul", { class: "plain-list stack-sm" }, case_.members.map((each) => h("li", {}, each.name)))
+        : h("p", { class: "muted" }, "Nobody is named besides its handlers.")) : null,
+      change ? h("div", { class: "row wrap" },
+        button(case_.restricted ? "Change who is named" : "Restrict it", { kind: "btn-sm", onclick: () => caseForm(record, reload) }),
+        case_.restricted ? button("Lift the restriction", { kind: "btn-ghost btn-sm", onclick: lift }) : null) : null));
 }
 
 function said(message) {
@@ -236,6 +304,7 @@ export function incidentPage(main, params) {
             ["Triaged", record.triaged ? `${dateTime(record.triaged.at)} by ${record.triaged.by}` : null],
             ["Closed", record.closed_at ? dateTime(record.closed_at) : null],
           ])),
+          caseCard(record, reload),
           // Until it is triaged nobody handles it, and triage names who does.
           ownersCard({ ...record, orphaned: record.orphaned && record.triaged != null },
             { vocab: data.vocab, units: data.units, reload, ownersTitle: "Who handles it" })));

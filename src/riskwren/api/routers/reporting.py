@@ -98,12 +98,21 @@ def whole_history(
         moment = datetime(found.year, found.month, found.day, tzinfo=UTC)
         return moment + timedelta(days=1) if end else moment
 
+    principal = current(request)
     with reading(request) as session:
+        found = None
+        if about:
+            record_type, record = find_any(session, about)
+            # What the asker may not know of, they may not read the history of.
+            record = records.load(session, principal, record_type, record.ref)
+            records.require_whole(session, principal, record_type, record)
+            found = (record_type, record)
         return envelope(
             history.everywhere(
                 session,
+                principal=principal,
                 actor=actor,
-                about=find_any(session, about) if about else None,
+                about=found,
                 kind=kind or None,
                 since=day(since, "since"),
                 until=day(until, "until", end=True),

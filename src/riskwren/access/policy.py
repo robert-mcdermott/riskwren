@@ -317,6 +317,7 @@ POLICIES.update(
         ("GET", "/api/v1/incidents/{ref}"): Needs.MEMBER,
         ("PATCH", "/api/v1/incidents/{ref}"): Needs.MEMBER,
         ("PUT", "/api/v1/incidents/{ref}/owners"): Needs.MEMBER,
+        ("PUT", "/api/v1/incidents/{ref}/case"): Needs.MEMBER,
         ("POST", "/api/v1/incidents/{ref}/triage"): Needs.ASSESS,
         ("POST", "/api/v1/incidents/{ref}/close"): Needs.MEMBER,
         ("POST", "/api/v1/incidents/{ref}/reopen"): Needs.ASSESS,

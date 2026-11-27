@@ -34,9 +34,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `incident` (`INC`) is a record of its own, with `incident_subject` for the records it concerns and `incident_message` for what is said, each shared with the reporter or kept among those handling it (migration 0040). `riskwren.incidents.reports` holds the rule of who sees one, as a check and as a condition for lists and search, which agree; its reporter sees only their report, where it stands, and what is said to them, and the views of a whole record (its history, as of a date, its connections) refuse them. Triage is for managers and the unit's assessors; it names one handler, who is told, and the reporter is told when it is being handled and when it is closed. `riskwren.incidents.anonymous` takes reports without a name once an administrator opens it: a 20-character code shown once and kept as a SHA-256 digest, no address kept or counted, and a cap of 30 an hour from everyone together. Incident categories are a new vocabulary. The demo has seven: closed, being handled, made without a name, and waiting for triage. The acceptance test is `tests/test_incidents.py`.
 
-### Slice 2: Cases ☐
+### Slice 2: Cases ☑
 
-- [ ] Restricted cases with named members, hidden from everyone else in lists, search, and history (INC-04)
+- [x] Restricted cases with named members, hidden from everyone else in lists, search, and history (INC-04)
+
+**Acceptance:** a restricted case is known only to those named on it (its members and its handlers) and its reporter; everyone else, those who read everything included, finds nothing by its reference, in lists, counts, search, the history of everything, or their notices; naming someone lets them see it; lifting the restriction gives it back to those who would see it.
+
+**Done:** `incident_member` names people on a case (migration 0041). `riskwren.incidents.reports` decides sight of a restricted case by whether the person is named on it, ahead of every role, in the check and the condition alike; a record type may now hide records from the history of everything (`hidden`), and **Reports → History** leaves out the events of cases the asker is not named on, while the chain keeps them. Restricting a case takes back the notices of those not named on it. When a handler leaves, a restricted case passes to someone else named on it (`stand_in`), never to a unit's stand-in. Its handlers, and its triagers who are named on it, restrict it, change who is named, and lift it. The demo restricts a pharmacy compliance concern to the risk manager and the compliance analyst handling it. The acceptance tests are in `tests/test_incidents.py`. Any later view of incidents beside another record (slice 4) must use the same condition.
 
 ### Slice 3: Breach assessment ☐
 

@@ -2328,6 +2328,8 @@ class Builder:
             steps.append((spec["on"], 9, "report", spec))
             if "triage" in spec:
                 steps.append((spec["triage"][0], 11, "triage", spec))
+            if "restrict" in spec:
+                steps.append((spec["restrict"][0], 12, "restrict", spec))
             for index, said in enumerate(spec.get("said", [])):
                 steps.append((said[0], 14 + index, "say", (spec, said)))
             if "closed" in spec:
@@ -2393,6 +2395,12 @@ class Builder:
                         "handler_id": self.cast[handler],
                         **({"org_unit_id": unit_of(session, moved[0])} if moved else {}),
                     })  # fmt: skip
+            elif what == "restrict":
+                _, by, members = spec["restrict"]
+                with self.act(self.cast[by]) as (session, who):
+                    incident_reports.set_case(
+                        session, who, find(session, spec), True, [self.cast[m] for m in members]
+                    )
             elif what == "close":
                 _, by, note = spec["closed"]
                 with self.act(self.cast[by]) as (session, who):

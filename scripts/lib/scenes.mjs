@@ -294,6 +294,9 @@ export const SCENES = [
   { name: "incident-triage", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=freezer+alarm")(page)}`, step: click("Triage") },
   { name: "incident-anonymous", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=infusion+pumps")(page)}` },
   { name: "incident-history", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=ransomware+stopped")(page)}?tab=history` },
+  { name: "incident-case", as: "cro", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=controlled+substance")(page)}` },
+  { name: "incident-case-form", as: "cro", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=controlled+substance")(page)}`, step: click("Change who is named") },
+  { name: "incident-restrict", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Restrict it") },
   { name: "incident-reporter", as: "member", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=mailbox")(page)}` },
   { name: "program-anonymous", as: "admin", path: "/admin/program?tab=visibility" },
   // Reporting without a name, and following up a report with the code the demo gave it.

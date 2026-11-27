@@ -62,6 +62,13 @@ class TriageBody(BaseModel):
     handler_id: int | None = Field(default=None, description="Who handles it")
 
 
+class CaseBody(BaseModel):
+    restricted: bool = Field(description="True: only those named on it know it exists")
+    members: list[int] = Field(
+        default_factory=list, description="Accounts named on it, besides its handlers"
+    )
+
+
 class NoteBody(BaseModel):
     note: str | None = Field(default=None, description="How it ended")
 
@@ -145,6 +152,13 @@ def _act(request: Request, ref: str, act: Any) -> dict[str, Any]:
 @router.post("/incidents/{ref}/triage", summary="Triage: category, severity, records, handler")
 def triage_incident(request: Request, ref: str, body: TriageBody) -> dict[str, Any]:
     return _act(request, ref, lambda s, p, i: reports.triage(s, p, i, body.model_dump()))
+
+
+@router.put("/incidents/{ref}/case", summary="Restrict an incident to those named on it")
+def set_incident_case(request: Request, ref: str, body: CaseBody) -> dict[str, Any]:
+    return _act(
+        request, ref, lambda s, p, i: reports.set_case(s, p, i, body.restricted, body.members)
+    )
 
 
 @router.post("/incidents/{ref}/close", summary="Close an incident, saying how it ended")

@@ -39,7 +39,7 @@ Four roles can be limited to a unit, and then cover that unit and everything ben
 | Decide an exception | | | | ✓ not their own request | | ✓ not their own request | | |
 | Export a list they can see | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Import records from a spreadsheet | | | ✓ | | | ✓ | | |
-| Read the full history | | | | | | ✓ | ✓ | ✓ |
+| Read the full history, except restricted incident cases they are not named on | | | | | | ✓ | ✓ | ✓ |
 | Shape the program; keep the organization's own frameworks | | | | | | ✓ | | ✓ |
 | Manage accounts, units, and appearance | | | | | | | | ✓ |
 
@@ -392,7 +392,7 @@ A reader who may not see a record that a report names (a restricted risk, say) s
 Every change to every record is written to an append-only history in the same transaction as the change: who, when, and each value before and after. Each event is hashed together with the one before it, and the database itself refuses updates and deletes on the history.
 
 - Each record's **History** tab shows its own events in plain words.
-- **Reports → History** shows every change in one place, for managers, auditors, and administrators: narrowed to a person, a record, a kind of record, or a span of dates. It opens on changes to records; sign-ins, exports, and settings are one choice away.
+- **Reports → History** shows every change in one place, for managers, auditors, and administrators: narrowed to a person, a record, a kind of record, or a span of dates. It opens on changes to records; sign-ins, exports, and settings are one choice away. A [restricted incident case](incidents.md#restricted-cases) is left out for anyone not named on it; its events are still in the chain that `riskwren verify` checks.
 - Reading is recorded where it matters: every download of an evidence file and every export of a list is an event, with who and what.
 - `uv run riskwren verify` recomputes the chain and reports the first event that has been altered, removed, or cut from the end.
 - `uv run riskwren doctor` checks that the database still refuses changes to the history.

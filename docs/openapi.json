@@ -842,6 +842,28 @@
         "title": "CapabilityBody",
         "type": "object"
       },
+      "CaseBody": {
+        "properties": {
+          "members": {
+            "description": "Accounts named on it, besides its handlers",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "restricted": {
+            "description": "True: only those named on it know it exists",
+            "title": "Restricted",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "restricted"
+        ],
+        "title": "CaseBody",
+        "type": "object"
+      },
       "CategoryBody": {
         "properties": {
           "appetite": {
@@ -18099,6 +18121,60 @@
           }
         },
         "summary": "Correct an incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/case": {
+      "put": {
+        "operationId": "set_incident_case_api_v1_incidents__ref__case_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Incident Case Api V1 Incidents  Ref  Case Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restrict an incident to those named on it",
         "tags": [
           "incidents"
         ]

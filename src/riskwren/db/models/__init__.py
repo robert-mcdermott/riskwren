@@ -62,7 +62,12 @@ from riskwren.db.models.governance import (
     Objective,
     RiskObjective,
 )
-from riskwren.db.models.incidents import Incident, IncidentMessage, IncidentSubject
+from riskwren.db.models.incidents import (
+    Incident,
+    IncidentMember,
+    IncidentMessage,
+    IncidentSubject,
+)
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.insight import LeadershipReport, MeasureSnapshot
 from riskwren.db.models.inventory import (
@@ -162,6 +167,7 @@ __all__ = [
     "ImpactAnalysis",
     "Implementation",
     "Incident",
+    "IncidentMember",
     "IncidentMessage",
     "IncidentSubject",
     "Indicator",

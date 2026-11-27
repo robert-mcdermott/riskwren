@@ -162,7 +162,7 @@ Detail: [waves/wave-7.md](waves/wave-7.md)
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
 | 1 | Reporting and triage | A one-minute report from anyone; reporting without a name through a link; triage, severity, and links | ☑ |
-| 2 | Cases | Restricted cases with named members | ☐ |
+| 2 | Cases | Restricted cases with named members | ☑ |
 | 3 | Breach assessment | The structured assessment, deadlines, and notifications; privacy impact assessments; privacy and breach framework packs | ☐ |
 | 4 | Learning and losses | Incidents joined to risks and controls; corrective actions; loss events and near misses | ☐ |
 | 5 | Business impact | Sites; impact analysis per process; recovery needs checked against what dependencies can deliver | ◐ |

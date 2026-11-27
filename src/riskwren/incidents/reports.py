@@ -1,4 +1,4 @@
-"""Reporting and triage (INC-01, INC-03).
+"""Reporting, triage, and restricted cases (INC-01, INC-03, INC-04).
 
 Anyone signed in reports an incident, a near miss, or a concern in one short form: what
 happened, when, and where. It goes to those who triage for its unit (managers, and assessors
@@ -9,22 +9,35 @@ An incident is seen by those who need to: its reporter, its handlers, those who 
 its unit, the leaders and stewards of its unit, and those who read everything; nobody else.
 Its reporter sees what they reported, where it stands, and what is said to them, but not the
 handling itself.
+
+A restricted case is known only to those named on it (its handlers and its members) and to
+whoever reported it. Nobody else learns that it exists: not its unit's leaders, not those who
+triage, not those who read everything. Lists, search, counts, the history, and notices all
+leave it out. Those named on it may change who is named, and lift the restriction.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from datetime import date
 from typing import Any
 
-from sqlalchemy import exists, or_, select
+from sqlalchemy import and_, delete, exists, not_, or_, select
 from sqlalchemy.orm import Session
 
 from riskwren.access import roles
 from riskwren.access.principal import Principal
 from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
-from riskwren.db.models import Account, Incident, IncidentMessage, IncidentSubject, RecordOwner
+from riskwren.db.models import (
+    Account,
+    Incident,
+    IncidentMember,
+    IncidentMessage,
+    IncidentSubject,
+    Notice,
+    RecordOwner,
+)
 from riskwren.db.models.compliance import SEVERITIES
 from riskwren.db.models.incidents import INCIDENT_KINDS, INCIDENT_STATUSES, INCIDENT_SUBJECTS
 from riskwren.db.refs import next_ref
@@ -39,6 +52,7 @@ KIND_LABELS = {"incident": "Incident", "near_miss": "Near miss", "concern": "Con
 # Those who see every incident in a unit they hold these roles for.
 OVERSEERS = (roles.MANAGER, roles.ASSESSOR, roles.LEADER, roles.STEWARD)
 LONGEST_MESSAGE = 10_000
+MOST_MEMBERS = 30
 
 
 # --- Who sees it, and who does what -------------------------------------------------------
@@ -50,6 +64,11 @@ def triages(principal: Principal, org_unit_id: int | None) -> bool:
     return principal.assesses_unit(org_unit_id)
 
 
+def triages_this(session: Session, principal: Principal, incident: Incident) -> bool:
+    """Triages for its unit, and sees all of it: a restricted case only those named on it."""
+    return triages(principal, incident.org_unit_id) and knows_all(session, principal, incident)
+
+
 def handles(session: Session, principal: Principal, incident: Incident) -> bool:
     kinds = access.owner_kinds(session, INCIDENT, incident.id, principal.account_id)
     return bool(kinds & set(access.EDITING_KINDS))
@@ -59,10 +78,31 @@ def reported(principal: Principal, incident: Incident) -> bool:
     return principal.account_id is not None and incident.created_by == principal.account_id
 
 
+def named(session: Session, principal: Principal, incident: Incident) -> bool:
+    """Named on it: one of its handlers, or a member of the case."""
+    me = principal.account_id
+    if me is None:
+        return False
+    if access.owner_kinds(session, INCIDENT, incident.id, me):
+        return True
+    return (
+        session.scalars(
+            select(IncidentMember.id).where(
+                IncidentMember.incident_id == incident.id, IncidentMember.account_id == me
+            )
+        ).first()
+        is not None
+    )
+
+
 def knows_all(session: Session, principal: Principal, incident: Incident) -> bool:
     """Whether the person sees the handling, not only the report: those who read
     everything, those who triage for its unit, its unit's leaders and stewards, and its
-    handlers."""
+    handlers; for a restricted case, only those named on it."""
+    if principal.command:
+        return True
+    if incident.restricted:
+        return named(session, principal, incident)
     if principal.reads_all:
         return True
     units = principal.units_for(*OVERSEERS)
@@ -75,25 +115,48 @@ def can_see(session: Session, principal: Principal, incident: Incident) -> bool:
     return reported(principal, incident) or knows_all(session, principal, incident)
 
 
-def visible(session: Session, principal: Principal) -> Any:
-    """The same rule as a condition, for lists, counts, and search."""
-    if principal.reads_all:
-        return None
-    units = principal.units_for(*OVERSEERS)
-    if units is None:
-        return None
-    me = principal.account_id
-    named = exists(
+def _named_condition(me: int | None) -> Any:
+    owner = exists(
         select(RecordOwner.id).where(
             RecordOwner.record_type == KEY,
             RecordOwner.record_id == Incident.id,
             RecordOwner.account_id == me,
         )
     )
-    found: list[Any] = [named, Incident.created_by == me]
-    if units:
-        found.append(Incident.org_unit_id.in_(units))
+    member = exists(
+        select(IncidentMember.id).where(
+            IncidentMember.incident_id == Incident.id, IncidentMember.account_id == me
+        )
+    )
+    return or_(owner, member)
+
+
+def visible(session: Session, principal: Principal) -> Any:
+    """The same rule as a condition, for lists, counts, and search."""
+    if principal.command:
+        return None
+    me = principal.account_id
+    ordinary = Incident.restricted.is_(False)
+    found: list[Any] = [_named_condition(me), Incident.created_by == me]
+    units = None if principal.reads_all else principal.units_for(*OVERSEERS)
+    if principal.reads_all or units is None:
+        found.append(ordinary)
+    elif units:
+        found.append(and_(ordinary, Incident.org_unit_id.in_(units)))
     return or_(*found)
+
+
+def hidden(session: Session, principal: Principal) -> Any:
+    """The restricted cases this person is not named on (and did not report): what the
+    history of everything leaves out for them. None when nothing is."""
+    if principal.command:
+        return None
+    me = principal.account_id
+    return select(Incident.id).where(
+        Incident.restricted.is_(True),
+        not_(_named_condition(me)),
+        or_(Incident.created_by.is_(None), Incident.created_by != me),
+    )
 
 
 def can_add(principal: Principal, org_unit_id: int | None) -> bool:
@@ -102,8 +165,11 @@ def can_add(principal: Principal, org_unit_id: int | None) -> bool:
 
 
 def can_edit(session: Session, principal: Principal, incident: Incident) -> bool:
-    """Its handlers and those who triage for its unit correct it and name its handlers."""
-    return triages(principal, incident.org_unit_id) or handles(session, principal, incident)
+    """Its handlers and those who triage for its unit correct it and name its handlers; for
+    a restricted case, those of them named on it."""
+    if handles(session, principal, incident):
+        return True
+    return triages_this(session, principal, incident)
 
 
 # --- The record type ----------------------------------------------------------------------
@@ -207,6 +273,16 @@ def messages_of(
     ]
 
 
+def members_of(session: Session, incident: Incident) -> list[dict[str, Any]]:
+    rows = session.execute(
+        select(Account.id, Account.display_name, Account.email)
+        .join(IncidentMember, IncidentMember.account_id == Account.id)
+        .where(IncidentMember.incident_id == incident.id)
+        .order_by(Account.display_name)
+    ).all()
+    return [{"account_id": row[0], "name": row[1], "email": row[2]} for row in rows]
+
+
 def _reporter(session: Session, incident: Incident) -> dict[str, Any] | None:
     if incident.anonymous or incident.created_by is None:
         return None
@@ -217,7 +293,7 @@ def _reporter(session: Session, incident: Incident) -> dict[str, Any] | None:
 def _detail(session: Session, principal: Principal, incident: Incident) -> dict[str, Any]:
     everything = knows_all(session, principal, incident)
     live = incident.status in LIVE
-    triager = triages(principal, incident.org_unit_id)
+    triager = triages_this(session, principal, incident)
     handler = handles(session, principal, incident)
     out: dict[str, Any] = {
         "occurred_on": incident.occurred_on,
@@ -243,6 +319,11 @@ def _detail(session: Session, principal: Principal, incident: Incident) -> dict[
             ),
             closure_note=incident.closure_note,
             subjects=subjects_of(session, principal, incident),
+            case={
+                "restricted": incident.restricted,
+                "members": members_of(session, incident),
+                "can_change": live and can_edit(session, principal, incident),
+            },
         )
     else:
         # What happened is the reporter's own; how it is handled is not.
@@ -285,6 +366,11 @@ def _history_title(event: Any, lookups: Any) -> str | None:
     if event.subject_type == "incident_subject":
         name = lookups.name(now("subject_type"), now("subject_id"))
         return f"Now concerns {name}" if event.action == "created" else f"No longer concerns {name}"
+    if event.subject_type == "incident_member":
+        name = lookups.name("account", now("account_id"))
+        return (
+            f"Named {name} on the case" if event.action == "created" else f"No longer names {name}"
+        )
     if event.subject_type == "incident_message" and event.action == "created":
         if now("from_reporter"):
             return "The reporter wrote"
@@ -314,6 +400,7 @@ INCIDENT = register(
             "can_add": can_add,
             "can_edit": can_edit,
             "knows_all": knows_all,
+            "hidden": hidden,
             # Triage names who handles it, and each report is its own: none is a duplicate
             # to merge, and none waits on a steward to name its owner.
             "no_orphans": True,
@@ -327,6 +414,7 @@ INCIDENT = register(
                 "triaged_at": "Triaged",
                 "closure_note": "How it ended",
                 "closed_at": "Closed",
+                "restricted": "A restricted case",
             },
             "history_quiet": ("triaged_by", "triaged_by_name", "follow_up_hash", "anonymous"),
         },
@@ -489,7 +577,7 @@ def triage(
     session: Session, principal: Principal, incident: Incident, values: Mapping[str, Any]
 ) -> Incident:
     """Give it a category, a severity, its unit, the records it concerns, and its handler."""
-    if not triages(principal, incident.org_unit_id):
+    if not triages_this(session, principal, incident):
         raise PermissionDenied("Reports are triaged by managers and by assessors for the unit.")
     if incident.status not in LIVE:
         raise Conflict("This is closed. Reopen it to triage it again.")
@@ -545,7 +633,7 @@ def triage(
 
 
 def close(session: Session, principal: Principal, incident: Incident, note: Any) -> Incident:
-    if not (triages(principal, incident.org_unit_id) or handles(session, principal, incident)):
+    if not (triages_this(session, principal, incident) or handles(session, principal, incident)):
         raise PermissionDenied("It is closed by its handlers, or by those who triage it.")
     if incident.status not in LIVE:
         raise Conflict("This is already closed.")
@@ -565,7 +653,7 @@ def close(session: Session, principal: Principal, incident: Incident, note: Any)
 
 
 def reopen(session: Session, principal: Principal, incident: Incident) -> Incident:
-    if not triages(principal, incident.org_unit_id):
+    if not triages_this(session, principal, incident):
         raise PermissionDenied("It is reopened by those who triage it.")
     if incident.status in LIVE:
         raise Conflict("This is not closed.")
@@ -654,7 +742,10 @@ def waiting_on(session: Session, principal: Principal) -> list[tuple[Incident, s
     out: list[tuple[Incident, str]] = []
     if principal.assesses:
         units = principal.units_for(roles.MANAGER, roles.ASSESSOR)
-        statement = select(Incident).where(Incident.status == "reported")
+        statement = select(Incident).where(
+            Incident.status == "reported",
+            or_(Incident.restricted.is_(False), _named_condition(principal.account_id)),
+        )
         if units is not None:
             statement = statement.where(Incident.org_unit_id.in_(units or [0]))
         for row in session.scalars(statement.order_by(Incident.created_at)):
@@ -672,3 +763,106 @@ def waiting_on(session: Session, principal: Principal) -> list[tuple[Incident, s
         ):
             out.append((row, "handle"))
     return out
+
+
+# --- Restricted cases (INC-04) ------------------------------------------------------------
+
+
+def _active_accounts(session: Session, ids: Iterable[int]) -> list[Account]:
+    wanted = list(dict.fromkeys(int(each) for each in ids))
+    found = session.scalars(select(Account).where(Account.id.in_(wanted or [0]))).all()
+    return [account for account in found if account.status != "disabled"]
+
+
+def set_case(
+    session: Session,
+    principal: Principal,
+    incident: Incident,
+    restricted: bool,
+    member_ids: Iterable[Any],
+) -> Incident:
+    """Restrict it to those named on it, or lift the restriction, and say who is named
+    besides its handlers. Whoever restricts it is named, so as not to lose sight of it."""
+    if not can_edit(session, principal, incident):
+        raise PermissionDenied("Who may see a case is changed by its handlers and its triagers.")
+    if incident.status not in LIVE:
+        raise Conflict("This is closed. Reopen it to change who sees it.")
+    errors = records.Errors()
+    try:
+        wanted = [int(each) for each in member_ids]
+    except (TypeError, ValueError):
+        wanted = []
+        errors.add("members", "Name people by their account.")
+    if principal.account_id is not None and restricted:
+        wanted.append(principal.account_id)
+    wanted = list(dict.fromkeys(wanted))
+    accounts_found = _active_accounts(session, wanted)
+    if len(accounts_found) != len(wanted):
+        errors.add("members", "Name only people whose accounts are not disabled.")
+    if len(wanted) > MOST_MEMBERS:
+        errors.add("members", f"Name at most {MOST_MEMBERS} people.")
+    if errors:
+        raise Invalid("Who sees it was not changed.", errors)
+    have = {
+        row.account_id: row
+        for row in session.scalars(
+            select(IncidentMember).where(IncidentMember.incident_id == incident.id)
+        )
+    }
+    added = [each for each in wanted if each not in have]
+    with audit.operation(session, "incident.case", restricted=restricted):
+        for account_id, row in have.items():
+            if account_id not in wanted:
+                session.delete(row)
+        for account_id in added:
+            session.add(IncidentMember(incident_id=incident.id, account_id=account_id))
+        incident.restricted = restricted
+        records.touch(session, incident)
+        incident.updated_at = utc_now()
+        session.flush()
+    if restricted:
+        _withdraw_notices(session, incident)
+    for account_id in added:
+        notices.tell(
+            session, account_id, "incident_case",
+            f"You are named on a restricted case: {incident.ref}", f"/incidents/{incident.ref}",
+            by=principal,
+        )  # fmt: skip
+    return incident
+
+
+def _withdraw_notices(session: Session, incident: Incident) -> None:
+    """A restricted case is not known to those not named on it, so the notices that told
+    them of it go. A notice already sent as email cannot be called back."""
+    keep = set(
+        session.scalars(
+            select(IncidentMember.account_id).where(IncidentMember.incident_id == incident.id)
+        )
+    )
+    keep |= set(notices.owners(session, KEY, incident.id))
+    if incident.created_by is not None:
+        keep.add(incident.created_by)
+    session.execute(
+        delete(Notice).where(
+            Notice.href == f"/incidents/{incident.ref}", Notice.account_id.not_in(keep or {0})
+        )
+    )
+
+
+def stand_in(session: Session, incident: Incident, leaving: int, default: Any) -> int | None:
+    """Who handles it when its handler leaves: for a restricted case, someone else named
+    on it, never someone who could not see it; otherwise whoever stands in as for any
+    record."""
+    if not incident.restricted:
+        return default()
+    others = set(
+        session.scalars(
+            select(IncidentMember.account_id).where(IncidentMember.incident_id == incident.id)
+        )
+    ) | set(notices.owners(session, KEY, incident.id))
+    others.discard(leaving)
+    found = sorted(account.id for account in _active_accounts(session, others))
+    return found[0] if found else None
+
+
+INCIDENT.extra["stand_in"] = stand_in

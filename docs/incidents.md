@@ -29,7 +29,7 @@ A report is seen by those who need to, and by nobody else:
 - **The leaders and stewards of its unit,** and of the units above it.
 - **Those who read everything:** managers for the whole organization, auditors, and administrators.
 
-Lists, search, and counts follow the same rule. Someone else in the same unit, or a steward of another unit, does not know it exists.
+Lists, search, and counts follow the same rule. Someone else in the same unit, or a steward of another unit, does not know it exists. A [restricted case](#restricted-cases) narrows this further.
 
 ## Triage
 
@@ -55,6 +55,20 @@ Those handling an incident, and those who see all of it, write on it under **Wha
 - **The reporter too:** a message to whoever reported it, who is told. They answer on the same page, and whoever handles it is told.
 
 When it is done, **Close** asks how it ended, and the reporter is told it is closed. Its handlers close it, or those who triage it. Those who triage it can **Reopen** it.
+
+## Restricted cases
+
+Some incidents must be kept to a few: a concern about how someone behaves, about the people who lead a unit, or one that may become a matter for lawyers. **Restrict it**, under **Who sees it** on the incident, makes it a restricted case. It is then known only to:
+
+- **Those named on the case,** chosen when it is restricted and changed later under **Change who is named**. Whoever restricts it is named, so as not to lose sight of it.
+- **Its handlers,** who are named on it by being its handlers.
+- **Whoever reported it,** who sees their report as before.
+
+Nobody else learns that it exists: not its unit's leaders and stewards, not those who triage, and not those who read everything, managers, auditors, and administrators included. It is left out of their lists, search results, counts, and the history of everything, and asking for it by its reference answers as though there were nothing there. The notices that told them of it when it was reported are taken back, though a notice already sent as email cannot be. Its events stay in the history's chain, which `riskwren verify` checks as before. A gap in the numbering (`INC-0004`, then `INC-0006`) is all that is left to see.
+
+Those who handle it, and those who triage for its unit and are named on it, may restrict it, change who is named, and **Lift the restriction**, which gives it back to everyone who would otherwise see it. Each of these is in its history. When its handler leaves, it passes to someone else named on it, never to someone who could not see it; if there is nobody, it stays as it is, and those named on it name a new handler.
+
+![A restricted case: known only to those named on it, with who is named, and who handles it](img/incident-case-light.webp)
 
 ## Reporting without a name
 

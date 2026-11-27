@@ -17,6 +17,9 @@ Wave 8, *Incidents and resilience*.
   reported, where it stands, and what is said to them, not the handling. Triage gives it a
   category, a severity, the records it concerns, and a handler, who handles it on their home
   page until it is closed. A new guide, **Incidents**.
+- **Restricted cases:** an incident can be kept to those named on it, its handlers, and its
+  reporter. Nobody else learns that it exists, those who read everything included: lists,
+  search, counts, the history of everything, and their notices leave it out.
 - **Reporting without a name,** closed until an administrator opens it under **Admin →
   Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
   name, or address, with a follow-up code shown once.
@@ -35,6 +38,9 @@ Wave 8, *Incidents and resilience*.
 - **A security leader who assesses everywhere now reads the leadership reports,** as does
   anyone else whose role covers the whole organization. Choose **Nobody else** under
   **Admin → Program → Who sees what** to keep them to those who lead the whole organization.
+- **Reports → History leaves out restricted incident cases** for managers, auditors, and
+  administrators who are not named on them. Their events stay in the chain that
+  `riskwren verify` checks.
 - **Incident categories** are a new vocabulary, editable under **Admin → Program →
   Vocabularies**. The menu has a new group, **Incidents**.
 - In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),

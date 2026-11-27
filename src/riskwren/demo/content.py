@@ -1214,6 +1214,19 @@ INCIDENTS = [
                                     "the elevators, or the one in the medication room?"),
               (12, "reporter", True, "By the elevators. The note has been there since the "
                                      "summer.")]},
+    # A restricted case: known only to those named on it, not to the pharmacy's leaders.
+    {"by": "pharm_mgr", "on": 9, "kind": "concern", "unit": "PHARM", "occurred": 10,
+     "where": "Pharmacy, the controlled substance vault",
+     "name": "Controlled substance counts signed without counting",
+     "summary": "On two night shifts this month the end-of-shift count was signed by both "
+                "witnesses, but only one of them was in the vault. The cabinet's own log shows "
+                "a single badge both times.",
+     "triage": (9, "cro", "compliance", "high", [("system", "Dispensing cabinets")], "assess2"),
+     "restrict": (9, "cro", []),
+     "said": [(8, "assess2", False, "The cabinet's access log for the month is exported and "
+                                    "kept with the case, not on the shared drive."),
+              (8, "assess2", True, "Thank you for raising this. Only the people named on this "
+                                   "case can see it. We may ask you more here.")]},
     {"by": "gen_mgr", "on": 6, "kind": "incident", "unit": "GEN", "occurred": 7,
      "where": "A parked car, overnight",
      "name": "Laptop stolen from a car",
