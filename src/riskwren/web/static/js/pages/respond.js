@@ -120,6 +120,44 @@ export async function respondPage(root, meta) {
       busy(false);
     }
   });
+  // Reports and certificates sent with the answers, one at a time, each kept as it arrives.
+  const sentList = h("ul", { class: "plain-list stack-sm" }, (asked.files ?? []).map((file) => h("li", {}, file.name)));
+  const picker = h("input", { type: "file", class: "input", id: "respond-file", accept: ".pdf,.docx,.xlsx,.png,.jpg,.jpeg,.txt,.csv" });
+  const fileProblem = h("div", { class: "error", role: "alert", hidden: true });
+  const sendFile = button("Send this file", { onclick: async () => {
+    const chosen = picker.files?.[0];
+    fileProblem.hidden = true;
+    if (!chosen) {
+      fileProblem.textContent = "Choose a file first.";
+      fileProblem.hidden = false;
+      return;
+    }
+    sendFile.disabled = true;
+    try {
+      const response = await fetch(`/api/v1/respond/files?name=${encodeURIComponent(chosen.name)}`, {
+        method: "POST", credentials: "omit", cache: "no-store",
+        headers: { Accept: "application/json", [HEADER]: kept, "Content-Type": chosen.type || "application/octet-stream" }, body: chosen });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        const reason = payload?.errors?.[0]?.message ?? payload?.detail ?? "The file was not taken.";
+        throw Object.assign(new Error(reason), { status: response.status });
+      }
+      sentList.append(h("li", {}, payload.data.name));
+      picker.value = "";
+    } catch (error) {
+      if (error.status === 404 || error.status === 410) {
+        fail(error);
+        return;
+      }
+      fileProblem.textContent = error.message;
+      fileProblem.hidden = false;
+    } finally {
+      sendFile.disabled = false;
+    }
+  } });
+  const files = h("section", { class: "stack" }, h("h2", {}, "Reports and certificates"),
+    h("p", { class: "muted" }, `If you were asked for a SOC 2 report, a certificate, or a penetration test summary, send it here: a PDF or an office document, up to 25 MB each, and up to ${asked.most_files ?? 10} in all. Each is sent at once.`),
+    sentList, h("div", { class: "field" }, h("label", { for: "respond-file" }, "A file"), picker, fileProblem), h("div", {}, sendFile));
   const who = [asked.organization, asked.asked_by ? `${asked.asked_by} asks` : null].filter(Boolean).join(" · ");
   root.replaceChildren(frame(meta,
     h("p", { class: "eyebrow" }, who),
@@ -127,6 +165,6 @@ export async function respondPage(root, meta) {
     h("p", { class: "lede" }, `For ${asked.contact}, of ${asked.third_party}.`, asked.due_on ? ` Please answer by ${date(asked.due_on)}.` : ""),
     asked.summary ? h("p", { class: "muted" }, asked.summary) : null,
     alert("info", h("div", {}, `You can save your answers and come back to them with the same link until ${date(asked.expires_at)}. Once you send them, they cannot be changed.`)),
-    problem, h("h2", { class: "sr-only" }, "The questions"), form.node, saved,
+    problem, h("h2", { class: "sr-only" }, "The questions"), form.node, files, saved,
     h("div", { class: "row wrap respond-actions" }, sendButton, saveButton)));
 }

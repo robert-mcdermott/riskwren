@@ -166,6 +166,8 @@ def view(session: Session, link: RespondentLink) -> dict[str, Any]:
         "document": version.document,
         "answers": response.answers if response else {},
         "saved_at": response.started_at if response else None,
+        "files": [{"name": item.file_name} for item in sent_files(session, review)],
+        "most_files": MAX_FILES,
     }
 
 
@@ -202,3 +204,75 @@ def save(session: Session, link: RespondentLink, answers: Any, *, submit: bool) 
     if submit:
         return {"sent": True}
     return {"sent": False, "saved_at": now}
+
+
+MAX_FILES = 10  # reports a contact may send with one review
+
+
+def sent_files(session: Session, review: ThirdPartyReview) -> list[Any]:
+    """The reports sent with a review's answers, through any of its links."""
+    from riskwren.db.models import Evidence, EvidenceLink
+
+    return list(
+        session.scalars(
+            select(Evidence)
+            .join(EvidenceLink, EvidenceLink.evidence_id == Evidence.id)
+            .where(
+                EvidenceLink.subject_type == "third_party_review",
+                EvidenceLink.subject_id == review.id,
+            )
+            .order_by(Evidence.id)
+        )
+    )
+
+
+def attach(
+    session: Session, link: RespondentLink, root: Any, data: bytes, name: str | None
+) -> dict[str, Any]:
+    """Keep a report the contact sends with the answers: stored like any evidence file, as
+    evidence of the third party and of the review, owned by whoever keeps the review, to be
+    read and reviewed here. Its kind is judged by its content, as any upload's is."""
+    from riskwren.access.principal import Principal
+    from riskwren.compliance.evidence import EVIDENCE
+    from riskwren.db.models import EvidenceLink, RecordOwner, StoredFile
+    from riskwren.files import store
+    from riskwren.inventory import records
+    from riskwren.people import notices
+    from riskwren.program import rules
+
+    review, contact, _asked, _version, _response, party = _parts(session, link)
+    if len(sent_files(session, review)) >= MAX_FILES:
+        raise Invalid(
+            "The file was not taken.",
+            {"file": f"Up to {MAX_FILES} files can be sent with one review."},
+        )
+    digest, kind = store.save(root, data)
+    stored = session.scalars(select(StoredFile).where(StoredFile.sha256 == digest)).first()
+    if stored is None:
+        stored = StoredFile(sha256=digest, size=len(data), media_type=kind.media_type,
+                            extension=kind.extension, created_at=utc_now())  # fmt: skip
+        session.add(stored)
+        session.flush()
+    called = store.safe_name(name, kind)
+    today = utc_now().date()
+    who = Principal(None, f"{contact.name} ({party.name if party else 'a third party'}), by link")
+    with audit.operation(session, "review.file", contact=contact.name, file=called):
+        item = records.create(session, who, EVIDENCE, {
+            "name": f"{called}, from {party.name if party else 'a third party'}",
+            "summary": f"Sent by {contact.name} with the answers to {review.ref}. Review it to "
+                       "say what it is, what it covers, and until when it holds.",
+            "kind": "file", "org_unit_id": review.org_unit_id, "collected_on": today,
+            "valid_until": rules.add_months(today, 12), "data_class": "confidential",
+        }, checked=True)  # fmt: skip
+        item.file_id, item.file_name = stored.id, called
+        session.add(EvidenceLink(evidence_id=item.id, subject_type="third_party_review",
+                                 subject_id=review.id))  # fmt: skip
+        if party is not None:
+            session.add(EvidenceLink(evidence_id=item.id, subject_type="third_party",
+                                     subject_id=party.id))  # fmt: skip
+        keepers = notices.owners(session, "third_party_review", review.id)
+        for account_id in keepers:
+            session.add(RecordOwner(record_type="evidence", record_id=item.id,
+                                    account_id=account_id, kind="owner"))  # fmt: skip
+        session.flush()
+    return {"name": called, "size": len(data)}

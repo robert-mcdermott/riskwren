@@ -508,6 +508,99 @@
         "title": "AnswerBody",
         "type": "object"
       },
+      "AssuranceReviewBody": {
+        "properties": {
+          "carve_outs": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carve Outs"
+          },
+          "exceptions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Exceptions",
+            "type": "array"
+          },
+          "issuer": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer"
+          },
+          "kind": {
+            "description": "soc2_type2, iso27001, hitrust, pentest, and the like",
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "opinion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "unqualified, qualified, adverse, none",
+            "title": "Opinion"
+          },
+          "reliance": {
+            "description": "relies, partly, or cannot",
+            "title": "Reliance",
+            "type": "string"
+          },
+          "responsibilities": {
+            "description": "Each with text, control (a reference), and status",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Responsibilities",
+            "type": "array"
+          },
+          "services": {
+            "description": "The services it covers",
+            "items": {
+              "type": "string"
+            },
+            "title": "Services",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "reliance"
+        ],
+        "title": "AssuranceReviewBody",
+        "type": "object"
+      },
       "AudienceBody": {
         "properties": {
           "everyone": {
@@ -3656,6 +3749,105 @@
           }
         },
         "title": "ReasonBody",
+        "type": "object"
+      },
+      "ReportBody": {
+        "properties": {
+          "collected_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When it was received",
+            "title": "Collected On"
+          },
+          "covers_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The period it covers, from",
+            "title": "Covers From"
+          },
+          "covers_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covers To"
+          },
+          "data_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Class"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where it is kept, if not sent as a file",
+            "title": "Url"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When it stops counting",
+            "title": "Valid Until"
+          }
+        },
+        "title": "ReportBody",
         "type": "object"
       },
       "RequirementBody": {
@@ -8340,6 +8532,29 @@
         "summary": "Add a control to an assessment",
         "tags": [
           "assessments"
+        ]
+      }
+    },
+    "/api/v1/assurance-kinds": {
+      "get": {
+        "operationId": "assurance_kinds_api_v1_assurance_kinds_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Assurance Kinds Api V1 Assurance Kinds Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The kinds of report, opinions, and judgments a review uses",
+        "tags": [
+          "third parties"
         ]
       }
     },
@@ -18397,6 +18612,58 @@
         ]
       }
     },
+    "/api/v1/respond/files": {
+      "post": {
+        "operationId": "respond_file_api_v1_respond_files_post",
+        "parameters": [
+          {
+            "description": "The file's name",
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The file's name",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Respond File Api V1 Respond Files Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send a report with the answers (no account; the link in a header)",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/respond/submit": {
       "post": {
         "operationId": "respond_submit_api_v1_respond_submit_post",
@@ -25577,6 +25844,165 @@
         "summary": "Change a third party",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/assurance": {
+      "get": {
+        "operationId": "show_assurance_api_v1_third_parties__ref__assurance_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Assurance Api V1 Third Parties  Ref  Assurance Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A third party's reports and certificates",
+        "tags": [
+          "third parties"
+        ]
+      },
+      "post": {
+        "operationId": "add_report_api_v1_third_parties__ref__assurance_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Report Api V1 Third Parties  Ref  Assurance Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a report or certificate about a third party",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/assurance/{document}/reviews": {
+      "post": {
+        "operationId": "review_report_api_v1_third_parties__ref__assurance__document__reviews_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "document",
+            "required": true,
+            "schema": {
+              "title": "Document",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssuranceReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Review Report Api V1 Third Parties  Ref  Assurance  Document  Reviews Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Review a report: what it covers, found, and leaves to us",
+        "tags": [
+          "third parties"
         ]
       }
     },

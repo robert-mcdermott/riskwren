@@ -23,6 +23,7 @@ NO_TOKEN = {
     ("DELETE", "/api/v1/session"),
     ("PUT", "/api/v1/respond"),
     ("POST", "/api/v1/respond/submit"),
+    ("POST", "/api/v1/respond/files"),
 }
 MAX_BODY = 32 * 1024 * 1024  # a little over the largest file anyone may send
 

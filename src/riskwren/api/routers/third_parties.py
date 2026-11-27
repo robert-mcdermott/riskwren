@@ -38,7 +38,7 @@ from riskwren.core.errors import NotFound, PermissionDenied
 from riskwren.db.models import ThirdParty
 from riskwren.inventory import access, records
 from riskwren.inventory.registry import THIRD_PARTY
-from riskwren.thirdparty import contacts, respondent, reviews, services, tiering
+from riskwren.thirdparty import assurance, contacts, respondent, reviews, services, tiering
 from riskwren.thirdparty.reviews import REVIEW
 from riskwren.thirdparty.services import SERVICE
 
@@ -415,3 +415,109 @@ def _respond(request: Request, body: AnswersBody, *, submit: bool) -> Any:
             _note_guess(request)
         return _refusal(request, refused)
     return JSONResponse(jsonable_encoder(envelope(done)), headers=NO_STORE)
+
+
+# --- Assurance documents ------------------------------------------------------------------
+
+
+class ReportBody(BaseModel):
+    name: str | None = Field(default=None, max_length=400)
+    summary: str | None = None
+    url: str | None = Field(default=None, description="Where it is kept, if not sent as a file")
+    collected_on: str | None = Field(default=None, description="When it was received")
+    covers_from: str | None = Field(default=None, description="The period it covers, from")
+    covers_to: str | None = None
+    valid_until: str | None = Field(default=None, description="When it stops counting")
+    data_class: str | None = None
+
+
+class AssuranceReviewBody(BaseModel):
+    kind: str = Field(description="soc2_type2, iso27001, hitrust, pentest, and the like")
+    issuer: str | None = Field(default=None, max_length=400)
+    opinion: str | None = Field(default=None, description="unqualified, qualified, adverse, none")
+    services: list[str] = Field(default_factory=list, description="The services it covers")
+    carve_outs: str | None = Field(default=None, max_length=8000)
+    exceptions: list[dict[str, Any]] = Field(default_factory=list)
+    responsibilities: list[dict[str, Any]] = Field(
+        default_factory=list, description="Each with text, control (a reference), and status"
+    )
+    reliance: str = Field(description="relies, partly, or cannot")
+    note: str | None = Field(default=None, max_length=8000)
+
+
+@router.get(
+    "/assurance-kinds", summary="The kinds of report, opinions, and judgments a review uses"
+)
+def assurance_kinds(request: Request) -> dict[str, Any]:
+    return envelope({
+        "kinds": assurance.KINDS, "opinions": assurance.OPINIONS,
+        "reliance": assurance.RELIANCE, "states": assurance.RESPONSIBILITY_STATES,
+    })  # fmt: skip
+
+
+@router.get("/third-parties/{ref}/assurance", summary="A third party's reports and certificates")
+def show_assurance(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        third_party = records.load(session, principal, THIRD_PARTY, ref)
+        return envelope({
+            "documents": assurance.documents_of(session, principal, third_party),
+            "standing": assurance.standing(session, third_party),
+            "can_add": assurance.may_review(session, principal, third_party),
+        })  # fmt: skip
+
+
+@router.post("/third-parties/{ref}/assurance", status_code=201,
+             summary="Add a report or certificate about a third party")  # fmt: skip
+def add_report(request: Request, ref: str, body: ReportBody) -> dict[str, Any]:
+    from riskwren.compliance.evidence import EVIDENCE
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        third_party = records.load(session, principal, THIRD_PARTY, ref)
+        item = assurance.add(session, principal, third_party, body.model_dump(exclude_unset=True))
+        return envelope(records.detail(session, principal, EVIDENCE, item))
+
+
+@router.post("/third-parties/{ref}/assurance/{document}/reviews", status_code=201,
+             summary="Review a report: what it covers, found, and leaves to us")  # fmt: skip
+def review_report(
+    request: Request, ref: str, document: str, body: AssuranceReviewBody
+) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        third_party = records.load(session, principal, THIRD_PARTY, ref)
+        item = assurance.find_document(session, document)
+        made = assurance.record(session, principal, item, third_party, body.model_dump())
+        return envelope(assurance.view(session, principal, made, third_party))
+
+
+@router.post(
+    "/respond/files", summary="Send a report with the answers (no account; the link in a header)"
+)
+async def respond_file(
+    request: Request,
+    name: str | None = Query(default=None, description="The file's name", max_length=200),
+) -> Any:
+    from starlette.concurrency import run_in_threadpool
+
+    data = await request.body()
+
+    def keep() -> Any:
+        if _guessing(request):
+            return problem(429, "Too many attempts. Wait a few minutes and try again.",
+                           instance=request.url.path)  # fmt: skip
+        token = _token(request)
+        try:
+            with reading(request) as session:
+                actor = respondent.actor_for(session, respondent.find(session, token))
+            with database(request).write(actor) as session:
+                done = respondent.attach(session, respondent.find(session, token),
+                                         request.app.state.home.files, data, name)  # fmt: skip
+        except respondent.LinkRefused as refused:
+            if refused.reason is None:
+                _note_guess(request)
+            return _refusal(request, refused)
+        return JSONResponse(jsonable_encoder(envelope(done)), status_code=201, headers=NO_STORE)
+
+    return await run_in_threadpool(keep)

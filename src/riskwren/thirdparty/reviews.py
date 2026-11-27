@@ -253,6 +253,18 @@ def contact_view(contact: ThirdPartyContact) -> dict[str, Any]:
             "phone": contact.phone, "status": contact.status}  # fmt: skip
 
 
+def _files(session: Session, principal: Principal, review: ThirdPartyReview) -> list[Any]:
+    """The reports the contact sent with the answers, as much as the person may see."""
+    from riskwren.compliance import evidence
+    from riskwren.thirdparty import respondent
+
+    return [
+        records.chip(evidence.EVIDENCE, item)
+        for item in respondent.sent_files(session, review)
+        if evidence.can_see(session, principal, item)
+    ]
+
+
 def _detail(session: Session, principal: Principal, review: ThirdPartyReview) -> dict[str, Any]:
     editable = can_edit(session, principal, review)
     party = session.get(ThirdParty, review.third_party_id)
@@ -283,6 +295,7 @@ def _detail(session: Session, principal: Principal, review: ThirdPartyReview) ->
             "expires_at": link.expires_at, "last_used_at": link.last_used_at,
         },
         "answers": answers,
+        "files": _files(session, principal, review),
         "conclusion_label": CONCLUSIONS.get(review.conclusion or ""),
         "conclusion_note": review.conclusion_note,
         "concluded_by": review.concluded_by_name,

@@ -226,3 +226,4 @@
 .respond-main { max-width: 46rem; margin: 0 auto; padding: var(--space-7) var(--space-5) var(--space-10); display: grid; gap: var(--space-5); }
 .respond-main h1 { margin: 0; }
 .respond-actions { padding-top: var(--space-3); }
+.repeat { border: 1px solid var(--border); border-radius: var(--radius-m); padding: var(--space-4); margin: 0; }

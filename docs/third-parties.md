@@ -2,7 +2,7 @@
 
 This guide is for whoever looks after the organization's suppliers, service providers, and partners: most often the security office, which asks how each handles the organization's information, and the units that rely on each.
 
-A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, and what it says about itself when asked.
+A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, what it says about itself when asked, and what independent reports say about it.
 
 ## Third parties and their services
 
@@ -94,3 +94,26 @@ When the answers come in, the review's owners are told, and it waits on their Ho
 **Conclude** records what was concluded: **approved**, **approved with conditions**, or **not approved**. Conditions, and a refusal, say what must change, or why.
 
 A review whose answers are late, or whose link expired or was withdrawn before anyone answered, waits on its owners' Home until it is sent again or cancelled.
+
+## Assurance documents
+
+A report or certificate is what someone independent found: a SOC 2 Type II report, an ISO/IEC 27001 certificate, a HITRUST certification, a penetration test summary, a bridge letter. Each is held as an item of [evidence](evidence-and-testing.md) on the third party, with the period it covers and the date it holds until. Past that date it no longer counts, and its owners are told beforehand, as with any evidence. Reports are confidential: they are seen by their owners, the third party's unit's stewards, leaders, and managers, assessors, and those who read everything, and not by everyone who can see the third party.
+
+The third party's **Assurance** tab lists them, newest first, each with whether it is in date and what its review found, and says at the top whether anything independent and in date can be relied on now.
+
+**Add a report** (those who keep the third party, and assessors) names it, the period it covers, when it was received, and when it stops counting, with the file. A contact can also send reports through the link of a due diligence review, up to ten, beside the answers: each arrives as evidence of the third party, owned by whoever keeps the review, and is listed on the review as sent with the answers.
+
+### Review a report
+
+A report says less than its cover suggests until someone reads it. **Review it** records what a careful reader notes:
+
+- **What it is**, who issued it, and the **opinion**: unqualified, qualified, adverse, or none (a certificate, or a test summary).
+- **The services it covers.** Those not ticked are listed as services it does not cover, so a report on the identity service is not taken to vouch for the mail service added since.
+- **What is carved out**: the parts left to others the third party uses, such as the data centres it runs in.
+- **Each exception the auditor noted**, whether it matters here, and what is done about it.
+- **What it leaves to the organization.** A SOC report lists complementary user entity controls: what the customer must do for the report to hold, such as requiring a second factor for its own users. Each is joined to the control here that does it, or said to be not in place, or not to apply. The control's page lists it under **Relied on by suppliers' reports**, so whoever owns that control knows a supplier's assurance leans on it.
+- **Whether it can be relied on**: as it is, with gaps, or not at all. With gaps, or not at all, says why.
+
+![A supplier's SOC 2 report, relied on with gaps: the service it does not cover, the data centres carved out, the exceptions noted, and what it leaves to the institute, joined to the institute's controls](img/third-party-assurance-light.webp)
+
+Reviewing again keeps the earlier review, and the control pages follow the review in force.

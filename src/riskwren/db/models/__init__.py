@@ -94,6 +94,8 @@ from riskwren.db.models.risk import (
 )
 from riskwren.db.models.system import ChainHead, Counter, Event
 from riskwren.db.models.third_parties import (
+    AssuranceResponsibility,
+    AssuranceReview,
     RespondentLink,
     ThirdPartyContact,
     ThirdPartyReview,
@@ -108,6 +110,8 @@ __all__ = [
     "Agreement",
     "AgreementCoverage",
     "Assessment",
+    "AssuranceResponsibility",
+    "AssuranceReview",
     "Baseline",
     "BaselineRequirement",
     "Campaign",

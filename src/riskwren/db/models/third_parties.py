@@ -128,3 +128,59 @@ class RespondentLink(Base):
     finished_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
 
     __table_args__ = (Index("ix_respondent_link_subject", "subject_type", "subject_id"),)
+
+
+class AssuranceReview(Base):
+    """A careful reading of a report or certificate about a third party: what it is, what it
+    covers and does not, what it found, and whether it can be relied on. Never edited:
+    reviewing again supersedes it, and it stays (TPR-04)."""
+
+    __tablename__ = "assurance_review"
+    __audit_parent__ = ("third_party", "third_party_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    evidence_id: Mapped[int] = mapped_column(ForeignKey("evidence.id"))
+    third_party_id: Mapped[int] = mapped_column(ForeignKey("third_party.id"))
+    kind: Mapped[str] = mapped_column(String(24))
+    issuer: Mapped[str | None] = mapped_column(String(200))  # the auditor or certifying body
+    opinion: Mapped[str] = mapped_column(String(16), default="none")
+    services: Mapped[list[int]] = mapped_column(JsonType, default=list)  # those it covers
+    carve_outs: Mapped[str | None] = mapped_column(Text)  # parts left to others it uses
+    exceptions: Mapped[list[dict[str, Any]]] = mapped_column(JsonType, default=list)
+    reliance: Mapped[str] = mapped_column(String(16))
+    note: Mapped[str | None] = mapped_column(Text)
+    reviewed_by: Mapped[int | None] = mapped_column(Integer)
+    reviewed_by_name: Mapped[str] = mapped_column(String(200))
+    reviewed_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    superseded_by: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (
+        CheckConstraint("reliance IN ('relies', 'partly', 'cannot')", name="reliance"),
+        CheckConstraint(
+            "opinion IN ('unqualified', 'qualified', 'adverse', 'none')", name="opinion"
+        ),
+        Index("ix_assurance_review_evidence_id", "evidence_id"),
+        Index("ix_assurance_review_third_party_id", "third_party_id"),
+    )
+
+
+class AssuranceResponsibility(Base):
+    """What a report leaves to the organization to do itself (in a SOC report, a
+    complementary user entity control), and the control here that does it."""
+
+    __tablename__ = "assurance_responsibility"
+    __audit_parent__ = ("third_party", "third_party_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    review_id: Mapped[int] = mapped_column(ForeignKey("assurance_review.id"))
+    third_party_id: Mapped[int] = mapped_column(ForeignKey("third_party.id"))
+    position: Mapped[int] = mapped_column(Integer, default=0)
+    text: Mapped[str] = mapped_column(Text)
+    control_id: Mapped[int | None] = mapped_column(ForeignKey("control.id"))
+    status: Mapped[str] = mapped_column(String(16))
+
+    __table_args__ = (
+        CheckConstraint("status IN ('in_place', 'not_in_place', 'not_applicable')", name="status"),
+        Index("ix_assurance_responsibility_review_id", "review_id"),
+        Index("ix_assurance_responsibility_control_id", "control_id"),
+    )

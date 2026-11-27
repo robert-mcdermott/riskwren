@@ -100,7 +100,7 @@ def test_a_contact_answers_through_the_link_and_through_nothing_else(
         assert seen["title"] == "Due diligence: short"
         assert set(seen) == {"organization", "asked_by", "third_party", "contact", "title",
                              "summary", "due_on", "expires_at", "document", "answers",
-                             "saved_at"}  # fmt: skip
+                             "saved_at", "files", "most_files"}  # fmt: skip
         for wrong in (None, "", "x" * 300, token[:-1] + ("A" if token[-1] != "A" else "B")):
             with pytest.raises(respondent.LinkRefused) as refused:
                 respondent.find(session, wrong)

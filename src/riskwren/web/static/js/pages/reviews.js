@@ -146,7 +146,8 @@ function overview(review, ctx) {
   return h("div", { class: "split" },
     h("div", { class: "stack-lg" }, conclusion,
       review.status === "cancelled" ? alert("info", h("div", {}, `Cancelled${review.cancelled_note ? `: ${review.cancelled_note}` : "."}`)) : null,
-      concernsCard(review), answersCard(review)),
+      concernsCard(review), answersCard(review),
+      review.files?.length ? card({ title: "Sent with the answers" }, h("ul", { class: "plain-list stack-sm" }, review.files.map((file) => h("li", {}, recordChip(file))))) : null),
     h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), ownersCard(review, ctx)));
 }
 

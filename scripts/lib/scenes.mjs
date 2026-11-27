@@ -228,6 +228,12 @@ export const SCENES = [
     step: click("Add a contact") },
   { name: "review-send", as: "ciso", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=genome")(page)}`,
     step: click("Send it") },
+  { name: "third-party-assurance", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=quillon")(page)}?tab=assurance` },
+  { name: "third-party-assurance-review", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=tallyfield")(page)}?tab=assurance`,
+    step: click("Review it") },
+  { name: "third-party-assurance-add", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=quillon")(page)}?tab=assurance`,
+    step: click("Add a report") },
+  { name: "control-relied-on", as: "assess1", path: async (page) => `/controls/${await first("/api/v1/controls?q=second+factor")(page)}` },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

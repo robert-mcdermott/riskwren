@@ -1806,6 +1806,12 @@ class Builder:
                                         submit=False)  # fmt: skip
                 else:
                     with self.db.write(actor) as session:
+                        if spec.get("sends") and self.files is not None:
+                            respondent.attach(
+                                session, respondent.find(session, tokens[index]), self.files,
+                                _pdf([str(spec["sends"]), "Demo data. Not a real report."]),
+                                str(spec["sends"]),
+                            )  # fmt: skip
                         respondent.save(session, respondent.find(session, tokens[index]),
                                         answers, submit=True)  # fmt: skip
             else:
@@ -1817,6 +1823,65 @@ class Builder:
                         str(spec["conclusion"]),
                         spec.get("note"),
                     )  # type: ignore[arg-type]
+
+    def _story_assurance(self) -> Script:
+        """Reports and certificates from the suppliers that matter most, each read for what
+        it covers and what it leaves to the institute: one relied on with gaps, one expired,
+        one certificate whose scope stops short of the service, and a test summary not yet
+        read."""
+        from riskwren.thirdparty import assurance
+
+        steps = []
+        for index, spec in enumerate(c.ASSURANCE):
+            steps.append((float(spec["received"]), index, "received", spec))  # type: ignore[arg-type]
+            if "reviewed" in spec:
+                steps.append((float(spec["reviewed"]), index, "reviewed", spec))  # type: ignore[arg-type]
+        made: dict[int, str] = {}
+        for days, index, step, spec in sorted(
+            steps, key=lambda s: (-s[0], s[1], s[2] != "received")
+        ):
+            yield self._on(days)
+            by = self.cast[str(spec["by"])]
+            _, party_id, _ = self.things[str(spec["party"])]
+            with self.act(by) as (session, who):
+                party = session.get(ThirdParty, party_id)
+                if step == "received":
+                    on = {
+                        key: self.day(-float(spec[key])).isoformat()  # type: ignore[arg-type]
+                        if spec.get(key) is not None
+                        else None
+                        for key in ("received", "from", "to", "until")
+                    }
+                    item = assurance.add(session, who, party, {
+                        "name": spec["name"], "collected_on": self.today.isoformat(),
+                        "covers_from": on["from"], "covers_to": on["to"],
+                        "valid_until": on["until"],
+                    })  # fmt: skip
+                    if self.files is not None:
+                        evidence.attach_file(
+                            session, who, item, self.files,
+                            _pdf([str(spec["name"]), str(party.name), "Demo data. Not a real report."]),
+                            f"{spec['kind']}.pdf",
+                        )  # fmt: skip
+                    made[index] = item.ref
+                    self.tally("reports and certificates")
+                else:
+                    duties = []
+                    for text, control, state in spec.get("duties", []):  # type: ignore[attr-defined]
+                        found = (
+                            self.controls.get((control[0], self.units[control[1]]))
+                            if control
+                            else None
+                        )
+                        ref = session.get(Control, found).ref if found else None
+                        duties.append({"text": text, "control": ref,
+                                       "status": state if ref or state != "in_place" else "not_in_place"})  # fmt: skip
+                    assurance.record(session, who, assurance.find_document(session, made[index]), party, {
+                        "kind": spec["kind"], "issuer": spec.get("issuer"), "opinion": spec.get("opinion"),
+                        "services": [self.things[key][2] for key in spec.get("services", [])],  # type: ignore[attr-defined]
+                        "carve_outs": spec.get("carve_outs"), "exceptions": spec.get("exceptions", []),
+                        "responsibilities": duties, "reliance": spec["reliance"], "note": spec.get("note"),
+                    })  # fmt: skip
 
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
@@ -3068,6 +3133,7 @@ class Builder:
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
             self._story_governance, self._story_third_parties, self._story_due_diligence,
+            self._story_assurance,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

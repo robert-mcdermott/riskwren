@@ -5,4 +5,10 @@ Importing the package registers services as a record type and gives third partie
 wave adds to them.
 """
 
-from riskwren.thirdparty import profile, reviews, services, tiering  # noqa: F401  (registers them)
+from riskwren.thirdparty import (  # noqa: F401  (registers them)
+    assurance,
+    profile,
+    reviews,
+    services,
+    tiering,
+)

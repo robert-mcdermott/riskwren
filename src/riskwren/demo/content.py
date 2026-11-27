@@ -846,6 +846,7 @@ REVIEWS: list[dict[str, object]] = [
      "answers": {"phi": True, "baa": True, "hipaa_assessment": True}},
     # Answered last week, with four concerns: waiting for the security leader.
     {"party": "surveyco", "by": "ciso", "started": 33, "sent": 31, "saved": 15, "answered": 6,
+     "sends": "SOC 2 Type II report 2026.pdf",
      "answers": {"us_only": False, "locations": "Survey responses are processed by our team in Dublin, Ireland.",
                  "breach_last": True,
                  "breach_detail": "In 2025 a misconfigured export exposed one customer's survey links for two days. Exports now need a second person's approval.",
@@ -861,6 +862,48 @@ REVIEWS: list[dict[str, object]] = [
     {"party": "soc", "by": "assess1", "started": 22, "sent": 20, "due": -1, "link_days": 14},
     # Started, not yet sent.
     {"party": "genomevault", "by": "ciso", "started": 2},
+]  # fmt: skip
+
+# Reports and certificates about third parties, and what a careful reading of each found.
+# Days are before the build (negative: after it). Each responsibility is what the report
+# leaves to the institute, with the control here that does it (by its library key and the
+# unit that runs it), or None.
+ASSURANCE: list[dict[str, object]] = [
+    {"party": "recordco", "by": "ciso", "name": "HITRUST r2 certification",
+     "kind": "hitrust", "issuer": "Calloway Certification Services", "opinion": "none",
+     "received": 320, "from": 380, "to": 380, "until": -350, "reviewed": 314,
+     "services": ["svc_record"], "reliance": "relies",
+     "duties": [("Customers remove their own users' access when they leave.",
+                 ("access_removed_on_leaving", "IT"), "in_place")]},
+    {"party": "cloud", "by": "ciso", "name": "SOC 2 Type II report, October 2024 to September 2025",
+     "kind": "soc2_type2", "issuer": "Harrowgate Assurance LLP", "opinion": "qualified",
+     "received": 282, "from": 785, "to": 422, "until": -40, "reviewed": 276,
+     "services": ["svc_identity"], "reliance": "partly",
+     "carve_outs": "The data centres the service runs in are carved out; their own reports cover them.",
+     "exceptions": [{"control": "CC6.2", "description": "For 3 of 25 leavers sampled, access was removed more than 30 days after they left.",
+                     "matters": True, "response": "The institute's own administrators are removed by its identity team on the day they leave."},
+                    {"control": "CC7.4", "description": "One incident's review was finished late.", "matters": False, "response": None}],
+     "duties": [("Customers require a second factor for their own users.", ("second_factor", "IT"), "in_place"),
+                ("Customers review who holds administrative roles in their tenant each quarter.", ("access_reviewed", "SEC"), "in_place"),
+                ("Customers set how long mail is kept, to meet their own obligations.", None, "not_in_place")],
+     "note": "The supplier's own removal of leavers is weak; the institute's administrators are removed by its own process. Mail, added since, is outside the report's period."},
+    {"party": "financeco", "by": "assess1", "name": "SOC 2 Type II report, 2024",
+     "kind": "soc2_type2", "issuer": "Pennock and Hale", "opinion": "unqualified",
+     "received": 430, "from": 790, "to": 425, "until": 60, "reviewed": 424,
+     "services": ["svc_finance"], "reliance": "relies",
+     "duties": [("Customers check each payment run before it is released.", ("payment_verification", "FIN"), "in_place")]},
+    {"party": "backupco", "by": "ciso", "name": "SOC 2 Type II report, 2025",
+     "kind": "soc2_type2", "issuer": "Harrowgate Assurance LLP", "opinion": "unqualified",
+     "received": 162, "from": 540, "to": 175, "until": -190, "reviewed": 152,
+     "services": ["svc_vault"], "reliance": "relies",
+     "duties": [("Customers test that they can restore what is vaulted.", ("backups_tested", "IT"), "in_place")]},
+    {"party": "edcco", "by": "ciso", "name": "ISO/IEC 27001 certificate",
+     "kind": "iso27001", "issuer": "Northway Registrar", "opinion": "none",
+     "received": 196, "from": None, "to": None, "until": -520, "reviewed": 190,
+     "services": [], "reliance": "partly",
+     "note": "The certificate's scope is the hosting operation, not the trial applications themselves."},
+    {"party": "trackco", "by": "assess1", "name": "Penetration test summary, 2026",
+     "kind": "pentest", "received": 38, "from": 70, "to": 60, "until": -320},
 ]  # fmt: skip
 
 # Scopes. Central IT provides; the clinic and the enclave rely on it.

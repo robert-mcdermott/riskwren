@@ -30,6 +30,11 @@ Wave 5, *Third parties*.
 - **Three due diligence questionnaires,** short, standard, and full, written for organizations
   in the United States. A choice or a yes-or-no question can mark an answer as a concern.
 - **A link sent by email is cleared once sent,** so the token is not kept in the outbox.
+- **Assurance documents:** reports and certificates as evidence of a third party, with their
+  period and expiry, kept to those who keep it and assessors. A review of each records what it
+  is, its opinion, the services it covers and does not, what is carved out, each exception and
+  whether it matters here, and each responsibility it leaves to the organization, joined to the
+  control that does it, which lists it. A contact can send reports through the review's link.
 - **A Third parties menu,** with third parties, services, and due diligence, and a new guide,
   [Third parties](docs/third-parties.md).
 
@@ -37,6 +42,7 @@ Wave 5, *Third parties*.
 
 - A kind of link a release adds, or a pair of records it may now join, reaches an installation
   that has renamed its kinds of link.
+- An answer to a questionnaire may be a contact's, given through a link, with no account.
 
 ## 0.4.0 (2026-11-27)
 
