@@ -37,6 +37,7 @@ PREFIXES = {
     "INC": "Incident",
     "LDR": "Leadership report",
     "SCN": "Scenario",
+    "APL": "Audit plan",
 }
 REF_PATTERN = re.compile(r"^([A-Z]{2,4})-(\d{4,})$")
 

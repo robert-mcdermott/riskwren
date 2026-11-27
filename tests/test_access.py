@@ -456,6 +456,21 @@ for _route in (
     ("GET", "/api/v1/scopes/{ref}/security-plan"), ("GET", "/api/v1/scopes/{ref}/oscal/{document}"),
 ):  # fmt: skip
     REACH[_route] = EVERYONE
+# Internal audit is read by those who read everything; only auditors change it.
+for _key in POLICIES:
+    if _key[1].startswith(
+        (
+            "/api/v1/audit/",
+            "/api/v1/engagements/",
+            "/api/v1/workpapers/",
+            "/api/v1/review-notes/",
+            "/api/v1/auditors",
+        )
+    ):
+        REACH[_key] = {"admin", "manager", "auditor"} if _key[0] == "GET" else {"auditor"}
+# A plan is approved by an auditor who did not draft it or by a leader of the whole
+# organization, which the service decides among those who may read plans.
+REACH[("POST", "/api/v1/audit/plans/{ref}/approve")] = {"admin", "manager", "auditor"}
 for _key in POLICIES:
     # Scenarios, and a risk's bow-tie and estimate, are decided by the record.
     if _key[1].startswith("/api/v1/scenarios") or _key[1] in (

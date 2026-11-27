@@ -80,6 +80,7 @@ CAST: list[tuple[str, str, str, str, list[tuple[str, str | None, str | None]]]] 
     ("assess1", "Keiko Nakashima", "Security Assurance Lead", "SEC", [("assessor", None, None)]),
     ("assess2", "Idris Rahimi", "Compliance Analyst", "CMPL", [("assessor", None, None)]),
     ("auditor", "Greta Bergstrom", "Director of Internal Audit", "RISK", [("auditor", None, None)]),
+    ("auditor2", "Ruben Castillo", "Senior Internal Auditor", "RISK", [("auditor", None, None)]),
     ("admin", "Tobias Larsen", "Systems Administrator", "IT", [("admin", None, None)]),
     ("cio", "Priya Chaudhry", "Chief Information Officer", "IT", [("leader", "IT", "high")]),
     ("ciso", "Goran Dimitrov", "Chief Information Security Officer", "SEC",
@@ -1020,6 +1021,84 @@ SCENARIOS = [
                     "data is identifiable.",
      "conclusion": None,
      "risks": [], "processes": ["Trial data management", "Safety reporting"]},
+]  # fmt: skip
+
+# Internal audit: what the auditor says about a few things in the universe (kind, name, what),
+# and two plans: this year's, approved by the president for the audit committee, mostly under
+# way, one engagement dropped; and next year's, in draft. Days are relative to the build.
+AUDIT_SAYS = [
+    ("process", "Medication dispensing", {"adjustment": 15, "adjustment_reason": "Two dispensing near misses were reported to the pharmacy and therapeutics committee this year."}),
+    ("system", "Identity service", {"last_audited_on": 400, "last_audit_note": "Identity and access review by the external auditors, before RiskWren."}),
+    ("unit", "Facilities and Safety", {"left_out": True, "left_out_reason": "Audited by the state's fire marshal and the insurer's engineers; internal audit relies on their reports."}),
+]  # fmt: skip
+AUDIT_PLANS = [
+    {"name": "Internal audit plan, this year", "from": 245, "to": -120, "drafted": 250,
+     "approved": 243, "by": "president",
+     "note": "Approved by the audit committee of the board.",
+     "summary": "Three engagements chosen from the top of the universe, with the security office's two highest risks first.",
+     "engagements": [
+         ("Backups and recovery of research data", "process", "Research data storage", "Ransomware reaching research storage is the security office's worst open risk, and a full restore has not been tested in two years.", 230, 180, None),
+         ("Clinical systems: access and change", "scope", "Clinical systems", "Its readiness against the HIPAA Security Rule is the lowest of the four scopes.", 200, 150, None),
+         ("Trial data vendor oversight", "third_party", "Castellan Trial Systems", "Tier 1 vendor holding identifiable trial data; its due diligence found restores untested.", 120, 60, None),
+         ("Travel and expense claims", "unit", "Finance", "Asked for by the CFO after a new card program.", 90, 60, "Moved to next year when the card program was delayed."),
+     ]},
+    {"name": "Internal audit plan, next year", "from": -121, "to": -485, "drafted": 10,
+     "approved": None, "by": None, "note": None,
+     "summary": "In draft for the committee's December meeting.",
+     "engagements": [
+         ("Medication dispensing controls", "process", "Medication dispensing", "Moved up by audit after two near misses; critical to patient safety.", -140, -180, None),
+         ("Travel and expense claims", "unit", "Finance", "Carried from this year's plan.", -200, -230, None),
+     ]},
+]  # fmt: skip
+
+# Engagements from this year's plan as they were carried out: when each moved on (days ago),
+# its steps (title, what was to be done, what was done, what was found, who prepared it, who
+# signed it off, and a review note with its answer), and its report.
+ENGAGEMENTS = [
+    {"name": "Backups and recovery of research data", "lead": "auditor", "members": ["auditor2"],
+     "start": 230, "fieldwork": 221, "reporting": 186, "reported": 178,
+     "scope": "Whether research storage is backed up, whether a restore works, and who can delete backups. The twelve months before fieldwork.",
+     "steps": [
+         ("Backups are taken as scheduled", "Compare the backup schedule with the job history for a sample of nights.",
+          "Compared the schedule with the job history for the first night of each month.",
+          "Every scheduled backup ran. Two finished with no data, and nobody noticed.", "auditor2", "auditor",
+          ("Which job history: the console's, or the exported logs?", "The exported logs, kept with the job reports.")),
+         ("A restore has been tested", "Ask for the last full restore test and its result.",
+          "Asked Research Computing for restore tests in the period, and read the one report given.",
+          "The last full restore of research storage was two years ago. Partial restores are done on request.", "auditor2", "auditor", None),
+         ("Deleting backups is limited", "List who can delete or expire backups, and check each against their job.",
+          "Listed the backup administrators and compared them with Research Computing's staff list.",
+          "Five people can delete backups; one left the institute in the spring.", "auditor", "auditor2", None),
+     ],
+     "summary": "Backups of research storage are taken as scheduled, but two empty backups went unnoticed, a full restore has not been tested in two years, and one person who has left could still delete backups. Management has agreed to check every backup, test a full restore this year, and review backup administrators each quarter.",
+     "opinion": "needs_improvement"},
+    {"name": "Clinical systems: access and change", "lead": "auditor2", "members": ["auditor"],
+     "start": 198, "fieldwork": 190, "reporting": 152, "reported": 146,
+     "scope": "Who has access to the clinic's systems, and how changes to them are approved. The six months before fieldwork.",
+     "steps": [
+         ("Access is approved", "For a sample of accounts made in the period, find the approval.",
+          "Found the approval for each of twenty-five accounts made in the period.",
+          "Every account was approved before it was made.", "auditor", "auditor2", None),
+         ("Changes are approved and tested", "For a sample of changes, find the approval and the test.",
+          "Read fifteen changes to the electronic health record and their tickets.",
+          "Each change was approved and tested; one emergency change was approved the next day, as the procedure allows.", "auditor", "auditor2", None),
+     ],
+     "summary": "Access to the clinic's systems is approved before it is given, and changes are approved and tested as the procedure says.",
+     "opinion": "effective"},
+    {"name": "Trial data vendor oversight", "lead": "auditor", "members": ["auditor2"],
+     "start": 118, "fieldwork": 110, "reporting": None, "reported": None,
+     "scope": "How Clinical Research and the security office oversee Castellan Trial Systems: due diligence, the agreement, and findings.",
+     "steps": [
+         ("Due diligence is done and read", "Read the last review and its conclusion.",
+          "Read the standard due diligence review and the reviewer's conclusion.",
+          "The review was answered and concluded with conditions; one finding is open.", "auditor2", "auditor", None),
+         ("The agreement covers what is shared", "Compare what the vendor holds with what its agreement covers.",
+          "Compared the trial data the vendor hosts with its services agreement.",
+          "The agreement covers the data it holds.", "auditor2", None,
+          ("Is the business associate agreement needed too, for the clinic's patients?", None)),
+         ("Findings are followed up", "Follow each finding to its actions and dates.", None, None, None, None, None),
+     ],
+     "summary": None, "opinion": None},
 ]  # fmt: skip
 
 # Scopes. Central IT provides; the clinic and the enclave rely on it.

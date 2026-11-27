@@ -11,6 +11,7 @@ from enum import StrEnum
 
 from fastapi import HTTPException, Request
 
+from riskwren.access import roles
 from riskwren.access.principal import Principal
 
 
@@ -23,6 +24,7 @@ class Needs(StrEnum):
     MANAGE = "manage"  # managers for the whole organization: running the program
     CONFIGURE = "configure"  # those managers, and administrators: shaping the program
     READ_ALL = "read_all"  # those managers, auditors, and administrators
+    AUDIT = "audit"  # auditors: internal audit's own records
     ADMIN = "admin"  # administrators
 
 
@@ -269,6 +271,29 @@ POLICIES.update(
         # As of a day: what each person may see, rebuilt from the history.
         ("GET", "/api/v1/as-of"): Needs.MEMBER,
         ("GET", "/api/v1/as-of/{ref}"): Needs.MEMBER,
+        # Internal audit: read by those who read everything and those who lead the whole
+        # organization, changed by auditors alone; the service decides both.
+        ("GET", "/api/v1/audit/universe"): Needs.MEMBER,
+        ("GET", "/api/v1/audit/universe/{kind}/{key}"): Needs.MEMBER,
+        ("PUT", "/api/v1/audit/universe/{kind}/{key}"): Needs.AUDIT,
+        ("GET", "/api/v1/audit/plans"): Needs.MEMBER,
+        ("POST", "/api/v1/audit/plans"): Needs.AUDIT,
+        ("GET", "/api/v1/audit/plans/{ref}"): Needs.MEMBER,
+        ("POST", "/api/v1/audit/plans/{ref}/engagements"): Needs.AUDIT,
+        ("POST", "/api/v1/audit/plans/{ref}/approve"): Needs.MEMBER,
+        ("POST", "/api/v1/audit/plans/{ref}/close"): Needs.AUDIT,
+        ("POST", "/api/v1/engagements/{ref}/drop"): Needs.AUDIT,
+        ("POST", "/api/v1/engagements/{ref}/restore"): Needs.AUDIT,
+        ("GET", "/api/v1/auditors"): Needs.MEMBER,
+        ("GET", "/api/v1/engagements/{ref}"): Needs.MEMBER,
+        ("POST", "/api/v1/engagements/{ref}/start"): Needs.AUDIT,
+        ("POST", "/api/v1/engagements/{ref}/advance"): Needs.AUDIT,
+        ("POST", "/api/v1/engagements/{ref}/workpapers"): Needs.AUDIT,
+        ("PUT", "/api/v1/workpapers/{paper_id}"): Needs.AUDIT,
+        ("POST", "/api/v1/workpapers/{paper_id}/sign-off"): Needs.AUDIT,
+        ("POST", "/api/v1/workpapers/{paper_id}/notes"): Needs.AUDIT,
+        ("POST", "/api/v1/review-notes/{note_id}/answer"): Needs.AUDIT,
+        ("POST", "/api/v1/review-notes/{note_id}/clear"): Needs.AUDIT,
         # Dossiers and a scope's plans hold what the person may see, checked by the record.
         ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
         ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,
@@ -490,6 +515,7 @@ def allowed(principal: Principal | None, needs: Needs) -> bool:
         Needs.MANAGE: principal.manages,
         Needs.CONFIGURE: principal.configures,
         Needs.READ_ALL: principal.reads_all,
+        Needs.AUDIT: principal.has(roles.AUDITOR),
         Needs.ADMIN: principal.is_admin,
     }[needs]
 

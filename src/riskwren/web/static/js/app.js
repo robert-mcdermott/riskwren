@@ -97,6 +97,10 @@ async function boot() {
   route("/leadership-reports", page("leadership", "leadershipList"));
   route("/leadership-reports/next", page("leadership", "leadershipNext"));
   route("/leadership-reports/:ref", page("leadership", "leadershipReport"));
+  route("/audit/universe", page("audit", "universePage"));
+  route("/audit/plans", page("audit", "planList"));
+  route("/audit/plans/:ref", page("audit", "planPage"));
+  route("/audit/engagements/:ref", page("audit", "engagementPage"));
   route("/as-of", page("as-of", "asOfRegister"));
   route("/as-of/:ref", page("as-of", "asOfRecord"));
   route("/check-dossier", page("check-dossier", "checkDossier"));

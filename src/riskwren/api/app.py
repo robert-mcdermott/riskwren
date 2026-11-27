@@ -25,6 +25,7 @@ from riskwren.api.routers import (
     frameworks,
     governance,
     indicators,
+    internal_audit,
     inventory,
     issues,
     operations,
@@ -51,6 +52,7 @@ ROUTERS = (
     system, session, sso, people, branding, inventory, risks, controls, treatment, frameworks,
     scopes, evidence, assessments, issues, exchange, reporting, operations, questionnaires,
     campaigns, indicators, tidy, analyses, documents, agreements, governance, third_parties,
+    internal_audit,
 )  # fmt: skip
 
 

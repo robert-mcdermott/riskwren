@@ -4,6 +4,26 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.7.0 (unreleased)
+
+Wave 7, *Audit*.
+
+### Added
+
+- **The audit universe:** every unit beneath the organization, and every process, system,
+  third party, and scope in use, ranked from the register (its worst open risk, risks above
+  appetite, open issues, criticality, a scope's readiness, and how long since it was last
+  audited), with each part of the ranking shown. An auditor may move a thing with a reason,
+  record an audit from before RiskWren, or leave a thing out. **Audit → Universe**.
+- **Audit plans:** a period's engagements, each on one thing with its reason, approved by an
+  auditor other than the drafter or by a leader of the whole organization, then tracked
+  against; engagements dropped with a reason. **Audit → Plans**.
+- **Engagements and workpapers:** a team and a lead; planning, fieldwork, reporting, and
+  reported, with a summary and an opinion; a program of work whose workpapers say what was
+  done and found with the evidence, are reviewed with notes, and are signed off by someone
+  other than their preparer. Until the report is issued, the work is its team's alone, and
+  the history keeps its words out.
+
 ## 0.6.0 (2026-11-27)
 
 Wave 6, *Insight*: the record read back to those who answer for it. Measures say what they

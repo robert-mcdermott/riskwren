@@ -4,6 +4,14 @@ from __future__ import annotations
 
 from riskwren.db.models.agreements import Agreement, AgreementCoverage, AgreementParty
 from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
+from riskwren.db.models.audit import (
+    AuditEntity,
+    AuditPlan,
+    Engagement,
+    EngagementMember,
+    ReviewNote,
+    Workpaper,
+)
 from riskwren.db.models.compliance import (
     Assessment,
     Baseline,
@@ -116,6 +124,8 @@ __all__ = [
     "Assessment",
     "AssuranceResponsibility",
     "AssuranceReview",
+    "AuditEntity",
+    "AuditPlan",
     "Baseline",
     "BaselineRequirement",
     "Campaign",
@@ -132,6 +142,8 @@ __all__ = [
     "Credential",
     "DocumentControl",
     "DocumentRequirement",
+    "Engagement",
+    "EngagementMember",
     "Event",
     "Evidence",
     "EvidenceLink",
@@ -175,6 +187,7 @@ __all__ = [
     "Requirement",
     "RespondentLink",
     "Response",
+    "ReviewNote",
     "Risk",
     "RiskAnalysis",
     "RiskAnalysisItem",
@@ -207,4 +220,5 @@ __all__ = [
     "ThirdPartyReview",
     "TierAssessment",
     "TreatmentPlan",
+    "Workpaper",
 ]

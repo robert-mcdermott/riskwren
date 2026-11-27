@@ -88,6 +88,13 @@ export const NAV = [
     ],
   },
   {
+    heading: "Audit",
+    items: [
+      { href: "/audit/universe", label: "Universe", iconName: "grid", when: "reports" },
+      { href: "/audit/plans", label: "Plans", iconName: "file", when: "reports" },
+    ],
+  },
+  {
     heading: "Admin",
     items: [
       { href: "/admin/program", label: "Program", iconName: "program", when: "configure" },
