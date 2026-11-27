@@ -42,27 +42,37 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with three scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, and issues and exceptions at every stage. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, and a risk committee that meets each quarter. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
 | Sign in as | To see |
 |---|---|
-| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end |
-| The risk manager | The whole register, the risk dashboard, the heat map, and the program, where a change to the matrix can be previewed |
+| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies, an exception to one waiting for a decision, and an agreement whose notice date is near |
+| The risk manager | The whole register, the risk dashboard, the heat map, the program, where a change to the matrix can be previewed, and the risk committee's next session |
 | The steward | One unit's inventory and risks, and a critical risk brought to high by controls, with its plan |
 | The unit leader | A high risk that is beyond their authority to accept |
 | The assessor | An assessment in progress, a result to review, an attestation campaign most of the way through, and a risk analysis half done |
 | The auditor | Everything, read-only, with every change in one place |
-| A staff member | Home for someone with one action to finish, and only their own unit's part of the register |
+| A staff member | Home for someone with one action to finish and a policy to acknowledge, the policy library, and only their own unit's part of the register |
 
 A demo listens only on the machine it runs on. See [Configuration](docs/configuration.md#the-demo-and-the-network) before changing that.
 
 ## What is in this release
 
-Version 0.3.0 is *Keeping watch*: a register that stays true without a central team chasing it. It follows 0.2.0, which added compliance to the register, and 0.2.1, which widened the library of common controls.
+Version 0.4.0 is *Policy and obligations*: the organization's own word, and what it has promised others. It follows 0.3.0, which keeps the register current, and 0.2.0, which added compliance to it.
 
-**Keeping watch, new in 0.3.0**
+**Policy and obligations, new in 0.4.0**
+
+- **Policies, standards, procedures, and guidelines** written here in a simple Markdown, linked to where they are kept, or attached as files, each implementing the one above it.
+- **Approval by named people,** none of whom wrote it, and **published versions that never change:** each is fingerprinted, and `riskwren verify` checks it. Any two versions compare side by side, and each document is reviewed on a cadence.
+- **A policy library** where everyone reads what applies to them, on a phone as well as a desk, and **acknowledges** it. A new version asks again; who has and who has not is shown by unit, and a campaign chases the rest.
+- **A document directs controls and answers requirements,** shown on each side, so "is there a policy for this?" has an answer with a date. A unit that cannot follow one for a time asks for an **exception** to it.
+- **Agreements:** awards, data use agreements, business associate agreements, and contracts, with their dates and notice periods. The terms an agreement imposes reach every scope that holds what it covers, and its owners are warned before its notice date and its end.
+- **A framework's new version is loaded beside the old,** with what changed by code and what it touches. A scope moves when its keepers say so, taking its decisions and exceptions with it. SP 800-53 Rev. 4 ships for programs that still name it, and a publisher's mapping suggests crosswalks a person confirms.
+- **Strategic objectives** that risks name, and **committee sessions** whose agenda is drawn from the register and whose every decision shows on the record it was about.
+
+**Keeping watch, from 0.3.0**
 
 - **Single sign-on, if you want it.** OpenID Connect beside local accounts, tested against a stand-in provider and built to work with Microsoft Entra ID: roles and units come from the provider's roles or groups. Out of the box it is local accounts and passwords, as before.
 - **It knows what is due.** A scheduler brings the register up to date and reminds whoever a thing is waiting on: before its date, when it passes, then their steward, then their leader. Email is optional, and each person chooses how much of it they get.
@@ -75,7 +85,7 @@ Version 0.3.0 is *Keeping watch*: a register that stays true without a central t
 - **The program is edited in the app:** categories, scales, the matrix, appetite, cadences, and vocabularies, with a **preview of every risk a change would move** before anything is published.
 - **Risk analyses:** each thing in a scope taken against each threat, raising risks or refreshing the ones already there, with a report of what was considered.
 
-**Compliance, new in 0.2.0**
+**Compliance, from 0.2.0**
 
 - **Frameworks** carried as published: the NIST Cybersecurity Framework 2.0, NIST SP 800-53 Rev. 5 with its baselines, NIST SP 800-171 Rev. 3, and the HIPAA Security Rule. An agreement or an internal standard is entered as a framework of your own.
 - **Crosswalks:** a control is mapped to every requirement it answers, in any number of frameworks. The common controls arrive mapped.
@@ -101,7 +111,7 @@ Version 0.3.0 is *Keeping watch*: a register that stays true without a central t
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Policies and obligations come next, then supplier reviews, reporting, audits, and incidents. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Third parties come next, then reporting, audits, and incidents. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 
@@ -114,6 +124,7 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Compliance](docs/compliance.md) | Security and compliance leads, and the stewards of what must comply |
 | [Evidence and testing](docs/evidence-and-testing.md) | Control owners and assessors |
 | [Issues and exceptions](docs/issues-and-exceptions.md) | Whoever fixes, checks, or decides |
+| [Policies](docs/policies.md) | Whoever writes, approves, or keeps the organization's policies |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
 | [API](docs/api.md) | Anyone connecting another system |

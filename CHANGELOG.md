@@ -4,13 +4,34 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## Unreleased
+## 0.4.0 (2026-11-27)
 
-### Upgrading
+Wave 4, *Policy and obligations*: the organization's own word, and what it has promised
+others. Policies, standards, procedures, and guidelines are written or linked here, approved
+by named people, published as versions that never change, reviewed on a cadence, read in a
+library on any device, and acknowledged by the people they apply to. Each is tied to the
+controls it directs and the requirements it answers. Agreements carry their dates and the
+terms they impose on the scopes that hold what they cover. A framework's new version is
+loaded beside the old, and a scope moves to it when its keepers say so. Strategic objectives
+and committee sessions connect the register to the organization's aims and its committees.
 
-Run `riskwren frameworks load --builtin` after upgrading. It loads nothing new, but brings
-the publisher's mappings into the frameworks already loaded: where each SP 800-53 Rev. 4
-control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement comes from.
+### Upgrading from 0.3.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0021 to 0026). Every row is
+kept, and the history still verifies. The upgrade brings the publishers' mappings into the
+frameworks already loaded: where each SP 800-53 Rev. 4 control went in Rev. 5, and the
+SP 800-53 controls each SP 800-171 requirement comes from. A few things look different
+afterwards:
+
+- **The Policies menu** has **Policy library** for everyone and **Documents** for those who
+  write and keep them. Nothing is in either until documents are added.
+- **Compliance has Agreements, and Risks has Objectives**; **Reports has Committee
+  sessions**. Each starts empty.
+- **A framework page may suggest crosswalks.** Where a control is mapped to SP 800-171 or
+  SP 800-53, the other is suggested from the publisher's mapping. Nothing is mapped until a
+  person confirms it.
+- **The program has a new cadence,** how often a document is reviewed: 12 months, until the
+  organization sets its own.
 
 ### Added
 
@@ -28,38 +49,6 @@ control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement c
 - **Review dates.** Each document is reviewed on the program's cadence (12 months as
   shipped) or its own. A review that is due shows on the document, on its owners' Home, and
   in the reminders; it is recorded as kept, or a new version is started.
-- **What a document governs:** the controls it directs and the requirements it answers,
-  shown from each side. A requirement lists the published documents that answer it beside
-  its controls, and a control the documents that direct it.
-- **Exceptions to a document,** asked for by a unit's steward, leader, or manager and
-  decided by a leader or manager of the unit that keeps the document. They end by their
-  dates like every exception.
-- **Documents in the web of records:** in the Connections picture, in search, in Tidy (a
-  policy, standard, or procedure that governs nothing is listed as missing it), and with
-  what each governs in the export of the document list.
-- **Strategic objectives** (`OBJ`). A risk names the objectives it threatens, and each
-  objective shows exactly the risks that name it, with how each stands.
-- **Committee sessions** (`SES`): an agenda drawn from the register, the decision taken on
-  each item, and the minutes. A decision shows on the record it was about, and its owners are
-  told.
-- **New versions of a framework, loaded beside the old.** What changed is listed by code
-  (changed, with the words that differ; added; withdrawn, with where each went), with what
-  uses the old version. Nothing changes until a scope is moved; then its decisions and
-  exceptions go with it where the code is unchanged, and the organization's crosswalks and
-  documents are carried across. A framework of your own can start a new version.
-- **NIST SP 800-53 Rev. 4,** with its Low, Moderate, and High baselines, ships to be loaded
-  when a program or an agreement still names it; Rev. 5 records where 179 of the 182 Rev. 4
-  controls it withdrew went.
-- **Crosswalks suggested by a publisher's mapping:** SP 800-171 Rev. 3 names the SP 800-53
-  controls each requirement comes from, so a control mapped to one is suggested for the
-  other. A person maps each suggestion, or sets it aside.
-- **Agreements** (`AGR`): awards, data use agreements, business associate agreements,
-  contracts, and the like, with their parties, dates, notice periods, and what they cover.
-  The framework an agreement imposes is held by every scope that holds what it covers, and
-  is said to be because of it; covering less, or closing the agreement, takes it away.
-- **Warnings before an agreement's notice date and its end,** further ahead than other
-  reminders, on its owners' Home and under the bell. One that has ended stays open, and goes
-  up to the steward and the leader, until it is renewed or closed.
 - **Who a document applies to:** everyone, or the people in chosen units and those who
   hold chosen roles.
 - **The policy library.** Everyone reads the published documents that apply to them, or
@@ -70,16 +59,50 @@ control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement c
   person, and what someone still has to acknowledge is on their Home.
 - **Acknowledgment campaigns** ask those who have not acknowledged a document by a date, with
   reminders and coverage by unit.
-- **A new guide, [Policies](docs/policies.md).**
+- **What a document governs:** the controls it directs and the requirements it answers,
+  shown from each side. A requirement lists the published documents that answer it beside
+  its controls, and a control the documents that direct it.
+- **Exceptions to a document,** asked for by a unit's steward, leader, or manager and
+  decided by a leader or manager of the unit that keeps the document. They end by their
+  dates like every exception.
+- **Documents in the web of records:** in the Connections picture, in search, in Tidy (a
+  policy, standard, or procedure that governs nothing is listed as missing it), and with
+  what each governs in the export of the document list.
+- **Agreements** (`AGR`): awards, data use agreements, business associate agreements,
+  contracts, and the like, with their parties, dates, notice periods, and what they cover.
+  The framework an agreement imposes is held by every scope that holds what it covers, and
+  is said to be because of it; covering less, or closing the agreement, takes it away.
+- **Warnings before an agreement's notice date and its end,** further ahead than other
+  reminders, on its owners' Home and under the bell. One that has ended stays open, and goes
+  up to the steward and the leader, until it is renewed or closed.
+- **New versions of a framework, loaded beside the old.** What changed is listed by code
+  (changed, with the words that differ; added; withdrawn, with where each went), with what
+  uses the old version. Nothing changes until a scope is moved; then its decisions and
+  exceptions go with it where the code is unchanged, and the organization's crosswalks and
+  documents are carried across. A framework of your own can start a new version, and a
+  pack can be loaded from a file.
+- **NIST SP 800-53 Rev. 4,** with its Low, Moderate, and High baselines, ships to be loaded
+  when a program or an agreement still names it; Rev. 5 records where 179 of the 182 Rev. 4
+  controls it withdrew went.
+- **Crosswalks suggested by a publisher's mapping:** SP 800-171 Rev. 3 names the SP 800-53
+  controls each requirement comes from, so a control mapped to one is suggested for the
+  other. A person maps each suggestion, or sets it aside.
+- **Strategic objectives** (`OBJ`). A risk names the objectives it threatens, and each
+  objective shows exactly the risks that name it, with how each stands.
+- **Committee sessions** (`SES`): an agenda drawn from the register, the decision taken on
+  each item, and the minutes. A decision shows on the record it was about, and its owners are
+  told.
+- **A new guide, [Policies](docs/policies.md),** and new sections in the others on
+  agreements, framework versions, suggested crosswalks, objectives, and committee sessions.
 
 ### Changed
 
 - A rule a later release adds to the program's cadences is taken from the default program
   until the organization sets it, so a table saved earlier still has it.
-- A leader may change a record of a kind leaders keep, such as an objective or a document, without
-  being refused for its unit.
-- The **Policies** menu has **Policy library** for everyone, and **Documents** for those who
-  write and keep them.
+- A record of a kind a unit's leaders keep, such as an objective or a document, is no
+  longer refused for its unit when a leader saves it.
+- Lists of agreements and objectives show those still in use unless asked; search finds
+  them all.
 
 ## 0.3.0 (2026-11-26)
 

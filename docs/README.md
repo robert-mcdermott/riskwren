@@ -80,7 +80,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.3.0 is the register, compliance, and the means of keeping both current: sign-in with local accounts or single sign-on, scheduled reminders with optional email, campaigns, indicators, search, and a program edited in the app. It does not yet hold policies or obligations, review suppliers, run audits, or handle incidents; those follow in later releases. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.4.0 is the register, compliance, the means of keeping both current, and the organization's own word: policies approved by named people and acknowledged by those they apply to, agreements and the terms they impose, framework versions, strategic objectives, and committee sessions. It does not yet review suppliers, run audits, or handle incidents; those follow in later releases. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

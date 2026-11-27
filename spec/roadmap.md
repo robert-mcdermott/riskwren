@@ -93,7 +93,7 @@ Decision record: [ADR-0009](decisions/0009-documentation-toolchain.md)
 
 Detail: [waves/wave-3.md](waves/wave-3.md)
 
-## Wave 4: Policy and obligations (v0.4.0) ◐
+## Wave 4: Policy and obligations (v0.4.0) ☑
 
 **Goal:** the governance in governance, risk, and compliance: what the organization has said it will do, and what it has promised others.
 
@@ -105,7 +105,7 @@ Detail: [waves/wave-3.md](waves/wave-3.md)
 | 4 | Agreements | Awards, data use agreements, and contracts as records with dates, parties, coverage, and the requirements they impose | ☑ |
 | 5 | Framework updates | Loading a new version beside the old, what changed, what it affects, and moving a scope across; publisher mappings as suggested crosswalks; further framework packs | ☑ |
 | 6 | Objectives and sessions | Strategic objectives linked to risks; committee sessions with agendas, decisions, and minutes | ☑ |
-| 7 | Release prep | Guides, changelog, release | ☐ |
+| 7 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-4.md](waves/wave-4.md)
 
