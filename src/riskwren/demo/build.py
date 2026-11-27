@@ -2501,6 +2501,67 @@ class Builder:
                 with self.act(self.cast[reviewer]) as (session, who):
                     privacy.review(session, who, item_id, note)
 
+    def _story_continuity(self) -> Script:
+        """Continuity plans for two critical processes: written, approved, published, said to
+        restore their processes, and exercised; one exercise's finding is an issue."""
+        from riskwren.db.models import PolicyDocument, Process
+        from riskwren.policy import documents
+        from riskwren.resilience import plans
+
+        steps: list[tuple[float, int, str, Any]] = []
+        for spec in c.CONTINUITY_PLANS:
+            steps += [(spec["written"], 10, "write", spec), (spec["published"] + 2, 10, "send", spec),
+                      (spec["published"] + 1, 11, "approve", spec),
+                      (spec["published"], 12, "publish", spec)]  # fmt: skip
+            for exercise in spec["exercises"]:
+                steps.append((exercise["days"], 15, "exercise", (spec, exercise)))
+        steps.sort(key=lambda step: (-step[0], step[1]))
+
+        def plan(session: Session, spec: dict[str, Any]) -> Any:
+            return session.scalars(
+                select(PolicyDocument).where(PolicyDocument.name == spec["name"])
+            ).one()
+
+        for days, hour, what, item in steps:
+            yield self._on(days, hour=hour)
+            spec = item[0] if what == "exercise" else item
+            if what == "write":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    document = documents.create(session, who, {
+                        "name": spec["name"], "kind": "plan", "summary": spec["summary"],
+                        "org_unit_id": self.units[spec["unit"]], "body": spec["body"]})  # fmt: skip
+                    processes = [
+                        found.ref for name in spec["covers"]
+                        if (found := session.scalars(
+                            select(Process).where(Process.name == name)).first())
+                    ]  # fmt: skip
+                    plans.set_covers(session, who, document, processes)
+            elif what == "send":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    documents.submit(
+                        session, who, plan(session, spec), [self.cast[spec["approver"]]]
+                    )
+            elif what == "approve":
+                with self.act(self.cast[spec["approver"]]) as (session, who):
+                    documents.decide(session, who, plan(session, spec), "approved", None)
+            elif what == "publish":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    documents.publish(session, who, plan(session, spec))
+                self.tally("continuity plans")
+            else:
+                exercise = item[1]
+                with self.act(self.cast[exercise["by"]]) as (session, who):
+                    document = plan(session, spec)
+                    row = plans.record_exercise(session, who, document, {
+                        "kind": exercise["kind"], "held_on": self.now.date(),
+                        "scenario": exercise["scenario"], "participants": exercise["participants"],
+                        "outcome": exercise["outcome"], "result": exercise["result"],
+                        "achieved_hours": exercise["achieved"]})  # fmt: skip
+                    finding = exercise.get("finding")
+                    if finding:
+                        plans.raise_finding(session, who, document, row.id, {
+                            **finding, "owner_id": self.cast[finding["owner"]]})  # fmt: skip
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3755,6 +3816,7 @@ class Builder:
             self._story_measures, self._story_leadership, self._story_scenarios,
             self._story_internal_audit, self._story_engagements, self._story_outside,
             self._story_resilience, self._story_incidents, self._story_privacy,
+            self._story_continuity,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

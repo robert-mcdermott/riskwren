@@ -86,6 +86,7 @@ These two are written from the code, so they always match the version they ship 
 | How do I keep a sensitive case to the few who must know? | [Restricted cases](incidents.md#restricted-cases) |
 | Which risks have actually happened, and what have they cost? | [What it taught](incidents.md#what-it-taught) |
 | Do we have to notify anyone about this breach, and by when? | [Breach assessment](incidents.md#breach-assessment) |
+| What do we do when research storage is down, and have we tried it? | [Continuity plans and exercises](the-register.md#continuity-plans-and-exercises) |
 | Which systems need a privacy impact assessment? | [Privacy impact assessments](running-the-program.md#privacy-impact-assessments) |
 | What would two weeks of ransomware cost us, in dollars, and how sure are we? | [Estimates in ranges](the-register.md#estimates-in-ranges), [Scenarios](the-register.md#scenarios) |
 | Which controls stand between the causes of this risk and what follows it? | [The bow-tie](the-register.md#the-bow-tie) |

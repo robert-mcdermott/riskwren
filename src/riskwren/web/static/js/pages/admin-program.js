@@ -288,7 +288,8 @@ function cadencesTab(program, ctx, vocab) {
       number("A key control is tested every", () => draft.key_control_test_months, (value) => { draft.key_control_test_months = value; }, "months"),
       number("An exception may run for", () => draft.exception_max_months, (value) => { draft.exception_max_months = value; }, "months"),
       number("A document is reviewed every", () => draft.document_review_months, (value) => { draft.document_review_months = value; }, "months",
-        "A document may set its own. Changing this moves the next review of those that do not."))),
+        "A document may set its own. Changing this moves the next review of those that do not."),
+      number("A continuity plan is exercised every", () => draft.plan_exercise_months, (value) => { draft.plan_exercise_months = value; }, "months"))),
     card({ title: "How long an issue is given" }, h("div", { class: "stack" },
       h("p", { class: "muted" }, "From the day it is raised, by its severity. A more severe issue is never given longer. Issues already raised keep the date they were given."),
       h("div", { class: "grid-3" }, severities.map((item) =>

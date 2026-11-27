@@ -38,6 +38,11 @@ Wave 8, *Incidents and resilience*.
 - **Reporting without a name,** closed until an administrator opens it under **Admin →
   Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
   name, or address, with a follow-up code shown once.
+- **Continuity plans and exercises:** a plan is a document of the new kind **Continuity
+  plan**, versioned, approved, and reviewed like any document. **Reports → Continuity plans**
+  shows what each restores and what that relies on, whom to call, a copy that prints or
+  downloads as one file for when the systems are down, and its exercises, whose findings are
+  issues. A plan is exercised on a new `plan_exercise_months` cadence.
 - **Business impact and recovery:** a process's business impact analysis (how its loss hurts
   over time, how soon it must be back, how much information it can lose, and the least it
   needs), what each system and service can deliver and what that rests on, and every shortfall
@@ -57,6 +62,7 @@ Wave 8, *Incidents and resilience*.
   administrators who are not named on them. Their events stay in the chain that
   `riskwren verify` checks.
 - **Protected information** is a new vocabulary, and the program pack has a `privacy` rule.
+- **Documents have a fifth kind, Continuity plan;** `issue_sources` gains `exercise`.
 - **Incident categories** are a new vocabulary, editable under **Admin → Program →
   Vocabularies**. The menu has a new group, **Incidents**.
 - In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),

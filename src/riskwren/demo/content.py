@@ -1324,6 +1324,63 @@ PRIVACY_ANSWERS = {
     }, None, None),
 }  # fmt: skip
 
+# Continuity plans: documents of their own kind, approved and published, the processes each
+# restores, and their exercises. Days ago for each step; an exercise's finding is an issue.
+CONTINUITY_PLANS = [
+    {"name": "Research data storage continuity plan", "unit": "RC", "by": "rc_dir",
+     "approver": "cio", "written": 150, "published": 140,
+     "summary": "Keeping research computing's storage going, or bringing it back, when the "
+                "primary data center is lost or the storage is encrypted.",
+     "body": """# When research storage is lost
+
+## First hour
+1. The on-call storage administrator declares an outage and calls the **security operations
+   manager** if encryption or tampering is suspected.
+2. Stop jobs that write to storage. Do not power off encrypted volumes: they are evidence.
+3. Tell the core directors that research storage is down, and how long it is expected to be.
+
+## Bringing it back
+- Fail over to the second data center's replica if it is clean.
+- If the replica is not clean, restore from the offline copy, newest first: lab shares,
+  then project data, then scratch.
+- Check each restore against its snapshot list before anyone is let back in.
+
+## Telling people
+Every four hours, the director of research computing writes to the core directors and the
+lab heads: what is back, what is next, and when.
+""",
+     "covers": ["Research data storage"],
+     "exercises": [
+         {"days": 34, "by": "ciso", "kind": "tabletop", "result": "partly", "achieved": 120,
+          "scenario": "Ransomware encrypts the primary storage and its replica on a Friday night.",
+          "participants": "Research computing, security operations, two core directors.",
+          "outcome": "Restoring everything from the offline copy took five days on paper, "
+                     "against the three days research needs. Lab shares came back first, "
+                     "as planned.",
+          "finding": {"name": "A full restore of research storage takes five days",
+                      "severity": "high", "owner": "rc_dir",
+                      "summary": "The exercise found that a restore from the offline copy "
+                                 "takes five days; research needs storage back in three."}},
+     ]},
+    {"name": "Medication dispensing downtime plan", "unit": "PHARM", "by": "pharm_mgr",
+     "approver": "clinic_lead", "written": 120, "published": 112,
+     "summary": "Dispensing medication when the cabinets or the network are down.",
+     "body": """# When the dispensing cabinets are down
+
+1. Switch the cabinets to their own override mode; each runs without the network.
+2. Pharmacists dispense from the paper override log, two signatures for each dose.
+3. When the cabinets are back, enter every override within four hours.
+""",
+     "covers": ["Medication dispensing"],
+     "exercises": [
+         {"days": 70, "by": "pharm_mgr", "kind": "simulation", "result": "met", "achieved": 1,
+          "scenario": "The network to the pharmacy is cut for four hours during the day shift.",
+          "participants": "The pharmacy team and the infusion nurses on shift.",
+          "outcome": "Override mode came up in minutes; every dose was logged and entered "
+                     "within the hour after."},
+     ]},
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

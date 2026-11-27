@@ -1386,23 +1386,6 @@
         "title": "ControlBody",
         "type": "object"
       },
-      "CoversBody": {
-        "properties": {
-          "covers": {
-            "description": "The references of the systems, information, and scopes",
-            "items": {
-              "type": "string"
-            },
-            "title": "Covers",
-            "type": "array"
-          }
-        },
-        "required": [
-          "covers"
-        ],
-        "title": "CoversBody",
-        "type": "object"
-      },
       "DemoSignIn": {
         "properties": {
           "email": {
@@ -2180,6 +2163,70 @@
           "note"
         ],
         "title": "Excuse",
+        "type": "object"
+      },
+      "ExerciseBody": {
+        "properties": {
+          "achieved_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How long recovery took",
+            "title": "Achieved Hours"
+          },
+          "held_on": {
+            "description": "The day it was held",
+            "title": "Held On",
+            "type": "string"
+          },
+          "kind": {
+            "description": "tabletop, walkthrough, simulation, or full",
+            "title": "Kind",
+            "type": "string"
+          },
+          "outcome": {
+            "description": "What happened",
+            "maxLength": 20000,
+            "title": "Outcome",
+            "type": "string"
+          },
+          "participants": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participants"
+          },
+          "result": {
+            "description": "met, partly, or not_met: its recovery objectives",
+            "title": "Result",
+            "type": "string"
+          },
+          "scenario": {
+            "description": "What was tried",
+            "maxLength": 20000,
+            "title": "Scenario",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "held_on",
+          "scenario",
+          "outcome",
+          "result"
+        ],
+        "title": "ExerciseBody",
         "type": "object"
       },
       "ExternalRefBody": {
@@ -6558,6 +6605,23 @@
         "title": "CloseBody",
         "type": "object"
       },
+      "riskwren__api__routers__agreements__CoversBody": {
+        "properties": {
+          "covers": {
+            "description": "The references of the systems, information, and scopes",
+            "items": {
+              "type": "string"
+            },
+            "title": "Covers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "covers"
+        ],
+        "title": "CoversBody",
+        "type": "object"
+      },
       "riskwren__api__routers__analyses__AnswerBody": {
         "properties": {
           "look_again": {
@@ -7606,6 +7670,79 @@
           "answers"
         ],
         "title": "AnswersIn",
+        "type": "object"
+      },
+      "riskwren__api__routers__resilience__CoversBody": {
+        "properties": {
+          "processes": {
+            "description": "References of processes",
+            "items": {
+              "type": "string"
+            },
+            "title": "Processes",
+            "type": "array"
+          }
+        },
+        "title": "CoversBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__resilience__FindingBody": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "title": "FindingBody",
         "type": "object"
       },
       "riskwren__api__routers__risks__AssessmentBody": {
@@ -9745,7 +9882,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CoversBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__agreements__CoversBody"
               }
             }
           },
@@ -12241,6 +12378,279 @@
         "summary": "Change a contact, or say they have left",
         "tags": [
           "third parties"
+        ]
+      }
+    },
+    "/api/v1/continuity": {
+      "get": {
+        "operationId": "continuity_api_v1_continuity_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Continuity Api V1 Continuity Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Every continuity plan, and the processes none restores",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}": {
+      "get": {
+        "operationId": "continuity_plan_api_v1_continuity__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Continuity Plan Api V1 Continuity  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A continuity plan: what it restores, whom to call",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/covers": {
+      "put": {
+        "operationId": "set_covers_api_v1_continuity__ref__covers_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__resilience__CoversBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Covers Api V1 Continuity  Ref  Covers Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say which processes a plan restores",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/exercises": {
+      "post": {
+        "operationId": "record_exercise_api_v1_continuity__ref__exercises_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Exercise Api V1 Continuity  Ref  Exercises Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record an exercise",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/exercises/{exercise_id}/issues": {
+      "post": {
+        "operationId": "raise_finding_api_v1_continuity__ref__exercises__exercise_id__issues_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "exercise_id",
+            "required": true,
+            "schema": {
+              "title": "Exercise Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__resilience__FindingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Raise Finding Api V1 Continuity  Ref  Exercises  Exercise Id  Issues Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise a finding of an exercise as an issue",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/offline": {
+      "get": {
+        "operationId": "continuity_offline_api_v1_continuity__ref__offline_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The plan in force as one file, for when the systems are down",
+        "tags": [
+          "resilience"
         ]
       }
     },

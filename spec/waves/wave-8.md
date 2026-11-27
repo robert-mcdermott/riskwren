@@ -67,9 +67,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** built first, while slices 1 and 2 wait on the decisions below. `impact_analysis` holds, for one process, the impact at each of five times (never lessening), the recovery time and point in hours, and the least it needs, by a named person, superseded and never edited. `recovery_capability` holds what a system or service can be restored within and lose, and what that rests on. `riskwren.resilience` checks a process's current analysis against the current capability of each system and service it relies on and lists the shortfalls in words; both appear in the record's history with titles of their own. A process's **Business impact** tab, a system's or service's **Recovery** tab with the processes that rely on it, and **Reports → Resilience**, most shortfalls first. The demo analyses four critical processes and the systems they rely on: research storage relies on a backup service whose full restore takes five days against the three days it needs. The acceptance test is `tests/test_resilience.py`. Sites, as places a process relies on, are left for a later slice.
 
-### Slice 6: Plans and exercises ☐
+### Slice 6: Plans and exercises ☑
 
-- [ ] Versioned plans that print for use offline; exercises with findings (RES-03, RES-04)
+- [x] Versioned plans that print for use offline; exercises with findings (RES-03, RES-04)
+
+**Acceptance:** a plan has versions, owners, and a review date; says which processes it restores, with what each needs and relies on and whom to call; prints cleanly and downloads as one file that needs nothing else; and is exercised, each exercise recording what was tried, what happened, and whether its objectives were met, with findings raised as issues.
+
+**Done:** a continuity plan is a document of the new kind `plan`, so its versions, approval, owners, and review are a document's (migration 0044 widens the kind, and adds `continuity_cover` and `continuity_exercise`). `riskwren.resilience.plans` says what a plan restores, gathers whom to call from the owners of the plan, its processes, and what they rely on, writes the version in force as one self-contained HTML file, records exercises against the version in force, raises findings as issues with the exercise as their source, and puts an exercise due within a month on its owner's home page, on a new `plan_exercise_months` cadence. A process's business impact names the plans that restore it. The demo has two plans; the research storage plan's tabletop exercise found the five-day restore. The acceptance tests are `tests/test_continuity.py`.
 
 ### Slice 7: Release prep ☐
 

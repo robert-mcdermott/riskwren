@@ -6,11 +6,12 @@ import { date } from "../core/format.js";
 import { contents, parse } from "../core/markdown.js";
 import { pill } from "./ui.js";
 
-export const KINDS = { policy: "Policy", standard: "Standard", procedure: "Procedure", guideline: "Guideline" };
+export const KINDS = { policy: "Policy", standard: "Standard", procedure: "Procedure", plan: "Continuity plan", guideline: "Guideline" };
 export const KIND_HINTS = {
   policy: "What the organization requires, and why. Approved by its leadership.",
   standard: "The particular rules that meet a policy: how long a password, which encryption.",
   procedure: "The steps someone follows to meet a standard or a policy.",
+  plan: "What to do to keep a process going, or to bring it back, when something stops it.",
   guideline: "Advice that helps people do it well. Recommended, not required.",
 };
 export const WORKING = {

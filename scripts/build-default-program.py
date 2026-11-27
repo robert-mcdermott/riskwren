@@ -464,6 +464,7 @@ COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ),
         ("audit", "Audit", "A finding from an internal or external audit"),
         ("incident", "Incident", "Something that went wrong showed it"),
+        ("exercise", "Exercise", "An exercise of a continuity plan showed it"),
         ("review", "Review", "A review of a supplier, a system, or a process"),
         ("observation", "Observation", "Somebody noticed it and said so"),
     ),
@@ -570,6 +571,8 @@ CADENCES: dict[str, Any] = {
     "key_control_test_months": 6,
     # How long a policy, standard, procedure, or guideline goes before it is looked at again.
     "document_review_months": 12,
+    # How often a continuity plan is exercised: tried out, on a table or for real.
+    "plan_exercise_months": 12,
     # When reminders go: so many days before a date, and how long something stays late
     # before the unit's steward, and then its leader, is told.
     "reminders": {"soon_days": 14, "steward_after_days": 7, "leader_after_days": 21},

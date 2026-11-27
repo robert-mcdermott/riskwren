@@ -61,6 +61,22 @@ The process's tab then checks each system and service it relies on against what 
 
 ![A process's business impact: what it needs, how much its loss hurts over time, and a shortfall in what it relies on](img/process-impact-light.webp)
 
+### Continuity plans and exercises
+
+A continuity plan says what to do to keep a process going, or to bring it back, when something stops it. It is written as a document of the kind **Continuity plan** ([Policies](policies.md#documents)), so it has versions, approval by named people before each is published, owners, and a review date, as any document does. **Reports → Continuity plans** lists every plan in use, and the processes with a business impact analysis that no plan restores.
+
+A plan's page shows the version in force, and, beside it, what is needed to use it:
+
+- **What it restores, soonest first:** each process it is said to restore (**Change**, by those who keep the plan), how soon it must be back and how much information it can lose, the least it needs, and each system and service it relies on, against what that can deliver.
+- **Whom to call:** the plan's owners, and the owners of each process and of what each relies on, with their titles and email addresses.
+- **Exercises:** each test of the plan.
+
+**Print** prints the page without the application around it. **Download for offline use** gives the version in force as one HTML file that needs nothing else to open: its words, what it restores and in what order, what each relies on, whom to call, and when it was last exercised, with the version and the moment it was taken, so that whoever holds it can check it is still the one in force. Keep a printed or downloaded copy where it can be reached when the systems are down. A process's **Business impact** tab names the plans that restore it.
+
+An exercise is a test of the plan: a tabletop, a walk-through, a simulation, or a full interruption. **Record an exercise** (those who keep the plan, and those who assess for its unit) says when it was held, what was tried, who took part, what happened, whether the recovery objectives were met, and how long recovery took if it was timed; it is kept with the version that was in force. Something it showed must be put right is a **finding**: **Raise a finding** raises an issue in the one register, for the plan's unit, with the exercise as its source. A plan is exercised every 12 months (the program's `plan_exercise_months` cadence), a new one within three months of being written; one due within a month waits on its owner's home page.
+
+![A continuity plan: the version in force, with buttons to print it and download it for offline use](img/continuity-plan-light.webp)
+
 ### Connections
 
 Every record has a **Connections** link beside its name. It opens a picture of everything joined to the record: its links in both directions, the risks that bear on it, the controls that reduce them, the scopes it is in, and the evidence, issues, and exceptions about it. A list beside the picture says the same in full. See [Connections](compliance.md#connections).

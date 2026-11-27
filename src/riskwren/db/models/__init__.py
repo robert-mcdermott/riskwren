@@ -104,7 +104,12 @@ from riskwren.db.models.people import (
     SignInRequest,
 )
 from riskwren.db.models.program import Setting
-from riskwren.db.models.resilience import ImpactAnalysis, RecoveryCapability
+from riskwren.db.models.resilience import (
+    ContinuityCover,
+    ContinuityExercise,
+    ImpactAnalysis,
+    RecoveryCapability,
+)
 from riskwren.db.models.risk import (
     Risk,
     RiskAssessment,
@@ -148,6 +153,8 @@ __all__ = [
     "ChainHead",
     "CommitteeItem",
     "CommitteeSession",
+    "ContinuityCover",
+    "ContinuityExercise",
     "Control",
     "ControlLibraryEntry",
     "ControlRating",

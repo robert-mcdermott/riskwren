@@ -89,6 +89,7 @@ export const NAV = [
       { href: "/portfolio", label: "Portfolio", iconName: "grid" },
       { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "leadership" },
       { href: "/resilience", label: "Resilience", iconName: "process" },
+      { href: "/continuity", label: "Continuity plans", iconName: "document" },
       { href: "/as-of", label: "As of a date", iconName: "history" },
       { href: "/check-dossier", label: "Check a dossier", iconName: "check" },
       { href: "/tidy", label: "Tidy", iconName: "check" },

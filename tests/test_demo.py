@@ -282,6 +282,7 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert {issue.status for issue in raised} == {"open", "proposed", "closed", "cancelled"}
         assert {issue.source_kind for issue in raised} == {
             "test", "gap", "audit", "review", "observation", "security_test", "incident",
+            "exercise",
         }  # fmt: skip
         failed = sum(
             1

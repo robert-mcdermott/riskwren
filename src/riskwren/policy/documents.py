@@ -49,6 +49,7 @@ KIND_LABELS = {
     "policy": "Policy",
     "standard": "Standard",
     "procedure": "Procedure",
+    "plan": "Continuity plan",
     "guideline": "Guideline",
 }
 RANK = {kind: place for place, kind in enumerate(DOCUMENT_KINDS)}
@@ -138,7 +139,9 @@ def _apply(
     if "kind" in values or creating:
         kind = values.get("kind")
         if kind not in DOCUMENT_KINDS:
-            errors.add("kind", "Say whether it is a policy, standard, procedure, or guideline.")
+            errors.add(
+                "kind", "Say whether it is a policy, standard, procedure, plan, or guideline."
+            )
         else:
             document.kind = kind
     if "parent" in values:
@@ -608,9 +611,9 @@ def _implements_nothing(model: Any) -> Any:
 
 def _governs_nothing(model: Any) -> Any:
     """A policy, standard, or procedure that directs no control and answers no requirement.
-    A guideline is advice, and is not expected to."""
+    A guideline is advice, and is not expected to; a continuity plan restores processes."""
     return and_(
-        model.kind != "guideline",
+        model.kind.not_in(("guideline", "plan")),
         ~exists(select(DocumentControl.id).where(DocumentControl.document_id == model.id)),
         ~exists(select(DocumentRequirement.id).where(DocumentRequirement.document_id == model.id)),
     )

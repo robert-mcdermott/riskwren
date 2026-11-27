@@ -350,6 +350,14 @@ POLICIES.update(
         ("POST", "/api/v1/systems/{ref}/recovery"): Needs.MEMBER,
         ("GET", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
         ("POST", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
+        # Continuity plans: documents of their own kind; the service decides who may change
+        # what a plan restores and who records its exercises.
+        ("GET", "/api/v1/continuity"): Needs.MEMBER,
+        ("GET", "/api/v1/continuity/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/continuity/{ref}/covers"): Needs.MEMBER,
+        ("POST", "/api/v1/continuity/{ref}/exercises"): Needs.MEMBER,
+        ("POST", "/api/v1/continuity/{ref}/exercises/{exercise_id}/issues"): Needs.MEMBER,
+        ("GET", "/api/v1/continuity/{ref}/offline"): Needs.MEMBER,
         # Dossiers and a scope's plans hold what the person may see, checked by the record.
         ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
         ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,

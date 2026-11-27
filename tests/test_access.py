@@ -406,7 +406,11 @@ for _route in (
 # Through a link, without an account: reached by anyone, and answered by the link.
 REACH[("GET", "/api/v1/outside")] = EVERYONE | {"nobody"}  # an outsider's link, in a header
 for _key in POLICIES:  # resilience is decided by the record
-    if _key[1] == "/api/v1/resilience" or _key[1].endswith(("/impact", "/recovery")):
+    if (
+        _key[1] in ("/api/v1/resilience",)
+        or _key[1].startswith("/api/v1/continuity")
+        or _key[1].endswith(("/impact", "/recovery"))
+    ):
         REACH[_key] = EVERYONE
 # Incidents: anyone reports one, and the record decides the rest; triage is for those who
 # assess. Reporting without a name is reached by anyone, and closed unless it is opened.

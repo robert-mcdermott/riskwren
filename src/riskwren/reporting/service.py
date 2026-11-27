@@ -563,6 +563,16 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/incidents/{incident.ref}", None, ref=incident.ref,
             )  # fmt: skip
 
+    # Continuity plans whose exercise is due.
+    from riskwren.resilience import plans as continuity
+
+    for document, due in continuity.waiting_on(session, principal):
+        add(
+            "plan_exercise", f"Exercise {document.name}",
+            f"{document.ref} · try the plan out, on a table or for real",
+            f"/continuity/{document.ref}", due, ref=document.ref,
+        )  # fmt: skip
+
     # Notifications an incident's handler still has to make, by the rules that apply.
     from riskwren.incidents import breach
 

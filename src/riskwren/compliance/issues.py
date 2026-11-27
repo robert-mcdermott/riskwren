@@ -286,6 +286,16 @@ def source_of(
 
         review = session.get(ThirdPartyReview, issue.source_id)
         return {"review": {"ref": review.ref, "name": review.name}} if review else None
+    if issue.source_type == "exercise" and issue.source_id is not None:
+        from riskwren.db.models import ContinuityExercise, PolicyDocument
+
+        exercise = session.get(ContinuityExercise, issue.source_id)
+        plan = session.get(PolicyDocument, exercise.document_id) if exercise else None
+        if exercise is None or plan is None:
+            return None
+        return {
+            "exercise": {"held_on": exercise.held_on, "plan": {"ref": plan.ref, "name": plan.name}}
+        }
     if issue.source_type == "incident" and issue.source_id is not None:
         from riskwren.db.models import Incident
         from riskwren.incidents import reports as incidents  # it builds on this module

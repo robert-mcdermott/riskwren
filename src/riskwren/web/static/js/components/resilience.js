@@ -84,6 +84,9 @@ export function impactTab(record, data, reload) {
   return h("div", { class: "stack-lg" },
     data.shortfalls ? alert("warn", h("strong", {}, `${data.shortfalls} shortfall${data.shortfalls === 1 ? "" : "s"}. `), "Some of what it relies on cannot deliver what it needs, or nobody has said.")
       : deps.length ? alert("ok", "Everything it relies on can deliver what it needs.") : null,
+    data.plans?.length ? card({ title: "Plans that restore it" }, h("ul", { class: "plain-list stack-sm" }, data.plans.map((plan) => h("li", {},
+      h("a", { href: `/continuity/${plan.ref}` }, plan.name), h("span", { class: "cell-sub" }, ` ${plan.ref}${plan.published ? "" : " · not yet published"}`)))))
+      : alert("info", "No continuity plan restores it yet. A plan is a document of the kind Continuity plan, said to restore the processes it covers."),
     card({ title: "What it needs", actions: act },
       h("dl", { class: "dl" },
         h("dt", {}, "Back within"), h("dd", {}, hours(now.recovery_hours)),

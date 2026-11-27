@@ -248,7 +248,14 @@ def process_view(session: Session, principal: Principal, process: Process) -> di
         "after": dict(AFTER),
         "levels": dict(LEVELS),
         "can_analyse": access.can_edit(session, principal, PROCESS, process),
+        "plans": _plans(session, principal, process),
     }
+
+
+def _plans(session: Session, principal: Principal, process: Process) -> list[dict[str, Any]]:
+    from riskwren.resilience import plans  # it builds on this module
+
+    return plans.plans_of(session, principal, process)
 
 
 def capability_view(

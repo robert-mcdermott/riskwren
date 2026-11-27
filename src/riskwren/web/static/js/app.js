@@ -120,6 +120,8 @@ async function boot() {
   route("/audit/outside", page("audit", "outsideAccess"));
   route("/as-of", page("as-of", "asOfRegister"));
   route("/resilience", page("resilience", "resiliencePage"));
+  route("/continuity", page("continuity", "continuityList"));
+  route("/continuity/:ref", page("continuity", "continuityPlan"));
   route("/as-of/:ref", page("as-of", "asOfRecord"));
   route("/check-dossier", page("check-dossier", "checkDossier"));
   route("/reviews/:ref", page("reviews", "reviewPage"));

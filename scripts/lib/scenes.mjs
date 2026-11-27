@@ -281,6 +281,12 @@ export const SCENES = [
   { name: "resilience", as: "cro", path: "/resilience" },
   { name: "process-impact", as: "cro", path: async (page) => `/processes/${await first("/api/v1/processes?q=research+data+storage")(page)}?tab=impact` },
   { name: "system-recovery", as: "cro", path: async (page) => `/systems/${await first("/api/v1/systems?q=backup+service")(page)}?tab=recovery` },
+  { name: "continuity", as: "cro", path: "/continuity" },
+  { name: "continuity-plan", as: "cro", path: async (page) => `/continuity/${await first("/api/v1/documents?q=research+data+storage+continuity")(page)}` },
+  { name: "continuity-exercise", as: "ciso", path: async (page) => `/continuity/${await first("/api/v1/documents?q=research+data+storage+continuity")(page)}`, step: click("Record an exercise") },
+  { name: "continuity-finding", as: "ciso", path: async (page) => `/continuity/${await first("/api/v1/documents?q=research+data+storage+continuity")(page)}`, step: click("Raise a finding") },
+  { name: "continuity-covers", as: "cro", path: async (page) => `/continuity/${await first("/api/v1/documents?q=dispensing+downtime")(page)}`, step: click("Change") },
+  { name: "continuity-document", as: "cro", path: async (page) => `/documents/${await first("/api/v1/documents?q=dispensing+downtime")(page)}` },
   { name: "outside-page", as: "auditor", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;
       const made = await fetch("/api/v1/audit/outside", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": me.csrf_token },
