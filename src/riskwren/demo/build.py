@@ -2119,8 +2119,11 @@ class Builder:
     def _story_engagements(self) -> Script:
         """This year's engagements carried out: started with a team, worked through step by
         step with review notes and sign-off, and reported; the last still in fieldwork."""
-        from riskwren.db.models import Engagement, ReviewNote, Workpaper
+        from datetime import timedelta
+
+        from riskwren.db.models import AuditRequest, Engagement, ReviewNote, Workpaper
         from riskwren.internal_audit import engagements
+        from riskwren.internal_audit import requests as audit_requests
 
         def find(session: Session, name: str) -> Engagement:
             return session.scalars(select(Engagement).where(Engagement.name == name)).one()
@@ -2136,6 +2139,12 @@ class Builder:
             for key in ("reporting", "reported"):
                 if spec[key]:
                     steps.append((spec[key], order, ("advance", spec)))
+            for index, asked in enumerate(spec["requests"]):
+                steps.append((asked[0], order, ("ask", spec, index)))
+                if asked[5]:
+                    steps.append((asked[5][0], order, ("answer", spec, index)))
+                if asked[6]:
+                    steps.append((asked[6], order, ("accept", spec, index)))
         for days, _, what in sorted(steps, key=lambda step: (-step[0], step[1])):
             yield self._on(days, hour=14)
             spec = what[1]
@@ -2156,6 +2165,27 @@ class Builder:
                     engagements.advance(session, who, found, {"summary": spec["summary"],
                                                               "opinion": spec["opinion"]})  # fmt: skip
                 self.tally(f"engagements {found.status}")
+            elif what[0] in ("ask", "answer", "accept"):
+                _, by, of, text, due_in, answered, _ = spec["requests"][what[2]]
+                if what[0] == "ask":
+                    with self.act(self.cast[by]) as (session, who):
+                        audit_requests.ask(session, who, find(session, spec["name"]), {
+                            "what": text, "assignee": self.cast[of],
+                            "due_on": self.today + timedelta(days=due_in)})  # fmt: skip
+                    self.tally("audit requests")
+                    continue
+                with self.act(self.cast[of] if what[0] == "answer" else lead) as (session, who):
+                    found = find(session, spec["name"])
+                    request = session.scalars(select(AuditRequest).where(
+                        AuditRequest.engagement_id == found.id,
+                        AuditRequest.what == text)).one()  # fmt: skip
+                    if what[0] == "answer":
+                        offered = audit_requests.on_file(session, who, found)
+                        audit_requests.answer(session, who, request, {
+                            "answer": answered[1],
+                            "evidence": [item["ref"] for item in offered[:1]]})  # fmt: skip
+                    else:
+                        audit_requests.accept(session, who, request, found)
             else:
                 title, _, done, found_text, preparer, signer, note = spec["steps"][what[2]]
                 with self.act(self.cast[preparer]) as (session, who):

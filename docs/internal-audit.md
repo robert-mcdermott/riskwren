@@ -59,9 +59,17 @@ Each step of the program of work has a **workpaper**: what was to be done, what 
 
 ![An engagement in fieldwork, seen by its team: the program of work, a workpaper signed off, and one with a review note waiting for its answer](img/audit-engagement-light.webp)
 
+### Requests to the audited
+
+While an engagement is being planned or in fieldwork, its team asks the audited for what it needs: **Ask for something** on the engagement, with what is needed, the person asked (anyone who can sign in), and by when. The request is on that person's home page. They see what is asked, by whom, for which engagement, and by when, and nothing else of the engagement's work.
+
+They answer in words, with evidence, or both. The evidence already kept about the thing being audited (and, for a scope, about the controls it uses) is offered first, so that nothing already on file is sent again; anything else is added under **Compliance → Evidence** first and named by its reference. The answer is on the team's home pages to read: they **accept** it, or **send it back** with what is still needed, and it is open again for the person asked.
+
+![A request as the person asked sees it: what is needed, by when, and the evidence already on file offered first](img/audit-request-light.webp)
+
 ### Independence
 
-Until an engagement is reported, its work is its team's alone. Others who may read the plans see that it exists, who is on it, and where it stands, and nothing of what it covers, what was done, or what was found; neither does another auditor who is not on its team. The history records every change to a workpaper and a review note, but keeps their words out of it, so that reading the history does not undo that. Once the report is issued, the whole of it opens to those who read the plans.
+Until an engagement is reported, its work is its team's alone. Others who may read the plans see that it exists, who is on it, and where it stands, and nothing of what it covers, what was done, or what was found; neither does another auditor who is not on its team. The history records every change to a workpaper, a review note, and a request, but keeps their words out of it, so that reading the history does not undo that. Once the report is issued, the whole of it opens to those who read the plans.
 
 ## Who sees what
 

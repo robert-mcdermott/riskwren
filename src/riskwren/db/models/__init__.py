@@ -7,6 +7,7 @@ from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
 from riskwren.db.models.audit import (
     AuditEntity,
     AuditPlan,
+    AuditRequest,
     Engagement,
     EngagementMember,
     ReviewNote,
@@ -126,6 +127,7 @@ __all__ = [
     "AssuranceReview",
     "AuditEntity",
     "AuditPlan",
+    "AuditRequest",
     "Baseline",
     "BaselineRequirement",
     "Campaign",

@@ -481,6 +481,33 @@
         "title": "AnalysisBody",
         "type": "object"
       },
+      "AskBody": {
+        "properties": {
+          "assignee": {
+            "description": "The account id of the person asked",
+            "title": "Assignee",
+            "type": "integer"
+          },
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "what": {
+            "description": "What is needed",
+            "maxLength": 8000,
+            "title": "What",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what",
+          "assignee",
+          "due_on"
+        ],
+        "title": "AskBody",
+        "type": "object"
+      },
       "AssuranceReviewBody": {
         "properties": {
           "carve_outs": {
@@ -4044,6 +4071,32 @@
           }
         },
         "title": "ReportBody",
+        "type": "object"
+      },
+      "RequestAnswerBody": {
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "evidence": {
+            "description": "References of evidence",
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "title": "RequestAnswerBody",
         "type": "object"
       },
       "RequirementBody": {
@@ -9716,6 +9769,202 @@
         ]
       }
     },
+    "/api/v1/audit/requests/{request_id}": {
+      "get": {
+        "operationId": "show_request_api_v1_audit_requests__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Request Api V1 Audit Requests  Request Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A request, for the person asked or the team",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}/accept": {
+      "post": {
+        "operationId": "accept_request_api_v1_audit_requests__request_id__accept_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Accept Request Api V1 Audit Requests  Request Id  Accept Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Accept the answer to a request",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}/answer": {
+      "post": {
+        "operationId": "answer_request_api_v1_audit_requests__request_id__answer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAnswerBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Answer Request Api V1 Audit Requests  Request Id  Answer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer a request, with evidence",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/audit/requests/{request_id}/return": {
+      "post": {
+        "operationId": "return_request_api_v1_audit_requests__request_id__return_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__ReasonBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Return Request Api V1 Audit Requests  Request Id  Return Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send an answer back, with what is missing",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
     "/api/v1/audit/universe": {
       "get": {
         "operationId": "show_universe_api_v1_audit_universe_get",
@@ -13210,6 +13459,60 @@
           }
         },
         "summary": "Drop a planned engagement, with the reason",
+        "tags": [
+          "internal audit"
+        ]
+      }
+    },
+    "/api/v1/engagements/{ref}/requests": {
+      "post": {
+        "operationId": "ask_for_api_v1_engagements__ref__requests_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Ask For Api V1 Engagements  Ref  Requests Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask the audited for something",
         "tags": [
           "internal audit"
         ]

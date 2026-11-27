@@ -1070,6 +1070,12 @@ ENGAGEMENTS = [
           "Listed the backup administrators and compared them with Research Computing's staff list.",
           "Five people can delete backups; one left the institute in the spring.", "auditor", "auditor2", None),
      ],
+     "requests": [
+         # asked (days ago), by, of, what, due (days after asking), answered (days ago) and
+         # the answer, accepted (days ago)
+         (219, "auditor2", "it_mgr", "The backup job history for research storage for the last twelve months, as exported from the backup console.", 10,
+          (214, "Exported the job history for every night of the twelve months and attached the summary report."), 212),
+     ],
      "summary": "Backups of research storage are taken as scheduled, but two empty backups went unnoticed, a full restore has not been tested in two years, and one person who has left could still delete backups. Management has agreed to check every backup, test a full restore this year, and review backup administrators each quarter.",
      "opinion": "needs_improvement"},
     {"name": "Clinical systems: access and change", "lead": "auditor2", "members": ["auditor"],
@@ -1083,6 +1089,7 @@ ENGAGEMENTS = [
           "Read fifteen changes to the electronic health record and their tickets.",
           "Each change was approved and tested; one emergency change was approved the next day, as the procedure allows.", "auditor", "auditor2", None),
      ],
+     "requests": [],
      "summary": "Access to the clinic's systems is approved before it is given, and changes are approved and tested as the procedure says.",
      "opinion": "effective"},
     {"name": "Trial data vendor oversight", "lead": "auditor", "members": ["auditor2"],
@@ -1097,6 +1104,11 @@ ENGAGEMENTS = [
           "The agreement covers the data it holds.", "auditor2", None,
           ("Is the business associate agreement needed too, for the clinic's patients?", None)),
          ("Findings are followed up", "Follow each finding to its actions and dates.", None, None, None, None, None),
+     ],
+     "requests": [
+         (108, "auditor", "ciso", "The conditions set when Castellan's due diligence review was concluded, and how each has been followed up.", 10,
+          (101, "One condition: a tested restore before the next trial starts. It is an open finding with the vendor, due next month; the report we rely on is attached."), None),
+         (20, "auditor2", "ciso", "The business associate agreement with Castellan Trial Systems, or the reason none is needed.", 14, None, None),
      ],
      "summary": None, "opinion": None},
 ]  # fmt: skip

@@ -135,3 +135,50 @@ def test_only_auditors_start_and_work_and_only_the_team(
     outsider = as_person(as_role, "Outside Auditor")
     assert outsider.post(f"{path}/workpapers", json={"title": "x"}).status_code == 403
     assert who(db, people, "auditor").has("auditor")
+
+
+def test_a_request_is_answered_by_the_person_asked_and_accepted_by_the_team(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    ref, ids = planned(as_role, people, db)
+    chief, member = as_person(as_role, "Chief Auditor"), as_role("auditor")
+    path = f"/api/v1/engagements/{ref}"
+    chief.post(
+        f"{path}/start", json={"lead": ids["Chief Auditor"], "members": [ids["Auditor Person"]]}
+    )
+    secret = "The restore test of the sequencing archive"
+    due = (utc_now().date() + timedelta(days=7)).isoformat()
+    asked = member.post(f"{path}/requests", json={"what": secret, "due_on": due,
+                        "assignee": people.accounts["steward"]})  # fmt: skip
+    assert asked.status_code == 201, asked.text
+    request = asked.json()["data"]["requests"][0]["id"]
+    assert as_role("manager").post(f"{path}/requests", json={
+        "what": "x", "due_on": due, "assignee": 1}).status_code == 403  # fmt: skip
+
+    steward = as_role("steward")
+    home = steward.get("/api/v1/home").json()["data"]["items"]
+    assert any(item["kind"] == "audit_request" and secret in item["title"] for item in home)
+    shown = steward.get(f"/api/v1/audit/requests/{request}").json()["data"]
+    assert shown["mine"] is True and shown["what"] == secret and isinstance(shown["on_file"], list)
+    # Nobody else outside the team reads it, and the engagement's work stays closed to them.
+    for other in (as_role("leader"), as_role("manager")):
+        assert other.get(f"/api/v1/audit/requests/{request}").status_code == 404
+    assert steward.get(path).status_code == 403  # the steward does not read audit's plans
+
+    answer = f"/api/v1/audit/requests/{request}/answer"
+    assert steward.post(answer, json={}).status_code == 422
+    assert steward.post(answer, json={"evidence": ["EV-9999"]}).status_code == 422
+    assert member.post(answer, json={"answer": "x"}).status_code == 403  # not the person asked
+    assert steward.post(answer, json={"answer": "Not done this year."}).status_code == 200
+    back = member.post(f"/api/v1/audit/requests/{request}/return",
+                       json={"reason": "When was it last done?"})  # fmt: skip
+    assert back.json()["data"]["status"] == "open"
+    assert back.json()["data"]["returned_reason"] == "When was it last done?"
+    steward.post(answer, json={"answer": "Last done two years ago."})
+    lead_home = chief.get("/api/v1/home").json()["data"]["items"]
+    assert any(item["kind"] == "audit_answer" for item in lead_home)
+    accepted = chief.post(f"/api/v1/audit/requests/{request}/accept").json()["data"]
+    assert accepted["status"] == "accepted" and accepted["accepted_by"] == "Chief Auditor"
+    with db.read() as session:
+        events = session.scalars(select(Event).where(Event.subject_type == "audit_request")).all()
+        assert events and all(secret not in str(event.changes) for event in events)

@@ -188,3 +188,38 @@ class ReviewNote(Base):
     cleared_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
 
     __table_args__ = (Index("ix_review_note_workpaper_id", "workpaper_id"),)
+
+
+REQUEST_STATUSES = ("open", "answered", "accepted")
+
+
+class AuditRequest(Base):
+    """Something an engagement needs from the audited: asked of one person by a date, and
+    answered with words and evidence, which the team accepts or sends back."""
+
+    __tablename__ = "audit_request"
+    __audit_parent__ = ("engagement", "engagement_id")
+    # What audit asks for tells what it is looking at: kept out of the history (AUD-07).
+    __audit_redact__ = frozenset({"what", "answer", "returned_reason"})
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    engagement_id: Mapped[int] = mapped_column(ForeignKey("engagement.id"))
+    what: Mapped[str] = mapped_column(Text)
+    assignee_id: Mapped[int] = mapped_column(ForeignKey("account.id"))
+    due_on: Mapped[date] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(16), default="open")
+    answer: Mapped[str | None] = mapped_column(Text)
+    evidence: Mapped[list[str]] = mapped_column(JsonType, default=list)
+    answered_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    returned_reason: Mapped[str | None] = mapped_column(Text)
+    accepted_by_name: Mapped[str | None] = mapped_column(String(200))
+    accepted_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    asked_by: Mapped[int | None] = mapped_column(Integer)
+    asked_by_name: Mapped[str] = mapped_column(String(200))
+    asked_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", REQUEST_STATUSES), name="status"),
+        Index("ix_audit_request_engagement_id", "engagement_id"),
+        Index("ix_audit_request_assignee_id", "assignee_id", "status"),
+    )

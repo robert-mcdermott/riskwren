@@ -46,9 +46,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `engagement_member` (a lead and members, auditors all), `workpaper` (a step's procedure, what was done and found, evidence by reference, its preparer and sign-off), and `review_note` (written, answered by the preparer, cleared by its writer). Starting an engagement names its team and what it covers; its lead moves it from planning to fieldwork, reporting, and reported, the last with a summary and an opinion, after which the universe counts the thing as audited that day. Recording the work again, or a new note, undoes a sign-off. Until it is reported, its work, scope, and notes are its team's alone; the history redacts the words of workpapers, notes, and the engagement's scope and report, so that reading it does not undo that. **Audit → Plans** opens each engagement's page with its stages, team, progress, and program of work. The demo's two auditors have reported two engagements and are in fieldwork on a third, with a review note waiting for its answer. The acceptance tests are `tests/test_engagements.py`.
 
-### Slice 3: Requests ☐
+### Slice 3: Requests ☑
 
-- [ ] Requests to the audited, each item assigned to a person with a date and answered with evidence, from what is on file where it exists
+- [x] Requests to the audited, each item assigned to a person with a date and answered with evidence, from what is on file where it exists
+
+**Acceptance:** a request reaches the person asked on their home page and nobody else outside the team; it is answered by that person alone, with words or evidence they can see; the team accepts it or sends it back with the reason, and the history keeps its words out.
+
+**Done:** `audit_request` holds what is asked, of whom, by when, the answer and its evidence, and whether it was accepted or sent back. The team asks while planning or in fieldwork; the person asked, auditor or not, opens and answers it, and is offered the evidence already kept about the thing being audited, and for a scope about the controls it uses, that they may see. Home lists a request for the person asked and an answer to read for the team. The engagement's page lists its requests; a request has a page of its own. The demo has a request answered and accepted, one answered and waiting for the team, and one past its date. The acceptance test is `tests/test_engagements.py::test_a_request_is_answered_by_the_person_asked_and_accepted_by_the_team`.
 
 ### Slice 4: Findings and follow-up ☐
 

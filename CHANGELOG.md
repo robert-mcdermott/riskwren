@@ -23,6 +23,9 @@ Wave 7, *Audit*.
   done and found with the evidence, are reviewed with notes, and are signed off by someone
   other than their preparer. Until the report is issued, the work is its team's alone, and
   the history keeps its words out.
+- **Requests to the audited:** what an engagement needs, asked of one person by a date and
+  on their home page, answered with words and evidence, offered first from what is already on
+  file, and accepted by the team or sent back with what is still needed.
 
 ## 0.6.0 (2026-11-27)
 

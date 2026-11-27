@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
 from riskwren.api.common import envelope, reading, writing
-from riskwren.internal_audit import engagements, plans, universe
+from riskwren.internal_audit import engagements, plans, requests, universe
 
 router = APIRouter(prefix="/api/v1", tags=["internal audit"])
 
@@ -264,3 +264,65 @@ def clear_review_note(request: Request, note_id: int) -> dict[str, Any]:
         note, engagement = engagements.find_note(session, principal, note_id)
         engagements.clear_note(session, principal, note, engagement)
         return envelope(engagements.view(session, principal, engagement))
+
+
+# --- Requests to the audited ------------------------------------------------------------------
+
+
+class AskBody(BaseModel):
+    what: str = Field(max_length=8000, description="What is needed")
+    assignee: int = Field(description="The account id of the person asked")
+    due_on: date
+
+
+class RequestAnswerBody(BaseModel):
+    answer: str | None = Field(default=None, max_length=20000)
+    evidence: list[str] = Field(default_factory=list, description="References of evidence")
+
+
+@router.post(
+    "/engagements/{ref}/requests", status_code=201, summary="Ask the audited for something"
+)
+def ask_for(request: Request, ref: str, body: AskBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        engagement = plans.find_engagement(session, principal, ref)
+        requests.ask(session, principal, engagement, body.model_dump())
+        return envelope(engagements.view(session, principal, engagement))
+
+
+@router.get("/audit/requests/{request_id}", summary="A request, for the person asked or the team")
+def show_request(request: Request, request_id: int) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        found, engagement = requests.find(session, principal, request_id)
+        return envelope(requests.view(session, principal, found, engagement))
+
+
+@router.post("/audit/requests/{request_id}/answer", summary="Answer a request, with evidence")
+def answer_request(request: Request, request_id: int, body: RequestAnswerBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        found, engagement = requests.find(session, principal, request_id)
+        requests.answer(session, principal, found, body.model_dump())
+        return envelope(requests.view(session, principal, found, engagement))
+
+
+@router.post("/audit/requests/{request_id}/accept", summary="Accept the answer to a request")
+def accept_request(request: Request, request_id: int) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        found, engagement = requests.find(session, principal, request_id)
+        requests.accept(session, principal, found, engagement)
+        return envelope(requests.view(session, principal, found, engagement))
+
+
+@router.post(
+    "/audit/requests/{request_id}/return", summary="Send an answer back, with what is missing"
+)
+def return_request(request: Request, request_id: int, body: ReasonBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        found, engagement = requests.find(session, principal, request_id)
+        requests.send_back(session, principal, found, engagement, body.reason)
+        return envelope(requests.view(session, principal, found, engagement))

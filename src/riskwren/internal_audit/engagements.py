@@ -394,6 +394,7 @@ def view(session: Session, principal: Principal, engagement: Engagement) -> dict
             and engagement.status in ("planning", "fieldwork", "reporting"),
             "advance": role == "lead" and engagement.status in NEXT,
         },
+        "requests": _requests(session, engagement) if seen else [],
         "next": NEXT.get(engagement.status),
         "waiting": _waiting(engagement, papers),
     }
@@ -419,3 +420,9 @@ def auditors(session: Session, principal: Principal) -> list[dict[str, Any]]:
         .order_by(Account.display_name)
     ).all()
     return [{"account_id": a, "name": n} for a, n in dict(rows).items()]
+
+
+def _requests(session: Session, engagement: Engagement) -> list[dict[str, Any]]:
+    from riskwren.internal_audit import requests
+
+    return requests.of_engagement(session, engagement)

@@ -101,6 +101,7 @@ async function boot() {
   route("/audit/plans", page("audit", "planList"));
   route("/audit/plans/:ref", page("audit", "planPage"));
   route("/audit/engagements/:ref", page("audit", "engagementPage"));
+  route("/audit/requests/:id", page("audit", "requestPage"));
   route("/as-of", page("as-of", "asOfRegister"));
   route("/as-of/:ref", page("as-of", "asOfRecord"));
   route("/check-dossier", page("check-dossier", "checkDossier"));

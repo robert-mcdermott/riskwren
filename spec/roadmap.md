@@ -148,7 +148,7 @@ Detail: [waves/wave-6.md](waves/wave-6.md)
 |---|---|---|---|
 | 1 | Universe and plan | Auditable entities drawn from the inventory with a risk ranking; the period plan | ☑ |
 | 2 | Engagements and workpapers | Stages, the program of work, workpapers with review and sign-off, restricted until issued | ☑ |
-| 3 | Requests | Requests to the audited, answered with evidence | ☐ |
+| 3 | Requests | Requests to the audited, answered with evidence | ☑ |
 | 4 | Findings and follow-up | Findings as issues with management action plans; validation by audit; the committee report | ☐ |
 | 5 | Outside auditors | Scoped, time-limited, read-only access with every view recorded | ☐ |
 | 6 | Release prep | Guides, changelog, release | ☐ |

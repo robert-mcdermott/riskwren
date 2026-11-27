@@ -6,6 +6,7 @@ import { button, h } from "../core/dom.js";
 import { date } from "../core/format.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { banner, checkbox, field, section, select, submit } from "../components/form.js";
+import { personField } from "../components/people-picker.js";
 import { openOverlay } from "../components/overlay.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
@@ -370,8 +371,91 @@ export function engagementPage(main, { ref }) {
             data.started_on ? h("p", { class: "subtle" }, `Started ${date(data.started_on)}${data.fieldwork_on ? `; fieldwork from ${date(data.fieldwork_on)}` : ""}${data.reported_on ? `; reported ${date(data.reported_on)}` : ""}.`) : null)),
         data.report ? card({ title: `Report: ${data.report.opinion_label}` }, h("p", {}, data.report.summary)) : null,
         data.scope_note ? card({ title: "What it covers" }, h("p", {}, data.scope_note)) : null,
+        data.restricted ? null : requestsCard(data, reload),
         data.restricted ? null : data.workpapers.length ? h("div", { class: "stack" }, h("h2", {}, "Program of work"), data.workpapers.map((paper) => workpaper(data, paper, reload)))
           : data.status !== "planned" && data.status !== "dropped" ? emptyState({ iconName: "file", title: "No steps yet", text: "Plan the work as steps; each has a workpaper." }) : null);
+    },
+  });
+}
+
+
+// --- Requests to the audited ------------------------------------------------------------------
+
+const REQUEST_STATUS = { open: ["Open", "info"], answered: ["Answered", "accent"], accepted: ["Accepted", "ok"] };
+
+function askForm(engagement, onDone) {
+  openOverlay({ title: "Ask for something", subtitle: `${engagement.ref} · ${engagement.name}. The person asked sees what is asked, by whom, and by when, and nothing else of the engagement.`,
+    render: (body, footer, close) => {
+      const what = field("What is needed", { type: "textarea", rows: 3, required: true, hint: "Such as “The last full restore test of research storage, with its result”." });
+      const who = personField("Asked of");
+      const soon = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+      const due = field("By", { type: "date", value: soon, required: true });
+      const problem = banner();
+      const go = button("Ask", { kind: "btn-primary" });
+      go.addEventListener("click", async () => {
+        const done = await submit({ button: go, banner: problem, fields: { what, assignee: who, due_on: due },
+          run: () => post(`/api/v1/engagements/${engagement.ref}/requests`, { what: what.input.value, assignee: who.value(), due_on: due.input.value }) });
+        if (!done) return;
+        close();
+        toast("Asked. It is on their home page.");
+        onDone();
+      });
+      body.append(h("div", { class: "stack-lg" }, problem, what.node, who.node, due.node));
+      footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    } });
+}
+
+function requestsCard(engagement, reload) {
+  const asking = engagement.can.work && ["planning", "fieldwork"].includes(engagement.status);
+  const rows = engagement.requests.map((item) => h("tr", {},
+    h("td", {}, h("a", { class: "cell-main", href: `/audit/requests/${item.id}` }, item.what)),
+    h("td", {}, item.assignee.name),
+    h("td", {}, date(item.due_on), item.overdue ? h("div", { class: "cell-sub warn-text" }, "Past its date") : null),
+    h("td", {}, pill(...REQUEST_STATUS[item.status]))));
+  return card({ title: "Requests to the audited", flush: rows.length > 0, actions: asking ? button("Ask for something", { kind: "btn-sm", onclick: () => askForm(engagement, reload) }) : null },
+    rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "What"), h("th", { scope: "col" }, "Asked of"), h("th", { scope: "col" }, "By"), h("th", { scope: "col" }, "Where it stands"))),
+      h("tbody", {}, rows)))
+      : h("p", { class: "muted" }, "Nothing asked yet."));
+}
+
+export function requestPage(main, { id }) {
+  return show(main, {
+    title: "Internal audit asks",
+    load: async () => (await get(`/api/v1/audit/requests/${id}`, null, { fresh: true })).data,
+    view: (item, reload) => {
+      const header = pageHeader({ eyebrow: `Internal audit · ${item.engagement.ref}`, title: "Internal audit asks",
+        lede: `For ${item.engagement.name}, asked by ${item.asked_by} on ${date(item.asked_at)}, of ${item.assignee.name}, by ${date(item.due_on)}.` });
+      const asked = card({ title: "What is needed", actions: pill(...REQUEST_STATUS[item.status]) }, h("p", {}, item.what),
+        item.returned_reason && item.status === "open" ? alert("warn", h("strong", {}, "Sent back. "), item.returned_reason) : null);
+      const answered = item.status !== "open" || item.answer ? card({ title: "The answer" },
+        item.answer ? h("p", {}, item.answer) : null,
+        item.evidence.length ? h("p", {}, "Evidence: ", item.evidence.map((ref, index) => [index ? ", " : "", h("a", { href: `/evidence/${ref}` }, ref)])) : null,
+        item.accepted_at ? h("p", { class: "subtle" }, `Accepted by ${item.accepted_by} on ${date(item.accepted_at)}.`) : null,
+        item.team && item.status === "answered" ? h("div", { class: "row-sm" },
+          button("Accept it", { kind: "btn-primary", onclick: async () => { await post(`/api/v1/audit/requests/${item.id}/accept`); toast("Accepted."); reload(); } }),
+          button("Send it back", { onclick: () => ask("Send it back", "What is still needed", { required: true, run: (why) => post(`/api/v1/audit/requests/${item.id}/return`, { reason: why }), done: reload }) })) : null) : null;
+      let form = null;
+      if (item.mine && item.status === "open") {
+        const words = field("Your answer", { type: "textarea", rows: 4 });
+        const picks = item.on_file.map((each) => ({ ref: each.ref, box: checkbox(`${each.ref} ${each.name}`, { hint: each.valid_until ? `Holds until ${date(each.valid_until)}` : null }) }));
+        const more = field("Other evidence", { hint: "References of other items of evidence, such as EV-0012, separated by commas. Add a new item under Compliance, Evidence, first." });
+        const problem = banner();
+        const go = button("Send the answer", { kind: "btn-primary" });
+        go.addEventListener("click", async () => {
+          const refs = [...picks.filter((each) => each.box.input.checked).map((each) => each.ref), ...more.input.value.split(",").map((ref) => ref.trim()).filter(Boolean)];
+          const done = await submit({ button: go, banner: problem, fields: { answer: words, evidence: more },
+            run: () => post(`/api/v1/audit/requests/${item.id}/answer`, { answer: words.input.value || null, evidence: refs }) });
+          if (!done) return;
+          toast("Sent. Internal audit will read it.");
+          reload();
+        });
+        form = card({ title: "Answer it" }, h("div", { class: "stack-lg" }, problem, words.node,
+          picks.length ? section("Already on file", h("p", { class: "subtle" }, "Evidence kept about what is being audited. Choose what answers the request; nothing needs sending twice."), picks.map((each) => each.box.node)) : null,
+          more.node, h("div", { class: "row" }, go)));
+      }
+      return h("div", { class: "stack-lg" }, header, asked, form, answered);
     },
   });
 }

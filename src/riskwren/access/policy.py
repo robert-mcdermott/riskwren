@@ -294,6 +294,12 @@ POLICIES.update(
         ("POST", "/api/v1/workpapers/{paper_id}/notes"): Needs.AUDIT,
         ("POST", "/api/v1/review-notes/{note_id}/answer"): Needs.AUDIT,
         ("POST", "/api/v1/review-notes/{note_id}/clear"): Needs.AUDIT,
+        ("POST", "/api/v1/engagements/{ref}/requests"): Needs.AUDIT,
+        # A request is answered by whoever it was asked of, auditor or not.
+        ("GET", "/api/v1/audit/requests/{request_id}"): Needs.MEMBER,
+        ("POST", "/api/v1/audit/requests/{request_id}/answer"): Needs.MEMBER,
+        ("POST", "/api/v1/audit/requests/{request_id}/accept"): Needs.AUDIT,
+        ("POST", "/api/v1/audit/requests/{request_id}/return"): Needs.AUDIT,
         # Dossiers and a scope's plans hold what the person may see, checked by the record.
         ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
         ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,
