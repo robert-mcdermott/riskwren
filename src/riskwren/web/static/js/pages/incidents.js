@@ -15,7 +15,7 @@ import { openOverlay } from "../components/overlay.js";
 import { peoplePicker, personField } from "../components/people-picker.js";
 import { recordChip } from "../components/record.js";
 import { toast } from "../components/toast.js";
-import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
+import { alert, card, emptyState, pageHeader, pill, stat } from "../components/ui.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 import { clearFilters, filterSelect, isFiltering, keepSearchFocus, pager, searchBox, sortHeader } from "./records.js";
@@ -54,12 +54,27 @@ export function incidentNew(main, meta) {
 
 // --- The list ------------------------------------------------------------------------------------
 
+function yearCard(summary) {
+  const costs = Object.entries(summary.loss_totals).map(([currency, amount]) =>
+    new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 0 }).format(amount)).join(" + ");
+  const top = (title, list) => (list.length ? h("div", { class: "stack-sm" }, h("h3", {}, title),
+    h("ul", { class: "plain-list stack-sm" }, list.map((item) => h("li", {}, recordChip(item), h("span", { class: "subtle" }, ` ${plural(item.count, "time")}`))))) : null);
+  return card({ title: "The last year" }, h("div", { class: "stack" },
+    h("div", { class: "grid-3" },
+      stat(String(summary.by_kind.incident ?? 0), "Incidents"),
+      stat(String(summary.by_kind.near_miss ?? 0), "Near misses"),
+      stat(costs || "None recorded", "What they cost")),
+    summary.by_category.length ? h("p", { class: "muted" }, summary.by_category.map((row) => `${row.label}: ${row.count}`).join(" · ")) : null,
+    h("div", { class: "grid-2" }, top("Risks realized most", summary.realized), top("Controls that failed most", summary.failed))));
+}
+
 export function incidentList(main) {
   return show(main, {
     title: "Incidents",
     load: async () => {
-      const [page, unitIndex, vocab] = await Promise.all([get("/api/v1/incidents", Object.fromEntries(query()), { fresh: true }), units(), vocabularies()]);
-      return { page, units: unitIndex, vocab };
+      const [page, unitIndex, vocab, summary] = await Promise.all([get("/api/v1/incidents", Object.fromEntries(query()), { fresh: true }), units(), vocabularies(),
+        get("/api/v1/incidents/summary", null, { fresh: true })]);
+      return { page, units: unitIndex, vocab, summary: summary.data };
     },
     view: (data) => {
       const rows = data.page.data;
@@ -86,6 +101,7 @@ export function incidentList(main) {
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Incidents", title: "Incidents", lede: "Incidents, near misses, and concerns: what you reported, and those you triage, handle, or lead the unit of.",
           actions: h("a", { class: "btn btn-primary", href: "/incidents/new" }, "Report something") }),
+        data.summary.total ? yearCard(data.summary) : null,
         bar, card({ title: plural(data.page.meta.total, "report"), flush: true, footer: pager(data.page.meta, rows.length) }, body));
     },
   });
@@ -247,7 +263,8 @@ export function incidentPage(main, params) {
       const entries = tab === "history" && record.data.everything ? await get(`${base}/history`, null, { fresh: true }) : null;
       const breach = tab === "breach" && record.data.everything
         ? await Promise.all([get(`${base}/breach`, null, { fresh: true }), import("./incident-breach.js")]) : null;
-      return { record: record.data, units: unitIndex, vocab, history: entries?.data ?? [], breach };
+      const learning = tab === "overview" && record.data.everything ? await import("./incident-learning.js") : null;
+      return { record: record.data, units: unitIndex, vocab, history: entries?.data ?? [], breach, learning };
     },
     view: (data, reload) => {
       const record = data.record;
@@ -293,6 +310,7 @@ export function incidentPage(main, params) {
             : h("p", { class: "muted" }, record.triaged ? "No records named." : "Named at triage."),
           subjects.hidden ? h("p", { class: "subtle" }, `And ${plural(subjects.hidden, "record")} you do not have access to.`) : null),
           conversation(record, reload),
+          data.learning ? data.learning.learningCards(record, data.vocab, reload) : null,
           record.closure_note ? card({ title: "How it ended" }, prose(record.closure_note)) : null),
         h("div", { class: "stack-lg" },
           card({ title: "At a glance" }, facts([

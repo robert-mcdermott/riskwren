@@ -1,4 +1,4 @@
-"""Incidents (INC-01 to INC-05): what happened, nearly happened, or worries someone.
+"""Incidents (INC-01 to INC-06): what happened, nearly happened, or worries someone.
 
 Anyone signed in reports one in a short form; where the organization opens it, anyone may
 report a concern through a link without a name, and follow it up with a code. Each report is
@@ -30,6 +30,10 @@ from riskwren.db.types import JsonType, UtcDateTime
 
 INCIDENT_KINDS = ("incident", "near_miss", "concern")
 INCIDENT_STATUSES = ("reported", "handling", "closed")
+# How a linked record bears on the incident: it concerns it, or (slice 4) it is a risk the
+# incident realized, a control that failed, or a control that held.
+SUBJECT_ROLES = ("concerns", "realized", "failed", "held")
+LOSS_KINDS = ("response", "recovery", "lost_revenue", "notification", "legal", "fines", "other")
 INCIDENT_SUBJECTS = (
     "system", "service", "information", "third_party", "process", "risk", "control", "scope",
 )  # fmt: skip
@@ -59,6 +63,9 @@ class Incident(RecordMixin, Base):
     triaged_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
     closure_note: Mapped[str | None] = mapped_column(Text)
     closed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    # What was learned, and why it happened (a key of the root_causes vocabulary).
+    lessons: Mapped[str | None] = mapped_column(Text)
+    root_cause: Mapped[str | None] = mapped_column(String(40))
 
     __table_args__ = (
         CheckConstraint(one_of("kind", INCIDENT_KINDS), name="kind"),
@@ -81,10 +88,14 @@ class IncidentSubject(Base):
     incident_id: Mapped[int] = mapped_column(ForeignKey("incident.id", ondelete="CASCADE"))
     subject_type: Mapped[str] = mapped_column(String(24))
     subject_id: Mapped[int] = mapped_column(Integer)
+    role: Mapped[str] = mapped_column(String(16), default="concerns", server_default="concerns")
 
     __table_args__ = (
         CheckConstraint(one_of("subject_type", INCIDENT_SUBJECTS), name="subject_type"),
-        UniqueConstraint("incident_id", "subject_type", "subject_id", name="uq_incident_subject"),
+        CheckConstraint(one_of("role", SUBJECT_ROLES), name="role"),
+        UniqueConstraint(
+            "incident_id", "subject_type", "subject_id", "role", name="uq_incident_subject"
+        ),
         Index("ix_incident_subject_subject", "subject_type", "subject_id"),
     )
 
@@ -187,3 +198,26 @@ class BreachNotification(Base):
     recorded_at: Mapped[datetime] = mapped_column(UtcDateTime)
 
     __table_args__ = (Index("ix_breach_notification_incident_id", "incident_id"),)
+
+
+class IncidentLoss(Base):
+    """What an incident cost: one amount, of one kind. Never edited; a correction is another
+    amount, which may be negative."""
+
+    __tablename__ = "incident_loss"
+    __audit_parent__ = ("incident", "incident_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("incident.id", ondelete="CASCADE"))
+    kind: Mapped[str] = mapped_column(String(24))
+    amount: Mapped[int] = mapped_column(Integer)  # whole units of the currency
+    currency: Mapped[str] = mapped_column(String(3), default="USD")
+    note: Mapped[str | None] = mapped_column(Text)
+    recorded_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    recorded_by_name: Mapped[str] = mapped_column(String(200))
+    recorded_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        CheckConstraint(one_of("kind", LOSS_KINDS), name="kind"),
+        Index("ix_incident_loss_incident_id", "incident_id"),
+    )

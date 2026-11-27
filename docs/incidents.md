@@ -1,6 +1,6 @@
 # Incidents
 
-This guide is for everyone who reports something that went wrong, and for those who triage and handle it: most often the security team, and the risk and compliance offices. An incident is a record of its own, on the same record as the risks and controls: something that happened, nearly happened, or worries someone. It is not an issue. An issue is something to put right; an incident is something that happened.
+This guide is for everyone who reports something that went wrong, and for those who triage, handle, and learn from it: most often the security team, and the risk and compliance offices. An incident is a record of its own, on the same record as the risks and controls: something that happened, nearly happened, or worries someone. It is not an issue. An issue is something to put right; an incident is something that happened.
 
 ## Reporting something
 
@@ -55,6 +55,18 @@ Those handling an incident, and those who see all of it, write on it under **Wha
 - **The reporter too:** a message to whoever reported it, who is told. They answer on the same page, and whoever handles it is told.
 
 When it is done, **Close** asks how it ended, and the reporter is told it is closed. Its handlers close it, or those who triage it. Those who triage it can **Reopen** it.
+
+## What it taught
+
+An incident is worth most for what it teaches the register. Beneath what happened, those who handle or triage it say:
+
+- **What it taught:** the risks it realized, the controls that failed, and the controls that held; why it happened, from the program's list of root causes (the same list an issue's closure uses); and what was learned, in words. A high or critical incident is not closed until what was learned is said. Triage names the records an incident *concerns*; this names what it *showed*, and triage again leaves it alone.
+- **What it cost:** each cost one amount, of one kind (responding, recovering, revenue or funding lost, notifying people, legal costs, fines and penalties, or other), in whole units of a currency. A cost is never edited: to correct one, record the difference, which may be negative. Amounts in different currencies are not added together.
+- **Issues raised from it:** whatever it showed must be put right is raised as an issue in the one register, for the incident's unit, with the incident as its source, so that it is put right, dated, and confirmed closed like any other ([Issues and exceptions](issues-and-exceptions.md)). An issue raised from a restricted case is restricted too, and names the case only to those who may know of it.
+
+The register learns back. A **risk** shows the incidents and near misses that realized it, how many in the last year, and what they cost, beside its own ratings and, where it has one, its estimate in ranges. A **control** shows the incidents in which it failed and those in which it held. **Incidents** opens on the last year: how many incidents and near misses, what they cost, the categories, and the risks realized and controls that failed most often. All of it follows who may see each incident: a restricted case is never shown beside a risk or a control to someone not named on it, and is never counted for them.
+
+![What an incident taught: the risks it realized, the controls that failed and held, what was learned, what it cost, and the issue raised from it](img/incident-learned-light.webp)
 
 ## Breach assessment
 

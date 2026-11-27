@@ -2320,7 +2320,7 @@ class Builder:
         triaged by the security team and the compliance office, written about, and closed."""
         from riskwren.db.models import Incident, OrgUnit, Risk, System
         from riskwren.events.actor import Actor
-        from riskwren.incidents import anonymous, breach
+        from riskwren.incidents import anonymous, breach, learning
         from riskwren.incidents import reports as incident_reports
 
         steps: list[tuple[float, int, str, Any]] = [(c.ANONYMOUS_OPENED, 9, "open", None)]
@@ -2332,6 +2332,12 @@ class Builder:
                 steps.append((spec["restrict"][0], 12, "restrict", spec))
             if "breach" in spec:
                 steps.append((spec["breach"][0], 13, "breach", spec))
+            if "learned" in spec:
+                steps.append((spec["learned"][0], 10, "learned", spec))
+            for index, loss in enumerate(spec.get("losses", [])):
+                steps.append((loss[0], 12 + index, "loss", (spec, loss)))
+            if "issue" in spec:
+                steps.append((spec["issue"][0], 15, "issue", spec))
             for index, sent in enumerate(spec.get("notified", [])):
                 steps.append((sent[0], 15 + index, "notified", (spec, sent)))
             for index, said in enumerate(spec.get("said", [])):
@@ -2351,6 +2357,12 @@ class Builder:
             if what == "open":
                 with self.act(self.cast["admin"]) as (session, who):
                     anonymous.set_open(session, who, True)
+                continue
+            if what == "loss":
+                spec, (_, by, kind, amount, note) = item
+                with self.act(self.cast[by]) as (session, who):
+                    learning.add_loss(session, who, find(session, spec),
+                                      {"kind": kind, "amount": amount, "note": note})  # fmt: skip
                 continue
             if what == "notified":
                 spec, (_, by, regime, duty, recipient, method) = item
@@ -2415,6 +2427,31 @@ class Builder:
                         "factors": {key: {"level": level, "note": note}
                                     for key, (level, note) in given["factors"].items()},
                     })  # fmt: skip
+            elif what == "learned":
+                _, by, given = spec["learned"]
+                with self.act(self.cast[by]) as (session, who):
+                    from riskwren.db.models import Control
+
+                    def refs(model: Any, names: list[str]) -> list[str]:
+                        return [found.ref for name in names
+                                if (found := session.scalars(
+                                    select(model).where(model.name == name)).first())]  # fmt: skip
+
+                    incident = find(session, spec)
+                    learning.set_links(session, who, incident, {
+                        "realized": refs(Risk, given.get("realized", [])),
+                        "failed": refs(Control, given.get("failed", [])),
+                        "held": refs(Control, given.get("held", []))})  # fmt: skip
+                    if given.get("lessons"):
+                        learning.learn(session, who, incident, given)
+            elif what == "issue":
+                _, by, given = spec["issue"]
+                with self.act(self.cast[by]) as (session, who):
+                    subjects = [found.ref for name in given["subjects"]
+                                if (found := session.scalars(
+                                    select(Risk).where(Risk.name == name)).first())]  # fmt: skip
+                    learning.raise_issue(session, who, find(session, spec), {
+                        **given, "subjects": subjects, "owner_id": self.cast[given["owner"]]})  # fmt: skip
             elif what == "restrict":
                 _, by, members = spec["restrict"]
                 with self.act(self.cast[by]) as (session, who):

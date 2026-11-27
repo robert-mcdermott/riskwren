@@ -50,9 +50,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `breach_assessment` (superseded, never edited) and `breach_notification` (migration 0042, which also lets a campaign ask for a privacy impact assessment). `riskwren.incidents.breach` holds the rules built in (HIPAA as a covered entity and as a business associate, the FTC Safeguards Rule, DFARS 252.204-7012) and those the organization names (a state's law, a contract), works out each duty's due date from discovery, and lists what is still to send on the handler's home page. `riskwren.compliance.privacy` decides which processes and systems need an assessment from the new `privacy` rule, asks for them through a new campaign kind with a built-in questionnaire, flags concerns in the answers, and records a review; a process's or system's **Privacy** tab and **Compliance → Privacy impact** show where each stands. The HIPAA Breach Notification Rule and the NIST Privacy Framework 1.0 are built from the eCFR and from NIST's reference tool, and loaded on request. The demo assesses two incidents and runs a privacy impact campaign. The acceptance tests are `tests/test_breach.py`.
 
-### Slice 4: Learning and losses ☐
+### Slice 4: Learning and losses ☑
 
-- [ ] Incidents joined to risks and controls; corrective actions; loss events and near misses (INC-06)
+- [x] Incidents joined to risks and controls; corrective actions; loss events and near misses (INC-06)
+
+**Acceptance:** an incident names the risks it realized and the controls that failed or held, why it happened, and what was learned, and a high or critical incident cannot be closed without it; its costs are recorded; issues raised from it carry it as their source; a risk and a control show the incidents that bear on them, and the incidents list the last year, never showing a restricted case to someone not named on it.
+
+**Done:** `incident_subject` gains a `role` (concerns, realized, failed, held), `incident` its `lessons` and `root_cause`, and `incident_loss` holds each cost, never edited (migration 0043). `riskwren.incidents.learning` sets what an incident showed without touching what triage named, records costs (totals kept per currency), raises issues for the incident's unit with `source_type` incident (restricted with a restricted case, and naming it only to those who may see it), and adds `incidents` to a risk's and a control's answers through the incidents' own visibility condition. The demo's ransomware near miss realized two risks, showed a control that failed and two that held, and cost $8,200; the shared-password concern raised an issue. The acceptance tests are `tests/test_learning.py`.
 
 ### Slice 5: Business impact ☑
 

@@ -239,7 +239,7 @@ def subjects_of(session: Session, principal: Principal, incident: Incident) -> d
     hidden = 0
     for link in session.scalars(
         select(IncidentSubject)
-        .where(IncidentSubject.incident_id == incident.id)
+        .where(IncidentSubject.incident_id == incident.id, IncidentSubject.role == "concerns")
         .order_by(IncidentSubject.id)
     ):
         record_type = _types().get(link.subject_type)
@@ -365,7 +365,13 @@ def _history_title(event: Any, lookups: Any) -> str | None:
 
     if event.subject_type == "incident_subject":
         name = lookups.name(now("subject_type"), now("subject_id"))
-        return f"Now concerns {name}" if event.action == "created" else f"No longer concerns {name}"
+        added = event.action == "created"
+        said = {
+            "realized": (f"Realized the risk {name}", f"No longer said to realize {name}"),
+            "failed": (f"Says {name} failed", f"No longer says {name} failed"),
+            "held": (f"Says {name} held", f"No longer says {name} held"),
+        }.get(now("role") or "concerns", (f"Now concerns {name}", f"No longer concerns {name}"))
+        return said[0] if added else said[1]
     if event.subject_type == "incident_member":
         name = lookups.name("account", now("account_id"))
         return (
@@ -533,7 +539,9 @@ def set_subjects(
     have = {
         (row.subject_type, row.subject_id): row
         for row in session.scalars(
-            select(IncidentSubject).where(IncidentSubject.incident_id == incident.id)
+            select(IncidentSubject).where(
+                IncidentSubject.incident_id == incident.id, IncidentSubject.role == "concerns"
+            )
         )
     }
     for key, row in have.items():
@@ -632,11 +640,25 @@ def triage(
     return incident
 
 
+SERIOUS = ("critical", "high")
+
+
+def close_blocked(incident: Incident) -> str | None:
+    """Why it cannot be closed yet, if it cannot: a high or critical incident is closed only
+    once what was learned is said."""
+    if incident.kind == "incident" and incident.severity in SERIOUS and not incident.lessons:
+        return "Say what was learned before closing an incident this serious."
+    return None
+
+
 def close(session: Session, principal: Principal, incident: Incident, note: Any) -> Incident:
     if not (triages_this(session, principal, incident) or handles(session, principal, incident)):
         raise PermissionDenied("It is closed by its handlers, or by those who triage it.")
     if incident.status not in LIVE:
         raise Conflict("This is already closed.")
+    blocked = close_blocked(incident)
+    if blocked:
+        raise Conflict(blocked)
     said = records.text(note)
     if not said:
         raise Invalid("It was not closed.", {"note": "Say how it ended."})

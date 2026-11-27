@@ -1189,6 +1189,21 @@ INCIDENTS = [
                                      "image."),
               (60, "sec_mgr", True, "The node is back in service. Nothing reached research "
                                     "storage: its snapshots were checked file by file.")],
+     "learned": (59, "ciso", {
+         "realized": ["Ransomware reaching research storage",
+                      "Staff accounts taken over through stolen passwords"],
+         "failed": ["Second factor at sign-in"],
+         "held": ["Protection against malicious software", "Backups tested by restoring"],
+         "root_cause": "design",
+         "lessons": "The cluster's login nodes were outside the second-factor rollout, so a "
+                    "password reused from a breached site was enough. Endpoint protection and "
+                    "the tested snapshots held. Every system that faces the internet is now on "
+                    "the second-factor list, and the list is checked each quarter.",
+     }),
+     "losses": [(59, "sec_mgr", "response", 6400, "Forty hours of the security team and "
+                                                   "the cluster administrators."),
+                (58, "sec_mgr", "recovery", 1800, "Rebuilding the node and checking the "
+                                                  "snapshots.")],
      "closed": (58, "sec_mgr", "Contained on one node; no data lost or taken. Multi-factor "
                                "sign-in is now required on the cluster's login nodes.")},
     {"by": "sp_mgr", "on": 23, "kind": "incident", "unit": "CR", "occurred": 24,
@@ -1229,7 +1244,12 @@ INCIDENTS = [
      "said": [(13, "sec_mgr", True, "Thank you. Is it the console at the nurses' station by "
                                     "the elevators, or the one in the medication room?"),
               (12, "reporter", True, "By the elevators. The note has been there since the "
-                                     "summer.")]},
+                                     "summer.")],
+     "issue": (11, "ciso", {
+         "name": "Infusion pump console signed in with a shared account", "severity": "high",
+         "summary": "Everyone at the nurses' station uses one account, and its password is on "
+                    "a note. Each nurse needs their own sign-in, through single sign-on.",
+         "subjects": ["Compromised account: Infusion therapy"], "owner": "it_mgr"})},
     # A restricted case: known only to those named on it, not to the pharmacy's leaders.
     {"by": "pharm_mgr", "on": 9, "kind": "concern", "unit": "PHARM", "occurred": 10,
      "where": "Pharmacy, the controlled substance vault",
@@ -1260,6 +1280,9 @@ INCIDENTS = [
                       "breach of unsecured information.",
          "regimes": [{"key": "contract", "name": "The genomics data use agreement", "days": 10}],
      }),
+     "losses": [(4, "sec_mgr", "recovery", 2150, "A replacement laptop, set up.")],
+     "learned": (4, "ciso", {"realized": [], "failed": [],
+                                "held": ["Devices and storage encrypted"]}),
      "said": [(6, "sec_mgr", False, "Endpoint management shows the disk was encrypted and the "
                                     "laptop last checked in at 7:12 pm. Remote wipe sent."),
               (5, "sec_mgr", True, "Thank you. Please file a police report and send us its "

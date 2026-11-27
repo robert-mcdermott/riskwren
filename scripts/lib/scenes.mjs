@@ -305,6 +305,12 @@ export const SCENES = [
   { name: "privacy", as: "cro", path: "/privacy" },
   { name: "system-privacy", as: "ciso", path: async (page) => `/systems/${await first("/api/v1/systems?q=survey+platform")(page)}?tab=privacy` },
   { name: "system-privacy-reviewed", as: "member", path: async (page) => `/systems/${await first("/api/v1/systems?q=scheduling+system")(page)}?tab=privacy` },
+  { name: "incident-learned", as: "cro", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=ransomware+stopped")(page)}` },
+  { name: "incident-learning-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Say what it taught") },
+  { name: "incident-loss-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Record a cost") },
+  { name: "incident-issue-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Raise an issue") },
+  { name: "risk-incidents", as: "cro", path: risk("ransomware reaching research") },
+  { name: "control-incidents", as: "ciso", path: async (page) => `/controls/${await first("/api/v1/controls?q=second+factor")(page)}` },
   { name: "incident-reporter", as: "member", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=mailbox")(page)}` },
   { name: "program-anonymous", as: "admin", path: "/admin/program?tab=visibility" },
   // Reporting without a name, and following up a report with the code the demo gave it.

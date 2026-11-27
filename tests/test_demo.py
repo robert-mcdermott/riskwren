@@ -281,7 +281,7 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         raised = session.scalars(select(Issue)).all()
         assert {issue.status for issue in raised} == {"open", "proposed", "closed", "cancelled"}
         assert {issue.source_kind for issue in raised} == {
-            "test", "gap", "audit", "review", "observation", "security_test",
+            "test", "gap", "audit", "review", "observation", "security_test", "incident",
         }  # fmt: skip
         failed = sum(
             1

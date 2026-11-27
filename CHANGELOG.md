@@ -20,6 +20,10 @@ Wave 8, *Incidents and resilience*.
 - **Restricted cases:** an incident can be kept to those named on it, its handlers, and its
   reporter. Nobody else learns that it exists, those who read everything included: lists,
   search, counts, the history of everything, and their notices leave it out.
+- **What an incident taught:** the risks it realized, the controls that failed or held, why it
+  happened, and what was learned (needed before a high or critical incident is closed); what
+  it cost; and the issues raised from it. A risk shows the incidents that realized it and
+  their cost, a control where it failed or held, and **Incidents** opens on the last year.
 - **Breach assessment:** whether an incident involving protected information must be
   notified: when it was discovered, what was involved, the four factors, any exception, and the
   conclusion, with the rules that apply. What each rule requires, to whom, and by when follows

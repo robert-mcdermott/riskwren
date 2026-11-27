@@ -23,7 +23,7 @@ from riskwren.api.routers.inventory import (
 )
 from riskwren.compliance import privacy
 from riskwren.events.actor import Actor
-from riskwren.incidents import anonymous, breach, reports
+from riskwren.incidents import anonymous, breach, learning, reports
 from riskwren.incidents.reports import INCIDENT
 from riskwren.inventory import history, records
 
@@ -119,6 +119,13 @@ def list_incidents(
     return list_records(request, INCIDENT, filters, sort, limit, cursor)
 
 
+@router.get("/incidents/summary", summary="The incidents you may see from the last year, counted")
+def incidents_summary(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(learning.summary(session, principal))
+
+
 @router.post("/incidents", status_code=201, summary="Report an incident, a near miss, or a concern")
 def report_incident(request: Request, body: ReportBody) -> dict[str, Any]:
     principal = current(request)
@@ -185,6 +192,52 @@ def incident_history(request: Request, ref: str) -> dict[str, Any]:
         incident = records.load(session, principal, INCIDENT, ref)
         records.require_whole(session, principal, INCIDENT, incident)
         return envelope(history.for_record(session, INCIDENT, incident))
+
+
+# --- Learning and losses -----------------------------------------------------------------
+
+
+class LearningBody(BaseModel):
+    realized: list[str] = Field(default_factory=list, description="Risks it realized")
+    failed: list[str] = Field(default_factory=list, description="Controls that failed")
+    held: list[str] = Field(default_factory=list, description="Controls that held")
+    lessons: str | None = Field(default=None, max_length=20000, description="What was learned")
+    root_cause: str | None = Field(default=None, description="From the root_causes vocabulary")
+
+
+class LossBody(BaseModel):
+    kind: str = Field(description="response, recovery, lost_revenue, notification, legal, "
+                      "fines, or other")  # fmt: skip
+    amount: int = Field(description="In whole units of the currency; negative to correct")
+    currency: str = Field(default="USD", max_length=3)
+    note: str | None = Field(default=None, max_length=4000)
+
+
+class IncidentIssueBody(BaseModel):
+    name: str | None = Field(default=None, max_length=400)
+    summary: str | None = Field(default=None, max_length=20000)
+    severity: str | None = None
+    subjects: list[str] = Field(default_factory=list, description="Controls, scopes, risks")
+    owner_id: int | None = None
+
+
+@router.put("/incidents/{ref}/learning", summary="What it realized, what failed, what was learned")
+def set_learning(request: Request, ref: str, body: LearningBody) -> dict[str, Any]:
+    def act(session: Any, principal: Any, incident: Any) -> None:
+        learning.set_links(session, principal, incident, body.model_dump())
+        learning.learn(session, principal, incident, body.model_dump())
+
+    return _act(request, ref, act)
+
+
+@router.post("/incidents/{ref}/losses", status_code=201, summary="Record what it cost")
+def add_loss(request: Request, ref: str, body: LossBody) -> dict[str, Any]:
+    return _act(request, ref, lambda s, p, i: learning.add_loss(s, p, i, body.model_dump()))
+
+
+@router.post("/incidents/{ref}/issues", status_code=201, summary="Raise an issue from it")
+def raise_issue(request: Request, ref: str, body: IncidentIssueBody) -> dict[str, Any]:
+    return _act(request, ref, lambda s, p, i: learning.raise_issue(s, p, i, body.model_dump()))
 
 
 # --- Breach assessment and notifications -------------------------------------------------
