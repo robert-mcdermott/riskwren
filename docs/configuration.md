@@ -315,6 +315,8 @@ RiskWren speaks plain HTTP and expects a reverse proxy to terminate TLS in front
 
 The app sets its own security headers, including a content security policy with no inline script or style and no third-party origins, so the proxy does not need to add them.
 
+If reporting without a name is open (see [Incidents](incidents.md#reporting-without-a-name)), RiskWren keeps nothing about who sends a report, but the proxy's access log, and the server's own, may record the address of every request. To keep reports at `/report` and `/api/v1/anonymous-reports` from being tied to an address, leave those paths out of the logs, or keep no addresses in them.
+
 ## The demo and the network
 
 A demo organization signs in anyone who asks as any of its sample people, with no password. So a demo's server listens only on the machine it runs on: `serve` refuses any other host, and the sample sign-in refuses requests from other machines.

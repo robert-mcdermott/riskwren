@@ -296,6 +296,10 @@ A requirement is addressed by a query, since codes such as `164.308(a)(1)(ii)(A)
 | `GET /exceptions` · `POST /exceptions` · `GET` · `PATCH /exceptions/{ref}` | Exceptions, with `state`; ask for one to a control, or to a requirement within a scope |
 | `POST /exceptions/{ref}/decision` | Approve or refuse it (a leader or a manager who did not ask) |
 | `POST /exceptions/{ref}/withdrawal` | Take back a request, or end an exception early |
+| `GET /incidents` · `POST /incidents` · `GET` · `PATCH /incidents/{ref}` | Incidents, near misses, and concerns you may see, with `status` (or `live`), `kind`, `category`, `severity`, `about`, and `reported` (yours); report one with `kind`, `name`, `summary`, `occurred_on`, `location`, and `org_unit_id`. Its reporter sees `everything: false`: what they reported, where it stands, and what is said to them |
+| `POST /incidents/{ref}/triage` · `PUT /incidents/{ref}/owners` | Triage it (a manager, or an assessor for its unit): `category`, `severity`, `org_unit_id`, `subjects` (references), and `handler_id`; set its handlers |
+| `POST /incidents/{ref}/messages` · `POST /incidents/{ref}/close` · `POST /incidents/{ref}/reopen` · `GET /incidents/{ref}/history` | Write on it, `shared` with the reporter or a note; close it with a `note` saying how it ended; reopen it; its history, for all but a reporter who sees only their report |
+| `GET` · `POST /anonymous-reports` · `POST /anonymous-reports/follow-up` · `POST /anonymous-reports/messages` | With no account, where reporting without a name is open (`404` where it is not): whether it is open; report something, getting a `code` this once; with the `code`, where it stands and what has been said; add to it. Nothing about who sends them is kept, failed codes are not counted by address, and at most 30 reports an hour are taken (`409` after) |
 | `GET /notices` · `GET /notices/count` · `POST /notices/read` | What has been assigned to you or decided for you; how many are unread; mark them read |
 
 ### Import and export
@@ -315,6 +319,7 @@ A requirement is addressed by a query, since codes such as `164.308(a)(1)(ii)(A)
 | `PATCH /risk-categories/{key}` | Set a category's appetite (a manager for the whole organization) |
 | `GET /vocabularies` | The lists of values records choose from |
 | `GET` · `PUT /admin/visibility` | How much of the register everyone sees |
+| `GET` · `PUT /admin/anonymous-reporting` | Whether reporting without a name is `open`; only an administrator opens or closes it |
 | `GET` · `PUT /admin/leadership-readers` | Who reads the leadership reports, beyond those who always do: `reach` (`executives`, `organization`, or `leaders`) and `people`, the accounts named as readers |
 | `GET` · `PUT /admin/branding` and its images | Appearance (admin) |
 | `GET /home` | What is waiting on you |

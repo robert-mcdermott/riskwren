@@ -66,6 +66,7 @@ def graph_around(request: Request, ref: str) -> dict[str, Any]:
     with reading(request) as session:
         record_type, found = find_any(session, ref)
         record = records.load(session, principal, record_type, found.ref)
+        records.require_whole(session, principal, record_type, record)
         return envelope(graph.around(session, principal, record_type, record))
 
 

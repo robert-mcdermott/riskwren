@@ -10,6 +10,16 @@ Wave 8, *Incidents and resilience*.
 
 ### Added
 
+- **Incidents:** anyone signed in reports an incident, a near miss, or a concern in one short
+  form, under **Incidents → Report something**. A report is seen by its reporter, those who
+  handle it, those who triage for its unit (managers, and its unit's assessors), the leaders
+  and stewards of its unit, and those who read everything; its reporter sees what they
+  reported, where it stands, and what is said to them, not the handling. Triage gives it a
+  category, a severity, the records it concerns, and a handler, who handles it on their home
+  page until it is closed. A new guide, **Incidents**.
+- **Reporting without a name,** closed until an administrator opens it under **Admin →
+  Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
+  name, or address, with a follow-up code shown once.
 - **Business impact and recovery:** a process's business impact analysis (how its loss hurts
   over time, how soon it must be back, how much information it can lose, and the least it
   needs), what each system and service can deliver and what that rests on, and every shortfall
@@ -25,6 +35,8 @@ Wave 8, *Incidents and resilience*.
 - **A security leader who assesses everywhere now reads the leadership reports,** as does
   anyone else whose role covers the whole organization. Choose **Nobody else** under
   **Admin → Program → Who sees what** to keep them to those who lead the whole organization.
+- **Incident categories** are a new vocabulary, editable under **Admin → Program →
+  Vocabularies**. The menu has a new group, **Incidents**.
 - In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),
   and `leadership` says whether the person reads the leadership reports.
 

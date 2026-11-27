@@ -467,6 +467,33 @@ COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ("review", "Review", "A review of a supplier, a system, or a process"),
         ("observation", "Observation", "Somebody noticed it and said so"),
     ),
+    # What an incident, a near miss, or a concern is about, given at triage.
+    "incident_categories": items(
+        (
+            "security",
+            "Security",
+            "Systems, accounts, or information reached, changed, or put at risk by someone who "
+            "should not have",
+        ),
+        (
+            "privacy",
+            "Privacy",
+            "Personal or health information used, shared, or lost in a way it should not be",
+        ),
+        ("safety", "Safety", "Harm, or the chance of harm, to people"),
+        (
+            "conduct",
+            "Conduct",
+            "How someone behaved: misconduct, harassment, or a conflict of interest",
+        ),
+        (
+            "compliance",
+            "Compliance",
+            "A law, a regulation, a contract, or the organization's own policy not followed",
+        ),
+        ("operations", "Operations", "Something the organization depends on failed or stopped"),
+        ("other", "Other", "None of these, or not yet known"),
+    ),
     # Why it happened, said when an issue is closed, so that causes can be counted.
     "root_causes": items(
         ("procedure", "Procedure", "There was no procedure, or it was unclear or out of date"),

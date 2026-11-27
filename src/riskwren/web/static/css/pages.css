@@ -262,3 +262,9 @@
 .stages li::before { content: counter(stage) ". "; }
 .stages .stage-done { color: var(--text); }
 .stages .stage-now { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+/* Incidents: the report form reads as one column; what was said, as a thread. */
+.narrow { max-width: 48rem; }
+.messages > li { padding-bottom: var(--space-3); border-bottom: 1px solid var(--border); }
+.messages > li:last-child { border-bottom: 0; }
+.follow-code { font-family: var(--font-mono); font-size: var(--text-xl); letter-spacing: 0.08em; padding: var(--space-4); border: 2px dashed var(--border-strong); border-radius: var(--radius-m); text-align: center; user-select: all; }

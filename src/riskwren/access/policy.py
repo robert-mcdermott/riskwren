@@ -310,6 +310,26 @@ POLICIES.update(
         # An outside auditor has no account: their link, in a header, opens one engagement or
         # scope, read-only, and each use is recorded.
         ("GET", "/api/v1/outside"): Needs.PUBLIC,
+        # Incidents: anyone reports one; the service decides who sees, triages, and handles
+        # each (its reporter, handlers, triagers, its unit's leaders and stewards).
+        ("GET", "/api/v1/incidents"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/incidents/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/incidents/{ref}/owners"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/triage"): Needs.ASSESS,
+        ("POST", "/api/v1/incidents/{ref}/close"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/reopen"): Needs.ASSESS,
+        ("POST", "/api/v1/incidents/{ref}/messages"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/{ref}/history"): Needs.MEMBER,
+        ("GET", "/api/v1/admin/anonymous-reporting"): Needs.CONFIGURE,
+        ("PUT", "/api/v1/admin/anonymous-reporting"): Needs.ADMIN,
+        # Reporting without a name: no account, and nothing kept of who sent it. Closed
+        # unless an administrator opens it.
+        ("GET", "/api/v1/anonymous-reports"): Needs.PUBLIC,
+        ("POST", "/api/v1/anonymous-reports"): Needs.PUBLIC,
+        ("POST", "/api/v1/anonymous-reports/follow-up"): Needs.PUBLIC,
+        ("POST", "/api/v1/anonymous-reports/messages"): Needs.PUBLIC,
         # Resilience: read with the record, changed by those who keep it.
         ("GET", "/api/v1/resilience"): Needs.MEMBER,
         ("GET", "/api/v1/processes/{ref}/impact"): Needs.MEMBER,

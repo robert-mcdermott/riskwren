@@ -408,6 +408,21 @@ REACH[("GET", "/api/v1/outside")] = EVERYONE | {"nobody"}  # an outsider's link,
 for _key in POLICIES:  # resilience is decided by the record
     if _key[1] == "/api/v1/resilience" or _key[1].endswith(("/impact", "/recovery")):
         REACH[_key] = EVERYONE
+# Incidents: anyone reports one, and the record decides the rest; triage is for those who
+# assess. Reporting without a name is reached by anyone, and closed unless it is opened.
+for _key in POLICIES:
+    if _key[1].startswith("/api/v1/incidents"):
+        REACH[_key] = EVERYONE
+for _route in (
+    ("POST", "/api/v1/incidents/{ref}/triage"),
+    ("POST", "/api/v1/incidents/{ref}/reopen"),
+):
+    REACH[_route] = {"manager", "assessor"}
+REACH[("GET", "/api/v1/admin/anonymous-reporting")] = {"admin", "manager"}
+REACH[("PUT", "/api/v1/admin/anonymous-reporting")] = {"admin"}
+for _key in POLICIES:
+    if _key[1].startswith("/api/v1/anonymous-reports"):
+        REACH[_key] = EVERYONE | {"nobody"}
 for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
                ("POST", "/api/v1/respond/submit"), ("POST", "/api/v1/respond/files")):  # fmt: skip
     REACH[_route] = EVERYONE | {"nobody"}

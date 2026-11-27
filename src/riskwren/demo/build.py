@@ -2315,6 +2315,89 @@ class Builder:
                         {"recovery_hours": back, "data_loss_hours": loss, "basis": basis},
                     )
 
+    def _story_incidents(self) -> Script:
+        """Reports from staff and, once an administrator opened it, from people without a name:
+        triaged by the security team and the compliance office, written about, and closed."""
+        from riskwren.db.models import Incident, OrgUnit, Risk, System
+        from riskwren.events.actor import Actor
+        from riskwren.incidents import anonymous
+        from riskwren.incidents import reports as incident_reports
+
+        steps: list[tuple[float, int, str, Any]] = [(c.ANONYMOUS_OPENED, 9, "open", None)]
+        for spec in c.INCIDENTS:
+            steps.append((spec["on"], 9, "report", spec))
+            if "triage" in spec:
+                steps.append((spec["triage"][0], 11, "triage", spec))
+            for index, said in enumerate(spec.get("said", [])):
+                steps.append((said[0], 14 + index, "say", (spec, said)))
+            if "closed" in spec:
+                steps.append((spec["closed"][0], 16, "close", spec))
+        steps.sort(key=lambda step: (-step[0], step[1]))
+
+        def find(session: Session, spec: dict[str, Any]) -> Incident:
+            return session.scalars(select(Incident).where(Incident.name == spec["name"])).one()
+
+        def unit_of(session: Session, code: str) -> int:
+            return session.scalars(select(OrgUnit.id).where(OrgUnit.code == code)).one()
+
+        for days, hour, what, item in steps:
+            yield self._on(days, hour=hour)
+            if what == "open":
+                with self.act(self.cast["admin"]) as (session, who):
+                    anonymous.set_open(session, who, True)
+                continue
+            if what == "say":
+                spec, (_, writer, shared, body) = item
+                if writer == "reporter" and spec["by"] is None:
+                    with self.db.write(Actor.system("Reported without a name")) as session:
+                        incident_reports.written_by_reporter(session, find(session, spec), body)
+                    continue
+                key = spec["by"] if writer == "reporter" else writer
+                with self.act(self.cast[key]) as (session, who):
+                    incident_reports.write(session, who, find(session, spec), body, shared=shared)
+                continue
+            spec = item
+            values = {
+                "kind": spec["kind"], "name": spec["name"], "summary": spec["summary"],
+                "location": spec["where"],
+                # Counted back from the day it was reported, which never falls on a weekend.
+                "occurred_on": self._on(spec["on"]).date()
+                - timedelta(days=spec["occurred"] - spec["on"])
+                if spec["occurred"] is not None else None,
+            }  # fmt: skip
+            if what == "report" and spec["by"] is None:
+                made = anonymous.new_code
+                anonymous.new_code = lambda code=spec["code"]: code  # type: ignore[assignment]
+                try:
+                    with self.db.write(Actor.system("Reported without a name")) as session:
+                        anonymous.report(session, values)
+                finally:
+                    anonymous.new_code = made  # type: ignore[assignment]
+                self.tally("incidents")
+            elif what == "report":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    values["org_unit_id"] = unit_of(session, spec["unit"])
+                    incident_reports.create(session, who, values)
+                self.tally("incidents")
+            elif what == "triage":
+                _, by, category, severity, subjects, handler, *moved = spec["triage"]
+                with self.act(self.cast[by]) as (session, who):
+                    refs = []
+                    for kind, name in subjects:
+                        model: Any = System if kind == "system" else Risk
+                        found = session.scalars(select(model).where(model.name == name)).first()
+                        if found is not None:
+                            refs.append(found.ref)
+                    incident_reports.triage(session, who, find(session, spec), {
+                        "category": category, "severity": severity, "subjects": refs,
+                        "handler_id": self.cast[handler],
+                        **({"org_unit_id": unit_of(session, moved[0])} if moved else {}),
+                    })  # fmt: skip
+            elif what == "close":
+                _, by, note = spec["closed"]
+                with self.act(self.cast[by]) as (session, who):
+                    incident_reports.close(session, who, find(session, spec), note)
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3568,7 +3651,7 @@ class Builder:
             self._story_assurance, self._story_coverage, self._story_lifecycle,
             self._story_measures, self._story_leadership, self._story_scenarios,
             self._story_internal_audit, self._story_engagements, self._story_outside,
-            self._story_resilience,
+            self._story_resilience, self._story_incidents,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

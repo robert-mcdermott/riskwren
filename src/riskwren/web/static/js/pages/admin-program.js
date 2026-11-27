@@ -6,6 +6,7 @@ import { button, h, iconButton } from "../core/dom.js";
 import { date, plural, titleCase } from "../core/format.js";
 import { program as loadProgram, units } from "../core/lookups.js";
 import { query } from "../core/router.js";
+import { can } from "../core/session.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { matrixGrid } from "../components/matrix.js";
 import { closeOverlay, openOverlay } from "../components/overlay.js";
@@ -426,6 +427,25 @@ function readersTab(seen) {
       h("p", { class: "subtle" }, "A reader who may not see a record a report names sees where it stands, but not what it is.")));
 }
 
+function anonymousTab(setting, reload) {
+  const open = setting.open;
+  const flip = can("admin") ? button(open ? "Close it" : "Open it", { kind: open ? "" : "btn-primary", onclick: async () => {
+    try {
+      await put("/api/v1/admin/anonymous-reporting", { open: !open });
+      toast(open ? "Reporting without a name is closed." : "Reporting without a name is open.");
+      reload();
+    } catch (error) {
+      toast(said(error));
+    }
+  } }) : null;
+  return card({ title: "Reporting without a name", actions: pill(open ? "Open" : "Closed", open ? "ok" : "") },
+    h("div", { class: "stack-sm" },
+      h("p", {}, open ? h("span", {}, "Anyone may report a concern at ", h("a", { href: "/report" }, "/report"), " without signing in. The sign-in page offers it.")
+        : "Closed: everyone reports signed in. An administrator opens it."),
+      h("p", { class: "subtle" }, `When it is open, nothing about who sends a report is kept: no account, no name, and no address. The reporter is shown a code once, and follows the report up with it. Failed codes are not counted against the address they came from, and at most ${setting.most_an_hour} reports are taken in an hour, from everyone together. Whether the web server's own log keeps addresses is set where it runs.`),
+      flip ? h("div", {}, flip) : null));
+}
+
 function rules(program) {
   const months = (count) => (count == null ? "" : plural(count, "month"));
   return card({ title: "What follows from a rating", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
@@ -446,8 +466,8 @@ export function adminProgram(main) {
     load: async () => {
       const [program, unitIndex, extra] = await Promise.all([loadProgram({ fresh: true }), units(),
         tab === "vocabularies" ? get("/api/v1/admin/vocabularies", undefined, { fresh: true })
-          : tab === "visibility" ? Promise.all([get("/api/v1/admin/visibility", undefined, { fresh: true }), get("/api/v1/admin/leadership-readers", undefined, { fresh: true })])
-            .then(([seen, readers]) => ({ data: { seen: seen.data, readers: readers.data } }))
+          : tab === "visibility" ? Promise.all(["visibility", "leadership-readers", "anonymous-reporting"].map((name) => get(`/api/v1/admin/${name}`, undefined, { fresh: true })))
+            .then(([seen, readers, anonymous]) => ({ data: { seen: seen.data, readers: readers.data, anonymous: anonymous.data } }))
             : tab === "cadences" ? get("/api/v1/vocabularies", undefined, { fresh: true }) : null]);
       return { program, unitIndex, extra: extra?.data };
     },
@@ -457,7 +477,7 @@ export function adminProgram(main) {
       const body = tab === "method" ? methodTab(data.program, ctx)
         : tab === "cadences" ? cadencesTab(data.program, ctx, data.extra)
           : tab === "vocabularies" ? vocabulariesTab(data.extra, reload)
-            : tab === "visibility" ? [visibilityTab(data.extra.seen), readersTab(data.extra.readers)]
+            : tab === "visibility" ? [visibilityTab(data.extra.seen), readersTab(data.extra.readers), anonymousTab(data.extra.anonymous, reload)]
               : [categoriesTab(data.program, ctx), rules(data.program)];
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Admin", title: "Program",

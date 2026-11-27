@@ -112,6 +112,7 @@ KEPT = {
     "criticalities": {"moderate"},
     "lifecycles": {"in_service"},
     "issue_sources": {"observation", "test"},
+    "incident_categories": {"other"},
     "unit_kinds": {"organization"},
 }
 KEY = re.compile(r"[a-z][a-z0-9_]{0,39}")

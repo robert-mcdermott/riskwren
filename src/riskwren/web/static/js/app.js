@@ -36,6 +36,11 @@ async function boot() {
     (await import("./pages/respond.js")).respondPage(root, meta);
     return;
   }
+  // Someone reporting a concern without a name, or following one up with its code.
+  if (window.location.pathname === "/report") {
+    (await import("./pages/report.js")).reportPage(root, meta);
+    return;
+  }
   // Someone outside the organization reading what an auditor opened to them: no account.
   if (window.location.pathname === "/outside") {
     (await import("./pages/outside.js")).outsidePage(root, meta);
@@ -75,6 +80,9 @@ async function boot() {
   route("/evidence/:ref", page("evidence", "evidencePage"));
   route("/assessments", page("assessments", "assessmentList"));
   route("/assessments/:ref", page("assessments", "assessmentPage"));
+  route("/incidents", page("incidents", "incidentList"));
+  route("/incidents/new", page("incidents", "incidentNew", meta));
+  route("/incidents/:ref", page("incidents", "incidentPage"));
   route("/issues", page("issues", "issueList"));
   route("/issues/:ref", page("issues", "issuePage"));
   route("/exceptions", page("exceptions", "exceptionList"));

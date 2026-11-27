@@ -91,7 +91,9 @@ export function signIn(root, meta) {
         : h("div", { class: "stack-lg" }, h("div", {}), sso, local),
       h("p", { class: "sign-in-foot" }, sample ? `Demo data, built ${meta.demo.built_on}. Nothing here is real.`
         : sso ? "Trouble signing in? Ask whoever looks after RiskWren in your organization."
-          : "Trouble signing in? Ask an administrator to reset your password."))),
+          : "Trouble signing in? Ask an administrator to reset your password."),
+      meta.report_without_name ? h("p", { class: "sign-in-foot" }, "Something to report, and rather not give your name? ",
+        h("a", { href: "/report" }, "Report it without signing in"), ".") : null)),
     h("aside", { class: "sign-in-art", "aria-hidden": "true" },
       wren("wren"),
       h("blockquote", {}, "What could go wrong, and what are we doing about it?"),

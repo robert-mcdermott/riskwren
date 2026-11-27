@@ -22,15 +22,17 @@ The wave is done when, on a fresh checkout:
 
 ## Slices
 
-### Slice 1: Reporting and triage ☐
+### Slice 1: Reporting and triage ☑
 
 **Goal:** a report from anyone in a minute, and each one triaged.
 
-- [ ] Report an incident, a near miss, or a concern: what happened, when, and where, in one short form (INC-01)
-- [ ] Reporting without a name, where the organization opens it, with a code to follow up (INC-02)
-- [ ] Triage: category, severity, the records it concerns, and who handles it (INC-03)
+- [x] Report an incident, a near miss, or a concern: what happened, when, and where, in one short form (INC-01)
+- [x] Reporting without a name, where the organization opens it, with a code to follow up (INC-02)
+- [x] Triage: category, severity, the records it concerns, and who handles it (INC-03)
 
 **Acceptance:** a report takes one form; it is seen by its reporter, those who triage, its handlers, its unit's leaders and stewards, and those who read everything, and by nobody else; triage gives it a category, a severity, its records, and an owner, and is in the history.
+
+**Done:** `incident` (`INC`) is a record of its own, with `incident_subject` for the records it concerns and `incident_message` for what is said, each shared with the reporter or kept among those handling it (migration 0040). `riskwren.incidents.reports` holds the rule of who sees one, as a check and as a condition for lists and search, which agree; its reporter sees only their report, where it stands, and what is said to them, and the views of a whole record (its history, as of a date, its connections) refuse them. Triage is for managers and the unit's assessors; it names one handler, who is told, and the reporter is told when it is being handled and when it is closed. `riskwren.incidents.anonymous` takes reports without a name once an administrator opens it: a 20-character code shown once and kept as a SHA-256 digest, no address kept or counted, and a cap of 30 an hour from everyone together. Incident categories are a new vocabulary. The demo has seven: closed, being handled, made without a name, and waiting for triage. The acceptance test is `tests/test_incidents.py`.
 
 ### Slice 2: Cases ☐
 

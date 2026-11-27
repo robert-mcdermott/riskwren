@@ -45,6 +45,9 @@ def meta(request: Request) -> dict[str, Any]:
     with reading(request) as session:
         brand = branding.public_view(branding.load(session))
         demo = demo_marker(session)
+        from riskwren.incidents import anonymous
+
+        report_without_name = anonymous.is_open(session)
     sso = request.app.state.config.sso
     return envelope(
         {
@@ -57,6 +60,8 @@ def meta(request: Request) -> dict[str, Any]:
             # Single sign-on is optional. Nothing about it is said unless it is set up.
             # Email is optional too. The app offers a choice about it only where it is set up.
             "mail": request.app.state.config.mail.enabled,
+            # Whether a concern can be reported without signing in.
+            "report_without_name": report_without_name,
             "sso": {"label": sso.label, "local_sign_in": sso.local_sign_in}
             if sso.enabled
             else None,

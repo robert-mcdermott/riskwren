@@ -662,6 +662,16 @@ def _decisions(
     return sessions.decisions_about(session, principal, record_type.key, record.id)
 
 
+def require_whole(
+    session: Session, principal: Principal, record_type: RecordType, record: Any
+) -> None:
+    """Some records show only part of themselves to some who see them: an incident's
+    reporter sees their report, not its handling. A view that shows every field refuses them."""
+    whole = record_type.extra.get("knows_all")
+    if whole is not None and not whole(session, principal, record):
+        raise NotFound(f"There is no more of {record.ref} for you to look into.")
+
+
 def load(session: Session, principal: Principal, record_type: RecordType, ref: str) -> Any:
     """Find a record the person may see, or raise NotFound."""
     from riskwren.inventory.registry import find

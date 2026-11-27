@@ -171,7 +171,7 @@ export function decisionsCard(record) {
 
 function ownersOnly(record, ctx) {
   const canEdit = record.can?.edit;
-  return card({ title: "Owners", actions: canEdit ? button("Edit", { kind: "btn-sm", onclick: () => editOwners(record, ctx) }) : null },
+  return card({ title: ctx.ownersTitle ?? "Owners", actions: canEdit ? button("Edit", { kind: "btn-sm", onclick: () => editOwners(record, ctx) }) : null },
     record.orphaned ? alert("warn", icon("alert"), h("div", {}, record.owners.some((o) => o.kind === "owner")
       ? "Its owner's account is disabled. Name a new owner." : "Nobody answers for this record. Name an owner.")) : null,
     record.owners.length ? h("div", { class: "stack" }, record.owners.map((owner) => h("div", { class: "row" },
@@ -357,8 +357,9 @@ export function recordHeader(record, { badges = [], actions = null } = {}) {
         h("div", { class: "row-sm wrap record-badges" }, badges,
           record.restricted ? h("span", { class: "pill" }, icon("lock"), "Restricted") : null,
           h("span", { class: "subtle" }, `Updated ${relative(record.updated_at)}`),
-          h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
-          h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"),
+          // A reporter who sees only their report is not offered the views of the whole record.
+          record.everything === false ? null : h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
+          record.everything === false ? null : h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"),
           DOSSIERS.has(record.type) ? h("a", { class: "connections-link", href: `/api/v1/dossiers/${record.ref}`, download: "" }, icon("download", "icon icon-sm"), "Dossier") : null)),
       actions),
     missingNote(record),

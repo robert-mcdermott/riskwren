@@ -166,6 +166,7 @@ def record_view(
     """A record as it stood on a day beside how it is now, field by field."""
     on = day(on)
     record = records.load(session, principal, record_type, ref)
+    records.require_whole(session, principal, record_type, record)
     then = state(session, record_type, record, on)
     lookups = history.Lookups(session, record_type)
     now = {key: chain.jsonable(getattr(record, key)) for key in _columns(record)}

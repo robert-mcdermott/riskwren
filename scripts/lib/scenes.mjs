@@ -288,6 +288,23 @@ export const SCENES = [
       const url = (await made.json()).meta.link.url;
       // A visit that differed only after "#" would not load the page again.
       return "/outside?visit=" + Date.now() + "#" + url.split("#")[1]; })()`) },
+  { name: "incidents", as: "ciso", path: "/incidents" },
+  { name: "incident-new", as: "member", path: "/incidents/new" },
+  { name: "incident", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}` },
+  { name: "incident-triage", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=freezer+alarm")(page)}`, step: click("Triage") },
+  { name: "incident-anonymous", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=infusion+pumps")(page)}` },
+  { name: "incident-history", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=ransomware+stopped")(page)}?tab=history` },
+  { name: "incident-reporter", as: "member", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=mailbox")(page)}` },
+  { name: "program-anonymous", as: "admin", path: "/admin/program?tab=visibility" },
+  // Reporting without a name, and following up a report with the code the demo gave it.
+  { name: "report-page", as: "member", path: "/report" },
+  { name: "report-follow-up", as: "member", path: "/report", step: `(async () => {
+      document.querySelectorAll(".tab")[1].click();
+      await new Promise((done) => setTimeout(done, 50));
+      const input = document.querySelector("input[autocomplete=off]");
+      input.value = "7KQ2M-PX4RT-9WZ3H-C6V8N";
+      [...document.querySelectorAll("button")].find((each) => each.textContent.trim() === "Open my report").click();
+      await new Promise((done) => setTimeout(done, 400)); })()` },
   { name: "audit-finding", as: "cro", path: async (page) => `/issues/${await first("/api/v1/issues?q=full+restore")(page)}` },
   { name: "audit-request", as: "ciso", path: async (page) => `/audit/requests/${await first("/api/v1/home", "(data) => data.items.find((item) => item.kind === 'audit_request').href.split('/').pop()")(page)}` },
   { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },

@@ -700,6 +700,43 @@
         "description": "Somebody noticed it and said so"
       }
     ],
+    "incident_categories": [
+      {
+        "key": "security",
+        "label": "Security",
+        "description": "Systems, accounts, or information reached, changed, or put at risk by someone who should not have"
+      },
+      {
+        "key": "privacy",
+        "label": "Privacy",
+        "description": "Personal or health information used, shared, or lost in a way it should not be"
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "description": "Harm, or the chance of harm, to people"
+      },
+      {
+        "key": "conduct",
+        "label": "Conduct",
+        "description": "How someone behaved: misconduct, harassment, or a conflict of interest"
+      },
+      {
+        "key": "compliance",
+        "label": "Compliance",
+        "description": "A law, a regulation, a contract, or the organization's own policy not followed"
+      },
+      {
+        "key": "operations",
+        "label": "Operations",
+        "description": "Something the organization depends on failed or stopped"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these, or not yet known"
+      }
+    ],
     "root_causes": [
       {
         "key": "procedure",

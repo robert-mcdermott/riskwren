@@ -56,6 +56,13 @@ export const NAV = [
     ],
   },
   {
+    heading: "Incidents",
+    items: [
+      { href: "/incidents", label: "Incidents", iconName: "alert" },
+      { href: "/incidents/new", label: "Report something", iconName: "plus" },
+    ],
+  },
+  {
     heading: "Third parties",
     items: [
       { href: "/third-parties", label: "Third parties", iconName: "third_party" },

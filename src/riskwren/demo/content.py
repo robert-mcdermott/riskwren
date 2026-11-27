@@ -1157,6 +1157,88 @@ CAPABILITY = [
     (44, "Genomics sample manager", 24, 4, "Nightly backups, restored on request."),
 ]  # fmt: skip
 
+# Incidents, near misses, and concerns, each reported some days ago by one of the cast or by
+# someone without a name (None), triaged, written about, and perhaps closed. A step's first
+# number is days ago; a message is (days ago, who wrote it or "reporter", shared, what).
+# Reporting without a name was opened this many days ago, and the demo's reports made that
+# way take these codes, so that the follow-up page can be shown.
+ANONYMOUS_OPENED = 200
+INCIDENTS = [
+    {"by": "member", "on": 96, "kind": "near_miss", "unit": "BIO", "occurred": 96, "where": "Email",
+     "name": "Email asking me to confirm my mailbox password",
+     "summary": "An email that looked as if it came from IT asked me to sign in to keep my "
+                "mailbox. The link went to a site that was not ours. I did not sign in, and I "
+                "forwarded it to the security team.",
+     "triage": (96, "assess1", "security", "low", [("system", "Email and collaboration")],
+                "sec_mgr"),
+     "said": [(96, "sec_mgr", True, "Thank you for sending it on. We blocked the sender and "
+                                    "took the same email out of 46 other mailboxes.")],
+     "closed": (95, "sec_mgr", "Sender blocked and 46 copies removed. The sign-in records show "
+                               "that nobody entered a password on the false site.")},
+    {"by": "rc_dir", "on": 61, "kind": "near_miss", "unit": "RC", "occurred": 61,
+     "where": "Compute cluster, login node 2",
+     "name": "Ransomware stopped on a cluster login node",
+     "summary": "Endpoint protection quarantined a file that began encrypting a user's scratch "
+                "directory on login node 2. The account had signed in from an unusual country "
+                "an hour before. We took the node out of service.",
+     "triage": (61, "ciso", "security", "high",
+                [("system", "Compute cluster"), ("system", "Research storage"),
+                 ("risk", "Ransomware reaching research storage")], "sec_mgr"),
+     "said": [(61, "sec_mgr", False, "The account's password was reused from a breached site. "
+                                     "Reset, sessions revoked, and the node rebuilt from its "
+                                     "image."),
+              (60, "sec_mgr", True, "The node is back in service. Nothing reached research "
+                                    "storage: its snapshots were checked file by file.")],
+     "closed": (58, "sec_mgr", "Contained on one node; no data lost or taken. Multi-factor "
+                               "sign-in is now required on the cluster's login nodes.")},
+    {"by": "sp_mgr", "on": 23, "kind": "incident", "unit": "CR", "occurred": 24,
+     "where": "Email to a trial sponsor",
+     "name": "Spreadsheet with participant names sent to a sponsor",
+     "summary": "A monthly enrollment report went to the sponsor with a tab that still had "
+                "participants' names and dates of birth. It should have had study numbers only.",
+     "triage": (23, "assess2", "privacy", "high", [("system", "Electronic data capture")],
+                "assess2"),
+     "said": [(22, "assess2", False, "The sponsor's privacy office confirmed in writing that "
+                                     "the file was deleted from the inbox and from backups."),
+              (22, "assess2", True, "Thank you for reporting it the same day. We are working "
+                                    "out with the privacy office whether anyone must be told.")]},
+    {"by": None, "on": 15, "kind": "concern", "unit": None, "occurred": None,
+     "where": "Infusion, third floor",
+     "code": "7KQ2M-PX4RT-9WZ3H-C6V8N",
+     "name": "Shared password on the infusion pumps' admin console",
+     "summary": "The pump management console at the nurses' station is signed in with one "
+                "account that everyone uses. Its password is on a note under the keyboard.",
+     "triage": (14, "ciso", "security", "moderate", [("system", "Infusion pumps")], "sec_mgr",
+                "INF"),
+     "said": [(13, "sec_mgr", True, "Thank you. Is it the console at the nurses' station by "
+                                    "the elevators, or the one in the medication room?"),
+              (12, "reporter", True, "By the elevators. The note has been there since the "
+                                     "summer.")]},
+    {"by": "gen_mgr", "on": 6, "kind": "incident", "unit": "GEN", "occurred": 7,
+     "where": "A parked car, overnight",
+     "name": "Laptop stolen from a car",
+     "summary": "A core laptop was taken from my car overnight. It had the sample manager's "
+                "export of last month's runs on it, with sample identifiers but no names.",
+     "triage": (6, "assess1", "security", "high",
+                [("system", "Endpoint management"), ("system", "Genomics sample manager")],
+                "sec_mgr"),
+     "said": [(6, "sec_mgr", False, "Endpoint management shows the disk was encrypted and the "
+                                    "laptop last checked in at 7:12 pm. Remote wipe sent."),
+              (5, "sec_mgr", True, "Thank you. Please file a police report and send us its "
+                                   "number when you have it.")]},
+    {"by": None, "on": 2, "kind": "concern", "unit": None, "occurred": None,
+     "where": "Imaging Core, the back door",
+     "code": "4DHN8-T2WQ6-MB9KX-3RF7P",
+     "name": "Visitors let into the imaging core without a badge",
+     "summary": "Visitors are being let in through the back door without signing in or wearing "
+                "a badge, and are left alone with the microscopes."},
+    {"by": "bio_mgr", "on": 1, "kind": "incident", "unit": "BIO", "occurred": 1,
+     "where": "Freezer room B",
+     "name": "Freezer alarm did not page anyone overnight",
+     "summary": "Freezer 12 rose to minus 62 at 2 am. The monitor showed the alarm, but no page "
+                "reached whoever was on call. The morning shift moved its boxes to the spare."},
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",
