@@ -17,7 +17,7 @@ import { amount, readingChart, statePill as indicatorPill, trendWord } from "../
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 
-const TABS = [["overview", "Overview"], ["controls", "Controls"], ["treatment", "Treatment"], ["assessments", "Assessments"], ["history", "History"]];
+const TABS = [["overview", "Overview"], ["controls", "Controls"], ["treatment", "Treatment"], ["bow-tie", "Bow-tie"], ["estimate", "In numbers"], ["assessments", "Assessments"], ["history", "History"]];
 const KIND_TITLES = { inherent: "Inherent rating", residual: "Residual rating", target: "Target rating" };
 
 function editObjectives({ risk, onDone }) {
@@ -112,14 +112,15 @@ export function riskPage(main, params) {
       const base = `/api/v1/risks/${params.ref}`;
       const [risk, programData, unitIndex, vocab, extra] = await Promise.all([
         get(base, null, { fresh: true }), loadProgram(), units(), vocabularies(),
-        ["history", "assessments", "controls", "treatment"].includes(tab) ? get(`${base}/${tab}`, null, { fresh: true }) : null]);
+        ["history", "assessments", "controls", "treatment", "bow-tie", "estimate"].includes(tab) ? get(`${base}/${tab}`, null, { fresh: true }) : null]);
+      const views = ["bow-tie", "estimate"].includes(tab) ? await import("../components/risk-views.js") : null;
       // What the library suggests for a risk started from it, offered on the Controls tab.
       let suggested = [];
       if (tab === "controls" && risk.data.library_key) {
         const [entry] = (await get("/api/v1/risk-library", { key: risk.data.library_key })).data;
         if (entry?.suggested_controls.length) suggested = (await get("/api/v1/control-library", { keys: entry.suggested_controls.join(",") })).data;
       }
-      return { risk: risk.data, program: programData, units: unitIndex, vocab, extra: extra?.data ?? [], suggested };
+      return { risk: risk.data, program: programData, units: unitIndex, vocab, extra: extra?.data ?? [], suggested, views };
     },
     view: (data, reload) => {
       const risk = data.risk;
@@ -141,7 +142,9 @@ export function riskPage(main, params) {
         tab === "history" ? card({ flush: true }, timeline(data.extra))
           : tab === "assessments" ? assessmentsTab(risk, data.extra, ctx)
             : tab === "controls" ? controlsTab(risk, { controls: data.extra, suggested: data.suggested }, ctx)
-              : tab === "treatment" ? treatmentTab(risk, data.extra, ctx) : overview(risk, ctx));
+              : tab === "treatment" ? treatmentTab(risk, data.extra, ctx)
+                : tab === "bow-tie" ? data.views.bowTieTab(risk, data.extra)
+                  : tab === "estimate" ? data.views.estimateTab(risk, data.extra, reload) : overview(risk, ctx));
     },
   });
 }

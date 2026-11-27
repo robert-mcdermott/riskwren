@@ -67,6 +67,14 @@ def _reminders(db: Database, _config: Config) -> dict[str, int]:
     return counts
 
 
+def _measures(db: Database, _config: Config) -> dict[str, int]:
+    # A snapshot is bookkeeping, not history, so no actor writes it.
+    from riskwren.insight import measures
+
+    with db.bookkeeping() as session:
+        return {"measures_taken": measures.snapshot(session)}
+
+
 def _tidy(db: Database, _config: Config) -> dict[str, int]:
     now = utc_now()
     with db.bookkeeping() as session:
@@ -94,6 +102,10 @@ JOBS: dict[str, JobSpec] = {
                 "Queues notices and daily summaries and sends what is waiting, where email is "
                 "set up",
                 timedelta(minutes=1), _mail),
+        JobSpec("measures", "Measures",
+                "Takes the day's snapshot of every measure, for its trend; a later one the same "
+                "day replaces it",
+                timedelta(hours=6), _measures),
         JobSpec("tidy", "Housekeeping",
                 "Removes run records older than ninety days and sign-ins that were never finished",
                 timedelta(days=1), _tidy),

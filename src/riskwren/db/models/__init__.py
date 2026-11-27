@@ -53,6 +53,7 @@ from riskwren.db.models.governance import (
     RiskObjective,
 )
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
+from riskwren.db.models.insight import LeadershipReport, MeasureSnapshot
 from riskwren.db.models.inventory import (
     ExternalRef,
     Information,
@@ -92,6 +93,7 @@ from riskwren.db.models.risk import (
     RiskSubject,
     ScoringMethod,
 )
+from riskwren.db.models.scenarios import RiskEstimate, Scenario, ScenarioSubject
 from riskwren.db.models.system import ChainHead, Counter, Event
 from riskwren.db.models.third_parties import (
     AssuranceResponsibility,
@@ -149,6 +151,8 @@ __all__ = [
     "IssueSubject",
     "Job",
     "JobRun",
+    "LeadershipReport",
+    "MeasureSnapshot",
     "Membership",
     "NotDuplicate",
     "Notice",
@@ -177,11 +181,14 @@ __all__ = [
     "RiskAssessment",
     "RiskCategory",
     "RiskControl",
+    "RiskEstimate",
     "RiskLibraryEntry",
     "RiskObjective",
     "RiskSubject",
     "RoleGrant",
     "SavedView",
+    "Scenario",
+    "ScenarioSubject",
     "Scope",
     "ScopeFramework",
     "ScopeMember",

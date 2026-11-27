@@ -26,7 +26,9 @@ from riskwren.api.routers.inventory import (
 from riskwren.inventory import records
 from riskwren.oversight import sessions
 from riskwren.oversight.sessions import SESSION
+from riskwren.risk import scenarios
 from riskwren.risk.objectives import OBJECTIVE
+from riskwren.risk.scenarios import SCENARIO
 
 router = APIRouter(prefix="/api/v1", tags=["objectives and sessions"])
 
@@ -123,6 +125,80 @@ def set_objective_owners(request: Request, ref: str, body: OwnersBody) -> dict[s
 @router.get("/objectives/{ref}/history", summary="Everything that has happened to an objective")
 def objective_history(request: Request, ref: str) -> dict[str, Any]:
     return record_history(request, OBJECTIVE, ref)
+
+
+# --- Scenarios --------------------------------------------------------------------------------
+
+
+class ScenarioBody(BaseModel):
+    """A scenario. On a change, send only what changes, with the ``version`` you had."""
+
+    version: int | None = None
+    name: str | None = Field(default=None, max_length=400)
+    summary: str | None = Field(default=None, description="What might happen, as a story")
+    assumptions: str | None = None
+    conclusion: str | None = None
+    status: str | None = Field(default=None, description="draft, concluded, or retired")
+    org_unit_id: int | None = None
+    tags: list[str] | None = None
+    restricted: bool | None = None
+
+
+class TouchesBody(BaseModel):
+    subjects: list[str] = Field(description="References of the risks and processes it touches")
+
+
+@router.get("/scenarios", summary="Find scenarios")
+def list_scenarios(
+    request: Request,
+    q: str | None = Q,
+    unit: int | None = UNIT,
+    status: str | None = Query(
+        default=None, description="draft, concluded, retired, or all; not retired by default"
+    ),
+    risk: str | None = Query(default=None, description="Those that touch this risk or process"),
+    owner: int | None = None,
+    mine: bool = MINE,
+    sort: str = Query(default="name", description=SORT.description),
+    limit: int | None = LIMIT,
+    cursor: str | None = None,
+) -> dict[str, Any]:
+    filters = {"q": q, "unit": unit, "status": status, "risk": risk, "owner": owner, "mine": mine}
+    return list_records(request, SCENARIO, filters, sort, limit, cursor)
+
+
+@router.post("/scenarios", status_code=201, summary="Add a scenario")
+def create_scenario(request: Request, body: ScenarioBody) -> dict[str, Any]:
+    return create_record(request, SCENARIO, body)
+
+
+@router.get("/scenarios/{ref}", summary="One scenario, with what it touches and its simulation")
+def show_scenario(request: Request, ref: str) -> dict[str, Any]:
+    return show_record_plain(request, SCENARIO, ref)
+
+
+@router.patch("/scenarios/{ref}", summary="Change a scenario, or conclude it")
+def update_scenario(request: Request, ref: str, body: ScenarioBody) -> dict[str, Any]:
+    return update_record(request, SCENARIO, ref, body)
+
+
+@router.put("/scenarios/{ref}/owners", summary="Set a scenario's owners")
+def set_scenario_owners(request: Request, ref: str, body: OwnersBody) -> dict[str, Any]:
+    return set_record_owners(request, SCENARIO, ref, body)
+
+
+@router.put("/scenarios/{ref}/subjects", summary="Say which risks and processes it touches")
+def set_scenario_subjects(request: Request, ref: str, body: TouchesBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        scenario = records.load(session, principal, SCENARIO, ref)
+        scenarios.set_subjects(session, principal, scenario, body.subjects)
+        return envelope(records.detail(session, principal, SCENARIO, scenario))
+
+
+@router.get("/scenarios/{ref}/history", summary="Everything that has happened to a scenario")
+def scenario_history(request: Request, ref: str) -> dict[str, Any]:
+    return record_history(request, SCENARIO, ref)
 
 
 # --- Sessions ---------------------------------------------------------------------------------

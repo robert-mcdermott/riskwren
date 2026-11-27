@@ -1549,6 +1549,60 @@
         "title": "EscalationBody",
         "type": "object"
       },
+      "EstimateBody": {
+        "description": "A risk in numbers: each a low, likely, and high value.",
+        "properties": {
+          "assumptions": {
+            "description": "Where the numbers came from",
+            "maxLength": 8000,
+            "title": "Assumptions",
+            "type": "string"
+          },
+          "currency": {
+            "default": "USD",
+            "maxLength": 3,
+            "title": "Currency",
+            "type": "string"
+          },
+          "frequency_high": {
+            "title": "Frequency High",
+            "type": "number"
+          },
+          "frequency_likely": {
+            "title": "Frequency Likely",
+            "type": "number"
+          },
+          "frequency_low": {
+            "description": "Fewest times a year, such as 0.1 (once a decade)",
+            "title": "Frequency Low",
+            "type": "number"
+          },
+          "loss_high": {
+            "title": "Loss High",
+            "type": "number"
+          },
+          "loss_likely": {
+            "title": "Loss Likely",
+            "type": "number"
+          },
+          "loss_low": {
+            "description": "Least it costs each time, in whole currency units",
+            "title": "Loss Low",
+            "type": "number"
+          }
+        },
+        "required": [
+          "frequency_low",
+          "frequency_likely",
+          "frequency_high",
+          "loss_low",
+          "loss_likely",
+          "loss_high",
+          "assumptions"
+        ],
+        "title": "EstimateBody",
+        "type": "object"
+      },
       "EvidenceBody": {
         "description": "An evidence item. On a change, send only what changes, with the ``version`` you had.",
         "properties": {
@@ -2795,6 +2849,64 @@
           "enabled"
         ],
         "title": "JobSwitch",
+        "type": "object"
+      },
+      "LeadershipReportBody": {
+        "properties": {
+          "from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The first day it covers; after the last report",
+            "title": "From"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the issuer has to say about it",
+            "title": "Summary"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Its title",
+            "title": "Title"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The last day it covers; today",
+            "title": "To"
+          }
+        },
+        "title": "LeadershipReportBody",
         "type": "object"
       },
       "MappingBody": {
@@ -4318,6 +4430,118 @@
         "title": "Roles",
         "type": "object"
       },
+      "ScenarioBody": {
+        "description": "A scenario. On a change, send only what changes, with the ``version`` you had.",
+        "properties": {
+          "assumptions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assumptions"
+          },
+          "conclusion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conclusion"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Unit Id"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "draft, concluded, or retired",
+            "title": "Status"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What might happen, as a story",
+            "title": "Summary"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "ScenarioBody",
+        "type": "object"
+      },
       "ScopeBody": {
         "description": "A scope. On a change, send only what changes, with the ``version`` you were editing.",
         "properties": {
@@ -5307,6 +5531,23 @@
           "answers"
         ],
         "title": "TieringBody",
+        "type": "object"
+      },
+      "TouchesBody": {
+        "properties": {
+          "subjects": {
+            "description": "References of the risks and processes it touches",
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          }
+        },
+        "required": [
+          "subjects"
+        ],
+        "title": "TouchesBody",
         "type": "object"
       },
       "UnitChanges": {
@@ -8131,6 +8372,147 @@
         "summary": "Open a closed agreement again",
         "tags": [
           "agreements"
+        ]
+      }
+    },
+    "/api/v1/as-of": {
+      "get": {
+        "operationId": "register_as_of_api_v1_as_of_get",
+        "parameters": [
+          {
+            "description": "risk, control, issue, ...",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "default": "risk",
+              "description": "risk, control, issue, ...",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The day; today if left out",
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The day; today if left out",
+              "title": "On"
+            }
+          },
+          {
+            "description": "Only what was open or in use then",
+            "in": "query",
+            "name": "live",
+            "required": false,
+            "schema": {
+              "default": true,
+              "description": "Only what was open or in use then",
+              "title": "Live",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Register As Of Api V1 As Of Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A register as it stood at the end of a day, rebuilt from the history",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/as-of/{ref}": {
+      "get": {
+        "operationId": "record_as_of_api_v1_as_of__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The day; today if left out",
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The day; today if left out",
+              "title": "On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record As Of Api V1 As Of  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A record as it stood at the end of a day, beside how it is now",
+        "tags": [
+          "reporting"
         ]
       }
     },
@@ -11815,6 +12197,65 @@
         ]
       }
     },
+    "/api/v1/dossiers/check": {
+      "post": {
+        "description": "Send the dossier's ZIP file as the request body, up to 32 MB; for a larger one, the\ncommand line's ``riskwren check-dossier`` checks it.",
+        "operationId": "check_dossier_api_v1_dossiers_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Dossier Api V1 Dossiers Check Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check that a dossier is whole and unchanged",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/dossiers/{ref}": {
+      "get": {
+        "operationId": "take_dossier_api_v1_dossiers__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A dossier of a scope, a risk, or a third party: a ZIP with a manifest that verifies",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/evidence": {
       "get": {
         "operationId": "list_evidence_api_v1_evidence_get",
@@ -12555,6 +12996,24 @@
               ],
               "description": "A document's reference",
               "title": "Document"
+            }
+          },
+          {
+            "description": "About a framework's requirements",
+            "in": "query",
+            "name": "framework",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "About a framework's requirements",
+              "title": "Framework"
             }
           },
           {
@@ -15970,6 +16429,76 @@
             }
           },
           {
+            "description": "Raised in a period: FROM..TO",
+            "in": "query",
+            "name": "raised",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Raised in a period: FROM..TO",
+              "title": "Raised"
+            }
+          },
+          {
+            "description": "Closed in a period: FROM..TO",
+            "in": "query",
+            "name": "closed",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Closed in a period: FROM..TO",
+              "title": "Closed"
+            }
+          },
+          {
+            "in": "query",
+            "name": "root_cause",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Root Cause"
+            }
+          },
+          {
+            "description": "About a framework's requirements",
+            "in": "query",
+            "name": "framework",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "About a framework's requirements",
+              "title": "Framework"
+            }
+          },
+          {
             "in": "query",
             "name": "owner",
             "required": false,
@@ -16805,6 +17334,187 @@
         ]
       }
     },
+    "/api/v1/leadership-reports": {
+      "get": {
+        "operationId": "leadership_reports_api_v1_leadership_reports_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leadership Reports Api V1 Leadership Reports Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The leadership reports issued, the latest first",
+        "tags": [
+          "reporting"
+        ]
+      },
+      "post": {
+        "operationId": "issue_leadership_report_api_v1_leadership_reports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadershipReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Issue Leadership Report Api V1 Leadership Reports Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Issue a leadership report: what it says is frozen, with its fingerprint",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/leadership-reports/next": {
+      "get": {
+        "operationId": "next_leadership_report_api_v1_leadership_reports_next_get",
+        "parameters": [
+          {
+            "description": "The first day it covers",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The first day it covers",
+              "title": "From"
+            }
+          },
+          {
+            "description": "The last day it covers",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The last day it covers",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Next Leadership Report Api V1 Leadership Reports Next Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The next leadership report as it stands now: not stored until it is issued",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
+    "/api/v1/leadership-reports/{ref}": {
+      "get": {
+        "operationId": "leadership_report_api_v1_leadership_reports__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Leadership Report Api V1 Leadership Reports  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A leadership report as it was issued, and whether its fingerprint verifies",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/library": {
       "get": {
         "description": "Those you have still to acknowledge come first, then the broadest kind first.",
@@ -17001,6 +17711,29 @@
         "summary": "Send yourself a test message",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/measures": {
+      "get": {
+        "operationId": "show_measures_api_v1_measures_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Measures Api V1 Measures Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Every defined measure: what it counts, its figure, and its trend",
+        "tags": [
+          "reporting"
         ]
       }
     },
@@ -17777,6 +18510,65 @@
         "summary": "Cancel a treatment plan, with the reason",
         "tags": [
           "treatment"
+        ]
+      }
+    },
+    "/api/v1/portfolio": {
+      "get": {
+        "operationId": "show_portfolio_api_v1_portfolio_get",
+        "parameters": [
+          {
+            "description": "unit, category, framework, third_party, causes",
+            "in": "query",
+            "name": "by",
+            "required": false,
+            "schema": {
+              "default": "unit",
+              "description": "unit, category, framework, third_party, causes",
+              "title": "By",
+              "type": "string"
+            }
+          },
+          {
+            "description": "quarter, half, or year",
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "quarter",
+              "description": "quarter, half, or year",
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Portfolio Api V1 Portfolio Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Risk and compliance by unit, category, framework, or third party",
+        "tags": [
+          "reporting"
         ]
       }
     },
@@ -20749,6 +21541,24 @@
             }
           },
           {
+            "description": "Raised in a period: FROM..TO",
+            "in": "query",
+            "name": "added",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Raised in a period: FROM..TO",
+              "title": "Added"
+            }
+          },
+          {
             "in": "query",
             "name": "inherent_likelihood",
             "required": false,
@@ -21236,6 +22046,50 @@
         ]
       }
     },
+    "/api/v1/risks/{ref}/bow-tie": {
+      "get": {
+        "operationId": "risk_bow_tie_api_v1_risks__ref__bow_tie_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Risk Bow Tie Api V1 Risks  Ref  Bow Tie Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A risk's causes, controls, event, and consequences",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
     "/api/v1/risks/{ref}/controls": {
       "get": {
         "operationId": "risk_controls_api_v1_risks__ref__controls_get",
@@ -21434,6 +22288,102 @@
           }
         },
         "summary": "Escalate a risk to a higher unit, or take it back",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
+    "/api/v1/risks/{ref}/estimate": {
+      "get": {
+        "operationId": "risk_estimate_api_v1_risks__ref__estimate_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Risk Estimate Api V1 Risks  Ref  Estimate Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A risk's estimate in ranges and its simulation",
+        "tags": [
+          "risks"
+        ]
+      },
+      "post": {
+        "operationId": "estimate_risk_api_v1_risks__ref__estimate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EstimateBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Estimate Risk Api V1 Risks  Ref  Estimate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Estimate a risk in ranges, anew",
         "tags": [
           "risks"
         ]
@@ -21861,6 +22811,476 @@
         "summary": "The roles and what each allows",
         "tags": [
           "people"
+        ]
+      }
+    },
+    "/api/v1/scenarios": {
+      "get": {
+        "operationId": "list_scenarios_api_v1_scenarios_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "draft, concluded, retired, or all; not retired by default",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "draft, concluded, retired, or all; not retired by default",
+              "title": "Status"
+            }
+          },
+          {
+            "description": "Those that touch this risk or process",
+            "in": "query",
+            "name": "risk",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Those that touch this risk or process",
+              "title": "Risk"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; start with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "name",
+              "description": "A field name; start with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Scenarios Api V1 Scenarios Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find scenarios",
+        "tags": [
+          "objectives and sessions"
+        ]
+      },
+      "post": {
+        "operationId": "create_scenario_api_v1_scenarios_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Scenario Api V1 Scenarios Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a scenario",
+        "tags": [
+          "objectives and sessions"
+        ]
+      }
+    },
+    "/api/v1/scenarios/{ref}": {
+      "get": {
+        "operationId": "show_scenario_api_v1_scenarios__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Scenario Api V1 Scenarios  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One scenario, with what it touches and its simulation",
+        "tags": [
+          "objectives and sessions"
+        ]
+      },
+      "patch": {
+        "operationId": "update_scenario_api_v1_scenarios__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Scenario Api V1 Scenarios  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change a scenario, or conclude it",
+        "tags": [
+          "objectives and sessions"
+        ]
+      }
+    },
+    "/api/v1/scenarios/{ref}/history": {
+      "get": {
+        "operationId": "scenario_history_api_v1_scenarios__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Scenario History Api V1 Scenarios  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that has happened to a scenario",
+        "tags": [
+          "objectives and sessions"
+        ]
+      }
+    },
+    "/api/v1/scenarios/{ref}/owners": {
+      "put": {
+        "operationId": "set_scenario_owners_api_v1_scenarios__ref__owners_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Scenario Owners Api V1 Scenarios  Ref  Owners Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a scenario's owners",
+        "tags": [
+          "objectives and sessions"
+        ]
+      }
+    },
+    "/api/v1/scenarios/{ref}/subjects": {
+      "put": {
+        "operationId": "set_scenario_subjects_api_v1_scenarios__ref__subjects_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TouchesBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Scenario Subjects Api V1 Scenarios  Ref  Subjects Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say which risks and processes it touches",
+        "tags": [
+          "objectives and sessions"
         ]
       }
     },
@@ -22752,6 +24172,68 @@
         ]
       }
     },
+    "/api/v1/scopes/{ref}/oscal/{document}": {
+      "get": {
+        "operationId": "scope_oscal_api_v1_scopes__ref__oscal__document__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "document",
+            "required": true,
+            "schema": {
+              "title": "Document",
+              "type": "string"
+            }
+          },
+          {
+            "description": "For ssp: the framework's key",
+            "in": "query",
+            "name": "framework",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "For ssp: the framework's key",
+              "title": "Framework"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A scope in OSCAL: its system security plan (ssp) or its plan of action (poam)",
+        "tags": [
+          "reporting"
+        ]
+      }
+    },
     "/api/v1/scopes/{ref}/owners": {
       "put": {
         "operationId": "set_scope_owners_api_v1_scopes__ref__owners_put",
@@ -22988,6 +24470,41 @@
         "summary": "Say whether a requirement applies within a scope",
         "tags": [
           "scopes"
+        ]
+      }
+    },
+    "/api/v1/scopes/{ref}/security-plan": {
+      "get": {
+        "operationId": "security_plan_api_v1_scopes__ref__security_plan_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A scope's system security plan, as a page that prints by itself",
+        "tags": [
+          "reporting"
         ]
       }
     },

@@ -4,6 +4,70 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.6.0 (2026-11-27)
+
+Wave 6, *Insight*: the record read back to those who answer for it. Measures say what they
+count and open the list behind each figure, with a trend from a daily snapshot. The portfolio
+cuts risk and compliance by unit, family, framework, and third party over a period. A
+leadership report is frozen when issued, with a fingerprint the history records, and reopens
+exactly as it was. Any record, and the register, can be seen as it stood on a chosen day. A
+scope, a risk, or a third party is packed as a dossier whose manifest proves nothing was
+changed, and a scope's security plan prints in the customary order and is written in OSCAL.
+Scenarios, estimates in ranges with a simulation, and the bow-tie put a risk in a story, in
+numbers, and in a picture.
+
+### Upgrading from 0.5.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0032 to 0034). Every row is
+kept, and the history still verifies. A few things look different afterwards:
+
+- **The scheduler has a new job, Measures,** which takes the organization's figure for each
+  measure every six hours, keeping one a day. Their trends start on the day of the upgrade.
+- **Reports has five new pages:** Measures, Portfolio, Leadership reports, As of a date, and
+  Check a dossier; and **Risks** has Scenarios. Leadership reports are read by those who read
+  everything and by those who lead the whole organization; a unit's leader does not see them.
+- **Every record's page has As of a date,** and scopes, risks, and third parties have
+  **Dossier**. A risk has two new tabs, **Bow-tie** and **In numbers**, and a scope's
+  Requirements tab downloads its **security plan** and its plan in **OSCAL**.
+- `riskwren verify` checks leadership reports as well as documents, and there is a new
+  command, `riskwren check-dossier`.
+
+### Added
+
+- **Measures:** a catalog of defined measures of risk, treatment, compliance, issues, and third
+  parties, each saying what it counts and among which records, with its figure as the reader
+  may see it, opening the list it counts. A daily snapshot, taken by the scheduler, gives each
+  a trend over the last quarter. **Reports → Measures**, for managers, auditors, and
+  administrators.
+- **The portfolio:** the register and compliance by unit, category, framework, and third
+  party over the last quarter, half year, or year, and issues by root cause, source, and age
+  with a year month by month. Every figure opens its list. **Reports → Portfolio**.
+- **Leadership reports:** a periodic report of the top risks and how they moved, appetite,
+  posture by framework, the third parties with most at stake, the measures against the last
+  report, and what is overdue. Issued, it is frozen with a SHA-256 fingerprint that the
+  history records too, and reopens exactly as it was; the page says whether the fingerprint
+  still verifies. **Reports → Leadership reports**, read by those who read everything and
+  those who lead the whole organization, and issued by managers.
+- **As of a date:** any record, and the register of risks, controls, issues, exceptions, or
+  third parties, as it stood at the end of a chosen day, rebuilt from the history, with what
+  has changed since. **Reports → As of a date**, and **As of a date** on every record.
+- **Dossiers:** a scope, a risk, or a third party with everything known about it, as one ZIP
+  with a page to read and print and a manifest of every file's SHA-256 whose fingerprint the
+  history records. **Reports → Check a dossier** and `riskwren check-dossier` check one.
+- **The security plan and OSCAL:** a scope's system security plan in the customary order, as a
+  page that prints by itself, and in OSCAL 1.1.2; its plan of action and milestones in OSCAL.
+- `riskwren verify` also checks every leadership report against the fingerprint the history
+  took when it was issued.
+- **Scenarios:** what might happen, told on purpose, with what it assumes, the risks and
+  processes it touches, and what was concluded. **Risks → Scenarios**.
+- **Estimates in ranges:** a risk's frequency and loss as low, likely, and high values, with
+  a reproducible simulation of a year's loss and its assumptions in words; a scenario adds
+  up its risks'. A risk's **In numbers** tab.
+- **The bow-tie:** a risk's causes, preventive controls, event, mitigating controls, and
+  consequences on one diagram, with a table behind it. A risk's **Bow-tie** tab.
+- **Lists cut to a period:** risks by when they were added, issues by when they were raised
+  or closed, issues by root cause, and issues and exceptions about a framework's requirements.
+
 ## 0.5.0 (2026-11-27)
 
 Wave 5, *Third parties*: who the organization depends on, what each can reach, and whether

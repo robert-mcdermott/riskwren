@@ -236,6 +236,7 @@ RiskWren does four things by itself, so that nobody has to remember to.
 | The calendar | Hourly | Brings risks up to date when a plan passes its date or an acceptance ends |
 | Reminders | Hourly | Reminds people of what is nearly due, and tells stewards and leaders what stays late. See [Reminders](running-the-program.md#reminders) |
 | Email | Every minute | Queues notices and daily summaries and sends what is waiting, where [email](#email) is set up |
+| Measures | Every six hours | Takes the day's snapshot of every measure, for its trend; a later one the same day replaces it |
 | Housekeeping | Daily | Removes run records older than ninety days and sign-ins that were never finished |
 
 The server runs them while it is up. Nothing needs to be installed or scheduled.

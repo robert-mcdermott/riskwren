@@ -441,6 +441,28 @@ REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
+REACH[("GET", "/api/v1/measures")] = {"admin", "manager", "auditor"}
+REACH[("GET", "/api/v1/portfolio")] = EVERYONE
+# Leadership reports are read by those who read everything (and those who lead all of it,
+# whom this organization does not have), and prepared and issued by managers.
+for _template in ("/api/v1/leadership-reports", "/api/v1/leadership-reports/{ref}"):
+    REACH[("GET", _template)] = {"admin", "manager", "auditor"}
+REACH[("GET", "/api/v1/leadership-reports/next")] = {"manager"}
+REACH[("POST", "/api/v1/leadership-reports")] = {"manager"}
+REACH[("GET", "/api/v1/as-of")] = EVERYONE
+REACH[("GET", "/api/v1/as-of/{ref}")] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/dossiers/{ref}"), ("POST", "/api/v1/dossiers/check"),
+    ("GET", "/api/v1/scopes/{ref}/security-plan"), ("GET", "/api/v1/scopes/{ref}/oscal/{document}"),
+):  # fmt: skip
+    REACH[_route] = EVERYONE
+for _key in POLICIES:
+    # Scenarios, and a risk's bow-tie and estimate, are decided by the record.
+    if _key[1].startswith("/api/v1/scenarios") or _key[1] in (
+        "/api/v1/risks/{ref}/bow-tie",
+        "/api/v1/risks/{ref}/estimate",
+    ):
+        REACH[_key] = EVERYONE
 REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():

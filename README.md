@@ -42,27 +42,36 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, and suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared, half a year of measures, a leadership report each quarter, and a ransomware scenario worked through in dollars. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
 | Sign in as | To see |
 |---|---|
-| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies; a supplier's answers to a security questionnaire waiting to be read, with their concerns; a review called for by a supplier's breach notice; and Third parties → Coverage, where patient records are shared with no business associate agreement |
-| The risk manager | The whole register, the risk dashboard, the heat map, the program, where a change to the matrix can be previewed, and the risk committee's next session |
+| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies; a supplier's answers to a security questionnaire waiting to be read, with their concerns; a review called for by a supplier's breach notice; Third parties → Coverage, where patient records are shared with no business associate agreement; and Risks → Scenarios, where two weeks of ransomware is worked through, with the risk's bow-tie and its estimate in numbers |
+| The risk manager | The whole register, the risk dashboard, the heat map, the program, where a change to the matrix can be previewed, the risk committee's next session, Reports → Measures and Portfolio, and the leadership reports with the next one ready to issue |
 | The steward | One unit's inventory and risks, a critical risk brought to high by controls, with its plan, and the unit's suppliers that are due for review |
 | The unit leader | A high risk that is beyond their authority to accept |
 | The assessor | An assessment in progress, a result to review, an attestation campaign most of the way through, and a risk analysis half done |
-| The auditor | Everything, read-only, with every change in one place |
+| The auditor | Everything, read-only, with every change in one place, the register as it stood on any day, and a dossier of any scope to check |
 | A staff member | Home for someone with one action to finish and a policy to acknowledge, the policy library, and only their own unit's part of the register |
 
 A demo listens only on the machine it runs on. See [Configuration](docs/configuration.md#the-demo-and-the-network) before changing that.
 
 ## What is in this release
 
-Version 0.5.0 is *Third parties*: who the organization depends on, what each can reach, and whether the paper covers it. It follows 0.4.0, which added the organization's policies and agreements, and 0.3.0, which keeps the register current.
+Version 0.6.0 is *Insight*: the record read back to those who answer for it, with figures that say what they count, a report that can be shown to be the one that was given, the register as it stood on any day, and packages an auditor can check. It follows 0.5.0, which added third parties, and 0.4.0, which added the organization's policies and agreements.
 
-**Third parties, new in 0.5.0**
+**Insight, new in 0.6.0**
+
+- **Measures** that say what they count, each opening the list behind it, with a trend from a daily snapshot.
+- **The portfolio:** risk and compliance by unit, family of risk, framework, and third party over a quarter, half year, or year, and issues by root cause, source, and age.
+- **Leadership reports:** the top risks and how they moved, appetite, posture by framework, the suppliers with most at stake, the measures against the last report, and what is overdue. Issued, a report is frozen with a fingerprint the history records, and reopens exactly as it was.
+- **As of a date:** any record, and the register, as it stood at the end of a chosen day, rebuilt from the history, with what has changed since.
+- **Dossiers:** a scope, a risk, or a supplier with everything known about it, as one ZIP with a page to print and a manifest that proves nothing was changed, added, or taken out. A scope's **system security plan** prints in the customary order and is written, with its plan of action, in **OSCAL**.
+- **Scenarios**, **estimates in ranges** with a simulation of a year's loss whose figures can be checked, and the **bow-tie** of each risk's causes, controls, and consequences.
+
+**Third parties, from 0.5.0**
 
 - **Services:** what each supplier or partner provides, with the systems each reaches and the information each handles.
 - **Tiering by the program's own rules,** from a few questions the inventory mostly answers, with the reasons shown. A different tier needs a reason, and both are kept.
@@ -120,7 +129,7 @@ Version 0.5.0 is *Third parties*: who the organization depends on, what each can
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Reporting comes next, then audits and incidents. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Audits come next, then incidents and resilience. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 

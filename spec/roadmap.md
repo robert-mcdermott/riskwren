@@ -124,19 +124,21 @@ Detail: [waves/wave-4.md](waves/wave-4.md)
 
 Detail: [waves/wave-5.md](waves/wave-5.md)
 
-## Wave 6: Insight (v0.6.0) ☐
+## Wave 6: Insight (v0.6.0) ☑
 
 **Goal:** answer leadership's questions from the record, with figures that explain themselves.
 
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
-| 1 | Measures | Defined measures of risk, treatment, compliance, and timeliness, each with its period and cohort; daily snapshots for trends | ☐ |
-| 2 | Portfolio | Views by unit, category, framework, and third party over a period, drilling down to records; root causes | ☐ |
-| 3 | Leadership report | A periodic report frozen as a snapshot that reopens unchanged | ☐ |
-| 4 | As of | Any record, and the register, as it stood on a chosen date | ☐ |
-| 5 | Dossier and open formats | A complete, verifiable package for a scope, risk, or third party; export in the open assessment language; the security plan document | ☐ |
-| 6 | Scenarios and ranges | Scenarios; estimates in ranges with simulation; the bow-tie view | ☐ |
-| 7 | Release prep | Guides, changelog, release | ☐ |
+| 1 | Measures | Defined measures of risk, treatment, compliance, and timeliness, each with its period and cohort; daily snapshots for trends | ☑ |
+| 2 | Portfolio | Views by unit, category, framework, and third party over a period, drilling down to records; root causes | ☑ |
+| 3 | Leadership report | A periodic report frozen as a snapshot that reopens unchanged | ☑ |
+| 4 | As of | Any record, and the register, as it stood on a chosen date | ☑ |
+| 5 | Dossier and open formats | A complete, verifiable package for a scope, risk, or third party; export in the open assessment language; the security plan document | ☑ |
+| 6 | Scenarios and ranges | Scenarios; estimates in ranges with simulation; the bow-tie view | ☑ |
+| 7 | Release prep | Guides, changelog, release | ☑ |
+
+Detail: [waves/wave-6.md](waves/wave-6.md)
 
 ## Wave 7: Audit (v0.7.0) ☐
 

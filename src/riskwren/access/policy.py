@@ -258,6 +258,35 @@ POLICIES.update(
         ("POST", "/api/v1/respond/submit"): Needs.PUBLIC,
         ("POST", "/api/v1/respond/files"): Needs.PUBLIC,
         ("GET", "/api/v1/coverage"): Needs.MEMBER,
+        # Measures carry the organization's trend, so they are for those who read everything.
+        ("GET", "/api/v1/measures"): Needs.READ_ALL,
+        # Leadership reports: read by those who read everything and those who lead all of it,
+        # which the service decides; prepared and issued by managers for the organization.
+        ("GET", "/api/v1/leadership-reports"): Needs.MEMBER,
+        ("GET", "/api/v1/leadership-reports/next"): Needs.MANAGE,
+        ("POST", "/api/v1/leadership-reports"): Needs.MANAGE,
+        ("GET", "/api/v1/leadership-reports/{ref}"): Needs.MEMBER,
+        # As of a day: what each person may see, rebuilt from the history.
+        ("GET", "/api/v1/as-of"): Needs.MEMBER,
+        ("GET", "/api/v1/as-of/{ref}"): Needs.MEMBER,
+        # Dossiers and a scope's plans hold what the person may see, checked by the record.
+        ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
+        ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/security-plan"): Needs.MEMBER,
+        ("GET", "/api/v1/scopes/{ref}/oscal/{document}"): Needs.MEMBER,
+        # Scenarios, estimates, and the bow-tie: decided by the record, as for risks.
+        ("GET", "/api/v1/scenarios"): Needs.MEMBER,
+        ("POST", "/api/v1/scenarios"): Needs.MEMBER,
+        ("GET", "/api/v1/scenarios/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/scenarios/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/scenarios/{ref}/owners"): Needs.MEMBER,
+        ("PUT", "/api/v1/scenarios/{ref}/subjects"): Needs.MEMBER,
+        ("GET", "/api/v1/scenarios/{ref}/history"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/bow-tie"): Needs.MEMBER,
+        ("GET", "/api/v1/risks/{ref}/estimate"): Needs.MEMBER,
+        ("POST", "/api/v1/risks/{ref}/estimate"): Needs.MEMBER,
+        # The portfolio counts only what each person may see, as the dashboards do.
+        ("GET", "/api/v1/portfolio"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/call-review"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/offboarding"): Needs.MEMBER,
         ("POST", "/api/v1/third-parties/{ref}/offboarding/steps/{step}"): Needs.MEMBER,

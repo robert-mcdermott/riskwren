@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.5.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.6.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
@@ -67,10 +67,18 @@ These two are written from the code, so they always match the version they ship 
 | Who holds our patient records without a business associate agreement? | [Coverage](third-parties.md#coverage) |
 | A supplier told us of a breach. How do we review it again now? | [Review again](third-parties.md#review-again) |
 | How do we end a supplier relationship properly? | [Ending a relationship](third-parties.md#ending-a-relationship) |
+| Are we getting better? Which figures moved this quarter? | [Measures](running-the-program.md#measures) |
+| Which units, frameworks, or suppliers need attention, and why do issues happen? | [Portfolio](running-the-program.md#portfolio) |
+| What did we tell leadership last quarter, and has the report been changed since? | [Leadership reports](running-the-program.md#leadership-reports) |
+| What did the register say on the day of the audit? Who owned this risk in March? | [As of a date](running-the-program.md#as-of-a-date) |
+| The auditor wants everything about this scope, in a form they can check | [Dossiers](running-the-program.md#dossiers) |
+| Can we give our system security plan to an agency that reads OSCAL? | [The security plan and OSCAL](compliance.md#the-security-plan-and-oscal) |
 | How do I change appetite, the scales, or the review cadence? | [Shape the program](running-the-program.md#shape-the-program) |
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |
 | How do I run a security risk analysis over a scope? | [Risk analyses](the-register.md#risk-analyses) |
+| What would two weeks of ransomware cost us, in dollars, and how sure are we? | [Estimates in ranges](the-register.md#estimates-in-ranges), [Scenarios](the-register.md#scenarios) |
+| Which controls stand between the causes of this risk and what follows it? | [The bow-tie](the-register.md#the-bow-tie) |
 | What does a dashboard figure count? | [Read the dashboards](running-the-program.md#read-the-dashboards) |
 | How do I move to PostgreSQL? | [Use PostgreSQL](configuration.md#use-postgresql) |
 | How do I put it behind a proxy? | [Run behind a reverse proxy](configuration.md#run-behind-a-reverse-proxy) |

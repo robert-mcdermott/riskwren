@@ -8,6 +8,8 @@ const first = (api, pick = "(rows) => rows[0].ref") => async (page) => page.eval
   `fetch(${JSON.stringify(api)}).then((r) => r.json()).then((body) => (${pick})(body.data))`);
 // A step that presses the button of that name. If there is none it says so, and the audit
 // reports it, so that a renamed button fails and is not passed over in silence.
+/** A day before today, as the date a page asks for. */
+const daysAgo = (days) => new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
 const click = (text) => `(() => { const el = [...document.querySelectorAll("button, a")].find((each) => each.textContent.trim() === ${JSON.stringify(text)});
   if (el) el.click(); else window.__sceneMissed = ${JSON.stringify(`there is no button called "${text}"`)}; })()`;
 const risk = (words, tab = "") => async (page) =>
@@ -251,6 +253,25 @@ export const SCENES = [
     step: click("Raise a finding") },
   { name: "issue-finding", as: "ciso", path: async (page) => `/issues/${await first("/api/v1/issues?q=phished")(page)}` },
   { name: "graph-subcontractor", as: "ciso", path: async (page) => `/graph/${await first("/api/v1/third-parties?q=quillon")(page)}` },
+  { name: "measures", as: "cro", path: "/measures" },
+  { name: "portfolio", as: "cro", path: "/portfolio" },
+  { name: "portfolio-framework", as: "ciso", path: "/portfolio?by=framework" },
+  { name: "portfolio-third-party", as: "ciso", path: "/portfolio?by=third_party&period=year" },
+  { name: "portfolio-causes", as: "auditor", path: "/portfolio?by=causes&period=year" },
+  { name: "portfolio-member", as: "member", path: "/portfolio?by=category" },
+  { name: "leadership-reports", as: "cro", path: "/leadership-reports" },
+  { name: "leadership-report", as: "president", path: "/leadership-reports/LDR-0002" },
+  { name: "leadership-next", as: "cro", path: "/leadership-reports/next" },
+  { name: "leadership-first", as: "auditor", path: "/leadership-reports/LDR-0001" },
+  { name: "as-of", as: "cro", path: `/as-of?on=${daysAgo(90)}` },
+  { name: "as-of-record", as: "cro",
+    path: async (page) => `/as-of/${await first("/api/v1/risks?q=ransomware")(page)}?on=${daysAgo(120)}` },
+  { name: "as-of-third-parties", as: "ciso", path: `/as-of?type=third_party&on=${daysAgo(200)}&live=false` },
+  { name: "check-dossier", as: "auditor", path: "/check-dossier" },
+  { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },
+  { name: "risk-estimate", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=estimate` },
+  { name: "scenarios", as: "ciso", path: "/scenarios" },
+  { name: "scenario", as: "ciso", path: async (page) => `/scenarios/${await first("/api/v1/scenarios?q=ransomware")(page)}` },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

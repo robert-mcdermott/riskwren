@@ -20,6 +20,7 @@ export const NAV = [
     items: [
       { href: "/risks", label: "Register", iconName: "risk" },
       { href: "/objectives", label: "Objectives", iconName: "objective" },
+      { href: "/scenarios", label: "Scenarios", iconName: "risk" },
       { href: "/heat-map", label: "Heat map", iconName: "grid" },
       { href: "/indicators", label: "Indicators", iconName: "chart" },
       { href: "/risk-analyses", label: "Analyses", iconName: "scope" },
@@ -76,6 +77,11 @@ export const NAV = [
     items: [
       { href: "/compliance", label: "Compliance", iconName: "shield-check" },
       { href: "/dashboard", label: "Risk", iconName: "chart" },
+      { href: "/measures", label: "Measures", iconName: "chart", when: "read_all" },
+      { href: "/portfolio", label: "Portfolio", iconName: "grid" },
+      { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "reports" },
+      { href: "/as-of", label: "As of a date", iconName: "history" },
+      { href: "/check-dossier", label: "Check a dossier", iconName: "check" },
       { href: "/tidy", label: "Tidy", iconName: "check" },
       { href: "/sessions", label: "Committee sessions", iconName: "session" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },

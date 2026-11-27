@@ -164,6 +164,17 @@ Three things follow, and they are the point of the design:
 
 The **Requirements** tab can be narrowed to any one state. A requirement that is a gap, planned, or failing has two actions beside it: **Raise an issue** and **Ask for an exception**. See [Issues and exceptions](issues-and-exceptions.md).
 
+## The security plan and OSCAL
+
+A scope's **Requirements** tab has two more downloads beside **Print** and the export:
+
+- **Security plan** is the scope's system security plan, in the customary order: system identification (name, reference, unit, owners), the description and authorization boundary, what the system includes, the frameworks it is held to, then for each framework every requirement in the catalog's order with where it stands and, for each control that answers it, the implementation statement here (or the provider's, for an inherited control), its responsibility, and where it stands; requirements left out with their reason; and last, the plan of action. It is a page that prints by itself, opened from the download.
+- **OSCAL** is the same scope's system security plan against the framework shown, in the Open Security Controls Assessment Language (OSCAL 1.1.2) that United States federal programs read. The scope's **Plan of action** tab has the plan of action and milestones in OSCAL too.
+
+In the OSCAL files every identifier is a name-based UUID made from RiskWren's references, so a scope exported twice keeps its identifiers and a reader can tell what changed. A requirement's control id is its code lowercased, with an enhancement's number after a dot (`AC-2(1)` becomes `ac-2.1`), as the published catalogs name them, and its code as written is kept as its label. Each requirement's implementation status follows its state here: verified and in place are *implemented*, failing is *partial*, planned and gap are *planned*, excepted is *alternative*, and left out is *not applicable*. What has no place in the model (a severity, a due date, the state here) is carried as a property in RiskWren's own namespace, `urn:riskwren:oscal`. A scope with no open issue has a plan of action with no items.
+
+Both downloads hold what you may see. See also [Dossiers](running-the-program.md#dossiers), which carry both.
+
 ## The compliance dashboard
 
 **Reports → Compliance** is the page for whoever answers for all of it, for the whole organization or for one unit and everything beneath it.

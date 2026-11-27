@@ -92,6 +92,14 @@ async function boot() {
   route("/third-parties/:ref", page("third-party", "thirdPartyPage"));
   route("/reviews", page("reviews", "reviewList"));
   route("/coverage", page("coverage", "coveragePage"));
+  route("/measures", page("measures", "measuresPage"));
+  route("/portfolio", page("portfolio", "portfolioPage"));
+  route("/leadership-reports", page("leadership", "leadershipList"));
+  route("/leadership-reports/next", page("leadership", "leadershipNext"));
+  route("/leadership-reports/:ref", page("leadership", "leadershipReport"));
+  route("/as-of", page("as-of", "asOfRegister"));
+  route("/as-of/:ref", page("as-of", "asOfRecord"));
+  route("/check-dossier", page("check-dossier", "checkDossier"));
   route("/reviews/:ref", page("reviews", "reviewPage"));
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
   route("/search", page("find", "searchPage"));
@@ -99,6 +107,8 @@ async function boot() {
   route("/handover/:id", page("find", "handoverPage"));
   route("/objectives", page("objectives", "objectiveList"));
   route("/objectives/:ref", page("objectives", "objectivePage"));
+  route("/scenarios", page("scenarios", "scenarioList"));
+  route("/scenarios/:ref", page("scenarios", "scenarioPage"));
   route("/sessions", page("sessions", "sessionList"));
   route("/sessions/:ref", page("sessions", "sessionPage"));
   route("/agreements", page("agreements", "agreementList"));

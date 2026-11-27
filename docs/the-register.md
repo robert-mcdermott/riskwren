@@ -150,6 +150,26 @@ A risk names the objectives it threatens, under **Objectives it threatens** on t
 
 The register can be cut to the risks that threaten one objective. A risk's history keeps each objective it came to name, or stopped naming.
 
+### The bow-tie
+
+A risk's **Bow-tie** tab draws it left to right: what could cause the event, the controls that keep it from happening, the event, the controls that soften what follows, and the consequences. Nothing is entered for it. It reads the risk's own cause, event, and consequence, and the controls on its **Controls** tab: a control that reduces likelihood stands before the event, one that reduces impact after it, and one that reduces both on both sides, each with where it stands. A cause or consequence written one to a line, or with semicolons between, is drawn as several. A table below says the same for those who do not read diagrams.
+
+![A risk's bow-tie: three causes, the controls that keep the event from happening, the event, the controls that soften what follows, and two consequences](img/risk-bow-tie-light.webp)
+
+### Estimates in ranges
+
+A rating on the program's scales is what the register is run by. For the risks worth putting a figure on, the risk's **In numbers** tab takes an estimate as ranges: how often a year (the fewest, the likely, and the most, where 0.1 is once in ten years) and what each time costs (the least, the likely, and the most), with what the numbers assume, which is required. An estimate is never edited: estimating anew supersedes the last, and every one is kept and in the history.
+
+A **simulation** then plays out ten thousand years: in each, the year's rate is drawn from a PERT distribution over the frequency range, the number of events from a Poisson distribution at that rate, and each event's cost from a PERT distribution over the loss range. It says the average loss a year, the loss exceeded one year in ten, the chance of any loss in a year, and the chance of a year's loss passing each of ten figures from the median to the worst year simulated, with every assumption in words. Its draws are seeded from the estimate, so the same estimate always gives the same figures, and a figure quoted in a report can be checked.
+
+![A risk in numbers: its estimate, and what a simulation of ten thousand years says a year's loss is likely to be](img/risk-estimate-light.webp)
+
+### Scenarios
+
+**Risks → Scenarios** holds stories told on purpose: what might happen ("ransomware takes research computing down for two weeks"), what is assumed, the risks it would bring about or make worse and the processes it would stop, and, once it has been worked through, what was concluded. A scenario is kept by the stewards and leaders of its unit, and by assessors and managers, who work through scenarios with them; concluding one needs its conclusion. Where the risks it touches have estimates in ranges, the scenario shows what a simulation of them together comes to, taking them as independent, and names the risks it touches that have no estimate.
+
+![A scenario: what happens, what it assumes, the risks and processes it touches, and what its risks add up to](img/scenario-light.webp)
+
 ## Controls
 
 A control is something the organization does to make a risk less likely or less harmful. It has a statement of what is done, an owner, a unit, a kind (preventive, detective, corrective, or directive), and how often it happens.

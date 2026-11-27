@@ -35,6 +35,8 @@ PREFIXES = {
     "DDR": "Due diligence review",
     "AUD": "Audit engagement",
     "INC": "Incident",
+    "LDR": "Leadership report",
+    "SCN": "Scenario",
 }
 REF_PATTERN = re.compile(r"^([A-Z]{2,4})-(\d{4,})$")
 

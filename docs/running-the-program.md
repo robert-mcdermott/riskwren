@@ -317,7 +317,65 @@ Below them are the residual matrix, the highest risks, the register by standing,
 
 On both, every figure is the count of a list, and opens that list with the same filters. A dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
 
+### Measures
+
+**Reports → Measures** (managers, auditors, and administrators) lists the program's defined measures, grouped as risk, treatment, compliance, issues and exceptions, and third parties. Each says what it counts and among which records, its figure as you may see it, and whether fewer is better. As on the dashboards, a figure opens the list it counts, with the same filters.
+
+| Measure | Counts |
+|---|---|
+| Open risks, risks above appetite, risks needing a decision, risk reviews overdue, ratings in doubt | As on the risk dashboard |
+| Actions overdue | Open actions, from plans and issues, past their date |
+| Controls failing a test, controls not assessed | Controls in use whose test, still in date, found them less than effective (as on the compliance dashboard); those whose design or operation nobody has assessed |
+| Evidence past its date | Items of evidence in use past the date they hold until |
+| Open issues, issues overdue, critical issues open | Issues not closed or cancelled; those past their date; those of critical severity |
+| Exceptions in force | Approved exceptions between their start and their end |
+| Third parties not tiered, third-party reviews overdue | Third parties in use with no tier, or past their next review date |
+| Sharing no agreement covers | The stops on Third parties → Coverage |
+
+Each measure has a **trend**: the organization's figure from a snapshot the scheduler takes each day, over the last quarter, with how far it has moved. A snapshot is bookkeeping, not history: it is kept outside the hash chain, and one taken again the same day replaces the earlier one.
+
+![Measures: each figure with what it counts, its trend over the quarter, and how far it moved](img/measures-light.webp)
+
+### Portfolio
+
+**Reports → Portfolio** cuts the register and compliance the ways leadership asks, over the last quarter, half year, or year:
+
+| View | Each row | Its figures |
+|---|---|---|
+| By unit | Each unit beneath the organization, with everything beneath it | Open risks, above appetite, needing a decision, risks added in the period; open and overdue issues, issues raised and closed in the period; exceptions in force |
+| By category | Each family of risk, with its appetite | Open risks, above appetite, needing a decision, ratings in doubt, reviews overdue, risks added in the period |
+| By framework | Each framework a scope is held to, with those scopes | How much of what applies is verified or in place; open and overdue issues about its requirements, issues raised and closed in the period; exceptions to its requirements in force |
+| By third party | Each third party in the two highest tiers | Open risks that concern it, open issues about it, issues raised in the period, sharing no agreement covers; its next review |
+| Issues and their causes | | Issues closed in the period by why they happened, raised in the period by what found them, open now by how long ago they were raised, and a year of issues raised and closed month by month |
+
+As everywhere, each figure counts only what you may see, and opens its list with the same filters: the lists of risks and issues can be cut to a period (`added`, `raised`, `closed`), a root cause, or a framework's requirements.
+
+![The portfolio by unit: each unit's risks, issues, and exceptions, with what was added, raised, and closed in the quarter](img/portfolio-light.webp)
+
 The calendar is caught up every hour by [scheduled work](configuration.md#scheduled-work): when an acceptance expires or a plan runs late, the risk's standing is updated, and the history records that as done by the system. Reading the register catches it up as well, so a figure is never behind the date even where the scheduler is turned off.
+
+### Leadership reports
+
+**Reports → Leadership reports** holds the reports given to leadership, the latest first. A manager for the whole organization prepares the next one: **Prepare the next report** shows it as it stands now, for the period from the day after the last report ended (the first time, the last quarter) to today. A report says:
+
+| Part | What it shows |
+|---|---|
+| Summary | What the person issuing it has to say about the period, in their own words |
+| In the period | Risks added, issues raised, and issues closed |
+| Top risks | The ten open risks with the highest residual rating, each with its unit, family, standing, and owners, and how it moved since the last report: new since then, joined the top, rose or fell from the rating it had, or unchanged; and the risks the last report listed that are no longer among them |
+| Appetite | Each family of risk with its appetite: open risks, those above appetite, those needing a decision, and reviews overdue |
+| Posture by framework | How much of each framework is verified or in place in the scopes held to it, how far that moved since the last report, and the open and overdue issues and exceptions in force about its requirements |
+| Third parties with most at stake | Those in the two highest tiers: their next review, open risks, open issues, and sharing no agreement covers |
+| Measures | Every [defined measure](#measures) now, against the last report; the first time, against the organization's snapshot from the start of the period |
+| Overdue | Issues, risk reviews, third-party reviews, and actions past their date: how many, and the ten most overdue of each |
+
+Until a report is issued nothing of it is kept: it is worked out afresh each time it is looked at. **Issue the report** freezes what it says, with its title and summary, and gives it a reference (`LDR-0001`). From then on it reopens exactly as it was, whatever happens to the register. Its figures are what they were on the day, so, unlike the dashboards', they do not open today's lists.
+
+An issued report carries a **fingerprint**: the SHA-256 of what it says, written canonically (keys sorted, no spaces, UTF-8). The history records the issue with the same fingerprint, in its hash chain. Whenever the report is opened, what it says is hashed again and compared with both, and **The fingerprint verifies** means it is the report that was given. A report changed afterwards no longer matches, and the page says so. A report is never edited or withdrawn: the next report is the place to correct one. **Print** prints it without the application around it.
+
+Leadership reports are the organization's. Those who read everything (managers, auditors, and administrators) and those who lead the whole organization read them; only managers for the whole organization prepare and issue them.
+
+![A leadership report as it was issued: the fingerprint verifies, then the summary, what happened in the period, and the top risks with how each moved](img/leadership-report-light.webp)
 
 ## The history
 
@@ -332,6 +390,31 @@ Every change to every record is written to an append-only history in the same tr
 ![Reports, History: every change in one place, with who made it and when, narrowed by person, record, or date](img/history-light.webp)
 
 Assessments, control ratings, test results, and acceptances are never edited. A new one supersedes the last, and all of them are kept.
+
+### As of a date
+
+Because every change holds each value before and after, any record and any register can be seen as it stood at the end of a chosen day. Nothing is kept for this: the record as it is now has every later change undone, newest first, and a record added after that day did not exist yet.
+
+- **Reports → As of a date** shows a register (risks, controls, issues, exceptions, or third parties) as it stood: what existed then, each with its status, unit, and the fields that matter for its kind, such as a risk's category, residual rating, standing, and next review. Where something has changed since, the cell is marked and says what it is now. By default it shows only what was open or in use then.
+- Every record's page has **As of a date** beside **Connections**: the record's fields at the end of the day beside how they are now, what changed listed first, and who owned it then and now.
+
+![The register as it stood at the end of a day: each risk's rating and standing then, and where they have changed since, what they are now](img/as-of-light.webp)
+
+What is rebuilt is what the history holds: a record's own fields and its owners. A record's links, its assessments, and its other parts have their own records and history; a value the history keeps hidden is not shown. A field that an upgrade added has no history from before that upgrade, so for days before it, it shows the value it was given then. As everywhere, you see only the records you may see now.
+
+### Dossiers
+
+A **dossier** is everything known about a scope, a risk, or a third party as one ZIP file: what an auditor, a sponsor, or a regulator asks for, in a form that proves itself. **Dossier** at the top of the record's page takes one.
+
+| Every dossier holds | A scope's also holds | A risk's also holds | A third party's also holds |
+|---|---|---|---|
+| `index.html`, a page to read and print: the record, what is in the package, and its history; `record.json`, the record as it stands; `history.json`, every change to it | Its members and implementations; each framework's statement; the security plan, as a page and in OSCAL; the plan of action, as data and in OSCAL; its evidence and that of the controls it uses, with their files | Its treatment: response, plans and their actions, acceptances; the issues about it | Its due diligence reviews with their answers and concerns; its reports and certificates with their reviews and files; its agreements; the sharing no agreement covers; the issues and risks about it |
+
+`manifest.json` lists every other file with its size and SHA-256, and has a **fingerprint**: the SHA-256 of the manifest written canonically (keys sorted, no spaces, UTF-8), without the fingerprint itself. Taking a dossier is recorded in the history with that fingerprint. Anyone can check a file without RiskWren, since its hash is what `shasum -a 256` prints; **Reports → Check a dossier** checks all of it at once (every listed file there and unchanged, nothing added, the fingerprint the manifest's own) and says who took it and when, if this installation's history recorded it. `uv run riskwren check-dossier FILE` does the same on the server, for a dossier of any size and without the database.
+
+A dossier holds only what the person taking it may see. A file they may not open is left out; so is a file missing from the data home, or one that would take the package past 200 MB of files, and the manifest and `index.html` list what was left out and why.
+
+`uv run riskwren verify` now also checks every leadership report against the fingerprint the history took when it was issued.
 
 ## Appearance
 

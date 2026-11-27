@@ -35,6 +35,8 @@ class Principal:
     has_password: bool = True
     session_id: int | None = None
     command: bool = field(default=False)
+    # Leads every unit there is, as the head of the organization does: worked out at sign-in.
+    leads_all: bool = False
 
     @classmethod
     def for_command(cls, label: str = "Command line") -> Principal:
@@ -105,6 +107,12 @@ class Principal:
         return self.manages or self.is_admin or self.has(roles.AUDITOR)
 
     @property
+    def reads_reports(self) -> bool:
+        """May read the leadership reports: they are the organization's, so those who read
+        everything, and those who lead all of it."""
+        return self.reads_all or self.leads_all or self.everywhere(roles.LEADER)
+
+    @property
     def edits_all(self) -> bool:
         """Administration is not judgment: only a manager for the whole organization."""
         return self.manages
@@ -144,6 +152,7 @@ class Principal:
             "assess": self.assesses,
             "steward": self.stewards or self.manages_somewhere,
             "lead": self.leads,
+            "reports": self.reads_reports,
         }
 
     def to_json(self) -> dict[str, Any]:
