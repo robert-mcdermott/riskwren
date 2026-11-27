@@ -80,6 +80,7 @@ from riskwren.db.models.inventory import (
     RecordLink,
     RecordOwner,
     Service,
+    Site,
     System,
     ThirdParty,
 )
@@ -241,6 +242,7 @@ __all__ = [
     "SessionToken",
     "Setting",
     "SignInRequest",
+    "Site",
     "StoredFile",
     "SuggestionSetAside",
     "System",

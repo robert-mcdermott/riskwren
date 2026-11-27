@@ -47,7 +47,9 @@ Wave 8, *Incidents and resilience*.
   over time, how soon it must be back, how much information it can lose, and the least it
   needs), what each system and service can deliver and what that rests on, and every shortfall
   between them. A process's **Business impact** tab, a system's or service's **Recovery** tab,
-  and **Reports → Resilience**.
+  and **Reports → Resilience**. **Sites** are a new kind of inventory record (`SIT`): the
+  places work depends on, relied on by processes and systems, with a **Recovery** tab of their
+  own; third parties that perform a process have one too, and both are checked with the rest.
 - **Who reads the leadership reports is the program's choice,** under **Admin → Program → Who
   sees what**: only those who lead the whole organization, anyone whose role covers the whole
   organization (the default), or every leader and manager, with named readers on top. A reader
@@ -63,6 +65,8 @@ Wave 8, *Incidents and resilience*.
   `riskwren verify` checks.
 - **Protected information** is a new vocabulary, and the program pack has a `privacy` rule.
 - **Documents have a fifth kind, Continuity plan;** `issue_sources` gains `exercise`.
+- **The inventory has a sixth kind of record, Site,** with a `site_kinds` vocabulary; `relies_on`
+  links may now join a process or a system to a site.
 - **Incident categories** are a new vocabulary, editable under **Admin → Program →
   Vocabularies**. The menu has a new group, **Incidents**.
 - In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),

@@ -115,6 +115,22 @@ class ThirdParty(ThingMixin, Base):
     )
 
 
+class Site(ThingMixin, Base):
+    """A place the organization's work depends on: a data center, a building, a freezer
+    room, a clinic. A process or a system relies on it, and it can be lost (RES-02)."""
+
+    __tablename__ = "site"
+    __subject__ = "site"
+
+    kind: Mapped[str] = mapped_column(String(40))
+    address: Mapped[str | None] = mapped_column(String(300))
+
+    __table_args__ = (
+        CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),
+        Index("ix_site_org_unit_id", "org_unit_id"),
+    )
+
+
 class Service(ThingMixin, Base):
     """What a third party provides: a hosted application, a maintenance contract, a
     laboratory test sent out. It is what reaches the organization's systems and handles its

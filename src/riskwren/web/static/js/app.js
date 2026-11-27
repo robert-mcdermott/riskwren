@@ -99,7 +99,7 @@ async function boot() {
   route("/actions", page("actions", "actionList"));
   route("/risks", page("risks", "riskRegister"));
   route("/risks/:ref", page("risk", "riskPage"));
-  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"], ["service", "services"]]) {
+  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"], ["service", "services"], ["site", "sites"]]) {
     route(`/${path}`, page("records", "recordList", type));
     if (type !== "third_party") route(`/${path}/:ref`, page("record", "recordPage", type));
   }

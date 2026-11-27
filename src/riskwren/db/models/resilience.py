@@ -30,7 +30,7 @@ from riskwren.db.base import Base
 from riskwren.db.models.inventory import one_of
 from riskwren.db.types import JsonType, UtcDateTime
 
-CAPABLE = ("system", "service")
+CAPABLE = ("system", "service", "site", "third_party")
 EXERCISE_KINDS = ("tabletop", "walkthrough", "simulation", "full")
 EXERCISE_RESULTS = ("met", "partly", "not_met")
 

@@ -2280,16 +2280,55 @@ class Builder:
     def _story_resilience(self) -> Script:
         """The risk office facilitates business impact analyses of the critical processes, and
         those who keep the systems say what each can deliver."""
-        from riskwren.db.models import Process, System
+        from riskwren.db.models import Process, Site, System, ThirdParty
+        from riskwren.inventory.registry import SITE
         from riskwren.resilience import analyse, record_capability
 
         steps = sorted([(spec[0], "impact", spec) for spec in c.IMPACT]
-                       + [(spec[0], "capability", spec) for spec in c.CAPABILITY],
+                       + [(spec[0], "capability", spec) for spec in c.CAPABILITY]
+                       + [(70, "site", spec) for spec in c.SITES]
+                       + [(spec[-1][0], "site_capability", spec) for spec in c.SITES]
+                       + [(spec[0], "third_party", spec) for spec in c.THIRD_PARTY_RECOVERY],
                        key=lambda step: -step[0])  # fmt: skip
         for days, what, spec in steps:
             yield self._on(days, hour=10)
             with self.act(self.cast["cro"]) as (session, who):
-                if what == "impact":
+                if what == "site":
+                    name, unit, kind, critical, address, processes, systems, _ = spec
+                    site = records.create(session, who, SITE, {
+                        "name": name, "kind": kind, "criticality": critical, "address": address,
+                        "org_unit_id": self.units[unit]})  # fmt: skip
+                    for process_name in processes:
+                        process = session.scalars(
+                            select(Process).where(Process.name == process_name)
+                        ).first()
+                        if process is not None:
+                            links.add(session, who, PROCESS, process, "relies_on", SITE, site)
+                    for key in systems:
+                        system = session.scalars(
+                            select(System).where(
+                                System.name == {row[0]: row[1] for row in c.SYSTEMS}[key]
+                            )
+                        ).first()
+                        if system is not None:
+                            links.add(session, who, SYSTEM, system, "relies_on", SITE, site)
+                    self.tally("sites")
+                elif what == "site_capability":
+                    _, back, basis = spec[-1]
+                    site = session.scalars(select(Site).where(Site.name == spec[0])).one()
+                    record_capability(session, who, "site", site,
+                                      {"recovery_hours": back, "basis": basis})  # fmt: skip
+                elif what == "third_party":
+                    _, key, back, loss, basis = spec
+                    party = session.scalars(
+                        select(ThirdParty).where(
+                            ThirdParty.name == {row[0]: row[1] for row in c.PARTIES}[key]
+                        )
+                    ).first()
+                    if party is not None:
+                        record_capability(session, who, "third_party", party, {
+                            "recovery_hours": back, "data_loss_hours": loss, "basis": basis})  # fmt: skip
+                elif what == "impact":
                     _, name, impacts, back, loss, minimum = spec
                     process = session.scalars(select(Process).where(Process.name == name)).one()
                     analyse(

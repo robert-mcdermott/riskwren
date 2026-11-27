@@ -283,6 +283,7 @@ RECORD_PATHS = {
     "third-parties": "TP",
     "information": "INF",
     "services": "SVC",
+    "sites": "SIT",
     "risks": "RSK",
     "controls": "CTL",
     "scopes": "SCP",

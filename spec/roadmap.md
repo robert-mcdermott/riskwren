@@ -165,7 +165,7 @@ Detail: [waves/wave-7.md](waves/wave-7.md)
 | 2 | Cases | Restricted cases with named members | ☑ |
 | 3 | Breach assessment | The structured assessment, deadlines, and notifications; privacy impact assessments; privacy and breach framework packs | ☑ |
 | 4 | Learning and losses | Incidents joined to risks and controls; corrective actions; loss events and near misses | ☑ |
-| 5 | Business impact | Sites; impact analysis per process; recovery needs checked against what dependencies can deliver | ◐ |
+| 5 | Business impact | Sites; impact analysis per process; recovery needs checked against what dependencies can deliver | ☑ |
 | 6 | Plans and exercises | Versioned plans that print for use offline; exercises with findings | ☑ |
 | 7 | Release prep | Guides, changelog, release | ☐ |
 

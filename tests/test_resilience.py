@@ -80,3 +80,53 @@ def test_a_process_is_checked_against_what_its_dependencies_can_deliver(
     assert any(t.startswith("Analysed its business impact: back within 72 hours") for t in titles)
     # Those who do not keep the process cannot analyse it.
     assert as_role("member").post(path, json=NEEDS).status_code in (403, 404)
+
+
+def test_sites_and_third_parties_are_checked_too(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    """A process relies on a site, and a third party performs part of it: each is checked
+    against what the process needs. A site loses no information of its own."""
+    from riskwren.inventory.registry import SITE, THIRD_PARTY
+
+    refs = relies_on_both(db, people)
+    steward = who(db, people, "steward")
+    with db.write(steward.actor) as session:
+        process = records.load(session, steward, PROCESS, refs["process"])
+        portal = records.load(session, steward, SYSTEM, refs["portal"])
+        host = records.load(session, steward, THIRD_PARTY, refs["host"])
+        room = records.create(session, steward, SITE, {
+            "name": "Server room 2", "kind": "data_center", "criticality": "high",
+            "address": "Hale building, basement", "org_unit_id": people.units["IMM"]})  # fmt: skip
+        links.add(session, steward, PROCESS, process, "relies_on", SITE, room)
+        links.add(session, steward, SYSTEM, portal, "relies_on", SITE, room)
+        links.add(session, steward, PROCESS, process, "performed_by", THIRD_PARTY, host)
+        room_ref = room.ref
+    client = as_role("steward")
+    path = f"/api/v1/processes/{refs['process']}/impact"
+    client.post(path, json=NEEDS)
+    shown = {d["ref"]: d for d in client.get(path).json()["data"]["dependencies"]}
+    assert {shown[room_ref]["type"], shown[refs["host"]]["type"]} == {"site", "third_party"}
+
+    # A site says how soon work goes on again, there or elsewhere; nothing about data loss.
+    cold = {"recovery_hours": 72, "basis": "The second room is cold."}
+    said = client.post(f"/api/v1/sites/{room_ref}/recovery", json=cold)
+    assert said.status_code == 201, said.text
+    site = said.json()["data"]
+    assert site["place"] is True and site["capability"]["data_loss_hours"] == 0
+    assert [p["ref"] for p in site["needed_by"]] == [refs["process"]]
+    assert [s["ref"] for s in site["systems"]] == [refs["portal"]]
+    performed = client.post(f"/api/v1/third-parties/{refs['host']}/recovery", json={
+        "recovery_hours": 12, "data_loss_hours": 24, "basis": "Its contract."})  # fmt: skip
+    assert performed.status_code == 201, performed.text
+    assert [p["ref"] for p in performed.json()["data"]["needed_by"]] == [refs["process"]]
+    checked = {d["ref"]: d for d in client.get(path).json()["data"]["dependencies"]}
+    late = "It is back in 72 hours; the process needs it in 24."
+    assert checked[room_ref]["problems"] == [late]
+    assert checked[refs["host"]]["problems"] == [
+        "It can lose 24 hours of information; the process can afford 4."
+    ]
+    listed = client.get("/api/v1/sites").json()["data"]
+    assert [row["ref"] for row in listed] == [room_ref]
+    events = client.get(f"/api/v1/sites/{room_ref}/history").json()["data"]
+    assert any("work goes on within 72 hours" in str(e.get("title")) for e in events)

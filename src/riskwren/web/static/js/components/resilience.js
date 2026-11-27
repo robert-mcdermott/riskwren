@@ -54,20 +54,22 @@ function capabilityForm(kind, record, data, onDone) {
   const last = data.capability;
   openOverlay({ title: "What it can deliver", subtitle: `${record.ref} · ${record.name}`,
     render: (body, footer, close) => {
-      const recovery = field("Back within, in hours", { type: "number", min: 0, step: 1, required: true, value: last?.recovery_hours ?? "" });
-      const loss = field("Loses at most, in hours of information", { type: "number", min: 0, step: 1, required: true, value: last?.data_loss_hours ?? "" });
+      const recovery = field(data.place ? "Work goes on again within, in hours" : "Back within, in hours", { type: "number", min: 0, step: 1, required: true, value: last?.recovery_hours ?? "" });
+      const place = data.place;
+      const loss = place ? null : field("Loses at most, in hours of information", { type: "number", min: 0, step: 1, required: true, value: last?.data_loss_hours ?? "" });
       const basis = field("What that rests on", { type: "textarea", rows: 3, required: true, hint: "A restore tested on a date, a supplier's contract, a design that has not been tried." });
       const problem = banner();
       const go = button("Record it", { kind: "btn-primary" });
       go.addEventListener("click", async () => {
-        const done = await submit({ button: go, banner: problem, fields: { recovery_hours: recovery, data_loss_hours: loss, basis },
-          run: () => post(`/api/v1/${TYPES[kind].path}/${record.ref}/recovery`, { recovery_hours: Number(recovery.input.value), data_loss_hours: Number(loss.input.value), basis: basis.input.value }) });
+        const done = await submit({ button: go, banner: problem, fields: { recovery_hours: recovery, ...(loss ? { data_loss_hours: loss } : {}), basis },
+          run: () => post(`/api/v1/${TYPES[kind].path}/${record.ref}/recovery`, { recovery_hours: Number(recovery.input.value), data_loss_hours: loss ? Number(loss.input.value) : 0, basis: basis.input.value }) });
         if (!done) return;
         close();
         toast("Recorded.");
         onDone();
       });
-      body.append(h("div", { class: "stack-lg" }, problem, recovery.node, loss.node, basis.node));
+      body.append(h("div", { class: "stack-lg" }, problem, recovery.node, loss?.node,
+        place ? h("p", { class: "subtle" }, "Whether here or somewhere else ready to take the work. A place loses no information of its own: what is kept there is the systems' to say.") : null, basis.node));
       footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
       footer.hidden = false;
     } });
@@ -102,9 +104,9 @@ export function impactTab(record, data, reload) {
       h("tbody", {}, deps.map((dep) => h("tr", {},
         h("td", {}, h("a", { class: "cell-main", href: `/${TYPES[dep.type].path}/${dep.ref}?tab=recovery` }, dep.name), h("div", { class: "cell-sub" }, `${TYPES[dep.type].label} · ${dep.ref}`)),
         h("td", {}, dep.capability ? hours(dep.capability.recovery_hours) : h("span", { class: "subtle" }, "Not said")),
-        h("td", {}, dep.capability ? hours(dep.capability.data_loss_hours) : h("span", { class: "subtle" }, "Not said")),
+        h("td", {}, dep.type === "site" ? h("span", { class: "subtle" }, "A place") : dep.capability ? hours(dep.capability.data_loss_hours) : h("span", { class: "subtle" }, "Not said")),
         h("td", {}, dep.problems.length ? h("ul", { class: "plain-list stack-sm" }, dep.problems.map((text) => h("li", { class: "warn-text" }, text))) : pill("Enough", "ok")))))))
-      : h("p", { class: "muted" }, "It relies on no system or service yet. Link them on its Overview tab.")));
+      : h("p", { class: "muted" }, "It relies on no system, service, or site yet, and no third party performs it. Link them on its Overview tab.")));
 }
 
 export function recoveryTab(kind, record, data, reload) {
@@ -112,8 +114,8 @@ export function recoveryTab(kind, record, data, reload) {
   const act = data.can_record ? button(now ? "Say again" : "Say what it can deliver", { kind: now ? "" : "btn-primary", onclick: () => capabilityForm(kind, record, data, reload) }) : null;
   return h("div", { class: "stack-lg" },
     card({ title: "What it can deliver", actions: act }, now ? h("dl", { class: "dl" },
-      h("dt", {}, "Back within"), h("dd", {}, hours(now.recovery_hours)),
-      h("dt", {}, "Loses at most"), h("dd", {}, `${hours(now.data_loss_hours)} of information`),
+      h("dt", {}, data.place ? "Work goes on within" : "Back within"), h("dd", {}, hours(now.recovery_hours)),
+      data.place ? null : [h("dt", {}, "Loses at most"), h("dd", {}, `${hours(now.data_loss_hours)} of information`)],
       h("dt", {}, "Rests on"), h("dd", {}, now.basis),
       h("dt", {}, "Said"), h("dd", {}, `${date(now.recorded_at)} by ${now.recorded_by}`))
       : h("p", { class: "muted" }, "Nobody has said yet what it can be restored within. Every process that relies on it counts that as a shortfall.")),
@@ -123,7 +125,13 @@ export function recoveryTab(kind, record, data, reload) {
         h("td", {}, h("a", { class: "cell-main", href: `/processes/${p.ref}?tab=impact` }, p.name), h("div", { class: "cell-sub" }, p.ref)),
         h("td", {}, p.recovery_hours == null ? h("span", { class: "subtle" }, "Not analysed") : hours(p.recovery_hours)),
         h("td", {}, p.data_loss_hours == null ? "" : hours(p.data_loss_hours)))))))
-      : h("p", { class: "muted" }, "No process in use relies on it.")));
+      : h("p", { class: "muted" }, kind === "third_party" ? "No process in use is performed by it." : "No process in use relies on it.")),
+    data.place ? card({ title: "Systems here", flush: data.systems.length > 0 }, data.systems.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "System"), h("th", { scope: "col" }, "Back within"))),
+      h("tbody", {}, data.systems.map((system) => h("tr", {},
+        h("td", {}, h("a", { class: "cell-main", href: `/systems/${system.ref}?tab=recovery` }, system.name), h("div", { class: "cell-sub" }, system.ref)),
+        h("td", {}, system.capability ? hours(system.capability.recovery_hours) : h("span", { class: "subtle" }, "Not said")))))))
+      : h("p", { class: "muted" }, "No system in use relies on it.")) : null);
 }
 
 /** The record page's tab: a process's business impact, or what a system or service delivers. */

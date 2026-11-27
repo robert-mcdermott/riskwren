@@ -16,7 +16,7 @@ The figures above the list count the same things for everything you may see, and
 
 ## The inventory
 
-The inventory is what the organization has and depends on. It has four kinds of record:
+The inventory is what the organization has and depends on. It has six kinds of record:
 
 | Record | What it is | Reference |
 |---|---|---|
@@ -25,6 +25,7 @@ The inventory is what the organization has and depends on. It has four kinds of 
 | **Third party** | Who it depends on: suppliers, service providers, collaborators, sponsors, subrecipients | `TP-0001` |
 | **Information asset** | A body of information it holds: what it is, where it is kept, and who it is shared with. The record describes the information and never contains it | `INF-0001` |
 | **Service** | What a third party provides: a hosted application, a maintenance contract, a test sent out. See [Third parties](third-parties.md) | `SVC-0001` |
+| **Site** | A place the work depends on: a data center, a building, a laboratory, a clinic, a store of specimens or records. Its address, and the processes and systems that rely on it | `SIT-0001` |
 
 Every record has a name, a unit, a criticality, the most sensitive class of data it touches, and named owners. Systems also say how they are hosted and where they are in their life: planned, in service, being retired, or unsupported.
 
@@ -55,9 +56,9 @@ A link is made once, from either end, and can be read from both. A lab can say t
 
 A process's **Business impact** tab says what the organization cannot afford to lose: how much its loss hurts as time goes on (after four hours, a day, three days, a week, and a month, from negligible to severe), how soon it must be back (its recovery time), how much information it can afford to lose (its recovery point), and the least it needs to run. An analysis is a judgment by a named person and is never edited: analysing again supersedes it, and every one is kept.
 
-A system's or a service's **Recovery** tab says what it can actually deliver: what it can be restored within, how much information it can lose, and what that rests on (a restore tested on a date, a supplier's contract, a design never tried), with the processes that rely on it and what each needs.
+A system's, a service's, a site's, or a third party's **Recovery** tab says what it can actually deliver: what it can be restored within, how much information it can lose, and what that rests on (a restore tested on a date, a supplier's contract, a design never tried), with the processes that rely on it and what each needs. A site says how soon work goes on again, there or somewhere ready to take it; it loses no information of its own, and its tab lists the systems that go down with it. A third party's is for the processes it performs.
 
-The process's tab then checks each system and service it relies on against what it needs, and lists every **shortfall**: one that cannot be back in time, one that would lose more information than the process can afford, and one whose capability nobody has said. **Reports → Resilience** lists every analysed process, those with the most shortfalls first.
+The process's tab then checks everything it depends on against what it needs (each system, service, and site it relies on, and each third party that performs it), and lists every **shortfall**: one that cannot be back in time, one that would lose more information than the process can afford, and one whose capability nobody has said. **Reports → Resilience** lists every analysed process, those with the most shortfalls first.
 
 ![A process's business impact: what it needs, how much its loss hurts over time, and a shortfall in what it relies on](img/process-impact-light.webp)
 

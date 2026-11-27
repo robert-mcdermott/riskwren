@@ -221,7 +221,12 @@ LINK_KINDS: list[dict[str, Any]] = [
         "key": "relies_on",
         "label": "Relies on",
         "reverse": "Supports",
-        "between": [["process", "system"], ["process", "service"]],
+        "between": [
+            ["process", "system"],
+            ["process", "service"],
+            ["process", "site"],
+            ["system", "site"],
+        ],
     },
     {
         "key": "performed_by",
@@ -467,6 +472,19 @@ COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ("exercise", "Exercise", "An exercise of a continuity plan showed it"),
         ("review", "Review", "A review of a supplier, a system, or a process"),
         ("observation", "Observation", "Somebody noticed it and said so"),
+    ),
+    # What kind of place a site is.
+    "site_kinds": items(
+        (
+            "data_center",
+            "Data center",
+            "Where systems run: a room, a building, or a colocation cage",
+        ),
+        ("building", "Building", "A building, or a floor of one, where people work"),
+        ("laboratory", "Laboratory", "Where research is done, with its instruments"),
+        ("clinic", "Clinic", "Where patients are seen and treated"),
+        ("storage", "Storage", "Where specimens, records, or supplies are kept"),
+        ("other", "Other"),
     ),
     # What protected information an incident involved, in a breach assessment. Each suggests
     # the rules that may require it to be notified.

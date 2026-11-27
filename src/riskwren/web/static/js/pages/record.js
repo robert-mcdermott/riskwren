@@ -380,7 +380,7 @@ export function stopsOf(record) {
 }
 
 // Resilience: a process's needs, and what a system or service delivers.
-const MORE = { process: ["impact", "Business impact"], system: ["recovery", "Recovery"], service: ["recovery", "Recovery"] };
+const MORE = { process: ["impact", "Business impact"], system: ["recovery", "Recovery"], service: ["recovery", "Recovery"], site: ["recovery", "Recovery"] };
 
 // Privacy impact: for a process or a system whose data class needs an assessment.
 const PRIVACY = new Set(["process", "system"]);

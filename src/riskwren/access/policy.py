@@ -234,7 +234,7 @@ def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], N
     return found
 
 
-for _path in ("processes", "systems", "third-parties", "information", "services"):
+for _path in ("processes", "systems", "third-parties", "information", "services", "sites"):
     POLICIES.update(record_policies(_path))
 
 # Third parties as a program. Who may tier one is decided where it is written.
@@ -350,6 +350,10 @@ POLICIES.update(
         ("POST", "/api/v1/systems/{ref}/recovery"): Needs.MEMBER,
         ("GET", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
         ("POST", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
+        ("GET", "/api/v1/sites/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/sites/{ref}/recovery"): Needs.MEMBER,
+        ("GET", "/api/v1/third-parties/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/recovery"): Needs.MEMBER,
         # Continuity plans: documents of their own kind; the service decides who may change
         # what a plan restores and who records its exercises.
         ("GET", "/api/v1/continuity"): Needs.MEMBER,

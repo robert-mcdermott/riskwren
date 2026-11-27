@@ -38,7 +38,9 @@ class ImpactBody(BaseModel):
 
 class CapabilityBody(BaseModel):
     recovery_hours: int = Field(description="What it can be restored within")
-    data_loss_hours: int = Field(description="How much information it can lose")
+    data_loss_hours: int = Field(
+        default=0, description="How much information it can lose; none for a site"
+    )
     basis: str = Field(max_length=8000, description="What that rests on")
 
 
@@ -75,7 +77,11 @@ def record_impact(request: Request, ref: str, body: ImpactBody) -> dict[str, Any
 
 
 def _recovery(request: Request, kind: str, ref: str, body: CapabilityBody | None) -> dict[str, Any]:
-    record_type = SYSTEM if kind == "system" else _service_type()
+    from riskwren.inventory.registry import TYPES
+
+    record_type = (
+        SYSTEM if kind == "system" else _service_type() if kind == "service" else TYPES[kind]
+    )
     principal = current(request)
     if body is None:
         with reading(request) as session:
@@ -105,6 +111,28 @@ def show_service_recovery(request: Request, ref: str) -> dict[str, Any]:
 @router.post("/services/{ref}/recovery", status_code=201, summary="Say what a service can deliver")
 def record_service_recovery(request: Request, ref: str, body: CapabilityBody) -> dict[str, Any]:
     return _recovery(request, "service", ref, body)
+
+
+@router.get("/sites/{ref}/recovery", summary="How soon work at a site goes on again")
+def show_site_recovery(request: Request, ref: str) -> dict[str, Any]:
+    return _recovery(request, "site", ref, None)
+
+
+@router.post("/sites/{ref}/recovery", status_code=201, summary="Say what a site can deliver")
+def record_site_recovery(request: Request, ref: str, body: CapabilityBody) -> dict[str, Any]:
+    return _recovery(request, "site", ref, body)
+
+
+@router.get("/third-parties/{ref}/recovery", summary="What a third party can be back within")
+def show_third_party_recovery(request: Request, ref: str) -> dict[str, Any]:
+    return _recovery(request, "third_party", ref, None)
+
+
+@router.post(
+    "/third-parties/{ref}/recovery", status_code=201, summary="Say what a third party can deliver"
+)
+def record_third_party_recovery(request: Request, ref: str, body: CapabilityBody) -> dict[str, Any]:
+    return _recovery(request, "third_party", ref, body)
 
 
 # --- Continuity plans and exercises -------------------------------------------------------

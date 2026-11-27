@@ -35,6 +35,7 @@ PREFIXES = {
     "DDR": "Due diligence review",
     "AUD": "Audit engagement",
     "INC": "Incident",
+    "SIT": "Site",
     "LDR": "Leadership report",
     "SCN": "Scenario",
     "APL": "Audit plan",

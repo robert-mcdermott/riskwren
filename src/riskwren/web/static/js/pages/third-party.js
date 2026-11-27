@@ -16,7 +16,7 @@ const editRecord = async (...args) => (await import("../components/record-forms.
 const openTiering = async (...args) => (await import("../components/tiering.js")).openTiering(...args);
 const tieringDetail = async (...args) => (await import("../components/tiering.js")).tieringDetail(...args);
 
-const TABS = [["overview", "Overview"], ["tiering", "Tiering"], ["diligence", "Due diligence"], ["assurance", "Assurance"], ["history", "History"]];
+const TABS = [["overview", "Overview"], ["tiering", "Tiering"], ["diligence", "Due diligence"], ["assurance", "Assurance"], ["recovery", "Recovery"], ["history", "History"]];
 const assuranceTab = async (...args) => (await import("../components/assurance.js")).assuranceTab(...args);
 const dueDiligenceTab = async (...args) => (await import("../components/third-party-dd.js")).dueDiligenceTab(...args);
 
@@ -117,8 +117,9 @@ export function thirdPartyPage(main, params) {
         tab === "history" ? get(`${base}/history`, null, { fresh: true }) : null,
         loadProgram(), get("/api/v1/risks", { subject: params.ref, limit: 50 }, { fresh: true }),
         tab === "tiering" ? get(`${base}/tiering`, null, { fresh: true }) : null]);
+      const recovery = tab === "recovery" ? await Promise.all([get(`${base}/recovery`, null, { fresh: true }), import("../components/resilience.js")]) : null;
       return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [], program: programData, risks: risks.data,
-        tiering: tiers?.data ?? null };
+        tiering: tiers?.data ?? null, recovery };
     },
     view: (data, reload) => {
       const record = data.record;
@@ -130,6 +131,7 @@ export function thirdPartyPage(main, params) {
         tierPill(record.tiering?.tier_label), criticality(data.vocab, record.criticality)];
       let body;
       if (tab === "history") body = card({ flush: true }, timeline(data.history));
+      else if (tab === "recovery") body = data.recovery[1].recoveryTab("third_party", record, data.recovery[0].data, reload);
       else if (tab === "tiering") body = tieringTab(record, data, ctx);
       else if (tab === "assurance") {
         body = h("div");

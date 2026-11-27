@@ -30,7 +30,9 @@ from riskwren.db.models import (
     RecordLink,
     RecoveryCapability,
     Service,
+    Site,
     System,
+    ThirdParty,
 )
 from riskwren.events import audit
 from riskwren.inventory import access, records
@@ -39,7 +41,12 @@ from riskwren.inventory.registry import PROCESS, TYPES
 AFTER = (("4h", "4 hours"), ("1d", "1 day"), ("3d", "3 days"), ("1w", "1 week"), ("1m", "1 month"))
 LEVELS = ((1, "Negligible"), (2, "Minor"), (3, "Moderate"), (4, "Major"), (5, "Severe"))
 MOST_HOURS = 24 * 365
-MODELS: dict[str, Any] = {"system": System, "service": Service}
+MODELS: dict[str, Any] = {"system": System, "service": Service, "site": Site,
+                          "third_party": ThirdParty}  # fmt: skip
+# What a process relies on, by the kind of link: systems, services, and sites it relies on, and
+# third parties that perform it. A site loses no information of its own: it is back, or not.
+DEPENDS = {"relies_on": ("system", "service", "site"), "performed_by": ("third_party",)}
+PLACES = ("site",)
 
 
 def _hours(values: Mapping[str, Any], key: str, errors: records.Errors) -> int | None:
@@ -129,7 +136,8 @@ def record_capability(
         raise PermissionDenied(f"Those who keep the {TYPES[kind].label.lower()} say this.")
     errors = records.Errors()
     recovery = _hours(values, "recovery_hours", errors)
-    loss = _hours(values, "data_loss_hours", errors)
+    # A place is back or not: it loses no information of its own.
+    loss = 0 if kind in PLACES else _hours(values, "data_loss_hours", errors)
     basis = records.text(values.get("basis"))
     if not basis:
         errors.add("basis", "Say what it rests on: a tested restore, a contract, a design.")
@@ -168,15 +176,18 @@ def _capability_view(row: RecoveryCapability | None) -> dict[str, Any] | None:
 
 
 def dependencies(session: Session, process: Process) -> list[tuple[str, Any]]:
-    """The systems and services the process relies on."""
+    """The systems, services, and sites the process relies on, and the third parties that
+    perform it."""
     found: list[tuple[str, Any]] = []
     for link in session.scalars(
         select(RecordLink).where(
             RecordLink.from_type == "process",
             RecordLink.from_id == process.id,
-            RecordLink.relation == "relies_on",
+            RecordLink.relation.in_(list(DEPENDS)),
         )
     ):
+        if link.to_type not in DEPENDS[link.relation]:
+            continue
         model = MODELS.get(link.to_type)
         thing = session.get(model, link.to_id) if model is not None else None
         if thing is not None and thing.status == "active":
@@ -202,7 +213,7 @@ def check(
                         f"It is back in {capability.recovery_hours} hours; the process needs "
                         f"it in {analysis.recovery_hours}."
                     )
-                if capability.data_loss_hours > analysis.data_loss_hours:
+                if kind not in PLACES and capability.data_loss_hours > analysis.data_loss_hours:
                     problems.append(
                         f"It can lose {capability.data_loss_hours} hours of information; the "
                         f"process can afford {analysis.data_loss_hours}."
@@ -267,17 +278,36 @@ def capability_view(
         .order_by(RecoveryCapability.id.desc())
     ).all()
     now = next((row for row in rows if row.superseded_by is None), None)
+    relation = "performed_by" if kind == "third_party" else "relies_on"
     relied = session.scalars(
         select(Process)
         .join(RecordLink, (RecordLink.from_type == "process") & (RecordLink.from_id == Process.id))
         .where(
-            RecordLink.relation == "relies_on",
+            RecordLink.relation == relation,
             RecordLink.to_type == kind,
             RecordLink.to_id == subject.id,
             Process.status == "active",
         )
         .order_by(Process.ref)
     ).all()
+    # Systems at a site go down with it.
+    systems = (
+        session.scalars(
+            select(System)
+            .join(
+                RecordLink, (RecordLink.from_type == "system") & (RecordLink.from_id == System.id)
+            )
+            .where(
+                RecordLink.relation == "relies_on",
+                RecordLink.to_type == kind,
+                RecordLink.to_id == subject.id,
+                System.status == "active",
+            )
+            .order_by(System.ref)
+        ).all()
+        if kind in PLACES
+        else []
+    )
     needs = []
     for process in relied:
         analysis = current_analysis(session, process.id)
@@ -292,6 +322,14 @@ def capability_view(
         "capability": _capability_view(now),
         "earlier": [_capability_view(row) for row in rows if row is not now],
         "needed_by": needs,
+        "systems": [
+            {
+                **records.chip(TYPES["system"], system),
+                "capability": _capability_view(current_capability(session, "system", system.id)),
+            }
+            for system in systems
+        ],
+        "place": kind in PLACES,
         "can_record": access.can_edit(session, principal, TYPES[kind], subject),
     }
 
@@ -337,6 +375,10 @@ def _history_title(earlier: Any) -> Any:
                 )
             return "An earlier analysis was superseded"
         if event.subject_type == "recovery_capability":
+            if event.action == "created" and event.parent_type in PLACES:
+                return (
+                    f"Said what it can deliver: work goes on within {now('recovery_hours')} hours"
+                )
             if event.action == "created":
                 return (
                     f"Said what it can deliver: back within {now('recovery_hours')} hours, "
@@ -349,10 +391,11 @@ def _history_title(earlier: Any) -> Any:
 
 
 def install() -> None:
-    """Name analyses and capabilities in the histories of processes, systems, and services."""
+    """Name analyses and capabilities in the histories of processes, systems, services, sites,
+    and third parties."""
     from riskwren.thirdparty.services import SERVICE
 
-    for record_type in (PROCESS, TYPES["system"], SERVICE):
+    for record_type in (PROCESS, TYPES["system"], SERVICE, TYPES["site"], TYPES["third_party"]):
         if not record_type.extra.get("_resilience"):
             record_type.extra["history_title"] = _history_title(
                 record_type.extra.get("history_title")

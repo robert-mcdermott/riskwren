@@ -515,6 +515,14 @@
           [
             "process",
             "service"
+          ],
+          [
+            "process",
+            "site"
+          ],
+          [
+            "system",
+            "site"
           ]
         ]
       },
@@ -703,6 +711,37 @@
         "key": "observation",
         "label": "Observation",
         "description": "Somebody noticed it and said so"
+      }
+    ],
+    "site_kinds": [
+      {
+        "key": "data_center",
+        "label": "Data center",
+        "description": "Where systems run: a room, a building, or a colocation cage"
+      },
+      {
+        "key": "building",
+        "label": "Building",
+        "description": "A building, or a floor of one, where people work"
+      },
+      {
+        "key": "laboratory",
+        "label": "Laboratory",
+        "description": "Where research is done, with its instruments"
+      },
+      {
+        "key": "clinic",
+        "label": "Clinic",
+        "description": "Where patients are seen and treated"
+      },
+      {
+        "key": "storage",
+        "label": "Storage",
+        "description": "Where specimens, records, or supplies are kept"
+      },
+      {
+        "key": "other",
+        "label": "Other"
       }
     ],
     "protected_information": [

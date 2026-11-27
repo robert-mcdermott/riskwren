@@ -78,6 +78,7 @@ export const NAV = [
       { href: "/processes", label: "Processes", iconName: "process" },
       { href: "/systems", label: "Systems", iconName: "system" },
       { href: "/information", label: "Information", iconName: "information" },
+      { href: "/sites", label: "Sites", iconName: "units" },
     ],
   },
   {

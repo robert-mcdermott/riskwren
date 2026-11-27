@@ -1381,6 +1381,33 @@ lab heads: what is back, what is next, and when.
      ]},
 ]  # fmt: skip
 
+# Sites: the places work depends on, what relies on each, and how soon work goes on again
+# after one is lost. name, unit, kind, criticality, address, processes, systems (by key),
+# then (days ago, hours, what that rests on). And a third party's own recovery: (days ago,
+# third party key, hours, information lost, what it rests on).
+SITES = [
+    ("Primary data center", "IT", "data_center", "critical", "Administration building, level B1",
+     ["Research data storage"], ["storage", "cluster", "enclave", "servers", "network"],
+     (58, 48, "Fail over to the second data center: storage was tested in March; the cluster "
+              "has no warm standby, and is rebuilt there by hand.")),
+    ("Second data center", "IT", "data_center", "high", "Colocation facility, Northgate",
+     [], ["backup"],
+     (58, 24, "Its own power and cooling; the backup service moves to the primary if it is "
+              "lost.")),
+    ("Freezer rooms A and B", "BIO", "storage", "critical", "Research building, level 1",
+     ["Specimen storage and retrieval"], ["freezers", "monitor"],
+     (52, 4, "The spare freezers on level 2 take the boxes; moved in four hours in the last "
+             "exercise.")),
+    ("Clinic building", "CLIN", "clinic", "critical", "Northmere Research Clinic",
+     ["Medication dispensing", "Infusion therapy", "Clinical laboratory testing"],
+     ["cabinets", "pumps", "lis", "analyzers"],
+     (50, 24, "The outpatient unit on the second campus takes infusions and dispensing within "
+              "a day; nothing is set up there to start sooner.")),
+]  # fmt: skip
+THIRD_PARTY_RECOVERY = [
+    (48, "labref", 24, 0, "Its contract: results within a day of a sample arriving."),
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",
