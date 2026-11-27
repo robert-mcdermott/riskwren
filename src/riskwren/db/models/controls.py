@@ -202,6 +202,8 @@ class Action(Base):
     status: Mapped[str] = mapped_column(String(16), default="open")
     source_type: Mapped[str] = mapped_column(String(24))
     source_id: Mapped[int] = mapped_column(Integer)
+    # Who outside does it, where a third party's contact does: the owner follows it up.
+    contact_id: Mapped[int | None] = mapped_column(ForeignKey("third_party_contact.id"))
     completed_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
     completion_note: Mapped[str | None] = mapped_column(Text)
     created_by: Mapped[int | None] = mapped_column(Integer)

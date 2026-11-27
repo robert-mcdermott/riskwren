@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Date,
     ForeignKey,
     Index,
     Integer,
@@ -103,6 +104,10 @@ class ThirdParty(ThingMixin, Base):
     # A copy of the latest tiering's tier, kept here so that lists can show and sort by it.
     # The tiering is the authority (``tier_assessment``).
     tier: Mapped[str | None] = mapped_column(String(24))
+    # When it is next due for review: its tier's cadence from its last concluded review, or
+    # sooner when an event called for one (``review_called`` says what).
+    next_review_on: Mapped[date | None] = mapped_column(Date)
+    review_called: Mapped[str | None] = mapped_column(Text)
 
     __table_args__ = (
         CheckConstraint(one_of("status", RECORD_STATUSES), name="status"),

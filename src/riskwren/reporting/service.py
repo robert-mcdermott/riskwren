@@ -525,6 +525,16 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/reviews/{review.ref}", review.due_on, ref=review.ref,
             )  # fmt: skip
 
+    # Third parties due for review: on their tier's cadence, or because something happened.
+    from riskwren.thirdparty import lifecycle
+
+    for party in lifecycle.due_soon(session, principal):
+        add(
+            "third_party_review", f"Review {party.name}",
+            f"{party.ref} · " + (party.review_called or "on its tier's cadence"),
+            f"/third-parties/{party.ref}?tab=diligence", party.next_review_on, ref=party.ref,
+        )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 

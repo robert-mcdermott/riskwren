@@ -946,6 +946,29 @@ SUPPLIER_AGREEMENTS: list[dict[str, object]] = [
      "unit": "BIO", "starts": 760, "ends": 25, "covers": ["svc_courier"]},
 ]  # fmt: skip
 
+# A relationship over time. Days are before the build (negative: after it).
+SUBCONTRACTORS = [("recordco", "cloud"), ("surveyco", "cloud"), ("edcco", "cloud")]
+FINDINGS: list[dict[str, object]] = [
+    {"review": "cloud", "by": "ciso", "raised": 284, "severity": "high",
+     "name": "Quillon Cloud: administrators' second factor can be phished",
+     "summary": "Its own staff use security keys; the institute's tenant administrators still use codes sent by text.",
+     "action": "Move every tenant administrator to a security key", "contact": "cloud", "due": -20},
+    {"review": "edcco", "by": "ciso", "raised": 179, "severity": "moderate",
+     "name": "Castellan Trial Systems: restoring trial data has not been tested",
+     "summary": "It answered that backups are not restored to test them. The condition was a tested restore before the next trial starts.",
+     "action": "Restore a trial's data to a test system, and send the result to Clinical Research", "contact": "edcco", "due": 15},
+]  # fmt: skip
+CALLED_REVIEWS = [
+    {"party": "backupco", "by": "ciso", "on": 12, "event": "breach_notice",
+     "note": "On the 14th it told customers that a misconfigured storage area exposed other customers' backup catalogues for a day. It says the institute's were not among them."},
+]  # fmt: skip
+OFFBOARDING = {
+    "party": "webco", "started": 25,
+    "reason": "The public website moves to the institute's own platform at the end of the month.",
+    "steps": [("access", 20, "The supplier's accounts on the web servers and in the content system were removed."),
+              ("information", 9, "The site's content and analytics were exported, and the supplier deleted its copies.")],
+}  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

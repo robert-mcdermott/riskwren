@@ -676,6 +676,33 @@
         "title": "BrandingBody",
         "type": "object"
       },
+      "CallReviewBody": {
+        "properties": {
+          "event": {
+            "description": "incident, breach_notice, service_change, ownership, finding, or other",
+            "title": "Event",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What happened, and when",
+            "title": "Note"
+          }
+        },
+        "required": [
+          "event"
+        ],
+        "title": "CallReviewBody",
+        "type": "object"
+      },
       "CampaignIn": {
         "properties": {
           "document": {
@@ -1869,6 +1896,49 @@
           "value"
         ],
         "title": "ExternalRefBody",
+        "type": "object"
+      },
+      "FindingBody": {
+        "properties": {
+          "name": {
+            "maxLength": 400,
+            "title": "Name",
+            "type": "string"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who here puts it right",
+            "title": "Owner Id"
+          },
+          "severity": {
+            "description": "critical, high, moderate, or low",
+            "title": "Severity",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "name",
+          "severity"
+        ],
+        "title": "FindingBody",
         "type": "object"
       },
       "FrameworkBody": {
@@ -3171,6 +3241,25 @@
           "objectives"
         ],
         "title": "ObjectivesBody",
+        "type": "object"
+      },
+      "OffboardBody": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why it ends",
+            "title": "Reason"
+          }
+        },
+        "title": "OffboardBody",
         "type": "object"
       },
       "OwnersBody": {
@@ -5870,6 +5959,17 @@
       },
       "riskwren__api__routers__issues__ActionBody": {
         "properties": {
+          "contact_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Id"
+          },
           "detail": {
             "anyOf": [
               {
@@ -19290,6 +19390,60 @@
         ]
       }
     },
+    "/api/v1/reviews/{ref}/findings": {
+      "post": {
+        "operationId": "raise_finding_api_v1_reviews__ref__findings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Raise Finding Api V1 Reviews  Ref  Findings Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise a concern from a review as an issue about the third party",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/reviews/{ref}/history": {
       "get": {
         "operationId": "review_history_api_v1_reviews__ref__history_get",
@@ -25700,6 +25854,24 @@
             }
           },
           {
+            "description": "due: overdue; soon: within a month",
+            "in": "query",
+            "name": "review",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "due: overdue; soon: within a month",
+              "title": "Review"
+            }
+          },
+          {
             "in": "query",
             "name": "owner",
             "required": false,
@@ -26100,6 +26272,60 @@
         ]
       }
     },
+    "/api/v1/third-parties/{ref}/call-review": {
+      "post": {
+        "operationId": "call_review_api_v1_third_parties__ref__call_review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CallReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Call Review Api V1 Third Parties  Ref  Call Review Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Call for a review now: what happened",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
     "/api/v1/third-parties/{ref}/contacts": {
       "post": {
         "operationId": "add_contact_api_v1_third_parties__ref__contacts_post",
@@ -26302,6 +26528,177 @@
         "summary": "Remove a link from a third party",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/offboarding": {
+      "post": {
+        "operationId": "start_offboarding_api_v1_third_parties__ref__offboarding_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OffboardBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Offboarding Api V1 Third Parties  Ref  Offboarding Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "End the relationship: open the checklist",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/offboarding/cancel": {
+      "post": {
+        "operationId": "cancel_offboarding_api_v1_third_parties__ref__offboarding_cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cancel Offboarding Api V1 Third Parties  Ref  Offboarding Cancel Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stop offboarding",
+        "tags": [
+          "third parties"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/offboarding/steps/{step}": {
+      "post": {
+        "operationId": "record_offboarding_step_api_v1_third_parties__ref__offboarding_steps__step__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step",
+            "required": true,
+            "schema": {
+              "title": "Step",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Offboarding Step Api V1 Third Parties  Ref  Offboarding Steps  Step  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record a step of offboarding: what was done",
+        "tags": [
+          "third parties"
         ]
       }
     },

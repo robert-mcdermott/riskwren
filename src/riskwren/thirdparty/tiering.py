@@ -398,6 +398,9 @@ def record(
         if before is not None:
             before.superseded_by = made.id
         third_party.tier = chosen
+        from riskwren.thirdparty import lifecycle  # it builds on this module
+
+        lifecycle.schedule(session, third_party)
         records.touch(session, third_party)
         session.flush()
     return made

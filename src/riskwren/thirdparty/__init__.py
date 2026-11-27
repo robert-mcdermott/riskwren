@@ -8,6 +8,7 @@ wave adds to them.
 from riskwren.thirdparty import (  # noqa: F401  (registers them)
     assurance,
     coverage,
+    lifecycle,
     profile,
     reviews,
     services,
@@ -15,3 +16,4 @@ from riskwren.thirdparty import (  # noqa: F401  (registers them)
 )
 
 coverage.install()  # after profile and services, whose detail it adds to
+lifecycle.install()

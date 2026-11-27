@@ -83,7 +83,13 @@ function overview(record, ctx) {
       record.summary ? card({ title: "About" }, prose(record.summary)) : null,
       record.notes ? card({ title: "Notes" }, prose(record.notes)) : null,
       tierCard(record, ctx), servicesCard(record, ctx), agreementsCard(record), risksCard(ctx), linksCard(record, ctx)),
-    h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), ownersCard(record, ctx)));
+    h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), lifecycle(record, ctx), ownersCard(record, ctx)));
+}
+
+function lifecycle(record, ctx) {
+  const holder = h("div", { class: "stack-lg" });
+  import("../components/third-party-life.js").then(({ lifecycleCards }) => holder.append(...lifecycleCards(record, ctx).filter(Boolean)));
+  return holder;
 }
 
 function tieringTab(record, data, ctx) {
@@ -120,7 +126,8 @@ export function thirdPartyPage(main, params) {
       const ctx = { vocab: data.vocab, units: data.units, program: data.program, risks: data.risks, reload };
       const edit = record.can?.edit ? button("Edit", { iconName: "edit", onclick: () =>
         editRecord("third_party", { record, vocab: data.vocab, units: data.units, onDone: reload }) }) : null;
-      const badges = [statusPill(record.status), tierPill(record.tiering?.tier_label), criticality(data.vocab, record.criticality)];
+      const badges = [statusPill(record.status), record.offboarding?.status === "open" ? pill("Being offboarded", "warn") : null,
+        tierPill(record.tiering?.tier_label), criticality(data.vocab, record.criticality)];
       let body;
       if (tab === "history") body = card({ flush: true }, timeline(data.history));
       else if (tab === "tiering") body = tieringTab(record, data, ctx);

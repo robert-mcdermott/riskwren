@@ -1925,6 +1925,65 @@ class Builder:
                 )  # type: ignore[attr-defined]
             self.tally("agreements")
 
+    def _story_lifecycle(self) -> Script:
+        """Relationships over time: the suppliers the clinical systems rely on in turn, two
+        findings followed up with the suppliers' own people, a review called for by a breach
+        notice, and a supplier being offboarded."""
+        from riskwren.compliance import issues as issue_service
+        from riskwren.db.models import ThirdPartyContact, ThirdPartyReview
+        from riskwren.thirdparty import lifecycle
+
+        yield self._on(300)
+        for host, sub in c.SUBCONTRACTORS:
+            with self.db.read() as session:
+                unit = session.get(ThirdParty, self.things[host][1]).org_unit_id
+            self.link_things(self.steward(unit), host, "subcontracts", sub)
+        for spec in c.FINDINGS:
+            yield self._on(float(spec["raised"]))  # type: ignore[arg-type]
+            by = self.cast[str(spec["by"])]
+            _, party_id, _ = self.things[str(spec["review"])]
+            with self.act(by) as (session, who):
+                review = session.scalars(select(ThirdPartyReview).where(
+                    ThirdPartyReview.third_party_id == party_id,
+                    ThirdPartyReview.status == "concluded")).first()  # fmt: skip
+                assert review is not None
+                issue = lifecycle.raise_finding(
+                    session,
+                    who,
+                    review,
+                    {
+                        "name": spec["name"],
+                        "summary": spec["summary"],
+                        "severity": spec["severity"],
+                    },
+                )
+                contact = session.scalars(select(ThirdPartyContact).where(
+                    ThirdPartyContact.third_party_id == party_id)).first()  # fmt: skip
+                issue_service.add_action(
+                    session, who, issue, title=str(spec["action"]), owner_id=by,
+                    due_on=self.day(-float(spec["due"])).isoformat(),  # type: ignore[arg-type]
+                    contact_id=contact.id if contact else None,
+                )  # fmt: skip
+            self.tally("findings from reviews")
+        spec = c.OFFBOARDING
+        yield self._on(float(spec["started"]))  # type: ignore[arg-type]
+        _, party_id, _ = self.things[str(spec["party"])]
+        with self.db.read() as session:
+            unit = session.get(ThirdParty, party_id).org_unit_id
+        keeper = self.steward(unit)
+        with self.act(keeper) as (session, who):
+            lifecycle.start(session, who, session.get(ThirdParty, party_id), spec["reason"])
+        for key, days, note in spec["steps"]:  # type: ignore[attr-defined]
+            yield self._on(float(days))
+            with self.act(keeper) as (session, who):
+                lifecycle.record_step(session, who, session.get(ThirdParty, party_id), key, note)
+        for called in c.CALLED_REVIEWS:
+            yield self._on(float(called["on"]))  # type: ignore[arg-type]
+            _, party_id, _ = self.things[str(called["party"])]
+            with self.act(self.cast[str(called["by"])]) as (session, who):
+                lifecycle.call_review(session, who, session.get(ThirdParty, party_id),
+                                      str(called["event"]), str(called["note"]))  # fmt: skip
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3175,7 +3234,7 @@ class Builder:
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
             self._story_governance, self._story_third_parties, self._story_due_diligence,
-            self._story_assurance, self._story_coverage,
+            self._story_assurance, self._story_coverage, self._story_lifecycle,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

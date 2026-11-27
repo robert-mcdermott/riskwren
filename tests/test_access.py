@@ -409,6 +409,11 @@ for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
     REACH[_route] = EVERYONE | {"nobody"}
 for _route in (
     ("GET", "/api/v1/coverage"), ("PUT", "/api/v1/agreements/{ref}/parties"),
+    ("POST", "/api/v1/third-parties/{ref}/call-review"),
+    ("POST", "/api/v1/third-parties/{ref}/offboarding"),
+    ("POST", "/api/v1/third-parties/{ref}/offboarding/steps/{step}"),
+    ("POST", "/api/v1/third-parties/{ref}/offboarding/cancel"),
+    ("POST", "/api/v1/reviews/{ref}/findings"),
     ("GET", "/api/v1/assurance-kinds"), ("GET", "/api/v1/third-parties/{ref}/assurance"),
     ("POST", "/api/v1/third-parties/{ref}/assurance"),
     ("POST", "/api/v1/third-parties/{ref}/assurance/{document}/reviews"),

@@ -42,6 +42,7 @@ from riskwren.thirdparty import (
     assurance,
     contacts,
     coverage,
+    lifecycle,
     respondent,
     reviews,
     services,
@@ -555,3 +556,70 @@ def set_agreement_parties(request: Request, ref: str, body: PartiesBody) -> dict
         agreement = records.load(session, principal, AGREEMENT, ref)
         coverage.set_parties(session, principal, agreement, body.parties)
         return envelope(records.detail(session, principal, AGREEMENT, agreement))
+
+
+# --- Lifecycle ------------------------------------------------------------------------------
+
+
+class CallReviewBody(BaseModel):
+    event: str = Field(description="incident, breach_notice, service_change, ownership, "
+                       "finding, or other")  # fmt: skip
+    note: str | None = Field(default=None, max_length=4000, description="What happened, and when")
+
+
+class OffboardBody(BaseModel):
+    reason: str | None = Field(default=None, max_length=4000, description="Why it ends")
+
+
+class FindingBody(BaseModel):
+    name: str = Field(max_length=400)
+    summary: str | None = None
+    severity: str = Field(description="critical, high, moderate, or low")
+    owner_id: int | None = Field(default=None, description="Who here puts it right")
+
+
+def _third_party_act(request: Request, ref: str, act: Any) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        third_party = records.load(session, principal, THIRD_PARTY, ref)
+        act(session, principal, third_party)
+        return envelope(records.detail(session, principal, THIRD_PARTY, third_party))
+
+
+@router.post("/third-parties/{ref}/call-review", summary="Call for a review now: what happened")
+def call_review(request: Request, ref: str, body: CallReviewBody) -> dict[str, Any]:
+    return _third_party_act(
+        request, ref, lambda s, p, t: lifecycle.call_review(s, p, t, body.event, body.note)
+    )
+
+
+@router.post("/third-parties/{ref}/offboarding", summary="End the relationship: open the checklist")
+def start_offboarding(request: Request, ref: str, body: OffboardBody) -> dict[str, Any]:
+    return _third_party_act(request, ref, lambda s, p, t: lifecycle.start(s, p, t, body.reason))
+
+
+@router.post("/third-parties/{ref}/offboarding/steps/{step}",
+             summary="Record a step of offboarding: what was done")  # fmt: skip
+def record_offboarding_step(
+    request: Request, ref: str, step: str, body: NoteBody
+) -> dict[str, Any]:
+    return _third_party_act(
+        request, ref, lambda s, p, t: lifecycle.record_step(s, p, t, step, body.note)
+    )
+
+
+@router.post("/third-parties/{ref}/offboarding/cancel", summary="Stop offboarding")
+def cancel_offboarding(request: Request, ref: str, body: NoteBody) -> dict[str, Any]:
+    return _third_party_act(request, ref, lambda s, p, t: lifecycle.cancel(s, p, t, body.note))
+
+
+@router.post("/reviews/{ref}/findings", status_code=201,
+             summary="Raise a concern from a review as an issue about the third party")  # fmt: skip
+def raise_finding(request: Request, ref: str, body: FindingBody) -> dict[str, Any]:
+    from riskwren.compliance.issues import ISSUE
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        review = records.load(session, principal, REVIEW, ref)
+        issue = lifecycle.raise_finding(session, principal, review, body.model_dump())
+        return envelope(records.detail(session, principal, ISSUE, issue))

@@ -96,6 +96,7 @@ from riskwren.db.models.system import ChainHead, Counter, Event
 from riskwren.db.models.third_parties import (
     AssuranceResponsibility,
     AssuranceReview,
+    Offboarding,
     RespondentLink,
     ThirdPartyContact,
     ThirdPartyReview,
@@ -152,6 +153,7 @@ __all__ = [
     "NotDuplicate",
     "Notice",
     "Objective",
+    "Offboarding",
     "OrgUnit",
     "OutboxMessage",
     "PolicyAcknowledgment",

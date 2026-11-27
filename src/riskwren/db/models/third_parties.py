@@ -184,3 +184,25 @@ class AssuranceResponsibility(Base):
         Index("ix_assurance_responsibility_review_id", "review_id"),
         Index("ix_assurance_responsibility_control_id", "control_id"),
     )
+
+
+class Offboarding(Base):
+    """Ending a relationship: the steps to record, each with who and when, until the third
+    party is retired (TPR-09)."""
+
+    __tablename__ = "offboarding"
+    __audit_parent__ = ("third_party", "third_party_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    third_party_id: Mapped[int] = mapped_column(ForeignKey("third_party.id"))
+    reason: Mapped[str] = mapped_column(Text)
+    steps: Mapped[list[dict[str, Any]]] = mapped_column(JsonType, default=list)
+    status: Mapped[str] = mapped_column(String(16), default="open")
+    started_by_name: Mapped[str] = mapped_column(String(200))
+    started_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    finished_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+
+    __table_args__ = (
+        CheckConstraint("status IN ('open', 'done', 'cancelled')", name="status"),
+        Index("ix_offboarding_third_party_id", "third_party_id"),
+    )

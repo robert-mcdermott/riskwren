@@ -242,6 +242,15 @@ export const SCENES = [
     step: `(() => { const card = [...document.querySelectorAll(".card")].find((el) => (el.querySelector("h2")?.textContent ?? "").startsWith("Who it is with"));
       const change = card && [...card.querySelectorAll("button")].find((each) => each.textContent.trim() === "Change");
       if (change) change.click(); else window.__sceneMissed = "the Change button of Who it is with"; })()` },
+  { name: "third-party-offboarding", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=papermill")(page)}` },
+  { name: "third-party-called", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=stonebridge")(page)}` },
+  { name: "third-party-call-review", as: "ciso", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=quillon")(page)}`,
+    step: click("Call for a review") },
+  { name: "third-parties-review-due", as: "ciso", path: "/third-parties?review=due&sort=tier" },
+  { name: "review-finding", as: "ciso", path: async (page) => `/reviews/${await first("/api/v1/reviews?q=tallyfield")(page)}`,
+    step: click("Raise a finding") },
+  { name: "issue-finding", as: "ciso", path: async (page) => `/issues/${await first("/api/v1/issues?q=phished")(page)}` },
+  { name: "graph-subcontractor", as: "ciso", path: async (page) => `/graph/${await first("/api/v1/third-parties?q=quillon")(page)}` },
   // The page a contact sees, through a link sent just now.
   { name: "respond", as: "ciso", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;

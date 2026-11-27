@@ -99,18 +99,21 @@ function addAction(issue, reload) {
       const me = session().account;
       const owner = personField("Who will do it", { value: { account_id: me.id, name: me.name }, hint: "They are told, and see the issue." });
       const due = field("Due", { type: "date", required: true, value: issue.due_on });
+      // Something a third party's contact does: the owner here follows it up.
+      const contact = issue.contacts?.length ? select("Done by, at the third party", [["", "Nobody outside"], ...issue.contacts.map((c) => [String(c.id), `${c.name}, ${c.third_party}`])],
+        { hint: "They have no account. The owner here follows it up with them." }) : null;
       const save = button("Add", { kind: "btn-primary" });
       save.addEventListener("click", async () => {
-        const done = await submit({ button: save, banner: problem, fields: { title, detail, owner_id: owner, due_on: due },
+        const done = await submit({ button: save, banner: problem, fields: { title, detail, owner_id: owner, due_on: due, ...(contact ? { contact_id: contact } : {}) },
           run: () => post(`/api/v1/issues/${issue.ref}/actions`, { title: title.input.value, detail: detail.input.value || null,
-            owner_id: owner.value() ?? 0, due_on: due.input.value || "0001-01-01" }) });
+            owner_id: owner.value() ?? 0, due_on: due.input.value || "0001-01-01", contact_id: contact?.input.value ? Number(contact.input.value) : null }) });
         if (done) {
           close();
           toast("The action was added.");
           reload();
         }
       });
-      body.append(h("div", { class: "stack-lg" }, problem, title.node, detail.node, h("div", { class: "grid-2" }, owner.node, due.node)));
+      body.append(h("div", { class: "stack-lg" }, problem, title.node, detail.node, h("div", { class: "grid-2" }, owner.node, due.node), contact?.node ?? null));
       footerOf(footer, save, close);
     },
   });
@@ -236,8 +239,9 @@ function overview(issue, ctx) {
       issue.status === "open" && issue.return_note ? alert("warn", icon("alert"), h("div", {}, `Sent back: ${issue.return_note}`)) : null,
       issue.status === "cancelled" ? alert("info", icon("info"), h("div", {}, `Withdrawn: ${issue.closure_note}`)) : null,
       card({ title: "What is wrong" }, issue.summary ? prose(issue.summary) : h("p", { class: "muted" }, "No detail was given."),
-        issue.source ? h("p", { class: "subtle" }, "From ", h("a", { href: `/assessments/${issue.source.assessment.ref}` }, `${issue.source.assessment.ref} ${issue.source.assessment.name}`),
-          `, tested by ${issue.source.tested_by} on ${date(issue.source.tested_at)}.`) : null),
+        issue.source?.review ? h("p", { class: "subtle" }, "From ", h("a", { href: `/reviews/${issue.source.review.ref}` }, `${issue.source.review.ref} ${issue.source.review.name}`), ".")
+          : issue.source ? h("p", { class: "subtle" }, "From ", h("a", { href: `/assessments/${issue.source.assessment.ref}` }, `${issue.source.assessment.ref} ${issue.source.assessment.name}`),
+            `, tested by ${issue.source.tested_by} on ${date(issue.source.tested_at)}.`) : null),
       card({ title: "What it is about" },
         about.records.length || about.requirements.length ? h("div", { class: "stack" },
           about.records.length ? h("div", { class: "chips" }, about.records.map((record) => recordChip(record))) : null,
@@ -252,7 +256,7 @@ function overview(issue, ctx) {
           h("th", { scope: "col" }, h("span", { class: "sr-only" }, "What you can do")))),
         h("tbody", {}, issue.actions.map((action) => h("tr", {},
           h("td", {}, h("div", { class: "cell-main" }, action.title), h("div", { class: "cell-sub" }, action.ref, action.completion_note ? ` · ${action.completion_note}` : "")),
-          h("td", {}, action.owner.name), h("td", { class: "nowrap" }, dueCell(action)), h("td", {}, actionStatus(action)),
+          h("td", {}, action.owner.name, action.contact ? h("div", { class: "cell-sub" }, `with ${action.contact.name}, ${action.contact.third_party}`) : null), h("td", { class: "nowrap" }, dueCell(action)), h("td", {}, actionStatus(action)),
           h("td", { class: "actions" }, actionButtons(action, ctx.reload)))))))
         : h("p", { class: "muted" }, "None yet. An issue is put right through actions, each with an owner and a date.")),
       issue.closure_note && issue.status !== "cancelled" ? card({ title: issue.status === "closed" ? "How it was put right" : "What its owner says was done" }, closureBody(issue, v)) : null),

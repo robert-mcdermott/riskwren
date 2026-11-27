@@ -2,7 +2,7 @@
 
 This guide is for whoever looks after the organization's suppliers, service providers, and partners: most often the security office, which asks how each handles the organization's information, and the units that rely on each.
 
-A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, what it says about itself when asked, what independent reports say about it, and whether an agreement covers what is shared with it.
+A third party has been a record of the inventory from the start: a name, a unit, owners, and links to the processes it performs and the systems it supplies. This guide is about what RiskWren adds to that: what each third party provides, how much is at stake with it, what it says about itself when asked, what independent reports say about it, whether an agreement covers what is shared with it, and how the relationship goes on and ends.
 
 ## Third parties and their services
 
@@ -136,3 +136,32 @@ Where a rule applies and no agreement meets it, the sharing is a **stop**. It is
 ![A dispensing cabinet supplier that handles patient records with no business associate agreement: the stop at the top of its page](img/third-party-stop-light.webp)
 
 A third party's page lists the agreements it is party to, with how each stands. The rules are part of the program, written in the condition language over the information's kind and class and the third party's kind and tier, and travel with it when it is exported and imported.
+
+## Over time
+
+### Findings
+
+A concern in a review's answers, or anything else a review turns up, is followed up as an issue. **Raise a finding** on the review (or **Raise it as a finding** beside one concern) raises an [issue](issues-and-exceptions.md) about the third party, found by *review*, which names the review it came from. Like any issue it has a severity, a date by its severity, owners here, and actions.
+
+An action on such an issue can be **done by** one of the third party's contacts: say who, when adding it. The contact has no account; the action's owner here follows it up with them, is reminded of its date, and records when it is done. The issue closes, as every issue does, when someone who does not own it confirms the fix.
+
+### Review again
+
+Each third party is due for review on the cadence its tier sets (as shipped, every 12, 24, or 36 months, and Tier 4 only when called for), counted from its last concluded review, or from when it was first tiered if it has never been reviewed. **Next review** on its page says when, and why. A review due within a month, or late, is on Home for those who keep the third party and in the reminders; the list of third parties can be cut to those whose review is due.
+
+Something can call for a review sooner: an incident at the supplier, a breach notice, a change to what it does for the organization or to who owns it. **Call for a review** records what happened, and makes it due at once. Concluding the next review answers the call, and sets the date after it by the tier. Tiering again, to a tier with a shorter cadence, brings the date forward.
+
+### Ending a relationship
+
+**End the relationship** opens a checklist:
+
+1. **Access removed**: its accounts, remote access, and badges here.
+2. **Information returned or destroyed**, with a certificate where there is one.
+3. **Agreements ended**: closed, or noted for what survives them.
+4. **Its attestation recorded**: its written confirmation that nothing of the organization's is kept.
+
+Each step is recorded by someone who keeps the third party, saying what was done. When the last is recorded, the third party and its services are retired; until then it is shown as being offboarded. Offboarding can be stopped, and the history keeps every step.
+
+### Subcontractors
+
+A third party names the third parties it depends on with a link, **Subcontracts to**, read from the other side as **Is a subcontractor of**. Both are in the **Connections** picture, so a supplier that several of the organization's suppliers rely on in turn is easy to see.

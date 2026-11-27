@@ -306,6 +306,7 @@ def _detail(session: Session, principal: Principal, review: ThirdPartyReview) ->
             "withdraw": editable and link_state(link) == "live",
             "conclude": editable and review.status == "answered",
             "cancel": editable and review.status in ("draft", "sent"),
+            "findings": editable and review.status in ("answered", "concluded"),
         },
     }  # fmt: skip
 
@@ -522,6 +523,10 @@ def conclude(
         review.concluded_at = utc_now()
         review.concluded_by, review.concluded_by_name = principal.account_id, principal.name
         records.touch(session, review)
+        session.flush()
+        from riskwren.thirdparty import lifecycle  # it builds on this module
+
+        lifecycle.after_review(session, review)
         session.flush()
 
 

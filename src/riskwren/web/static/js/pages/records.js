@@ -106,6 +106,7 @@ export function recordList(main, type) {
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
         filterSelect("status", statusOptions(["active", "retired"], "Any status"), "Status"),
         tiered ? filterSelect("tier", [["", "Any tier"], ...data.tiers.map((tier) => [tier.key, tier.label]), ["none", "Not tiered"]], "Tier") : null,
+        tiered ? filterSelect("review", [["", "Any review date"], ["due", "Review overdue"], ["soon", "Review due within a month"]], "Review") : null,
         mineToggle());
       const body = rows.length
         ? h("div", { class: "table-wrap" }, h("table", { class: "table" },

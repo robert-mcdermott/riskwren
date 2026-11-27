@@ -44,6 +44,18 @@ Wave 5, *Third parties*.
   data, and so on). Where information is shared, directly or through a service, and no open
   agreement of a required kind with that third party covers it, the information, the third
   party, and the service each show the stop, and **Third parties → Coverage** gathers them.
+- **Findings from a review** are issues about the third party, found by review, naming the
+  review they came from. An action on one can be done by the third party's contact, followed
+  up by its owner here.
+- **Review again** on the tier's cadence, from the last concluded review or from the first
+  tiering, or at once when an event calls for it (an incident, a breach notice, a change of
+  service or owner). A review due or late is on Home and in the reminders, and the list of
+  third parties can be cut to it.
+- **Offboarding:** ending a relationship opens a checklist (access removed, information
+  returned or destroyed, agreements ended, an attestation recorded), and the third party and
+  its services are retired when the last step is recorded.
+- **Subcontractors:** a third party *subcontracts to* others, shown on both and in the
+  Connections picture.
 - **A Third parties menu,** with third parties, services, and due diligence, and a new guide,
   [Third parties](docs/third-parties.md).
 

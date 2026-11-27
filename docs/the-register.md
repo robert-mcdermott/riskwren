@@ -46,6 +46,7 @@ A record says what it relies on:
 | Information asset | is shared with | Third party |
 | Service | reaches · handles | System · Information asset |
 | Process · System | relies on · is supplied by | Service |
+| Third party | subcontracts to | Another third party |
 | Process or system | depends on · is part of | Another of the same kind |
 
 A link is made once, from either end, and can be read from both. A lab can say that its work relies on central storage without anyone in central computing doing anything.

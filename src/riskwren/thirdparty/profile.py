@@ -8,22 +8,24 @@ list can be cut to one tier or to those not yet tiered, and its history tells ea
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import case
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
+from riskwren.core.clock import utc_now
 from riskwren.db.models import ThirdParty
 from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import THIRD_PARTY
-from riskwren.thirdparty import contacts, coverage, reviews, services, tiering
+from riskwren.thirdparty import contacts, coverage, lifecycle, reviews, services, tiering
 
 UNTIERED = "none"
 
 
 def _cards(session: Session, rows: list[ThirdParty]) -> list[dict[str, Any]]:
-    return [{"tier": row.tier} for row in rows]
+    return [{"tier": row.tier, "next_review_on": row.next_review_on} for row in rows]
 
 
 def _detail(session: Session, principal: Principal, third_party: ThirdParty) -> dict[str, Any]:
@@ -51,16 +53,27 @@ def _detail(session: Session, principal: Principal, third_party: ThirdParty) -> 
         else None,
         "reviews": reviews.of(session, principal, third_party),
         "agreements": coverage.agreements_with(session, principal, third_party),
+        "next_review_on": third_party.next_review_on,
+        "review_called": third_party.review_called,
+        "offboarding": lifecycle.offboarding_view(
+            lifecycle.current_offboarding(session, third_party)
+        ),
     }
 
 
 def _conditions(session: Session, principal: Principal, filters: Mapping[str, Any]) -> list[Any]:
+    found: list[Any] = []
     tier = filters.get("tier")
     if tier == UNTIERED:
-        return [ThirdParty.tier.is_(None)]
-    if tier:
-        return [ThirdParty.tier == str(tier)]
-    return []
+        found.append(ThirdParty.tier.is_(None))
+    elif tier:
+        found.append(ThirdParty.tier == str(tier))
+    review = filters.get("review")
+    if review in ("due", "soon"):
+        today = utc_now().date()
+        horizon = today if review == "due" else today + timedelta(days=lifecycle.SOON)
+        found += [ThirdParty.status == "active", ThirdParty.next_review_on <= horizon]
+    return found
 
 
 def _tier_order(session: Session, model: Any) -> Any:
@@ -70,15 +83,27 @@ def _tier_order(session: Session, model: Any) -> Any:
 
 def _history_title(event: Any, lookups: Any) -> str | None:
     context = event.context or {}
-    if context.get("op") != "third_party.tier":
-        return None
-    if event.subject_type == "tier_assessment" and event.action == "created":
+    op = context.get("op")
+    mine = event.subject_type == "third_party"
+    if op == "third_party.call_review" and mine:
+        return f"Called for a review: {context.get('why')}"
+    if event.subject_type == "offboarding":
+        if op == "third_party.offboard":
+            return f"Started offboarding: {context.get('reason')}"
+        if op == "third_party.offboard_step":
+            return f"Recorded: {context.get('step')}. {context.get('note')}"
+        if op == "third_party.offboard_cancel":
+            return "Stopped offboarding" + (f": {context['note']}" if context.get("note") else "")
+    if event.subject_type == "third_party_contact" and op == "third_party.contact":
+        verb = "Added a contact" if event.action == "created" else "Changed a contact"
+        return f"{verb}: {context.get('who')}"
+    if op == "third_party.tier" and event.subject_type == "tier_assessment":
         tier, suggested = context.get("tier"), context.get("suggested")
         if tier == suggested:
             return f"Tiered it: {tier}, as the rules give"
         why = context.get("rationale")
         return f"Tiered it: {tier}, where the rules give {suggested}" + (f". {why}" if why else "")
-    return "Tiered it"  # the copy onto the third party, already told
+    return None
 
 
 THIRD_PARTY.extra.update(
@@ -88,8 +113,10 @@ THIRD_PARTY.extra.update(
         "conditions": _conditions,
         "sort_columns": {"tier": _tier_order},
         "history_title": _history_title,
+        # A call for a review changes only what the history keeps quiet; it is told by title.
+        "history_keeps_titled": True,
         "history_labels": {"tier": "Tier"},
-        "history_quiet": ("tier",),
+        "history_quiet": ("tier", "next_review_on", "review_called"),
         "expected": [
             Expected(
                 "tier",

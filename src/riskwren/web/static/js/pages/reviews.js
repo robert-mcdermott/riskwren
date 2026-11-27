@@ -5,7 +5,7 @@ import { get, post } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date, dateTime, plural, relative } from "../core/format.js";
 import { vocabularies } from "../core/lookups.js";
-import { query } from "../core/router.js";
+import { navigate, query } from "../core/router.js";
 import { banner, field, select, submit } from "../components/form.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { asAsked } from "../components/questionnaire.js";
@@ -119,14 +119,41 @@ function answersCard(review) {
   return card({ title: `Answers, sent by ${found.by} ${relative(found.submitted_at)}` }, asAsked(sections));
 }
 
+function raiseFinding(review, concern) {
+  openOverlay({
+    title: "Raise a finding",
+    subtitle: `${review.ref} · ${review.third_party?.name ?? ""}`,
+    render: (body, footer, close) => {
+      const problem = banner();
+      const name = field("What is wrong", { required: true, value: concern ? `${review.third_party?.name}: ${concern.label}` : "", maxlength: 200 });
+      const severity = select("Severity", [["high", "High"], ["critical", "Critical"], ["moderate", "Moderate"], ["low", "Low"]], { value: "high" });
+      const summary = field("Detail", { type: "textarea", rows: 3, value: concern ? `${concern.section}: they answered ${concern.said}.` : "" });
+      const go = button("Raise it", { kind: "btn-primary" });
+      go.addEventListener("click", async () => {
+        const done = await submit({ button: go, banner: problem, fields: { name, severity, summary },
+          run: () => post(`/api/v1/reviews/${review.ref}/findings`, { name: name.input.value, severity: severity.input.value, summary: summary.input.value || null }) });
+        if (!done) return;
+        close();
+        toast(`${done.data.ref} was raised. Add the actions, and who at the third party does each.`);
+        navigate(`/issues/${done.data.ref}`);
+      });
+      body.append(h("div", { class: "stack-lg" }, problem, name.node, severity.node, summary.node));
+      footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    },
+  });
+}
+
 function concernsCard(review) {
   const found = review.answers?.concerns;
   if (!found) return null;
-  return card({ title: "Concerns" },
+  const may = review.can.findings;
+  return card({ title: "Concerns", actions: may ? button("Raise a finding", { kind: "btn-sm", onclick: () => raiseFinding(review, null) }) : null },
     h("p", {}, found.count ? `${plural(found.count, "answer")} of ${found.scored} the questionnaire marks are concerns.`
       : `None of the ${found.scored} answers the questionnaire marks is a concern.`),
     found.items.length ? h("ul", { class: "plain-list stack-sm reasons" }, found.items.map((each) => h("li", {},
-      h("span", { class: "subtle" }, `${each.section}: `), each.label, " ", h("strong", {}, each.said)))) : null);
+      h("span", { class: "subtle" }, `${each.section}: `), each.label, " ", h("strong", {}, each.said),
+      may ? h("div", {}, button("Raise it as a finding", { kind: "btn-sm btn-ghost", "aria-label": `Raise a finding: ${each.label}`, onclick: () => raiseFinding(review, each) })) : null))) : null);
 }
 
 function overview(review, ctx) {

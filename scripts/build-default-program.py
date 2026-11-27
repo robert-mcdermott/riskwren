@@ -266,6 +266,12 @@ LINK_KINDS: list[dict[str, Any]] = [
         "between": [["service", "information"]],
     },
     {
+        "key": "subcontracts",
+        "label": "Subcontracts to",
+        "reverse": "Is a subcontractor of",
+        "between": [["third_party", "third_party"]],
+    },
+    {
         "key": "depends_on",
         "label": "Depends on",
         "reverse": "Is depended on by",
