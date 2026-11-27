@@ -144,6 +144,8 @@ def list_records(
     principal = current(request)
     size = clamp_limit(limit)
     offset = int((decode_cursor(cursor) or {}).get("offset", 0))
+    # Every list can be cut to the records missing something expected of them.
+    filters = {**filters, "missing": request.query_params.get("missing")}
     with reading(request) as session:
         rows, total = records.search(
             session, principal, record_type, filters, sort=sort, limit=size, offset=offset

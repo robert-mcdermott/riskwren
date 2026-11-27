@@ -1,5 +1,6 @@
 // Evidence: the list, and one item with its file, its dates, and what it supports.
 
+import { listTools } from "../components/tidy.js";
 import { get, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date, plural, relative } from "../core/format.js";
@@ -147,7 +148,7 @@ export function evidenceList(main) {
       const add = () => editEvidence({ vocab: data.vocab, units: data.units, onDone: reload });
       const search = searchBox("Search evidence");
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("state", stateOptions("Current or not"), "Whether it counts"),
         filterSelect("kind", [["", "Any kind"], ...KINDS.map(([key]) => [key, kindLabel(key)])], "Kind"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"), mineToggle());

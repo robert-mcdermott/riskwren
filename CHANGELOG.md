@@ -8,6 +8,12 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ### Changed
 
+- **Disabling an account leaves nothing without an owner.** What the person alone answered
+  for (records, open actions, treatment plans, and what campaigns were waiting on them for)
+  passes to the steward of its unit, who is told, until someone is named for good. Before,
+  such records were shown as having nobody answering for them.
+- **A list's search needs every word, in any order.** Before, the words had to appear
+  together as typed.
 - Risks are brought up to date with the calendar every hour by a scheduled job, as well as
   when the register is read.
 - The accessibility audit and the screenshot capture start their demo on a port the
@@ -78,6 +84,19 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
   owners of each risk it warns of, and marks those risks' ratings as in doubt until they are
   assessed again. Readings that fall due are on Home and in the reminders, and the risk
   dashboard counts indicators by where they stand.
+- **One search.** ⌘K and the box at the top of every page find records of every kind, and
+  actions, by name, reference, summary, or what they are called elsewhere. Every word must
+  be on the record. A search returns only what its searcher may open.
+- **Saved views.** Any list as it is filtered and sorted can be kept under a name, and
+  shared by those who look after a list. A view keeps the question, never the answer.
+- **What a record is missing.** Each kind of record has a short list of expected facts. A
+  record says which it lacks, any list can be cut to the records lacking one, and
+  **Reports → Tidy** counts them, each figure opening the list it counts.
+- **Likely duplicates.** Typing the name of a new record shows what it might already be,
+  and Tidy lists pairs that look like one thing. Nothing is merged: a person decides, or
+  says they are different things.
+- **Passing on what a person held.** A page lists everything someone answers for, and an
+  administrator, or a steward for their own units, passes it to someone else in one step.
 - `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
   laptop. Its signing key is public; it is not for real use.
 

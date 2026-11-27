@@ -1,5 +1,6 @@
 // Exceptions: the register, one exception with its decision, and the form that asks for one.
 
+import { listTools } from "../components/tidy.js";
 import { get, patch, post } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date, plural } from "../core/format.js";
@@ -201,7 +202,7 @@ export function exceptionList(main) {
       const rows = data.page.data;
       const search = searchBox("Search exceptions");
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("state", [["", "Any standing"], ...["requested", "in_force", "expired", "refused", "withdrawn"].map((key) => [key, EXCEPTION_STATE[key][0]])], "Standing"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"), mineToggle());
       const body = rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },

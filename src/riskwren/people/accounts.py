@@ -190,6 +190,12 @@ def set_status(session: Session, principal: Principal, account: Account, status:
             raise Conflict("This is the last active administrator and cannot be disabled.")
         session.flush()
         _end_sessions(session, account.id)
+        if account.status != "disabled":
+            # Nothing is left without someone who can sign in to answer for it.
+            from riskwren.people import handover
+
+            account.status = status
+            handover.cover(session, principal, account)
     account.status = status
 
 

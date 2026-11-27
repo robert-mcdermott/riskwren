@@ -1,5 +1,6 @@
 // One inventory record: what it is, who answers for it, what it is connected to, and its history.
 
+import { missingNote } from "../components/tidy.js";
 import { del, get, patch, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { dateTime, relative } from "../core/format.js";
@@ -9,11 +10,13 @@ import { banner, field, select, submit } from "../components/form.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { peoplePicker } from "../components/people-picker.js";
 import { criticality, hrefOf, recordChip, statusPill, TYPES } from "../components/record.js";
-import { editRecord } from "../components/record-forms.js";
 import { rating, standingPill } from "../components/risk.js";
 import { toast } from "../components/toast.js";
 import { alert, avatar, card, emptyState } from "../components/ui.js";
 import { show } from "./page.js";
+
+// The form is fetched when someone first asks to add or edit.
+const editRecord = async (...args) => (await import("../components/record-forms.js")).editRecord(...args);
 
 export function facts(pairs) {
   const shown = pairs.filter(([, value]) => value != null && value !== "" && !(Array.isArray(value) && !value.length));
@@ -339,6 +342,7 @@ export function recordHeader(record, { badges = [], actions = null } = {}) {
           h("span", { class: "subtle" }, `Updated ${relative(record.updated_at)}`),
           h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"))),
       actions),
+    missingNote(record),
   ];
 }
 

@@ -71,9 +71,9 @@ def test_a_campaign_asks_the_owners_and_tracks_who_has_answered(
         owned(session, manager, cancer, "Doors locked", people.accounts["leader"])
         # A control whose only owner has left: there is nobody to ask, and that should show.
         owned(session, manager, cancer, "Nobody's control", people.accounts["auditor"])
-        accounts.set_status(
-            session, ME, accounts.get(session, people.accounts["auditor"]), "disabled"
-        )
+        # Disabling an account now passes its records on (tests/test_tidy.py), so this is
+        # set as an installation from before that would have it.
+        accounts.get(session, people.accounts["auditor"]).status = "disabled"
         for values, fields in [
             ({"kind": "census", "name": "", "due_on": "soon"}, {"kind", "name", "due_on"}),
             ({"kind": "attestation", "name": "x", "due_on": "2026-03-01"}, {"due_on"}),

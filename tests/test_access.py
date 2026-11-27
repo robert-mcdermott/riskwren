@@ -301,6 +301,12 @@ for _route in (
     ("PUT", "/api/v1/indicators/{ref}/owners"), ("GET", "/api/v1/indicators/{ref}/history"),
     ("POST", "/api/v1/indicators/{ref}/readings"), ("PUT", "/api/v1/indicators/{ref}/risks"),
     ("GET", "/api/v1/risks/{ref}/indicators"),
+    ("GET", "/api/v1/search"), ("GET", "/api/v1/views"), ("POST", "/api/v1/views"),
+    ("PATCH", "/api/v1/views/{view_id}"), ("DELETE", "/api/v1/views/{view_id}"),
+    ("GET", "/api/v1/tidy"), ("GET", "/api/v1/similar"),
+    ("POST", "/api/v1/tidy/not-duplicates"),
+    ("GET", "/api/v1/accounts/{account_id}/holdings"),
+    ("POST", "/api/v1/accounts/{account_id}/handover"),
 ):  # fmt: skip
     REACH[_route] = EVERYONE
 RUNNERS = {"manager", "assessor"}

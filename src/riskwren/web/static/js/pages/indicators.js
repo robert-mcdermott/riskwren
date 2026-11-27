@@ -1,6 +1,7 @@
 // Indicators: numbers read on a schedule that warn of risks. Someone reads the number where
 // it lives and records it here; RiskWren shows where it stands against its levels.
 
+import { listTools } from "../components/tidy.js";
 import { get, patch, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date, plural, titleCase } from "../core/format.js";
@@ -61,7 +62,7 @@ export function indicatorList(main) {
     view: (data) => h("div", { class: "stack-lg" },
       pageHeader({ eyebrow: "Risks", title: "Indicators",
         lede: "Numbers read on a schedule that warn of a risk before it happens. Each has a level to worry at and a limit. Past the limit, its owners are told and the risks it warns of are flagged.",
-        actions: h("div", { class: "row-sm wrap" }, exportButton("indicators", filters),
+        actions: h("div", { class: "row-sm wrap" }, listTools(), exportButton("indicators", filters),
           can("steward") ? button("Add an indicator", { kind: "btn-primary", iconName: "plus",
             onclick: () => openOverlay({ title: "Add an indicator", render: (body) => form(body, { unitIndex: data.units, onDone: (made) => navigate(`/indicators/${made.ref}`) }) }) }) : null) }),
       h("div", { class: "segmented", role: "group", "aria-label": "Narrow by where each stands" },

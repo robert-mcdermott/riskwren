@@ -57,6 +57,10 @@ These two are written from the code, so they always match the version they ship 
 | Does an owner saying a control works make it verified? | [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test) |
 | How do I change the questions people are asked, without changing what they already answered? | [Questionnaires](running-the-program.md#questionnaires) |
 | Who is reminded of what, and when does it go to their steward? | [Reminders](running-the-program.md#reminders) |
+| How do I find a record when I only remember a word of it? | [Find anything](the-register.md#find-anything) |
+| How do I keep a filtered list and share it? | [Saved views](the-register.md#saved-views) |
+| Which records are incomplete, or written down twice? | [What a record is missing](the-register.md#what-a-record-is-missing) |
+| Someone has left. What happens to what they owned? | [When someone leaves](running-the-program.md#when-someone-leaves) |
 | How do I let people sign in with Entra ID or another identity provider? | [Single sign-on](configuration.md#single-sign-on) |
 | Nobody can sign in. How do I get back in? | [`riskwren users`](cli.md#riskwren-users) |
 

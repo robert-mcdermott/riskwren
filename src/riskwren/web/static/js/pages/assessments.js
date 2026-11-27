@@ -1,6 +1,7 @@
 // Assessments: the list, and one assessment with the tests planned in it, what each found,
 // and whether a second person has confirmed it.
 
+import { listTools } from "../components/tidy.js";
 import { del, get, patch, post } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date, plural, relative } from "../core/format.js";
@@ -426,7 +427,7 @@ export function assessmentList(main) {
       const add = () => editAssessment({});
       const search = searchBox("Search assessments");
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("status", [["", "Any status"], ...Object.entries(STATUS).map(([key, [text]]) => [key, text])], "Status"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"), mineToggle());
       const body = rows.length ? assessmentRows(rows)

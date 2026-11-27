@@ -73,6 +73,7 @@ from riskwren.db.models.risk import (
     ScoringMethod,
 )
 from riskwren.db.models.system import ChainHead, Counter, Event
+from riskwren.db.models.tidy import Handover, NotDuplicate, SavedView
 
 __all__ = [
     "Acceptance",
@@ -98,6 +99,7 @@ __all__ = [
     "ExternalRef",
     "FailedSignIn",
     "Framework",
+    "Handover",
     "Identity",
     "Implementation",
     "Indicator",
@@ -109,6 +111,7 @@ __all__ = [
     "Job",
     "JobRun",
     "Membership",
+    "NotDuplicate",
     "Notice",
     "OrgUnit",
     "OutboxMessage",
@@ -128,6 +131,7 @@ __all__ = [
     "RiskLibraryEntry",
     "RiskSubject",
     "RoleGrant",
+    "SavedView",
     "Scope",
     "ScopeFramework",
     "ScopeMember",

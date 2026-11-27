@@ -1,5 +1,6 @@
 // The inventory's list pages. Filters, sort, and page all live in the URL.
 
+import { listTools } from "../components/tidy.js";
 import { get } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { plural, relative } from "../core/format.js";
@@ -8,9 +9,11 @@ import { query, setQuery } from "../core/router.js";
 import { can } from "../core/session.js";
 import { criticality, hrefOf, statusOptions, statusPill, TYPES } from "../components/record.js";
 import { exportButton } from "../components/exchange.js";
-import { editRecord } from "../components/record-forms.js";
 import { card, emptyState, pageHeader } from "../components/ui.js";
 import { show } from "./page.js";
+
+// The form is fetched when someone first asks to add or edit.
+const editRecord = async (...args) => (await import("../components/record-forms.js")).editRecord(...args);
 
 export function filterSelect(name, choices, labelText) {
   const node = h("select", { class: "select", "aria-label": labelText, onchange: () => setQuery({ [name]: node.value, cursor: null }) },
@@ -94,7 +97,7 @@ export function recordList(main, type) {
       const add = () => editRecord(type, { vocab, units: data.units, onDone: reload });
       const search = searchBox(`Search ${meta.nouns}`);
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("kind", options(vocab, meta.kinds, { blank: "Any kind" }), "Kind"),
         filterSelect("criticality", options(vocab, "criticalities", { blank: "Any criticality" }), "Criticality"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),

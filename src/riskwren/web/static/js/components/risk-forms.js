@@ -1,5 +1,6 @@
 // The forms of the risk register: raising and editing a risk, and assessing one.
 
+import { similarHint } from "./tidy.js";
 import { get, patch, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { categoryOptions, unitOptions } from "../core/lookups.js";
@@ -91,7 +92,7 @@ export function editRisk({ record = null, program, units, onDone }) {
       } }, problem,
       record ? null : section("Start from the library", h("div", { class: "field" }, search, found),
         h("p", { class: "hint subtle" }, "Optional. Choosing one fills in the statement, which you then make your own.")),
-      section("What could go wrong", name.node, cause.node, event.node, consequence.node),
+      section("What could go wrong", name.node, similarHint("risk", name.input, { unit: () => unit.input.value, apartFrom: record?.ref }), cause.node, event.node, consequence.node),
       section("Where it belongs", h("div", { class: "grid-2" }, category.node, unit.node), restricted.node)));
       saveButton.addEventListener("click", save);
       footer.replaceChildren(h("div", { class: "row" }, saveButton, button("Cancel", { kind: "btn-ghost", onclick: close })));

@@ -15,19 +15,22 @@ function close() {
 }
 
 /** items: [{ label, hint, iconName, href | run, keywords }] */
-export function openPalette(items) {
+export function openPalette(items, { find = null } = {}) {
   if (open) {
     close();
     return;
   }
   const returnFocus = document.activeElement;
-  const input = h("input", { class: "palette-input", type: "text", placeholder: "Go to a page or run an action…",
+  const input = h("input", { class: "palette-input", type: "text", placeholder: find ? "Find a record, go to a page, or run an action…" : "Go to a page or run an action…",
     "aria-label": "Command", role: "combobox", "aria-expanded": "true", "aria-controls": "palette-list", autocomplete: "off" });
   const list = h("div", { class: "palette-list", id: "palette-list", role: "listbox" });
   const panel = h("div", { class: "palette", role: "dialog", "aria-modal": "true", "aria-label": "Command palette" }, input, list);
   const backdrop = h("div", { class: "backdrop", onclick: close });
   let shown = [];
   let selected = 0;
+  let found = [];
+  let timer = null;
+  let latest = 0;
 
   const choose = (item) => {
     close();
@@ -40,6 +43,10 @@ export function openPalette(items) {
       const text = `${item.label} ${item.hint ?? ""} ${item.keywords ?? ""}`.toLowerCase();
       return words.every((word) => text.includes(word));
     });
+    if (find && input.value.trim().length > 1) {
+      shown = [...shown, ...found, { label: `Search everything for “${input.value.trim()}”`, hint: "Search", iconName: "search",
+        href: `/search?q=${encodeURIComponent(input.value.trim())}` }];
+    }
     selected = Math.min(selected, Math.max(0, shown.length - 1));
     if (!shown.length) {
       list.replaceChildren(h("div", { class: "palette-empty" }, "Nothing matches."));
@@ -76,7 +83,20 @@ export function openPalette(items) {
   };
   input.addEventListener("input", () => {
     selected = 0;
+    found = [];
     draw();
+    clearTimeout(timer);
+    const text = input.value.trim();
+    const mine = ++latest;
+    if (!find || text.length < 2) return;
+    timer = setTimeout(async () => {
+      try {
+        const rows = await find(text);
+        if (mine !== latest || !open) return;
+        found = rows;
+        draw();
+      } catch { /* the pages and actions are still there */ }
+    }, 200);
   });
   document.addEventListener("keydown", onKey, true);
   document.body.append(backdrop, panel);

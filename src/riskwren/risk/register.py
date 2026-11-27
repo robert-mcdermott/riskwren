@@ -7,7 +7,7 @@ from collections.abc import Callable, Mapping
 from datetime import date
 from typing import Any
 
-from sqlalchemy import case, or_, select
+from sqlalchemy import case, exists, or_, select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
@@ -18,6 +18,7 @@ from riskwren.db.models import Event, OrgUnit, Risk, RiskAssessment, RiskSubject
 from riskwren.db.models.risk import ASSESSMENT_KINDS, RISK_STATUSES
 from riskwren.events import audit
 from riskwren.inventory import access, records
+from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import TYPES, Field, RecordType, find_any, register
 from riskwren.people import units
 from riskwren.program import rules
@@ -212,6 +213,12 @@ def _history_value(lookups: Any, field: str, value: Any) -> Any:
     return None
 
 
+def _no_controls(model: Any) -> Any:
+    from riskwren.db.models import RiskControl
+
+    return ~exists(select(RiskControl.id).where(RiskControl.risk_id == model.id))
+
+
 RISK = register(
     RecordType(
         "risk",
@@ -244,6 +251,22 @@ RISK = register(
             "cards": _cards,
             "detail": _detail,
             "conditions": _conditions,
+            "live_statuses": ("open",),
+            "live_filters": {"status": "open"},
+            "expected": [
+                Expected(
+                    "rating",
+                    "a rating",
+                    lambda model: model.standing == "not_assessed",
+                    "Nobody has said how likely or how bad it is.",
+                ),
+                Expected(
+                    "controls",
+                    "a control that bears on it",
+                    _no_controls,
+                    "Nothing is recorded as reducing it.",
+                ),
+            ],
             "sort_columns": {
                 name: _rating_order(name)
                 for name in ("residual_rating", "inherent_rating", "target_rating")

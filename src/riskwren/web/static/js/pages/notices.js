@@ -8,7 +8,7 @@ import { card, emptyState, pageHeader } from "../components/ui.js";
 import { show } from "./page.js";
 
 const ICONS = { issue: "issue", closure: "issue", action: "check", exception: "exception", test: "assessment",
-  reminder: "bell", overdue: "alert", escalated: "alert", campaign: "bell", attestation: "control", indicator: "chart" };
+  reminder: "bell", overdue: "alert", escalated: "alert", campaign: "bell", attestation: "control", indicator: "chart", handover: "user" };
 
 /** Tell the top bar how many are left unread. */
 function announce(unread) {

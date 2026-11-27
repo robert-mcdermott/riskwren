@@ -135,6 +135,10 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET /campaigns/{ref}` · `POST /campaigns/{ref}/remind` · `/close` · `/cancel` | One campaign with its coverage by unit and items; remind those who have not answered; end it |
 | `GET /campaign-items/{id}` · `POST /campaign-items/{id}/answer` · `/excuse` | What one person is asked; answer it, as a draft or in full; take it out of the campaign |
 | `GET` · `POST /indicators` · `GET` · `PATCH /indicators/{ref}` · `PUT /indicators/{ref}/owners` · `GET /indicators/{ref}/history` | Indicators with where each stands; one with its readings, trend, and the risks it warns of |
+| `GET /search` | Every kind of record, and actions, by words; only what you may open |
+| `GET` · `POST /views` · `PATCH` · `DELETE /views/{id}` | Saved views of a list: yours and the shared ones |
+| `GET /tidy` · `GET /similar` · `POST /tidy/not-duplicates` | What records are missing, likely duplicates, and what people who have left still hold; what a new name might already be; say two records are different things |
+| `GET /accounts/{id}/holdings` · `POST /accounts/{id}/handover` | What a person answers for, with who is standing in; pass it on |
 | `POST /indicators/{ref}/readings` · `PUT /indicators/{ref}/risks` · `GET /risks/{ref}/indicators` | Record what an indicator stood at on a day; say which risks it warns of; the indicators that warn of a risk |
 | `POST /questionnaires/check` | Check a document without saving it, and see which questions given answers would show |
 | `POST /questionnaires/{key}/responses` · `GET /responses/{id}` | Answer a questionnaire, as a draft or in full; read answers as they were asked |

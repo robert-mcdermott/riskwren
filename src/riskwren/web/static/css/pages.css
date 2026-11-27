@@ -122,3 +122,19 @@
 .rows { list-style: none; margin: 0; padding: 0; }
 .rows > li { padding: var(--space-3) var(--space-5); border-top: 1px solid var(--border); }
 .rows > li:first-child { border-top: 0; }
+
+/* Find and tidy */
+.pill-x { display: inline-grid; place-items: center; margin: 0 -4px 0 2px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; border-radius: 50%; }
+.pill-x:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.missing-note { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-2) var(--space-3); border: 1px dashed var(--border-strong); border-radius: var(--radius-m); color: var(--text); font-size: var(--text-s); }
+.missing-note .icon { margin-top: 2px; color: var(--text-muted); flex: none; }
+.similar-box { padding: var(--space-3); border: 1px solid var(--border-strong); border-left: 3px solid var(--warn); border-radius: var(--radius-m); background: var(--surface-2); }
+.similar-box ul { margin: var(--space-1) 0; }
+.similar .ref { font-family: var(--font-mono); font-size: var(--text-s); color: var(--text-muted); }
+.found > li { display: flex; gap: var(--space-3); align-items: center; }
+.record-icon.small { width: 30px; height: 30px; border-radius: var(--radius-s); }
+.filter-search.wide { flex: 1 1 420px; max-width: 640px; }
+.card-note { margin: 0; padding: var(--space-3) var(--space-5); border-bottom: 1px solid var(--border); font-size: var(--text-s); }
+.pill-x { min-width: 24px; min-height: 24px; }
+.drawer-header .icon-button { flex: none; }
+.pick { width: 24px; height: 24px; accent-color: var(--accent); cursor: pointer; }

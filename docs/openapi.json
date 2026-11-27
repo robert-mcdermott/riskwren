@@ -1182,6 +1182,53 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HandoverBody": {
+        "properties": {
+          "only": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/HandoverItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only these; everything you may pass on if absent",
+            "title": "Only"
+          },
+          "to": {
+            "description": "The account that takes it",
+            "title": "To",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "title": "HandoverBody",
+        "type": "object"
+      },
+      "HandoverItem": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id"
+        ],
+        "title": "HandoverItem",
+        "type": "object"
+      },
       "HeldBody": {
         "properties": {
           "baseline": {
@@ -2052,6 +2099,23 @@
           "owners"
         ],
         "title": "OwnersBody",
+        "type": "object"
+      },
+      "PairBody": {
+        "properties": {
+          "refs": {
+            "description": "The two references, such as SYS-0004 and SYS-0019",
+            "items": {
+              "type": "string"
+            },
+            "title": "Refs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "refs"
+        ],
+        "title": "PairBody",
         "type": "object"
       },
       "PasswordChange": {
@@ -3526,6 +3590,61 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "ViewBody": {
+        "description": "A saved view. On a change, send only what changes.",
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The list it is of, such as /risks",
+            "title": "Path"
+          },
+          "query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Its filters, as the address has them",
+            "title": "Query"
+          },
+          "shared": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether everyone has it",
+            "title": "Shared"
+          }
+        },
+        "title": "ViewBody",
+        "type": "object"
+      },
       "VisibilityBody": {
         "properties": {
           "visibility": {
@@ -4402,6 +4521,105 @@
         "summary": "Change a person's details",
         "tags": [
           "people"
+        ]
+      }
+    },
+    "/api/v1/accounts/{account_id}/handover": {
+      "post": {
+        "operationId": "pass_on_api_v1_accounts__account_id__handover_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "account_id",
+            "required": true,
+            "schema": {
+              "title": "Account Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoverBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Pass On Api V1 Accounts  Account Id  Handover Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pass on what a person held",
+        "tags": [
+          "find"
+        ]
+      }
+    },
+    "/api/v1/accounts/{account_id}/holdings": {
+      "get": {
+        "description": "Everything they are named on, and what was passed to a stand-in when their account\nwas disabled, cut to what you may see.",
+        "operationId": "holdings_api_v1_accounts__account_id__holdings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "account_id",
+            "required": true,
+            "schema": {
+              "title": "Account Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Holdings Api V1 Accounts  Account Id  Holdings Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What a person answers for",
+        "tags": [
+          "find"
         ]
       }
     },
@@ -15494,6 +15712,85 @@
         ]
       }
     },
+    "/api/v1/search": {
+      "get": {
+        "description": "Looks in names, references, summaries, and what a record is called elsewhere, across\nevery kind of record and actions. Only what you may open is returned.",
+        "operationId": "search_api_v1_search_get",
+        "parameters": [
+          {
+            "description": "Words to look for; every word must be on the record",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "Words to look for; every word must be on the record",
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only this kind, such as risk",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only this kind, such as risk",
+              "title": "Type"
+            }
+          },
+          {
+            "description": "How many of each kind",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 6,
+              "description": "How many of each kind",
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Search Api V1 Search Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search every kind of record",
+        "tags": [
+          "find"
+        ]
+      }
+    },
     "/api/v1/session": {
       "delete": {
         "operationId": "sign_out_api_v1_session_delete",
@@ -15717,6 +16014,99 @@
         "summary": "Say how you want to be told",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/similar": {
+      "get": {
+        "operationId": "similar_api_v1_similar_get",
+        "parameters": [
+          {
+            "description": "The kind of record, such as issue",
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "description": "The kind of record, such as issue",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The name being given",
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The name being given",
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The unit it would belong to",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The unit it would belong to",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "A reference to leave out",
+            "in": "query",
+            "name": "apart_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A reference to leave out",
+              "title": "Apart From"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Similar Api V1 Similar Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Records that one with this name might already be",
+        "tags": [
+          "find"
         ]
       }
     },
@@ -17218,6 +17608,103 @@
         ]
       }
     },
+    "/api/v1/tidy": {
+      "get": {
+        "description": "What records are missing, likely duplicates, and what people who have left still\nhold, each cut to what you may see. Every count is the length of the list behind it.",
+        "operationId": "tidy_api_v1_tidy_get",
+        "parameters": [
+          {
+            "description": "A unit's id, with every unit beneath",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id, with every unit beneath",
+              "title": "Unit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Tidy Api V1 Tidy Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What needs putting in order",
+        "tags": [
+          "find"
+        ]
+      }
+    },
+    "/api/v1/tidy/not-duplicates": {
+      "post": {
+        "operationId": "not_duplicates_api_v1_tidy_not_duplicates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Not Duplicates Api V1 Tidy Not Duplicates Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say that two records are different things",
+        "tags": [
+          "find"
+        ]
+      }
+    },
     "/api/v1/units": {
       "get": {
         "operationId": "list_units_api_v1_units_get",
@@ -17375,6 +17862,196 @@
         "summary": "Rename, move, or close a unit",
         "tags": [
           "people"
+        ]
+      }
+    },
+    "/api/v1/views": {
+      "get": {
+        "operationId": "list_views_api_v1_views_get",
+        "parameters": [
+          {
+            "description": "Of one list only",
+            "in": "query",
+            "name": "path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Of one list only",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Views Api V1 Views Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Your saved views, and the shared ones",
+        "tags": [
+          "find"
+        ]
+      },
+      "post": {
+        "operationId": "save_view_api_v1_views_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ViewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save View Api V1 Views Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save a view",
+        "tags": [
+          "find"
+        ]
+      }
+    },
+    "/api/v1/views/{view_id}": {
+      "delete": {
+        "operationId": "delete_view_api_v1_views__view_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "view_id",
+            "required": true,
+            "schema": {
+              "title": "View Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Delete View Api V1 Views  View Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a view",
+        "tags": [
+          "find"
+        ]
+      },
+      "patch": {
+        "operationId": "change_view_api_v1_views__view_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "view_id",
+            "required": true,
+            "schema": {
+              "title": "View Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ViewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Change View Api V1 Views  View Id  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename, change, share, or stop sharing a view",
+        "tags": [
+          "find"
         ]
       }
     },

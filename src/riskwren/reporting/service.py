@@ -24,6 +24,7 @@ from riskwren.db.models import (
     Account,
     Action,
     Control,
+    Handover,
     OrgUnit,
     RecordOwner,
     Risk,
@@ -484,6 +485,21 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                     f"{record.ref} has nobody answering for it.",
                     f"/{record_type.path}/{record.ref}", None, ref=record.ref,
                 )  # fmt: skip
+
+    # Whoever is standing in for someone who has left is asked to name who takes it for good.
+    standing_in = session.execute(
+        select(Handover.from_account_id, func.count())
+        .where(Handover.held_by == principal.account_id)
+        .group_by(Handover.from_account_id)
+    ).all()
+    for account_id, number in standing_in:
+        gone = session.get(Account, account_id)
+        things = "1 thing" if number == 1 else f"{number} things"
+        add(
+            "handover", f"Name who takes what {gone.display_name if gone else 'someone'} held",
+            f"You answer for {things} of theirs until someone is named.",
+            f"/handover/{account_id}", None,
+        )  # fmt: skip
 
     items.sort(key=lambda item: (not item["overdue"], item["due_on"] or date.max, item["title"]))
     summary = None

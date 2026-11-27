@@ -61,10 +61,10 @@ from riskwren.db.models import (
     TreatmentPlan,
 )
 from riskwren.demo import content as c
-from riskwren.inventory import access, links, records
+from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
 from riskwren.oversight import campaigns
-from riskwren.people import accounts, units
+from riskwren.people import accounts, handover, units
 from riskwren.program import branding, packs, settings
 from riskwren.risk import categories, indicators, register
 from riskwren.risk.indicators import INDICATOR
@@ -2251,8 +2251,8 @@ class Builder:
         )  # fmt: skip
 
     def _story_departure(self) -> Script:
-        """A principal investigator leaves; what they owned is orphaned, and one risk is
-        reassigned."""
+        """A principal investigator leaves. What they alone answered for passes to the
+        lab's steward, who keeps one risk for good; the rest still waits for a name."""
         lab = self.labs["CB"][0]
         head, by = self.heads[lab], self.steward(lab)
         yield self.ago(400)
@@ -2273,11 +2273,21 @@ class Builder:
         owned = [r for r in self.unit_risks[lab] if self.risks[r]["owner"] == head]
         for risk in owned[:1]:
             with self.act(by) as (session, who):
-                records.set_owners(
-                    session, who, RISK, session.get(Risk, risk),
-                    [{"account_id": by, "kind": "owner"}],
+                handover.pass_on(
+                    session, who, accounts.get(session, head), accounts.get(session, by),
+                    only=[("risk", risk)],
                 )  # fmt: skip
             self.risks[risk]["owner"] = by
+
+    def _story_views(self) -> Script:
+        """Lists people keep coming back to, saved and shared."""
+        yield self.ago(60)
+        for key, name, path, query in c.VIEWS:
+            with self.act(self.cast[key]) as (session, who):
+                views.create(
+                    session, who, {"name": name, "path": path, "query": query, "shared": True}
+                )
+            self.tally("saved views")
 
     # --- Everything -----------------------------------------------------------------------
 
@@ -2327,7 +2337,7 @@ class Builder:
             self._story_escalated, self._story_departure, self._story_power,
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
-            self._story_indicators,
+            self._story_indicators, self._story_views,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

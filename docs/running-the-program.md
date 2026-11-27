@@ -193,6 +193,22 @@ Answers are kept as given, and some need someone else to act. Those people are t
 
 An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
 
+## When someone leaves
+
+Disable the account under **Admin → People**, or with [`riskwren users disable`](cli.md#riskwren-users-disable). The person is signed out and cannot sign in. Everything they did stays in the history under their name.
+
+Nothing they answered for is left without an owner:
+
+- **What they alone owned** passes at once to the steward of its unit; where the unit and the units above it have no steward, to its leader; failing that to someone who runs the program; and failing that to the administrator who disabled the account. This covers records of every kind, open actions, treatment plans, and what open campaigns were waiting on them for.
+- **Whoever it passes to is told**, with a count, and has **Name who takes what they held** on Home until it is done.
+- **What they shared with someone else** is left as it is: the other owner still answers for it.
+
+The stand-in is a holding place, not a decision. **Reports → Tidy → From people who have left** lists each person with things still to pass on, and their page lists every one with who has it now. Choose who takes it and **Pass on**: everything ticked changes hands in one step, the new owner is told, and the stand-in is released. A stand-in who should keep something passes it to themselves.
+
+An administrator can pass on anything. A steward or a manager can pass on what belongs to their own units. The same page works for someone who has not left: **Admin → People**, the person, **What they hold**. Use it to move what a person holds when they change jobs.
+
+Letting a person sign in again does not give anything back. Accounts disabled before version 0.3.0 were not covered this way: what they alone owned shows on Home as needing an owner, and under **Tidy** as missing an owner who can sign in.
+
 ## Reminders
 
 Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, what a campaign has asked, and the next reading of each indicator.

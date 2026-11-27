@@ -26,6 +26,7 @@ from riskwren.db.models.indicators import INDICATOR_DIRECTIONS, INDICATOR_FREQUE
 from riskwren.db.models.inventory import RECORD_STATUSES
 from riskwren.events import audit
 from riskwren.inventory import access, records
+from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import RecordType, find, register
 from riskwren.people import notices
 
@@ -260,6 +261,10 @@ def _history_title(event: Any, lookups: Any) -> str | None:
     return None
 
 
+def _warns_of_nothing(model: Any) -> Any:
+    return ~exists(select(IndicatorRisk.id).where(IndicatorRisk.indicator_id == model.id))
+
+
 INDICATOR: RecordType = register(
     RecordType(
         "indicator",
@@ -272,6 +277,26 @@ INDICATOR: RecordType = register(
         sorts=("updated_at", "name", "ref", "state", "last_read_on"),
         filters=("status", "state"),
         extra={
+            "expected": [
+                Expected(
+                    "reading",
+                    "a reading",
+                    lambda model: model.state == "no_reading",
+                    "It has never been read, so it warns of nothing.",
+                ),
+                Expected(
+                    "risks",
+                    "a risk it warns of",
+                    _warns_of_nothing,
+                    "A breach would reach nobody but its own owners.",
+                ),
+                Expected(
+                    "source",
+                    "where it is read from",
+                    lambda model: model.source.is_(None),
+                    "Whoever reads it next may read something else.",
+                ),
+            ],
             "new": _new,
             "apply": _apply,
             "cards": _cards,

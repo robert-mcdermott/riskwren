@@ -8,6 +8,8 @@ import { can, session } from "../core/session.js";
 import { mode, setMode } from "../core/prefs.js";
 import { openAppearance } from "./appearance.js";
 import { openPalette } from "./cmdk.js";
+
+const quickFind = async (text) => (await import("../pages/find.js")).quickFind(text);
 import { avatar } from "./ui.js";
 
 // Each entry appears only for people who can use it. Sections arrive as the product grows.
@@ -56,6 +58,7 @@ export const NAV = [
     items: [
       { href: "/compliance", label: "Compliance", iconName: "shield-check" },
       { href: "/dashboard", label: "Risk", iconName: "chart" },
+      { href: "/tidy", label: "Tidy", iconName: "check" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },
     ],
   },
@@ -106,6 +109,7 @@ export function commands(meta) {
   })));
   return [
     ...pages,
+    { label: "Search", hint: "Page", iconName: "search", href: "/search", keywords: "find look" },
     { label: "Your account", hint: "Page", iconName: "user", href: "/account", keywords: "profile password" },
     { label: "Appearance…", hint: "Action", iconName: "appearance", run: () => openAppearance(meta), keywords: "theme palette colors" },
     { label: mode() === "dark" ? "Switch to light" : "Switch to dark", hint: "Action",
@@ -208,8 +212,8 @@ export function mountShell(root, meta) {
 
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
   const search = h("button", { type: "button", class: "search-button", "aria-label": "Open the command palette",
-    onclick: () => openPalette(commands(meta)) },
-  icon("search", "icon icon-sm"), h("span", {}, "Go to…"), h("kbd", {}, isMac ? "⌘K" : "Ctrl K"));
+    onclick: () => openPalette(commands(meta), { find: quickFind }) },
+  icon("search", "icon icon-sm"), h("span", {}, "Find or go to…"), h("kbd", {}, isMac ? "⌘K" : "Ctrl K"));
 
   const powered = meta.branding.show_powered_by && meta.branding.product_name !== "RiskWren"
     ? h("div", { class: "powered" }, "Powered by ", h("a", { href: "https://github.com/robert-mcdermott/riskwren", target: "_blank", rel: "noopener" }, "RiskWren"))

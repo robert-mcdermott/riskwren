@@ -877,6 +877,20 @@ SCOPE_ENCLAVE = {
     "excluded": [],
 }  # fmt: skip
 
+# Saved views: who shares it, its name, the list, and its filters.
+VIEWS = [
+    (
+        "ciso",
+        "Technology risks above appetite",
+        "/risks",
+        "above_appetite=true&category=technology",
+    ),
+    ("cro", "Reviews overdue", "/risks", "overdue=true&sort=next_review_on"),
+    ("ciso", "Controls nobody has rated", "/controls", "missing=rating"),
+    ("ciso", "Systems with no data class", "/systems", "missing=data_class"),
+    ("assess1", "High issues still open", "/issues", "severity=high&status=open"),
+]
+
 # Indicators: numbers the institute already watches. Each: the unit that reads it, what it
 # is counted in, which way is worse, the warning level, the limit, how often it is read, where
 # it is read from, the library risks it warns of, and its readings, oldest first, one for each

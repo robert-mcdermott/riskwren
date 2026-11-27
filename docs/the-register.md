@@ -76,7 +76,7 @@ Each row is added as if by hand, by the same rules, in your name. Nothing is add
 
 Every record names the people who answer for it. An **owner** is accountable, a **delegate** acts for the owner day to day, and a **contact** knows the detail. Owners and delegates may edit the record.
 
-When an owner's account is disabled, the record is not reassigned by guesswork. It is shown as having nobody answering for it, on Home for those who can name a new owner, until someone does.
+When an owner's account is disabled, nothing they answered for is left without an owner. What they alone owned passes to the steward of its unit, who is told, and stays listed as theirs to pass on until someone is named for good. See [When someone leaves](running-the-program.md#when-someone-leaves).
 
 ### History
 
@@ -213,6 +213,49 @@ If you may not accept a risk, its page says why and what is needed. An acceptanc
 
 An acceptance covers the rating that was accepted. If the residual rating later rises above it, or the acceptance expires or is withdrawn, the risk needs a decision again. **Acceptances** in the sidebar lists them, soonest to expire first, and can show only those expiring within 30 or 90 days.
 
+## Find anything
+
+Press **⌘K** (or Ctrl K), or use the box at the top of every page, and type a name, a reference, or a few words. Records that match appear under the pages and actions; **Search everything** opens the full results.
+
+- The search looks at every kind of record, and actions: in the name, the reference, the summary, and what a record is called in another system.
+- Every word you type has to be on the record, in any order. Part of a word is enough.
+- Results are grouped by kind, the closest match first. A reference typed exactly is its own best answer.
+- You find only what you may open. A record you could not see on its own list is not in a search either, and is not counted.
+
+### Saved views
+
+Every list keeps its filters and sort in the address, so a list as you have it can be kept. **Views**, beside the search box of each list, saves what is showing under a name and lists the views of that list.
+
+- A view keeps the question and never the answer. Whoever opens it sees what they may see, as it stands that day.
+- A view is yours alone unless it is shared. A steward, an assessor, a manager, an auditor, or an administrator can **share** one, which puts it on that list for everyone.
+- Only whoever saved a view can rename or delete it. An administrator can take a shared one down.
+
+### What a record is missing
+
+Each kind of record is expected to say a few things, and a record that does not yet says so under its title, with why it matters.
+
+| Kind | Expected |
+| --- | --- |
+| Every kind below | An owner who can sign in |
+| Processes, systems, third parties, information | The class of data it handles; a link to anything else |
+| Systems | Where it is hosted |
+| Information | Where it is held |
+| Risks | A rating; a control that bears on it |
+| Controls | A rating of how well it works |
+| Indicators | A reading; a risk it warns of; where it is read from |
+
+Only records still in use are counted: a retired system or a closed risk is not expected to be complete. A summary is not on the list, because many records are plain from their name.
+
+**Reports → Tidy** counts, for each kind, how many records are missing something and what. Each figure opens the list it counts, and any list can be cut the same way from its address with `missing=`, so it can be saved as a view.
+
+### The same thing written down twice
+
+As you type the name of a new process, system, third party, information asset, risk, control, or issue, records already here that it might be are shown under the box. Open one in a new tab before adding another.
+
+**Reports → Tidy** also lists pairs that look like one thing: names with the same words in any order, or nearly the same spelling. Two units often keep a record each of the same thing on purpose, so across units only the very same name counts.
+
+Nothing is merged for you. Open both, keep the better one, move what the other holds, and retire it. If they are different things, someone who can edit either says so, and the pair is not suggested again.
+
 ## Indicators
 
 An indicator is a number someone already reads, kept where the risks it warns of can see it: servers patched within 30 days, days to remove a leaver's access, people who entered a password in the phishing exercise. **Risks → Indicators → Add an indicator** (a steward or a manager).
@@ -241,7 +284,7 @@ A reading that falls due is on its owners' Home and is reminded as it falls due 
 - **Indicators** lists every indicator with where it stands, and can show only those past their limit, past their warning level, or never read.
 - **Heat map** places every rated risk on the matrix, for the residual, inherent, or target rating, for a unit and everything beneath it, or for one category. Each cell opens the risks in it.
 - **Reports → Risk** shows where the register stands, and **Reports → Compliance** how ready each scope is against what it is held to. Every figure opens the list it counts. See [Read the dashboards](running-the-program.md#read-the-dashboards).
-- **⌘K** (or Ctrl K) finds any record by name or reference.
+- **⌘K** (or Ctrl K) finds any record by name or reference, and goes to any page. See [Find anything](#find-anything).
 
 ![The heat map: every rated risk placed by likelihood and impact, with the number of risks in each cell](img/heat-map-light.webp)
 

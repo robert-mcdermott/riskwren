@@ -23,6 +23,7 @@ from riskwren.db.models.controls import BASES, EFFECTIVENESS, REDUCES, RELIANCE
 from riskwren.db.models.inventory import RECORD_STATUSES
 from riskwren.events import audit
 from riskwren.inventory import access, records
+from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import Field, RecordType, register
 from riskwren.program import rules
 from riskwren.risk import method as methods
@@ -244,6 +245,14 @@ CONTROL = register(
             "cards": _cards,
             "detail": _detail,
             "conditions": _conditions,
+            "expected": [
+                Expected(
+                    "rating",
+                    "a rating of how well it works",
+                    lambda model: model.rated_at.is_(None),
+                    "Nobody has judged whether it works.",
+                ),
+            ],
             "history_title": _history_title,
             "history_value": _history_value,
             "history_quiet": ("design", "operation", "rated_at"),

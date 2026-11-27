@@ -1,5 +1,6 @@
 // The control library. Filters, sort, and page all live in the URL.
 
+import { listTools } from "../components/tidy.js";
 import { exportButton } from "../components/exchange.js";
 import { get } from "../core/api.js";
 import { button, h } from "../core/dom.js";
@@ -29,7 +30,7 @@ export function controlLibrary(main) {
       const add = () => editControl({ vocab, units: data.units });
       const search = searchBox("Search controls");
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("kind", options(vocab, "control_kinds", { blank: "Any kind" }), "Kind"),
         filterSelect("state", stateOptions("Any effectiveness"), "Effectiveness"),
         filterSelect("tested", [["", "Tested or not"], ["effective", "Tested, and effective"], ["failing", "Tested, and found wanting"], ["none", "No test that still holds"]], "What its rating rests on"),

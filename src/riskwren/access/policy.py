@@ -58,6 +58,18 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("PATCH", "/api/v1/questionnaires/{key}"): Needs.CONFIGURE,
     ("POST", "/api/v1/questionnaires/{key}/responses"): Needs.MEMBER,
     ("GET", "/api/v1/responses/{response_id}"): Needs.MEMBER,
+    # Finding and tidying: everything here is cut to what the person may see or change
+    # where it is read or written.
+    ("GET", "/api/v1/search"): Needs.MEMBER,
+    ("GET", "/api/v1/views"): Needs.MEMBER,
+    ("POST", "/api/v1/views"): Needs.MEMBER,
+    ("PATCH", "/api/v1/views/{view_id}"): Needs.MEMBER,
+    ("DELETE", "/api/v1/views/{view_id}"): Needs.MEMBER,
+    ("GET", "/api/v1/tidy"): Needs.MEMBER,
+    ("GET", "/api/v1/similar"): Needs.MEMBER,
+    ("POST", "/api/v1/tidy/not-duplicates"): Needs.MEMBER,
+    ("GET", "/api/v1/accounts/{account_id}/holdings"): Needs.MEMBER,
+    ("POST", "/api/v1/accounts/{account_id}/handover"): Needs.MEMBER,
     # Indicators are records like any other: what a person may see or change is decided
     # where it is read or written.
     ("GET", "/api/v1/indicators"): Needs.MEMBER,
