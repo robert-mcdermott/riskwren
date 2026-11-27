@@ -36,6 +36,77 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("DELETE", "/api/v1/session"): Needs.PUBLIC,
     ("POST", "/api/v1/session/demo"): Needs.PUBLIC,  # answers 404 unless this is a demo
     ("POST", "/api/v1/session/password"): Needs.MEMBER,
+    # Single sign-on. The round trip answers 404 itself unless it is set up.
+    ("GET", "/api/v1/sso/start"): Needs.PUBLIC,
+    ("GET", "/api/v1/sso/callback"): Needs.PUBLIC,
+    ("GET", "/api/v1/sso"): Needs.ADMIN,
+    ("POST", "/api/v1/sso/check"): Needs.ADMIN,
+    ("PUT", "/api/v1/sso/mappings"): Needs.ADMIN,
+    # Scheduled work and email, for whoever keeps the installation.
+    ("GET", "/api/v1/jobs"): Needs.ADMIN,
+    ("POST", "/api/v1/jobs/{key}/run"): Needs.ADMIN,
+    ("PUT", "/api/v1/jobs/{key}"): Needs.ADMIN,
+    ("GET", "/api/v1/mail"): Needs.ADMIN,
+    ("POST", "/api/v1/mail/test"): Needs.ADMIN,
+    ("GET", "/api/v1/session/preferences"): Needs.MEMBER,
+    ("PUT", "/api/v1/session/preferences"): Needs.MEMBER,
+    # Questionnaires: anyone reads and answers; those who run the program change them.
+    ("GET", "/api/v1/questionnaires"): Needs.MEMBER,
+    ("POST", "/api/v1/questionnaires"): Needs.CONFIGURE,
+    ("POST", "/api/v1/questionnaires/check"): Needs.CONFIGURE,
+    ("GET", "/api/v1/questionnaires/{key}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/questionnaires/{key}"): Needs.CONFIGURE,
+    ("POST", "/api/v1/questionnaires/{key}/responses"): Needs.MEMBER,
+    ("GET", "/api/v1/responses/{response_id}"): Needs.MEMBER,
+    # Finding and tidying: everything here is cut to what the person may see or change
+    # where it is read or written.
+    ("GET", "/api/v1/search"): Needs.MEMBER,
+    ("GET", "/api/v1/views"): Needs.MEMBER,
+    ("POST", "/api/v1/views"): Needs.MEMBER,
+    ("PATCH", "/api/v1/views/{view_id}"): Needs.MEMBER,
+    ("DELETE", "/api/v1/views/{view_id}"): Needs.MEMBER,
+    ("GET", "/api/v1/tidy"): Needs.MEMBER,
+    ("GET", "/api/v1/similar"): Needs.MEMBER,
+    ("POST", "/api/v1/tidy/not-duplicates"): Needs.MEMBER,
+    ("GET", "/api/v1/accounts/{account_id}/holdings"): Needs.MEMBER,
+    ("POST", "/api/v1/accounts/{account_id}/handover"): Needs.MEMBER,
+    # Risk analyses are records like any other: who may start, work through, or read one
+    # is decided where it is read or written.
+    ("GET", "/api/v1/risk-analyses"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/preview"): Needs.MEMBER,
+    ("GET", "/api/v1/risk-analyses/{ref}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/risk-analyses/{ref}"): Needs.MEMBER,
+    ("PUT", "/api/v1/risk-analyses/{ref}/owners"): Needs.MEMBER,
+    ("GET", "/api/v1/risk-analyses/{ref}/history"): Needs.MEMBER,
+    ("GET", "/api/v1/risk-analyses/{ref}/assets/{subject}"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/items/{item_id}"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/assets/{subject}/rest"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/close"): Needs.MEMBER,
+    ("POST", "/api/v1/risk-analyses/{ref}/reopen"): Needs.MEMBER,
+    # Indicators are records like any other: what a person may see or change is decided
+    # where it is read or written.
+    ("GET", "/api/v1/indicators"): Needs.MEMBER,
+    ("POST", "/api/v1/indicators"): Needs.MEMBER,
+    ("GET", "/api/v1/indicators/{ref}"): Needs.MEMBER,
+    ("PATCH", "/api/v1/indicators/{ref}"): Needs.MEMBER,
+    ("PUT", "/api/v1/indicators/{ref}/owners"): Needs.MEMBER,
+    ("GET", "/api/v1/indicators/{ref}/history"): Needs.MEMBER,
+    ("POST", "/api/v1/indicators/{ref}/readings"): Needs.MEMBER,
+    ("PUT", "/api/v1/indicators/{ref}/risks"): Needs.MEMBER,
+    ("GET", "/api/v1/risks/{ref}/indicators"): Needs.MEMBER,
+    # Campaigns: assessors and managers run them; whoever is asked answers. What a person
+    # may see of a campaign is decided where it is read.
+    ("GET", "/api/v1/campaigns"): Needs.MEMBER,
+    ("POST", "/api/v1/campaigns"): Needs.ASSESS,
+    ("POST", "/api/v1/campaigns/preview"): Needs.ASSESS,
+    ("GET", "/api/v1/campaigns/{ref}"): Needs.MEMBER,
+    ("POST", "/api/v1/campaigns/{ref}/remind"): Needs.ASSESS,
+    ("POST", "/api/v1/campaigns/{ref}/close"): Needs.ASSESS,
+    ("POST", "/api/v1/campaigns/{ref}/cancel"): Needs.ASSESS,
+    ("GET", "/api/v1/campaign-items/{item_id}"): Needs.MEMBER,
+    ("POST", "/api/v1/campaign-items/{item_id}/answer"): Needs.MEMBER,
+    ("POST", "/api/v1/campaign-items/{item_id}/excuse"): Needs.ASSESS,
     # People
     ("GET", "/api/v1/accounts"): Needs.MEMBER,  # the people picker; members see names only
     ("POST", "/api/v1/accounts"): Needs.ADMIN,
@@ -63,6 +134,11 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/vocabularies"): Needs.MEMBER,
     ("GET", "/api/v1/admin/visibility"): Needs.CONFIGURE,
     ("PUT", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+    ("GET", "/api/v1/admin/vocabularies"): Needs.CONFIGURE,
+    ("PUT", "/api/v1/vocabularies/{name}"): Needs.CONFIGURE,
+    ("POST", "/api/v1/risk-categories"): Needs.CONFIGURE,
+    ("POST", "/api/v1/program/preview"): Needs.CONFIGURE,
+    ("POST", "/api/v1/program/publish"): Needs.CONFIGURE,
 }
 
 

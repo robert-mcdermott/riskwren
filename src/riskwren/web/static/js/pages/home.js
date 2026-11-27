@@ -34,6 +34,7 @@ const KINDS = {
   rate: ["control", "Rate"], acceptance: ["accept", "Renew"], orphan: ["user", "Assign"], evidence: ["evidence", "Renew"],
   test: ["assessment", "Test"], confirm: ["assessment", "Review"],
   issue: ["issue", "Put right"], closure: ["issue", "Confirm"], exception: ["exception", "Decide"],
+  campaign: ["bell", "Answer"], reading: ["chart", "Record"], handover: ["user", "Pass on"], analysis: ["scope", "Carry on"],
 };
 
 function owed(listing) {

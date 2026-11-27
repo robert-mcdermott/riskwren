@@ -16,7 +16,8 @@ from riskwren.api.common import (
     reading,
     writing,
 )
-from riskwren.core.errors import Invalid
+from riskwren.core.errors import Invalid, PermissionDenied
+from riskwren.events import audit
 from riskwren.inventory import access, history, links, records
 from riskwren.inventory.registry import (
     INFORMATION,
@@ -105,6 +106,33 @@ def vocabularies(request: Request) -> dict[str, Any]:
         return envelope(found)
 
 
+class VocabularyBody(BaseModel):
+    items: list[dict[str, Any]] = Field(
+        description="Every value, in order: key, label, description, and retired"
+    )
+
+
+@router.get("/admin/vocabularies", summary="Every vocabulary, with what may be changed in it")
+def describe_vocabularies(request: Request) -> dict[str, Any]:
+    with reading(request) as session:
+        return envelope(vocab.describe(session))
+
+
+@router.put("/vocabularies/{name}", summary="Rename, reorder, add to, or retire a vocabulary")
+def save_vocabulary(request: Request, name: str, body: VocabularyBody) -> dict[str, Any]:
+    """A value's key never changes, so renaming one never rewrites a record. A value in use
+    is retired, not removed: records keep it and new ones cannot choose it."""
+    principal = current(request)
+    if not principal.configures:
+        raise PermissionDenied("Only those who run the program can change a vocabulary.")
+    with writing(request, principal.actor) as session:
+        with audit.operation(session, "vocabulary.edit", vocabulary=name):
+            items = vocab.edit(session, name, body.items)
+            audit.record(session, "vocabulary.edit", subject_kind="program",
+                         changes={name: [item["key"] for item in items]})  # fmt: skip
+        return envelope(items)
+
+
 @router.get("/admin/visibility", summary="How much of the register everyone can see")
 def show_visibility(request: Request) -> dict[str, Any]:
     with reading(request) as session:
@@ -144,6 +172,8 @@ def list_records(
     principal = current(request)
     size = clamp_limit(limit)
     offset = int((decode_cursor(cursor) or {}).get("offset", 0))
+    # Every list can be cut to the records missing something expected of them.
+    filters = {**filters, "missing": request.query_params.get("missing")}
     with reading(request) as session:
         rows, total = records.search(
             session, principal, record_type, filters, sort=sort, limit=size, offset=offset

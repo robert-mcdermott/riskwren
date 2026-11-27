@@ -1,5 +1,6 @@
 // The risk register. Filters, sort, and page all live in the URL.
 
+import { listTools } from "../components/tidy.js";
 import { exportButton } from "../components/exchange.js";
 import { get } from "../core/api.js";
 import { button, h } from "../core/dom.js";
@@ -46,7 +47,7 @@ export function riskRegister(main) {
       const add = () => editRisk({ program, units: data.units, onDone: reload });
       const search = searchBox("Search risks");
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("category", categoryOptions(program, { blank: "Any category" }), "Category"),
         filterSelect("residual_rating", ratingOptions(program, "Any residual rating"), "Residual rating"),
         filterSelect("standing", standingOptions("Any standing"), "Standing"),

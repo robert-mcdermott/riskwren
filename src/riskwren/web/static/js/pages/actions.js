@@ -1,5 +1,6 @@
 // One list of everything owed, and the registers of treatment plans and acceptances.
 
+import { listTools } from "../components/tidy.js";
 import { get } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date, plural } from "../core/format.js";
@@ -35,7 +36,7 @@ export function actionList(main) {
       const rows = data.page.data;
       const search = searchBox("Search actions");
       keepSearchFocus(search);
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("status", [["open", "Not yet done"], ["done", "Done"], ["cancelled", "Cancelled"]], "Status"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
         toggle("overdue", "Overdue"), mineToggle());

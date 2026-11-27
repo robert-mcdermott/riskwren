@@ -24,7 +24,7 @@ from riskwren.api.routers.inventory import (
 from riskwren.core import scoring
 from riskwren.inventory import records
 from riskwren.program import rules
-from riskwren.risk import categories, library, register
+from riskwren.risk import categories, library, program, register
 from riskwren.risk import method as methods
 from riskwren.risk.register import RISK
 from riskwren.treatment import service as treatment
@@ -76,6 +76,7 @@ class CategoryBody(BaseModel):
     description: str | None = None
     appetite: str | None = None
     status: str | None = None
+    move: str | None = Field(default=None, description="up or down, among those beside it")
 
 
 def program_view(session: Any) -> dict[str, Any]:
@@ -103,9 +104,60 @@ def update_category(request: Request, key: str, body: CategoryBody) -> dict[str,
     principal = current(request)
     with writing(request, principal.actor) as session:
         category = categories.by_key(session, key)
-        categories.update(session, principal, category, body.model_dump(exclude_unset=True))
+        values = body.model_dump(exclude_unset=True)
+        if values.pop("move", None):
+            categories.move(session, principal, category, str(body.move))
+        categories.update(session, principal, category, values)
         changed = register.refresh_category(session, category.id)
         return envelope(program_view(session)["categories"], risks_whose_standing_changed=changed)
+
+
+class NewCategoryBody(BaseModel):
+    name: str = Field(max_length=200)
+    key: str | None = Field(default=None, description="Made from the name if absent")
+    parent: str | None = Field(default=None, description="The key of the category above it")
+    description: str | None = None
+    appetite: str | None = Field(default=None, description="A rating; needed at the top")
+
+
+@router.post("/risk-categories", status_code=201, summary="Add a risk category")
+def add_category(request: Request, body: NewCategoryBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        categories.create(session, principal, body.model_dump())
+        return envelope(program_view(session)["categories"])
+
+
+class ProgramChange(BaseModel):
+    """A change to what moves risks. Send only the parts that change, each of them whole."""
+
+    method: dict[str, Any] | None = Field(default=None, description="The whole scoring method")
+    appetites: dict[str, str | None] | None = Field(
+        default=None, description="Category key to rating; null takes the one above"
+    )
+    cadences: dict[str, Any] | None = Field(default=None, description="The whole cadence table")
+
+
+@router.post("/program/preview", summary="See which risks a change to the program would move")
+def preview_program(request: Request, body: ProgramChange) -> dict[str, Any]:
+    """Makes the change, lists every open risk whose rating, standing, or next review moved,
+    and then undoes it. Nothing is changed, and what is listed is exactly what publishing
+    the same change would move."""
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        found = program.change(session, principal, body.model_dump(exclude_none=True))
+        session.rollback()
+        return envelope(found, preview=True)
+
+
+@router.post("/program/publish", summary="Change the scoring method, appetite, or cadences")
+def publish_program(request: Request, body: ProgramChange) -> dict[str, Any]:
+    """A changed scoring method is published as a new version. Every open risk is read again
+    under what is now in force; assessments keep the rating they were given."""
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        found = program.change(session, principal, body.model_dump(exclude_none=True))
+        return envelope({**found, "program": program_view(session)}, preview=False)
 
 
 @router.get("/risk-library", summary="Reusable risk statements to start a risk from")

@@ -8,6 +8,8 @@ import { can, session } from "../core/session.js";
 import { mode, setMode } from "../core/prefs.js";
 import { openAppearance } from "./appearance.js";
 import { openPalette } from "./cmdk.js";
+
+const quickFind = async (text) => (await import("../pages/find.js")).quickFind(text);
 import { avatar } from "./ui.js";
 
 // Each entry appears only for people who can use it. Sections arrive as the product grows.
@@ -18,6 +20,8 @@ export const NAV = [
     items: [
       { href: "/risks", label: "Register", iconName: "risk" },
       { href: "/heat-map", label: "Heat map", iconName: "grid" },
+      { href: "/indicators", label: "Indicators", iconName: "chart" },
+      { href: "/risk-analyses", label: "Analyses", iconName: "scope" },
       { href: "/plans", label: "Treatment plans", iconName: "plan" },
       { href: "/acceptances", label: "Acceptances", iconName: "accept" },
       { href: "/actions", label: "Actions", iconName: "check" },
@@ -38,6 +42,7 @@ export const NAV = [
       { href: "/assessments", label: "Assessments", iconName: "assessment" },
       { href: "/issues", label: "Issues", iconName: "issue" },
       { href: "/exceptions", label: "Exceptions", iconName: "exception" },
+      { href: "/campaigns", label: "Campaigns", iconName: "bell", when: ["assess", "read_all"] },
     ],
   },
   {
@@ -54,6 +59,7 @@ export const NAV = [
     items: [
       { href: "/compliance", label: "Compliance", iconName: "shield-check" },
       { href: "/dashboard", label: "Risk", iconName: "chart" },
+      { href: "/tidy", label: "Tidy", iconName: "check" },
       { href: "/history", label: "History", iconName: "history", when: "read_all" },
     ],
   },
@@ -61,15 +67,18 @@ export const NAV = [
     heading: "Admin",
     items: [
       { href: "/admin/program", label: "Program", iconName: "program", when: "configure" },
+      { href: "/questionnaires", label: "Questionnaires", iconName: "file", when: "configure" },
       { href: "/admin/people", label: "People", iconName: "people", when: "admin" },
       { href: "/admin/units", label: "Units", iconName: "units", when: "admin" },
       { href: "/admin/appearance", label: "Appearance", iconName: "appearance", when: "admin" },
+      { href: "/admin/sso", label: "Single sign-on", iconName: "key", when: "admin" },
+      { href: "/admin/scheduled-work", label: "Scheduled work", iconName: "history", when: "admin" },
     ],
   },
 ];
 
 export function visibleNav() {
-  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || can(item.when)) }))
+  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || [item.when].flat().some((need) => can(need))) }))
     .filter((group) => group.items.length);
 }
 
@@ -101,6 +110,7 @@ export function commands(meta) {
   })));
   return [
     ...pages,
+    { label: "Search", hint: "Page", iconName: "search", href: "/search", keywords: "find look" },
     { label: "Your account", hint: "Page", iconName: "user", href: "/account", keywords: "profile password" },
     { label: "Appearance…", hint: "Action", iconName: "appearance", run: () => openAppearance(meta), keywords: "theme palette colors" },
     { label: mode() === "dark" ? "Switch to light" : "Switch to dark", hint: "Action",
@@ -203,8 +213,8 @@ export function mountShell(root, meta) {
 
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
   const search = h("button", { type: "button", class: "search-button", "aria-label": "Open the command palette",
-    onclick: () => openPalette(commands(meta)) },
-  icon("search", "icon icon-sm"), h("span", {}, "Go to…"), h("kbd", {}, isMac ? "⌘K" : "Ctrl K"));
+    onclick: () => openPalette(commands(meta), { find: quickFind }) },
+  icon("search", "icon icon-sm"), h("span", {}, "Find or go to…"), h("kbd", {}, isMac ? "⌘K" : "Ctrl K"));
 
   const powered = meta.branding.show_powered_by && meta.branding.product_name !== "RiskWren"
     ? h("div", { class: "powered" }, "Powered by ", h("a", { href: "https://github.com/robert-mcdermott/riskwren", target: "_blank", rel: "noopener" }, "RiskWren"))

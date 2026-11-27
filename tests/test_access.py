@@ -242,6 +242,19 @@ REACH: dict[tuple[str, str], set[str]] = {
     ("DELETE", "/api/v1/session"): EVERYONE | {"nobody"},
     ("POST", "/api/v1/session/demo"): EVERYONE | {"nobody"},
     ("POST", "/api/v1/session/password"): EVERYONE,
+    # Single sign-on. The round trip is open to all, and answers 404 unless it is set up.
+    ("GET", "/api/v1/sso/start"): EVERYONE | {"nobody"},
+    ("GET", "/api/v1/sso/callback"): EVERYONE | {"nobody"},
+    ("GET", "/api/v1/sso"): {"admin"},
+    ("POST", "/api/v1/sso/check"): {"admin"},
+    ("PUT", "/api/v1/sso/mappings"): {"admin"},
+    ("GET", "/api/v1/jobs"): {"admin"},
+    ("POST", "/api/v1/jobs/{key}/run"): {"admin"},
+    ("PUT", "/api/v1/jobs/{key}"): {"admin"},
+    ("GET", "/api/v1/mail"): {"admin"},
+    ("POST", "/api/v1/mail/test"): {"admin"},
+    ("GET", "/api/v1/session/preferences"): EVERYONE,
+    ("PUT", "/api/v1/session/preferences"): EVERYONE,
     ("GET", "/api/v1/accounts"): EVERYONE,
     ("POST", "/api/v1/accounts"): {"admin"},
     ("GET", "/api/v1/accounts/{account_id}"): EVERYONE,
@@ -275,7 +288,60 @@ RECORD_PATHS = {
 }
 REACH[("GET", "/api/v1/vocabularies")] = EVERYONE
 REACH[("GET", "/api/v1/admin/visibility")] = {"admin", "manager"}
+REACH[("GET", "/api/v1/questionnaires")] = EVERYONE
+REACH[("POST", "/api/v1/questionnaires")] = {"admin", "manager"}
+REACH[("POST", "/api/v1/questionnaires/check")] = {"admin", "manager"}
+REACH[("GET", "/api/v1/questionnaires/{key}")] = EVERYONE
+REACH[("PATCH", "/api/v1/questionnaires/{key}")] = {"admin", "manager"}
+REACH[("POST", "/api/v1/questionnaires/{key}/responses")] = EVERYONE
+REACH[("GET", "/api/v1/responses/{response_id}")] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/indicators"), ("POST", "/api/v1/indicators"),
+    ("GET", "/api/v1/indicators/{ref}"), ("PATCH", "/api/v1/indicators/{ref}"),
+    ("PUT", "/api/v1/indicators/{ref}/owners"), ("GET", "/api/v1/indicators/{ref}/history"),
+    ("POST", "/api/v1/indicators/{ref}/readings"), ("PUT", "/api/v1/indicators/{ref}/risks"),
+    ("GET", "/api/v1/risks/{ref}/indicators"),
+    ("GET", "/api/v1/search"), ("GET", "/api/v1/views"), ("POST", "/api/v1/views"),
+    ("PATCH", "/api/v1/views/{view_id}"), ("DELETE", "/api/v1/views/{view_id}"),
+    ("GET", "/api/v1/tidy"), ("GET", "/api/v1/similar"),
+    ("POST", "/api/v1/tidy/not-duplicates"),
+    ("GET", "/api/v1/accounts/{account_id}/holdings"),
+    ("POST", "/api/v1/accounts/{account_id}/handover"),
+):  # fmt: skip
+    REACH[_route] = EVERYONE
+for _route in (
+    ("GET", "/api/v1/risk-analyses"),
+    ("POST", "/api/v1/risk-analyses"),
+    ("POST", "/api/v1/risk-analyses/preview"),
+    ("GET", "/api/v1/risk-analyses/{ref}"),
+    ("PATCH", "/api/v1/risk-analyses/{ref}"),
+    ("PUT", "/api/v1/risk-analyses/{ref}/owners"),
+    ("GET", "/api/v1/risk-analyses/{ref}/history"),
+    ("GET", "/api/v1/risk-analyses/{ref}/assets/{subject}"),
+    ("POST", "/api/v1/risk-analyses/{ref}/items/{item_id}"),
+    ("POST", "/api/v1/risk-analyses/{ref}/assets/{subject}/rest"),
+    ("POST", "/api/v1/risk-analyses/{ref}/close"),
+    ("POST", "/api/v1/risk-analyses/{ref}/reopen"),
+):
+    REACH[_route] = EVERYONE
+RUNNERS = {"manager", "assessor"}
+REACH[("GET", "/api/v1/campaigns")] = EVERYONE
+REACH[("POST", "/api/v1/campaigns")] = RUNNERS
+REACH[("POST", "/api/v1/campaigns/preview")] = RUNNERS
+REACH[("GET", "/api/v1/campaigns/{ref}")] = EVERYONE
+REACH[("POST", "/api/v1/campaigns/{ref}/remind")] = RUNNERS
+REACH[("POST", "/api/v1/campaigns/{ref}/close")] = RUNNERS
+REACH[("POST", "/api/v1/campaigns/{ref}/cancel")] = RUNNERS
+REACH[("GET", "/api/v1/campaign-items/{item_id}")] = EVERYONE
+REACH[("POST", "/api/v1/campaign-items/{item_id}/answer")] = EVERYONE
+REACH[("POST", "/api/v1/campaign-items/{item_id}/excuse")] = RUNNERS
 REACH[("PUT", "/api/v1/admin/visibility")] = {"admin", "manager"}
+for _route in (
+    ("GET", "/api/v1/admin/vocabularies"), ("PUT", "/api/v1/vocabularies/{name}"),
+    ("POST", "/api/v1/risk-categories"), ("POST", "/api/v1/program/preview"),
+    ("POST", "/api/v1/program/publish"),
+):  # fmt: skip
+    REACH[_route] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE

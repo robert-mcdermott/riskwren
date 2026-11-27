@@ -12,6 +12,7 @@ import { assessRisk, closeRisk, editRisk, editSubjects, escalateRisk } from "../
 import { toast } from "../components/toast.js";
 import { controlsTab, treatmentTab } from "../components/treatment.js";
 import { alert, card, emptyState } from "../components/ui.js";
+import { amount, readingChart, statePill as indicatorPill, trendWord } from "../components/indicator.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 
@@ -39,6 +40,12 @@ function overview(risk, ctx) {
       risk.status === "closed" ? alert("info", icon("info"), h("div", {}, h("strong", {}, "Closed. "), risk.closed_reason ?? "")) : null,
       risk.residual_in_doubt ? alert("warn", icon("alert"), h("div", {}, h("strong", {}, "The residual rating may be out of date. "),
         risk.residual_doubt_reason ?? "", " Assess it again.")) : null,
+      risk.indicators?.length ? card({ title: "Early warning", flush: true },
+        h("ul", { class: "rows" }, risk.indicators.map((item) => h("li", { class: "row" },
+          h("div", { class: "grow" }, h("a", { class: "cell-main", href: `/indicators/${item.ref}` }, item.name),
+            h("div", { class: "cell-sub" }, item.last_value == null ? "Not read yet" : `${amount(item, item.last_value)}, against a limit of ${amount(item, item.breach_at)} · ${trendWord(item.trend)}`)),
+          item.values.length > 1 ? readingChart(item, item.values, { width: 120, height: 32, compact: true }) : null,
+          indicatorPill(item.state))))) : null,
       card({ title: "How much is at stake",
         actions: risk.can.assess && risk.status !== "closed" ? button("Assess", { kind: "btn-sm btn-primary", onclick: () => assessRisk({ risk, program, onDone: ctx.reload }) }) : null },
       journey(program, risk, { onOpen: (kind) => showReasons(program, risk, kind) }),

@@ -49,10 +49,10 @@ Its sign-in page offers ten sample people and asks for no password. Try a few:
 | Sign in as | To see |
 |---|---|
 | The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end |
-| The risk manager | The whole register, the risk dashboard, and the heat map |
+| The risk manager | The whole register, the risk dashboard, the heat map, and the program, where a change to the matrix can be previewed |
 | The steward | One unit's inventory and risks, and a critical risk brought to high by controls, with its plan |
 | The unit leader | A high risk that is beyond their authority to accept |
-| The assessor | An assessment in progress, a result to review, and the issues its failed tests opened |
+| The assessor | An assessment in progress, a result to review, an attestation campaign most of the way through, and a risk analysis half done |
 | The auditor | Everything, read-only, with every change in one place |
 | A staff member | Home for someone with one action to finish, and only their own unit's part of the register |
 
@@ -60,7 +60,20 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.2.0 added compliance to the register. Version 0.2.1 adds nineteen security controls to the library of common controls, which now reach about three quarters of each built-in framework, and a documentation site.
+Version 0.3.0 is *Keeping watch*: a register that stays true without a central team chasing it. It follows 0.2.0, which added compliance to the register, and 0.2.1, which widened the library of common controls.
+
+**Keeping watch, new in 0.3.0**
+
+- **Single sign-on, if you want it.** OpenID Connect beside local accounts, tested against a stand-in provider and built to work with Microsoft Entra ID: roles and units come from the provider's roles or groups. Out of the box it is local accounts and passwords, as before.
+- **It knows what is due.** A scheduler brings the register up to date and reminds whoever a thing is waiting on: before its date, when it passes, then their steward, then their leader. Email is optional, and each person chooses how much of it they get.
+- **Questionnaires as versioned data,** with questions that appear by condition. An answer always reads as it was asked.
+- **Campaigns:** ask every control owner to attest, every risk owner to look again, every steward to check a unit's records, or for a named piece of evidence, and see who has answered, by unit.
+- **An attestation is never mistaken for a test.** What an owner says of a control is shown apart from its rating and never makes a requirement verified.
+- **Indicators:** a number someone already reads, with a warning level and a limit. Past the limit, its owners and the owners of the risks it warns of are told.
+- **One search** across every kind of record, cut to what the searcher may open; **saved views** of any list; what each record is **missing**; and likely **duplicates**.
+- **When someone leaves,** nothing is left without an owner: what they alone answered for passes to the steward of its unit, and is passed on for good in one step.
+- **The program is edited in the app:** categories, scales, the matrix, appetite, cadences, and vocabularies, with a **preview of every risk a change would move** before anything is published.
+- **Risk analyses:** each thing in a scope taken against each threat, raising risks or refreshing the ones already there, with a report of what was considered.
 
 **Compliance, new in 0.2.0**
 
@@ -88,7 +101,7 @@ Version 0.2.0 added compliance to the register. Version 0.2.1 adds nineteen secu
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-This release signs in with local accounts and sends no email. Single sign-on, email, reminders, attestations, and scheduled jobs come next. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Policies and obligations come next, then supplier reviews, reporting, audits, and incidents. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 

@@ -27,6 +27,10 @@ base_url = ""
 session_idle_hours = 12
 session_max_days = 7
 
+# Run scheduled work (what is due, reminders, email) inside this server. Leave it on unless
+# you run `riskwren jobs run` from a scheduled task instead.
+scheduler = true
+
 [database]
 # Leave empty to use SQLite, in a single file inside the data home.
 # For PostgreSQL: "postgresql+psycopg://riskwren@db.example.org:5432/riskwren", with the
@@ -37,3 +41,65 @@ url = ""
 [data]
 # The data home: evidence files, uploaded logos, exports, logs, and the SQLite database.
 home = "var"
+
+[sso]
+# Single sign-on is optional. Out of the box people sign in with an email address and a
+# password held by RiskWren, and nothing here needs to be set.
+#
+# To let people sign in with your organization's identity provider as well, name its issuer
+# and the client (application) ID it gave RiskWren. Any OpenID Connect provider works. For
+# Microsoft Entra ID the issuer is "https://login.microsoftonline.com/<tenant id>/v2.0".
+# Give the provider this redirect address: <base_url>/api/v1/sso/callback
+issuer = ""
+client_id = ""
+
+# The client secret is never written in this file. Put it in the environment variable named
+# here.
+client_secret_env = "RISKWREN_SSO_CLIENT_SECRET"
+
+# What RiskWren asks the provider for.
+scopes = "openid profile email"
+
+# The claim in the ID token that lists a person's application roles or groups. Which value
+# gives which role is set in the app, under Admin, Single sign-on. Entra ID sends application
+# roles as "roles" and groups as "groups".
+roles_claim = "roles"
+
+# The words on the sign-in button.
+label = "Sign in with your organization account"
+
+# Accept the provider's address for a person without its saying the address is verified.
+# Entra ID does not say, so set this to true for a single Entra ID tenant.
+trust_email = false
+
+# Make an account the first time someone signs in. With false, only people who already have
+# an account here can sign in.
+create_accounts = true
+
+# Keep the password form for everyone who has a password. With false, only administrators
+# may sign in with a password, so that there is always a way in.
+local_sign_in = true
+
+[mail]
+# Email is optional. Without it, notices and reminders are read in the app, under the bell.
+#
+# To send them by email as well, name an SMTP server and the address they come from. Each
+# person then chooses, under Your account, to get each notice as it happens, one summary a
+# day, or none.
+host = ""
+port = 587
+
+# "starttls" (the usual choice on port 587), "tls" (port 465), or "none".
+security = "starttls"
+
+# The account to sign in to the mail server with, if it needs one. The password is never
+# written in this file. Put it in the environment variable named here.
+username = ""
+password_env = "RISKWREN_MAIL_PASSWORD"
+
+# Who the messages come from.
+from_address = ""
+from_name = ""
+
+# The hour of the day, in UTC, after which daily summaries are sent.
+digest_hour = 7

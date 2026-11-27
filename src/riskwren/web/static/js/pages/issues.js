@@ -1,5 +1,6 @@
 // Issues: the register, and one issue with what it is about, its actions, and its closure.
 
+import { listTools, similarHint } from "../components/tidy.js";
 import { get, patch, post } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date, plural, relative } from "../core/format.js";
@@ -7,12 +8,11 @@ import { label, options, unitOptions, units, vocabularies } from "../core/lookup
 import { navigate, query, setQuery } from "../core/router.js";
 import { session } from "../core/session.js";
 import { evidenceUnits, freshness } from "../components/evidence.js";
-import { banner, checkbox, field, select, submit } from "../components/form.js";
+import { banner, checkbox, field, section, select, submit } from "../components/form.js";
 import { ISSUE_STATUS, issueDue, issueStatus, recordPicker, SEVERITY, severityPill } from "../components/issue.js";
 import { openOverlay } from "../components/overlay.js";
 import { personField } from "../components/people-picker.js";
 import { recordChip, TYPES } from "../components/record.js";
-import { section } from "../components/record-forms.js";
 import { toast } from "../components/toast.js";
 import { actionButtons, actionStatus, dueCell } from "../components/treatment.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
@@ -78,7 +78,7 @@ export function editIssue({ issue = null, about = [], requirement = null, unitId
         event.preventDefault();
         save();
       } }, problem,
-      section("What it is", title.node, summary.node, h("div", { class: "grid-2" }, unit.node, source.node)),
+      section("What it is", title.node, similarHint("issue", title.input, { unit: () => unit.input.value, apartFrom: issue?.ref }), summary.node, h("div", { class: "grid-2" }, unit.node, source.node)),
       section("How serious", severity.node, meaning),
       picker ? section("What it is about", requirement ? h("p", {}, h("span", { class: "requirement-code" }, requirement.code), " ", requirement.title ?? "") : null, picker) : null,
       section("Who", owner?.node ?? null, restricted.node)));
@@ -344,7 +344,7 @@ export function issueList(main) {
       const search = searchBox("Search issues");
       keepSearchFocus(search);
       const overdue = query().get("overdue") === "true";
-      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search),
+      const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("status", [["", "Not yet closed"], ["open", "Open"], ["proposed", "Awaiting confirmation"], ["closed", "Closed"], ["cancelled", "Withdrawn"], ["any", "Any status"]], "Status"),
         filterSelect("severity", severityOptions(data.vocab, "Any severity"), "Severity"),
         filterSelect("source_kind", options(data.vocab, "issue_sources", { blank: "Found by anything" }), "What found it"),

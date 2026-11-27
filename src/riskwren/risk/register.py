@@ -7,7 +7,7 @@ from collections.abc import Callable, Mapping
 from datetime import date
 from typing import Any
 
-from sqlalchemy import case, or_, select
+from sqlalchemy import case, exists, or_, select
 from sqlalchemy.orm import Session
 
 from riskwren.access.principal import Principal
@@ -18,6 +18,7 @@ from riskwren.db.models import Event, OrgUnit, Risk, RiskAssessment, RiskSubject
 from riskwren.db.models.risk import ASSESSMENT_KINDS, RISK_STATUSES
 from riskwren.events import audit
 from riskwren.inventory import access, records
+from riskwren.inventory.completeness import Expected
 from riskwren.inventory.registry import TYPES, Field, RecordType, find_any, register
 from riskwren.people import units
 from riskwren.program import rules
@@ -170,7 +171,16 @@ def _detail(session: Session, principal: Principal, risk: Risk) -> dict[str, Any
             for kind, row in latest(session, risk).items()
         },
         "can_escalate": can_escalate(session, principal, risk),
+        "indicators": _indicators(session, principal, risk),
     }
+
+
+def _indicators(session: Session, principal: Principal, risk: Risk) -> list[dict[str, Any]]:
+    """The indicators that warn of the risk. They build on this module, so they are asked
+    for when needed."""
+    from riskwren.risk import indicators
+
+    return indicators.of_risk(session, principal, risk)
 
 
 def _history_title(event: Event, lookups: Any) -> str | None:
@@ -186,6 +196,8 @@ def _history_title(event: Event, lookups: Any) -> str | None:
         return f"Assessed the {now('kind')} risk as {rating}"
     if event.subject_type == "risk_assessment":
         return "An earlier assessment was superseded"
+    if event.subject_type == "risk" and (event.context or {}).get("op") == "program.change":
+        return "Changed when the program was changed"
     if event.subject_type == "risk_subject":
         kind = now("subject_type")
         name = lookups.name(kind, now("subject_id")) if kind in TYPES else "a record"
@@ -201,6 +213,12 @@ def _history_value(lookups: Any, field: str, value: Any) -> Any:
         ratings = {r["key"]: r["label"] for r in methods.current(lookups.session)["ratings"]}
         return ratings.get(value, value)
     return None
+
+
+def _no_controls(model: Any) -> Any:
+    from riskwren.db.models import RiskControl
+
+    return ~exists(select(RiskControl.id).where(RiskControl.risk_id == model.id))
 
 
 RISK = register(
@@ -235,12 +253,29 @@ RISK = register(
             "cards": _cards,
             "detail": _detail,
             "conditions": _conditions,
+            "live_statuses": ("open",),
+            "live_filters": {"status": "open"},
+            "expected": [
+                Expected(
+                    "rating",
+                    "a rating",
+                    lambda model: model.standing == "not_assessed",
+                    "Nobody has said how likely or how bad it is.",
+                ),
+                Expected(
+                    "controls",
+                    "a control that bears on it",
+                    _no_controls,
+                    "Nothing is recorded as reducing it.",
+                ),
+            ],
             "sort_columns": {
                 name: _rating_order(name)
                 for name in ("residual_rating", "inherent_rating", "target_rating")
             },
             "history_title": _history_title,
             "history_value": _history_value,
+            "history_loud": ("program.change",),
             "history_quiet": (
                 "next_review_on",
                 *(
@@ -274,8 +309,10 @@ RISK = register(
 # --- Raising and changing -----------------------------------------------------------------
 
 
-def create(session: Session, principal: Principal, values: Mapping[str, Any]) -> Risk:
-    risk: Risk = records.create(session, principal, RISK, values)
+def create(
+    session: Session, principal: Principal, values: Mapping[str, Any], *, checked: bool = False
+) -> Risk:
+    risk: Risk = records.create(session, principal, RISK, values, checked=checked)
     with audit.operation(session, "risk.create"):
         refresh(session, risk)
     return risk
@@ -329,7 +366,9 @@ def next_review(session: Session, risk: Risk) -> date | None:
     if newest is None:
         months = int(cadences.get("unrated_risk_review_months", 3))
         return rules.add_months(risk.created_at.date(), months)
-    months = int(cadences["risk_review_months"].get(newest.rating, 12))
+    # The rating as the method in force reads it, which may not be the one it was given.
+    rating = risk.residual_rating or newest.rating
+    months = int(cadences["risk_review_months"].get(rating, 12))
     return rules.add_months(newest.assessed_at.date(), months)
 
 

@@ -72,7 +72,7 @@ As installed, RiskWren listens only on the machine it runs on. To put it in fron
 
 Open the address in a browser and sign in with the email address and password you gave `init`.
 
-This release signs in with local accounts: an email address and a password held by RiskWren. Single sign-on comes later; see the [roadmap](../spec/roadmap.md).
+RiskWren signs in with local accounts: an email address and a password that it keeps. Nothing else has to be installed or connected. Signing in with your organization's identity provider, such as Microsoft Entra ID, is optional and can be added at any time: see [Single sign-on](configuration.md#single-sign-on).
 
 - Five failed attempts within fifteen minutes stop sign-in for that account from that address for a few minutes.
 - A sign-in ends after 12 hours without activity, and after 7 days in any case. Both are [settings](configuration.md#server).

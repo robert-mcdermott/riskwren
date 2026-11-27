@@ -29,7 +29,7 @@ Relative paths in the file are resolved against the file's own directory, not th
 
 ## Every section and key
 
-The file has three sections. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
+The file has five sections. Only the first three matter for a new installation; `[sso]` and `[mail]` are optional. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
 
 ### `[server]`
 
@@ -38,9 +38,10 @@ The file has three sections. A section or key that RiskWren does not know is an 
 | `host` | `"127.0.0.1"` | The address the web server listens on. Keep `127.0.0.1` when a reverse proxy on the same machine terminates TLS. Use `0.0.0.0` only behind one |
 | `port` | `8000` | The port |
 | `workers` | `1` | How many server processes to run. One is enough for SQLite and small teams |
-| `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Meant for links in messages RiskWren sends. This release sends no email, so it can stay empty |
+| `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Used for the single sign-on redirect address, and for links in messages RiskWren sends. Set it when you use single sign-on |
 | `session_idle_hours` | `12` | A sign-in ends after this long without activity |
 | `session_max_days` | `7` | A sign-in ends after this long in any case |
+| `scheduler` | `true` | Run scheduled work inside this server. See [Scheduled work](#scheduled-work) |
 
 `host`, `port`, and `workers` can also be given to `uv run riskwren serve` as `--host`, `--port`, and `--workers`, which take precedence for that run.
 
@@ -56,7 +57,38 @@ The file has three sections. A section or key that RiskWren does not know is an 
 |---|---|---|
 | `home` | `"var"` | The data home: the one directory that holds everything not in the database |
 
-RiskWren also gives advice that does not stop it running. `serve` and `doctor` warn when several workers share one SQLite file, and when `base_url` is `http://` on a host other than localhost.
+### `[sso]`
+
+Single sign-on is optional and off until both `issuer` and `client_id` are set. See [Single sign-on](#single-sign-on).
+
+| Key | Default | Meaning |
+|---|---|---|
+| `issuer` | `""` | The identity provider's issuer address. For Microsoft Entra ID, `"https://login.microsoftonline.com/<tenant id>/v2.0"` |
+| `client_id` | `""` | The client (application) ID the provider gave RiskWren |
+| `client_secret_env` | `"RISKWREN_SSO_CLIENT_SECRET"` | The name of the environment variable that holds the client secret. The secret itself is refused in the file |
+| `scopes` | `"openid profile email"` | What RiskWren asks the provider for. Must include `openid` |
+| `roles_claim` | `"roles"` | The claim in the ID token that lists a person's application roles or groups |
+| `label` | `"Sign in with your organization account"` | The words on the sign-in button |
+| `trust_email` | `false` | Accept the provider's address for a person without its saying the address is verified. Entra ID does not say, so set this to `true` for a single Entra ID tenant |
+| `create_accounts` | `true` | Make an account the first time someone signs in. With `false`, only people who already have an account can sign in |
+| `local_sign_in` | `true` | Keep the password form for everyone who has a password. With `false`, only administrators may sign in with a password |
+
+### `[mail]`
+
+Email is optional and off until both `host` and `from_address` are set. See [Email](#email).
+
+| Key | Default | Meaning |
+|---|---|---|
+| `host` | `""` | The SMTP server |
+| `port` | `587` | Its port |
+| `security` | `"starttls"` | `"starttls"` (usual on port 587), `"tls"` (port 465), or `"none"` |
+| `username` | `""` | The account to sign in to the mail server with, if it needs one |
+| `password_env` | `"RISKWREN_MAIL_PASSWORD"` | The name of the environment variable that holds the password. The password itself is refused in the file |
+| `from_address` | `""` | The address messages come from |
+| `from_name` | `""` | The name beside it. Empty means the product's name |
+| `digest_hour` | `7` | The hour of the day, in UTC, after which daily summaries are sent |
+
+RiskWren also gives advice that does not stop it running. `serve` and `doctor` warn when several workers share one SQLite file, when `base_url` is `http://` on a host other than localhost, and when email is set up without a `base_url` for its links.
 
 ## Environment overrides
 
@@ -103,6 +135,134 @@ The data home is created by `init`. With the default settings it is `./var`.
 - It must be writable by the account that runs the server.
 - Request bodies and tokens are never written to the log.
 
+## Single sign-on
+
+**You do not need this to use RiskWren.** A new installation signs in with an email address and a password that RiskWren keeps, and an evaluation or a small team needs nothing else. Single sign-on is something an administrator adds when the organization wants people to use the account they already have, under its own multi-factor authentication and offboarding.
+
+When it is on, it sits beside local accounts and does not replace them. The sign-in page shows the organization's button first, with the password form folded beneath it. An administrator can always sign in with a password, so a provider that is down or misconfigured never locks everyone out.
+
+RiskWren speaks OpenID Connect: the authorization-code flow with PKCE. It works with Microsoft Entra ID and with any provider that follows the standard and signs its ID tokens with RS256.
+
+### What you set, and where
+
+| What | Where |
+|---|---|
+| The provider's issuer and RiskWren's client ID | `[sso]` in `riskwren.toml` |
+| The client secret | An environment variable, `RISKWREN_SSO_CLIENT_SECRET` unless you name another |
+| RiskWren's public address | `[server] base_url`, so the redirect address is always the same |
+| Which of the provider's roles or groups give which role here | In the app: **Admin → Single sign-on** |
+
+The redirect address to give the provider is `<base_url>/api/v1/sso/callback`. **Admin → Single sign-on** shows it, before and after you set anything up.
+
+### With Microsoft Entra ID
+
+1. In the Entra admin center, open **App registrations → New registration**. Name it, choose **Accounts in this organizational directory only**, and add a **Web** redirect URI: your `base_url` followed by `/api/v1/sso/callback`.
+2. From the registration's **Overview**, copy the **Application (client) ID** and the **Directory (tenant) ID**.
+3. Under **Certificates & secrets**, add a client secret and copy its **Value**. It is shown once.
+4. Under **App roles**, create a role for each kind of access you want to give from Entra ID, for users and groups. The role's **Value** is what RiskWren sees: for example `RiskWren.Admin`, `RiskWren.Assessor`, `RiskWren.Security.Leader`.
+5. Under **Enterprise applications**, open the same application, then **Users and groups**, and assign people or groups to those roles. Under **Properties**, set **Assignment required** to **Yes** if only assigned people should be able to sign in.
+6. Under **Token configuration**, add the optional **ID** claim `email`.
+7. In `riskwren.toml`:
+
+   ```toml
+   [server]
+   base_url = "https://riskwren.example.org"
+
+   [sso]
+   issuer = "https://login.microsoftonline.com/<tenant id>/v2.0"
+   client_id = "<application id>"
+   trust_email = true
+   ```
+
+8. Put the secret's value in `RISKWREN_SSO_CLIENT_SECRET` in the environment RiskWren starts in, and restart it.
+9. Run `uv run riskwren doctor`. It reads the provider and says whether the secret is set.
+10. Sign in with a password as an administrator, open **Admin → Single sign-on**, choose **Check the connection**, and map each app role's value to a role here.
+
+Three things about Entra ID are worth knowing.
+
+- **Name one tenant.** RiskWren refuses the shared issuers (`common`, `organizations`, `consumers`), because they would accept a sign-in from any directory.
+- **Entra ID does not mark addresses as verified**, which is why `trust_email` is `true` above. That is safe for a single tenant, whose addresses are the organization's own. Without it nobody can be matched to an existing account or created.
+- **Prefer app roles to groups.** To use groups instead, add a groups claim under **Token configuration**, set `roles_claim = "groups"`, and map each group's object ID. Entra ID leaves the groups out of the token for a person in more than about two hundred of them; RiskWren then leaves that person's roles as they were and says so in its log.
+
+### With another provider
+
+Register RiskWren as a confidential web client with the redirect address above. Set `issuer` to the address whose `/.well-known/openid-configuration` the provider serves, and `client_id` to what it gave you. Have it put a person's groups or roles in a claim, and name that claim in `roles_claim` (many providers call it `groups`). If the provider says `email_verified` is true for its addresses, leave `trust_email` as it is.
+
+### Roles from the provider
+
+**Admin → Single sign-on** lists mappings. Each says: everyone the provider gives this value gets this role here.
+
+| Role here | For |
+|---|---|
+| Works in a unit | One unit. Membership grants nothing by itself; it decides what a member sees |
+| Steward, Leader | One unit, and everything beneath it. A leader's mapping also says what they may accept |
+| Assessor, Manager | The whole organization, or one unit |
+| Auditor, Administrator | The whole organization |
+
+- Roles given this way are **set again at every sign-in**. Take the role away at the provider and it is gone here the next time the person signs in. A shorter `session_max_days` shortens the wait.
+- Roles given by hand under **Admin → People** are left alone, and are shown apart from those the provider gave.
+- **The last administrator is never removed**, whatever the provider says.
+- A unit in a mapping is the unit itself, so renaming it changes nothing.
+
+### Who a person is
+
+A person is known by the provider's own identifier for them, never by an address alone. The first time someone signs in:
+
+- if an account here has the address the provider vouches for, the two are joined, and from then on the provider's identifier is what counts;
+- otherwise an account is made for them, with the roles their mappings give, unless `create_accounts` is `false`.
+
+A disabled account cannot come in through the provider. Signing out of RiskWren does not sign anyone out of the provider.
+
+### Passwords, once it is on
+
+With `local_sign_in = true`, anyone who has a password may still use it. With `false`, only administrators may. There is no setting that removes the administrator's password, on purpose: it is the way in when the provider cannot be reached.
+
+### Try it on a laptop
+
+`scripts/dev_identity_provider.py` is a stand-in provider for trying this out. It has a fixed list of people and no passwords, and its signing key is published in the file, so it proves nothing and listens only on the machine it runs on.
+
+```bash
+uv run python scripts/dev_identity_provider.py
+```
+
+Then set `issuer = "http://127.0.0.1:8099"`, `client_id = "riskwren-dev"`, and `trust_email = true` under `[sso]`, and start RiskWren with `RISKWREN_SSO_CLIENT_SECRET=dev-secret` in its environment.
+
+## Scheduled work
+
+RiskWren does four things by itself, so that nobody has to remember to.
+
+| Job | How often | What it does |
+|---|---|---|
+| The calendar | Hourly | Brings risks up to date when a plan passes its date or an acceptance ends |
+| Reminders | Hourly | Reminds people of what is nearly due, and tells stewards and leaders what stays late. See [Reminders](running-the-program.md#reminders) |
+| Email | Every minute | Queues notices and daily summaries and sends what is waiting, where [email](#email) is set up |
+| Housekeeping | Daily | Removes run records older than ninety days and sign-ins that were never finished |
+
+The server runs them while it is up. Nothing needs to be installed or scheduled.
+
+- **Each job runs once.** Before a process runs a job it claims the job in the database. With several workers, or several servers on one database, whichever claims it has it and the others leave it alone. A process that dies mid-job loses its claim after fifteen minutes.
+- **A restart loses nothing.** What is due is worked out from the database and the clock, so a server that was down catches up when it starts.
+- **Admin → Scheduled work** shows each job, when it last ran and what it did, and can run one now or pause it. A failed run is shown with its reason and tried again when next due.
+- `uv run riskwren jobs` lists the same from the command line, and `uv run riskwren jobs run` runs whatever is due.
+
+To run the jobs from the operating system's scheduler instead, set `scheduler = false` under `[server]` and run `uv run riskwren jobs run` every few minutes. `doctor` warns if the scheduler is off and nothing has run for two days.
+
+## Email
+
+**You do not need this to use RiskWren.** Notices and reminders are read in the app, under the bell at the top right, and on Home. Email sends the same notices to people's inboxes as well, for organizations that want that.
+
+1. Under `[mail]` in `riskwren.toml`, set `host` and `from_address`. If the mail server needs a sign-in, set `username`, and put the password in the `RISKWREN_MAIL_PASSWORD` environment variable.
+2. Set `base_url` under `[server]`, so that messages can link back.
+3. Restart RiskWren, and run `uv run riskwren doctor`: it connects and signs in to the mail server, and sends nothing.
+4. Send yourself a message from **Admin → Scheduled work**, or with `uv run riskwren mail test you@example.org`.
+
+Then each person chooses, under **Your account**: each notice as it happens, one summary a day, or no email. The choice appears only once email is set up.
+
+- **Nothing is sent from the request that caused it.** A notice is written to the database, the mailer turns it into a message in an outbox in the same database, and sends from there. A mail server that is down is tried again later, with longer waits, and given up on after six attempts.
+- **Turning email on does not send people their history.** Only notices written after it is set up are sent.
+- **A daily summary** gathers what a person has not yet read in the app, once a day after `digest_hour`.
+- Messages say what happened and link to it. They carry no record's contents beyond its name.
+
 ## Use PostgreSQL
 
 SQLite is the default and needs no setup. Use PostgreSQL when many people will use RiskWren at once or you want more than one server process. The features and the data model are the same on both, and the test suite runs on both.
@@ -141,7 +301,7 @@ uv sync
 uv run riskwren db upgrade
 ```
 
-`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.1.0, that is the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. Back up first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
+`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.2.1, that is the four built-in questionnaires; the [changelog](../CHANGELOG.md) says what behaves differently afterwards. Coming from 0.1.0, that is also the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. Back up first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
 
 ## Run behind a reverse proxy
 

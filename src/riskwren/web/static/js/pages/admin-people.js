@@ -3,7 +3,7 @@
 import { get, patch, post, put } from "../core/api.js";
 import { button, h, uid } from "../core/dom.js";
 import { plural, titleCase } from "../core/format.js";
-import { query, setQuery } from "../core/router.js";
+import { navigate, query, setQuery } from "../core/router.js";
 import { session } from "../core/session.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { openImport } from "../components/importer.js";
@@ -160,12 +160,14 @@ function editPerson({ account, roles, units, reload }) {
         } })
         : button("Disable", { kind: "btn-danger", onclick: () => confirmAction({
           title: `Disable ${account.display_name}?`,
-          text: "They will be signed out and unable to sign in. Their records and everything they did stay in the history.",
+          text: "They will be signed out and unable to sign in. Everything they did stays in the history. What they alone answer for passes to the steward of its unit, who is told, until you name who takes it for good.",
           confirmLabel: "Disable", danger: true,
           run: async () => {
             try {
               await patch(`/api/v1/accounts/${account.id}`, { status: "disabled" });
-              toast(`${account.display_name} was disabled.`);
+              const held = (await get(`/api/v1/accounts/${account.id}/holdings`, null, { fresh: true })).data.items.length;
+              toast(held ? `${account.display_name} was disabled. What they alone answered for went to the stewards of its units.` : `${account.display_name} was disabled.`,
+                held ? { action: { label: "Pass it on", run: () => navigate(`/handover/${account.id}`) } } : {});
               reload();
             } catch (error) {
               toast(error.detail || "That did not work.");
@@ -176,7 +178,11 @@ function editPerson({ account, roles, units, reload }) {
           account.has_password ? null : pill("No password", "warn")),
         name.node, title.node, worksIn.node, editor.node,
         h("div", { class: "stack-sm" }, h("div", { class: "label" }, "Sign-in"),
-          h("div", { class: "row wrap" }, mine ? null : setPassword, mine || account.status === "invited" ? null : toggle),
+          h("div", { class: "row wrap" }, mine ? null : setPassword, mine || account.status === "invited" ? null : toggle,
+            button("What they hold", { onclick: () => {
+              close();
+              navigate(`/handover/${account.id}`);
+            } })),
           mine ? h("p", { class: "subtle" }, "This is you. Change your own password from your account page.") : null)));
       footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
       footer.hidden = false;

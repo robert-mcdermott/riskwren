@@ -24,6 +24,7 @@ from riskwren.db.models import (
     Account,
     Action,
     Control,
+    Handover,
     OrgUnit,
     RecordOwner,
     Risk,
@@ -124,6 +125,12 @@ def dashboard(session: Session, principal: Principal, *, unit: int | None = None
         asked = {"status": "active", **scope, **filters}
         return {"count": count(session, principal, CONTROL, asked), "filters": asked}
 
+    def indicator_count(**filters: Any) -> dict[str, Any]:
+        from riskwren.risk.indicators import INDICATOR
+
+        asked = {"status": "active", **scope, **filters}
+        return {"count": count(session, principal, INDICATOR, asked), "filters": asked}
+
     def actions(**filters: Any) -> dict[str, Any]:
         asked = {"status": "open", **scope, **filters}
         return {
@@ -202,6 +209,11 @@ def dashboard(session: Session, principal: Principal, *, unit: int | None = None
             ],
             "stale": control_count(stale=True),
         },
+        # Early warning: where the indicators stand. Each count opens its list.
+        "indicators": [
+            {"key": state, **indicator_count(state=state)}
+            for state in ("breach", "warn", "ok", "no_reading")
+        ],
         "top_risks": records.cards(session, RISK, top),
         "heat_map": heat_map(session, principal, unit=unit),
     }
@@ -368,6 +380,47 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             f"/evidence/{held.ref}", held.valid_until, ref=held.ref,
         )  # fmt: skip
 
+    # Indicators of theirs whose next reading is due.
+    from riskwren.risk import indicators
+
+    for indicator in indicators.due(session, principal):
+        add(
+            "reading", f"Record a reading of {indicator.name}",
+            f"{indicator.ref} · read {indicator.frequency}",
+            f"/indicators/{indicator.ref}", indicators.next_due(indicator), ref=indicator.ref,
+        )  # fmt: skip
+
+    # What campaigns have asked of them: an attestation, a look at a risk, a check of a unit.
+    from riskwren.oversight import campaigns
+
+    for item, campaign in campaigns.waiting_on(session, principal):
+        about = f"{item.subject_ref or ''} {item.subject_name}".strip()
+        verb = {
+            "attestation": "Attest", "self_assessment": "Look again at",
+            "completeness": "Check the records of", "profile": "Describe the security of",
+            "evidence": "Provide evidence for",
+        }[campaign.kind]  # fmt: skip
+        add(
+            "campaign", f"{verb} {about}", f"{campaign.ref} · {campaign.name}",
+            f"/campaign-items/{item.id}", campaign.due_on, ref=campaign.ref,
+        )  # fmt: skip
+
+    # An analysis the person leads that still has questions without an answer.
+    from riskwren.risk.analysis import ANALYSIS
+
+    led, _ = records.search(
+        session, principal, ANALYSIS, {"mine": True, "status": "open"}, limit=20
+    )
+    for found, card in zip(led, records.cards(session, ANALYSIS, led), strict=True):
+        if card["pending"]:
+            left = card["pending"]
+            add(
+                "analysis", f"Carry on with {found.name}",
+                f"{left} of {card['items']} questions have no answer yet."
+                if left != 1 else f"1 of {card['items']} questions has no answer yet.",
+                f"/risk-analyses/{found.ref}", None, ref=found.ref,
+            )  # fmt: skip
+
     # Tests a person has been asked to do, and results that wait for their review.
     from riskwren.compliance import assessments
 
@@ -448,6 +501,21 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                     f"{record.ref} has nobody answering for it.",
                     f"/{record_type.path}/{record.ref}", None, ref=record.ref,
                 )  # fmt: skip
+
+    # Whoever is standing in for someone who has left is asked to name who takes it for good.
+    standing_in = session.execute(
+        select(Handover.from_account_id, func.count())
+        .where(Handover.held_by == principal.account_id)
+        .group_by(Handover.from_account_id)
+    ).all()
+    for account_id, number in standing_in:
+        gone = session.get(Account, account_id)
+        things = "1 thing" if number == 1 else f"{number} things"
+        add(
+            "handover", f"Name who takes what {gone.display_name if gone else 'someone'} held",
+            f"You answer for {things} of theirs until someone is named.",
+            f"/handover/{account_id}", None,
+        )  # fmt: skip
 
     items.sort(key=lambda item: (not item["overdue"], item["due_on"] or date.max, item["title"]))
     summary = None

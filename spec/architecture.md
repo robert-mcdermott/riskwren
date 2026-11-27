@@ -52,7 +52,7 @@ The one rule that matters most: **only services write.** The API, the command li
 
 - **Program settings** (`riskwren.program`). Everything the program team configures: vocabularies, the taxonomy and appetite, the scoring method, cadences, the authority table, and branding. Stored in the database, versioned, edited in the app, and exported or imported as a program pack. A built-in default pack is loaded by `riskwren init`.
 - **Scoring** (`riskwren.core.scoring`). Pure functions over a scoring method: the rating for a likelihood and an impact, a control's strength, and the suggested residual rating with its working. Data in, data out, no database. The same method document is sent to the browser, where a JavaScript twin shows a rating as the assessor chooses levels; a shared set of test cases keeps the two in agreement.
-- **Condition evaluator** (`riskwren.core.conditions`, wave 2). One small interpreter for the declarative conditions used by applicability rules, questionnaires, and tiering. Data in, boolean out; no expression strings and no evaluation of code.
+- **Condition evaluator** (`riskwren.core.conditions`, wave 3). One small interpreter for the declarative conditions used by applicability rules, questionnaires, and tiering. Data in, boolean out; no expression strings and no evaluation of code.
 - **Inventory** (`riskwren.inventory`). Processes, systems, third parties, and later information assets and sites; owners, links, and tags.
 - **Risk** (`riskwren.risk`). The register, categories, assessments, standing, review dates, roll-up, and the risk library.
 - **Controls** (`riskwren.controls`). The control library, ratings, and the links from controls to risks.

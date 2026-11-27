@@ -258,8 +258,12 @@ def create(
     principal: Principal,
     record_type: RecordType,
     values: Mapping[str, Any],
+    *,
+    checked: bool = False,
 ) -> Any:
-    """Add a record. Whoever adds it becomes its owner until they name someone else."""
+    """Add a record. Whoever adds it becomes its owner until they name someone else.
+    ``checked`` says the caller has already decided, by a rule of its own, that this person
+    may add it here."""
     now = utc_now()
     record: Any = record_type.model(created_by=principal.account_id, created_at=now, updated_at=now)
     record.tags, record.restricted, record.version = [], False, 1
@@ -272,7 +276,7 @@ def create(
     if errors:
         raise Invalid(f"The {record_type.label} was not saved.", errors)
     may_add = record_type.extra.get("can_add")
-    allowed = (
+    allowed = checked or (
         may_add(principal, record.org_unit_id)
         if may_add is not None
         else access.can_add(principal, record.org_unit_id)
@@ -471,9 +475,9 @@ def conditions_for(
     seen = access.visible(session, principal, record_type)
     if seen is not None:
         conditions.append(seen)
-    query = text(filters.get("q"))
-    if query:
-        like = f"%{query.lower()}%"
+    # Every word asked for must be somewhere on the record, in any order.
+    for word in (text(filters.get("q")) or "").lower().split()[:8]:
+        like = f"%{word}%"
         elsewhere = exists(
             select(ExternalRef.id).where(
                 ExternalRef.record_type == record_type.key,
@@ -489,6 +493,11 @@ def conditions_for(
                 elsewhere,  # what it is called in another system
             )
         )
+    lacking = text(filters.get("missing"))
+    if lacking:
+        from riskwren.inventory import completeness
+
+        conditions.append(completeness.condition(session, record_type, lacking))
     if filters.get("unit"):
         conditions.append(
             model.org_unit_id.in_(units.with_descendants(session, [int(filters["unit"])]))
@@ -600,6 +609,11 @@ def cards(session: Session, record_type: RecordType, rows: list[Any]) -> list[di
     if more is not None:
         for item, extra in zip(out, more(session, rows), strict=True):
             item.update(extra)
+    from riskwren.inventory import completeness
+
+    lacking = completeness.missing_for(session, record_type, [row.id for row in rows])
+    for item, row in zip(out, rows, strict=True):
+        item["missing"] = lacking.get(row.id, [])
     return out
 
 

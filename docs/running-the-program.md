@@ -73,15 +73,72 @@ One consequence is worth knowing. Under the default setting a steward cannot lin
 
 ## Shape the program
 
-**Admin → Program** shows how risks are rated here, in full: the categories and their appetite, the matrix, what follows from each rating, and the written definition of every level. Anyone assessing a risk sees the same definitions as they choose.
+**Admin → Program** is where the program is kept, by those who run it: managers for the whole organization, and administrators. It has five parts.
+
+| Part | What is there |
+|---|---|
+| Categories and appetite | The kinds of risk, in a tree two deep, and how much of each the organization will live with |
+| Scales and matrix | What each level of likelihood and impact means, the ratings, and the matrix that combines them |
+| Cadences | How often risks are reviewed and key controls tested, how long a rating stands, how long an issue is given, and when reminders go |
+| Vocabularies | The lists records choose from: kinds of system, data classes, root causes, and the rest |
+| Who sees what | How much of the register a person with no role sees |
 
 ![Admin, Program: the categories with their appetite, the matrix, and the written definition of every level](img/program-light.webp)
 
+### See what a change would do before you make it
+
+Three things can move a risk without anyone touching it: the **matrix** gives it its rating, **appetite** its standing, and the **cadences** its next review. A change to any of them is not made as you type. The page holds it as a draft, says so in a bar at the top, and **Preview and publish** shows every open risk that would change, with what would change about it:
+
+- its inherent, residual, or target **rating**;
+- its **standing**: a risk within appetite may now need a decision, or the other way about;
+- when it is **next reviewed**.
+
+Nothing has changed at that point. **Publish** makes the change, and changes exactly the risks listed. **Cancel** leaves everything as it was, draft included; **Discard** drops the draft.
+
+![Before publishing a change to appetite: each open risk whose standing would change, and what it would become](img/program-preview-light.webp)
+
+What is published is recorded in the history, and each risk that moved says so in its own history, with the line that changed.
+
+### Categories
+
+**Add a category** at the top of the tree or beneath a category that is there. A category at the top needs an appetite of its own. **Edit** renames one, describes it, or retires it: a retired category is not offered to new risks, and risks already in it keep it. The arrows put categories in the order people will choose from.
+
 ### Appetite
 
-Appetite is the highest residual rating the organization will live with for a kind of risk without a plan or an acceptance. It is set for each of the nine top categories and can be set differently for any category beneath; one that sets none takes its parent's.
+Appetite is the highest residual rating the organization will live with for a kind of risk without a plan or an acceptance. It is set for each top category and can be set differently for any category beneath; one that sets none takes its parent's.
 
-As shipped, clinical, regulatory, and financial risk have a low appetite, strategic risk a high one, and the rest moderate. Change any of them on the Program page. The page says at once how many risks changed standing, and the change is recorded in the history.
+As shipped, clinical, regulatory, and financial risk have a low appetite, strategic risk a high one, and the rest moderate. Changing one is previewed first, because it changes which risks need a decision.
+
+### Scales and matrix
+
+Every word in the method can be changed: the name and meaning of each level of likelihood, the name of each level of impact, what each impact level means on each dimension, and the name and meaning of each rating. Each cell of the matrix is a choice of rating.
+
+- **A rating may not fall as likelihood or impact rises.** A matrix that breaks this is refused, with the reason.
+- **Publishing makes a new version.** Every open risk is read again from the matrix now in force, so the register always speaks one language. Each judgment already made keeps the rating it was given and the version it was made under: the assessments of a risk show what was decided at the time, and its history shows when the program moved it.
+- **The shape stays.** The number of levels and the set of ratings are changed with a program pack, because appetite, acceptances, the review cadence, and people's limits all name the ratings. So is how much a control may reduce a rating.
+
+### Cadences
+
+| Cadence | As shipped |
+|---|---|
+| How often a risk is reviewed, by residual rating | Critical 3 months, high 6, moderate 12, low 24 |
+| How soon a risk not yet rated is due | 3 months |
+| How long a control's rating, a test result, and evidence hold | 12 months |
+| How often a key control is tested | 6 months |
+| The longest an exception may run | 12 months |
+| How long an issue is given, by severity | Critical 30 days, high 90, moderate 180, low 365 |
+| Reminders | 14 days before; the steward 7 days late; the leader 21 days late |
+
+A higher rating is never reviewed less often, and a more severe issue is never given longer. Changing how often risks are reviewed moves their review dates, so it is previewed. An issue already raised keeps the date it was given.
+
+### Vocabularies
+
+Choose a list, then rename its values, say what each means, put them in order, add one, or retire one.
+
+- **Records store a value's key, never its name**, so renaming a value rewrites nothing. A new value's key is made from its name and never changes.
+- **A value in use is retired, not removed.** Records that have it keep it; new records cannot choose it.
+- **Some lists can only be renamed.** A severity sets a clock, a kind of link says what it joins, an owner kind decides who may edit. Their names, meanings, and order can be changed here; values are added or taken away with a program pack.
+- **A value new records start with cannot be retired**, such as a system's lifecycle "in service".
 
 ### Who may accept what
 
@@ -96,18 +153,6 @@ The table on the Program page shows, for each rating, how often a risk is review
 
 A leader's limit is set with the role. A sensible start: unit leaders at moderate, division leaders at high, and one or two executives at critical.
 
-### Clocks for issues and exceptions
-
-Two more rules are part of the program:
-
-| Rule | As shipped |
-|---|---|
-| How long after it is raised an issue is due, by severity | Critical 30 days, high 90, moderate 180, low 365 |
-| The longest an exception may run | 12 months |
-| How long a control's rating, a test result, and evidence hold | 12 months |
-
-They are in the program pack under `cadences`, as `issue_due_days`, `exception_max_months`, and `control_rating_months`. The meanings of the four severities, the root causes an issue is closed with, what can find an issue, and the other systems a record can be known in (each with an optional address pattern, so that an identifier becomes a link) are vocabularies in the same pack.
-
 ### Change the program with a pack
 
 The scoring method, cadences, the acceptance table, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
@@ -118,9 +163,124 @@ uv run riskwren program import program.json --dry-run   # check an edited one
 uv run riskwren program import program.json             # load it
 ```
 
-An import checks the whole pack first and reports every problem together. A scoring method in which a rating falls as likelihood or impact rises is refused. A changed method becomes a new version: assessments already made keep the version they were made under, so an old rating always means what it meant.
+An import checks the whole pack first and reports every problem together. A scoring method in which a rating falls as likelihood or impact rises is refused. A changed method becomes a new version: assessments already made keep the version they were made under, and every open risk is read again from what was loaded, as it is when a change is published in the app.
+
+A pack is the way to change what the Program page does not: who may accept what, the number of levels and ratings, and how much a control may reduce a rating.
 
 A pack is also how one installation's program is copied to another, and how a program is kept under version control.
+
+## Questionnaires
+
+A questionnaire is a set of questions RiskWren asks people: to attest that a control still operates, to look again at a risk they own, to confirm that a unit's records are complete. **Admin → Questionnaires** lists them. Anyone signed in can read one and try it; those who run the program change them.
+
+A new installation has four, written for RiskWren:
+
+| Questionnaire | Asks |
+|---|---|
+| **Control attestation** | A control's owner: does it still operate as described, is there evidence in date, and are you still the right person to answer for it? |
+| **Risk self-assessment** | A risk's owner: does it still stand, what has changed, and are its rating and plan still right? |
+| **Unit completeness check** | A unit's steward: is everything the unit has on record, with the right owners, and is anything worrying not in the register? |
+| **System security profile** | Whoever runs a system: what it holds, who can reach it, how people sign in, and who patches, backs up, and watches it |
+
+### Questions that appear by condition
+
+A question, or a whole section, can be asked only when an earlier answer makes it relevant. "What is different from the statement?" is asked only of someone who said the control operates partly or not at all. So nobody answers what does not apply to them, and what is asked is short.
+
+- A rule looks only at questions asked before it, so showing and hiding can never run in a circle.
+- An answer to a question that an earlier answer has since hidden is dropped. It cannot go on deciding what else is asked.
+- The form reacts as it is filled in, and the server decides again when the answers are sent. The two use the same rules, held together by one file of test cases.
+
+### Versions
+
+**Edit** changes a questionnaire's sections, questions, their kinds and options, and when each is asked, with the form as it will be asked shown beneath. Saving changed questions **publishes a new version**. Earlier versions are never altered.
+
+- **An answer is read against the version it was given to.** Reword a question or remove one, and what people answered before still reads as it was asked then.
+- A draft begun under one version is finished under that version.
+- A built-in questionnaire you have edited is yours from then on, and a later release leaves it alone. One you have not touched is brought up to date, as a new version.
+- **Versions** lists every one, with who published it and what they said had changed. **Retiring** a questionnaire stops new answers and keeps the old.
+
+The **Try it** tab asks the questions and shows how the answers would be kept, without saving anything.
+
+## Campaigns
+
+A campaign asks a set of people for one thing by a date, and shows who has answered. **Compliance → Campaigns → Start a campaign** (an assessor or a manager, for the units they cover).
+
+| Campaign | Asks | For |
+|---|---|---|
+| **Control attestation** | The owners of controls | Does each control still operate as described, is its evidence in date, and are you still the right owner? |
+| **Risk self-assessment** | The owners of risks | Does each risk still stand, what has changed, and are its rating and plan still right? |
+| **Unit completeness check** | The stewards of units | Is everything the unit has on record, with the right owners? |
+| **System security profile** | The owners of systems | What each system holds, who can reach it, and who patches, backs up, and watches it |
+| **Evidence request** | The owners of controls | A named piece of evidence for each control |
+
+Choose what to ask, give it a name and a date, and say what it is about: everything in a unit and beneath it, or, for controls, only those a compliance scope uses. Before it starts, the form says how many people would be asked about how many things. Each person is told once, with a count, and finds each thing on their **Home**.
+
+- **Everyone is asked the same version** of the questionnaire, the one in use when the campaign started. Changing the questionnaire later does not change a campaign under way.
+- Any owner of a control, risk, or system may answer for it, not only the one who was asked. An answer can be saved and finished later.
+- **Something with nobody to ask is still listed**, and shown as such, so that a control whose only owner has left does not pass unnoticed. Name an owner, or **excuse** it with a reason.
+- **An evidence request closes by itself** when evidence collected since the request is attached to the control.
+
+### Following one
+
+A campaign's page shows how far it has got, what those who answered said, **coverage by unit** with the least covered first, and every item with who was asked. Each figure is the count of the list beneath it.
+
+![An attestation campaign: how many have answered, what they said, and coverage by unit](img/campaign-light.webp)
+
+- **Remind** tells everyone who still owes something, once, with how many. The scheduled [reminders](#reminders) do the same as the date approaches, and tell a unit's steward and then its leader about what stays unanswered.
+- **Close** ends a campaign and keeps what was answered. **Cancel it** is for one started in error.
+
+### What an answer sets in motion
+
+Answers are kept as given, and some need someone else to act. Those people are told.
+
+| Answer | Who is told |
+|---|---|
+| A control only partly operates, or does not | The unit's assessors, managers, and stewards |
+| Someone else should own this control | The unit's stewards |
+| A risk no longer stands, or its rating is no longer right | The unit's stewards, assessors, and managers |
+| A unit's records need attention | The assessors and managers who cover it |
+
+An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
+
+## When someone leaves
+
+Disable the account under **Admin → People**, or with [`riskwren users disable`](cli.md#riskwren-users-disable). The person is signed out and cannot sign in. Everything they did stays in the history under their name.
+
+Nothing they answered for is left without an owner:
+
+- **What they alone owned** passes at once to the steward of its unit; where the unit and the units above it have no steward, to its leader; failing that to someone who runs the program; and failing that to the administrator who disabled the account. This covers records of every kind, open actions, treatment plans, and what open campaigns were waiting on them for.
+- **Whoever it passes to is told**, with a count, and has **Name who takes what they held** on Home until it is done.
+- **What they shared with someone else** is left as it is: the other owner still answers for it.
+
+The stand-in is a holding place, not a decision. **Reports → Tidy → From people who have left** lists each person with things still to pass on, and their page lists every one with who has it now. Choose who takes it and **Pass on**: everything ticked changes hands in one step, the new owner is told, and the stand-in is released. A stand-in who should keep something passes it to themselves.
+
+![What a person who has left held: each thing, who is standing in, and the box to pass it on](img/handover-light.webp)
+
+An administrator can pass on anything. A steward or a manager can pass on what belongs to their own units. The same page works for someone who has not left: **Admin → People**, the person, **What they hold**. Use it to move what a person holds when they change jobs.
+
+Letting a person sign in again does not give anything back. Accounts disabled before version 0.3.0 were not covered this way: what they alone owned shows on Home as needing an owner, and under **Tidy** as missing an owner who can sign in.
+
+## Reminders
+
+Everything with a date reminds whoever it is waiting on: actions, risk reviews, issues, evidence, acceptances, exceptions, the next test of each control, what a campaign has asked, and the next reading of each indicator.
+
+| When | Who is told |
+|---|---|
+| 14 days before the date | Whoever it is waiting on |
+| The day after the date | The same people, as overdue. An overdue test also goes to the assessors, because an owner cannot test their own control |
+| Still late after 7 days | The steward of the unit |
+| Still late after 21 days | The unit's leader |
+
+- Each of these is said **once** for a given date. Moving the date starts again.
+- Actions, issues, and what a campaign has asked go up to the steward and the leader. An indicator's reading is reminded only as it falls due, not two weeks ahead. The rest are for their owners: nobody else can renew a person's evidence or review their risk for them.
+- Something found already long overdue, as on the first day after an upgrade, is told once to whoever it has reached, and not to everyone below as well.
+- A reminder is a notice. It is read under the bell, and sent by email where [email is set up](configuration.md#email).
+
+The three periods are part of the program's cadences, with the others. **Admin → Scheduled work** shows them as they are set.
+
+### Key controls and the next test
+
+What is known about a control holds for twelve months. A control marked **key** is due to be tested again after six. Each control's page shows the date its next test is due, and its owners are reminded as it approaches. Marking a control key does not change what its last rating counts for; it brings the next test forward.
 
 ## Read the dashboards
 
@@ -141,7 +301,7 @@ Below them are the residual matrix, the highest risks, the register by standing,
 
 On both, every figure is the count of a list, and opens that list with the same filters. A dashboard has no numbers of its own, so a figure and the records behind it cannot disagree.
 
-Until scheduled jobs arrive in a later release, the calendar is caught up when the register is read: the first person to open it after an acceptance expires or a plan runs late causes the standing to be updated, and the history records that as done by the system.
+The calendar is caught up every hour by [scheduled work](configuration.md#scheduled-work): when an acceptance expires or a plan runs late, the risk's standing is updated, and the history records that as done by the system. Reading the register catches it up as well, so a figure is never behind the date even where the scheduler is turned off.
 
 ## The history
 

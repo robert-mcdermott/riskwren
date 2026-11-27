@@ -1,0 +1,2151 @@
+[
+ {
+  "name": "no condition is true",
+  "condition": null,
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "an empty condition is true",
+  "condition": {},
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq matches",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "eq",
+   "value": "restricted"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq does not match",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "eq",
+   "value": "public"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "eq on a missing field is false",
+  "condition": {
+   "field": "answers.missing",
+   "op": "eq",
+   "value": "x"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "eq on a blank answer is false",
+  "condition": {
+   "field": "answers.blank",
+   "op": "eq",
+   "value": ""
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "eq on a number",
+  "condition": {
+   "field": "answers.count",
+   "op": "eq",
+   "value": 3
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq on zero is true: zero is an answer",
+  "condition": {
+   "field": "answers.zero",
+   "op": "eq",
+   "value": 0
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq true",
+  "condition": {
+   "field": "answers.flag",
+   "op": "eq",
+   "value": true
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq false matches a false answer",
+  "condition": {
+   "field": "answers.off",
+   "op": "eq",
+   "value": false
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq compares lists by content",
+  "condition": {
+   "field": "answers.categories",
+   "op": "eq",
+   "value": [
+    "health",
+    "personal"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "eq of lists minds the order",
+  "condition": {
+   "field": "answers.categories",
+   "op": "eq",
+   "value": [
+    "personal",
+    "health"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "ne matches a different value",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "ne",
+   "value": "public"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "ne is false for the same value",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "ne",
+   "value": "restricted"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "ne is true of a missing field",
+  "condition": {
+   "field": "answers.missing",
+   "op": "ne",
+   "value": "x"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "in",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "in",
+   "value": [
+    "protected",
+    "restricted"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "in, not among them",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "in",
+   "value": [
+    "public",
+    "internal"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "in on a missing field",
+  "condition": {
+   "field": "answers.missing",
+   "op": "in",
+   "value": [
+    "x"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "not_in",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "not_in",
+   "value": [
+    "public"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "not_in when it is among them",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "not_in",
+   "value": [
+    "restricted"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "not_in is true of a missing field",
+  "condition": {
+   "field": "answers.missing",
+   "op": "not_in",
+   "value": [
+    "x"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "contains",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains",
+   "value": "health"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "contains, absent",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains",
+   "value": "genetic"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "contains on a single value treats it as a list of one",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "contains",
+   "value": "restricted"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "contains on an empty list",
+  "condition": {
+   "field": "answers.empty_list",
+   "op": "contains",
+   "value": "x"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "contains_any",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains_any",
+   "value": [
+    "genetic",
+    "personal"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "contains_any, none present",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains_any",
+   "value": [
+    "genetic",
+    "student"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "contains_any of nothing is false",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains_any",
+   "value": []
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "contains_all",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains_all",
+   "value": [
+    "health",
+    "personal"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "contains_all, one missing",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains_all",
+   "value": [
+    "health",
+    "genetic"
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "contains_all of nothing is false",
+  "condition": {
+   "field": "answers.categories",
+   "op": "contains_all",
+   "value": []
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "gt",
+  "condition": {
+   "field": "answers.count",
+   "op": "gt",
+   "value": 2
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "gt, equal is not greater",
+  "condition": {
+   "field": "answers.count",
+   "op": "gt",
+   "value": 3
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "gte, equal",
+  "condition": {
+   "field": "answers.count",
+   "op": "gte",
+   "value": 3
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "lt",
+  "condition": {
+   "field": "answers.ratio",
+   "op": "lt",
+   "value": 1
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "lte",
+  "condition": {
+   "field": "tier",
+   "op": "lte",
+   "value": 3
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "numbers are not compared with text",
+  "condition": {
+   "field": "answers.text",
+   "op": "gt",
+   "value": 1
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "true is not a number to compare",
+  "condition": {
+   "field": "answers.flag",
+   "op": "gte",
+   "value": 1
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "gte on a missing field",
+  "condition": {
+   "field": "answers.missing",
+   "op": "gte",
+   "value": 0
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "gte on zero",
+  "condition": {
+   "field": "answers.zero",
+   "op": "gte",
+   "value": 0
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "answered",
+  "condition": {
+   "field": "answers.data_class",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "answered: false is an answer",
+  "condition": {
+   "field": "answers.off",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "answered: zero is an answer",
+  "condition": {
+   "field": "answers.zero",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "answered: blank is not",
+  "condition": {
+   "field": "answers.blank",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "answered: an empty list is not",
+  "condition": {
+   "field": "answers.empty_list",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "answered: none is not",
+  "condition": {
+   "field": "answers.none",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "empty: missing",
+  "condition": {
+   "field": "answers.missing",
+   "op": "empty"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "empty: an empty list",
+  "condition": {
+   "field": "answers.empty_list",
+   "op": "empty"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "empty: a value is not",
+  "condition": {
+   "field": "answers.count",
+   "op": "empty"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "a path through nested objects",
+  "condition": {
+   "field": "answers.nested.deep.value",
+   "op": "eq",
+   "value": "x"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "a path that runs into a value",
+  "condition": {
+   "field": "answers.text.length",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "a path that runs into a list",
+  "condition": {
+   "field": "answers.categories.0",
+   "op": "answered"
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "a top-level field",
+  "condition": {
+   "field": "tier",
+   "op": "eq",
+   "value": 3
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "all, every part true",
+  "condition": {
+   "all": [
+    {
+     "field": "tier",
+     "op": "gte",
+     "value": 3
+    },
+    {
+     "field": "answers.categories",
+     "op": "contains",
+     "value": "health"
+    }
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "all, one part false",
+  "condition": {
+   "all": [
+    {
+     "field": "tier",
+     "op": "gte",
+     "value": 3
+    },
+    {
+     "field": "answers.data_class",
+     "op": "eq",
+     "value": "public"
+    }
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "all of nothing is true",
+  "condition": {
+   "all": []
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "any, one part true",
+  "condition": {
+   "any": [
+    {
+     "field": "tier",
+     "op": "eq",
+     "value": 1
+    },
+    {
+     "field": "answers.data_class",
+     "op": "eq",
+     "value": "restricted"
+    }
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "any, no part true",
+  "condition": {
+   "any": [
+    {
+     "field": "tier",
+     "op": "eq",
+     "value": 1
+    },
+    {
+     "field": "answers.data_class",
+     "op": "eq",
+     "value": "public"
+    }
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "any of nothing is false",
+  "condition": {
+   "any": []
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "not",
+  "condition": {
+   "not": {
+    "field": "answers.data_class",
+    "op": "eq",
+    "value": "public"
+   }
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "not of a true condition",
+  "condition": {
+   "not": {
+    "field": "tier",
+    "op": "eq",
+    "value": 3
+   }
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": false
+ },
+ {
+  "name": "nested groups",
+  "condition": {
+   "all": [
+    {
+     "any": [
+      {
+       "field": "tier",
+       "op": "eq",
+       "value": 1
+      },
+      {
+       "field": "tier",
+       "op": "eq",
+       "value": 3
+      }
+     ]
+    },
+    {
+     "not": {
+      "any": [
+       {
+        "field": "answers.missing",
+        "op": "answered"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "context": {
+   "answers": {
+    "data_class": "restricted",
+    "categories": [
+     "health",
+     "personal"
+    ],
+    "count": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "off": false,
+    "blank": "",
+    "none": null,
+    "empty_list": [],
+    "zero": 0,
+    "nested": {
+     "deep": {
+      "value": "x"
+     }
+    },
+    "text": "hello"
+   },
+   "tier": 3
+  },
+  "expect": true
+ },
+ {
+  "name": "an empty context",
+  "condition": {
+   "all": [
+    {
+     "field": "answers.x",
+     "op": "empty"
+    },
+    {
+     "not": {
+      "field": "answers.x",
+      "op": "eq",
+      "value": 1
+     }
+    }
+   ]
+  },
+  "context": {},
+  "expect": true
+ },
+ {
+  "name": "answers that are not an object",
+  "condition": {
+   "field": "answers.x",
+   "op": "answered"
+  },
+  "context": {
+   "answers": "text"
+  },
+  "expect": false
+ }
+]

@@ -128,6 +128,29 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET /meta` | Product name, version, branding, and palettes (public) |
 | `GET` · `POST` · `DELETE /session` | Who is signed in; sign in; sign out |
 | `POST /session/password` | Change your own password |
+| `GET /sso/start` · `GET /sso/callback` | The single sign-on round trip, for a browser (public; 404 unless it is set up) |
+| `GET` · `PUT /session/preferences` | How you want notices by email, where email is set up |
+| `GET` · `POST /questionnaires` · `GET` · `PATCH /questionnaires/{key}` | Questionnaires and their versions; a changed document is published as a new version (changing them is for those who run the program) |
+| `GET` · `POST /campaigns` · `POST /campaigns/preview` | Campaigns you run or may read; start one; count who one would ask |
+| `GET /campaigns/{ref}` · `POST /campaigns/{ref}/remind` · `/close` · `/cancel` | One campaign with its coverage by unit and items; remind those who have not answered; end it |
+| `GET /campaign-items/{id}` · `POST /campaign-items/{id}/answer` · `/excuse` | What one person is asked; answer it, as a draft or in full; take it out of the campaign |
+| `GET` · `POST /indicators` · `GET` · `PATCH /indicators/{ref}` · `PUT /indicators/{ref}/owners` · `GET /indicators/{ref}/history` | Indicators with where each stands; one with its readings, trend, and the risks it warns of |
+| `POST /program/preview` · `POST /program/publish` | Which open risks a change to the scoring method, appetite, or cadences would move; make the change (those who run the program) |
+| `POST /risk-categories` · `PATCH /risk-categories/{key}` | Add a risk category; rename, describe, retire, or move one |
+| `GET /admin/vocabularies` · `PUT /vocabularies/{name}` | Every vocabulary with what may be changed in it; rename, reorder, add to, or retire its values |
+| `GET` · `POST /risk-analyses` · `POST /risk-analyses/preview` · `GET` · `PATCH /risk-analyses/{ref}` | Risk analyses; start one over a scope or a unit; how many questions one would have; one with its progress and everything it considered |
+| `GET /risk-analyses/{ref}/assets/{subject}` · `POST /risk-analyses/{ref}/items/{id}` · `POST …/assets/{subject}/rest` | One thing with each threat and the risks that might answer it; answer one question; say none of the others apply |
+| `POST /risk-analyses/{ref}/close` · `/reopen` | Close an analysis with what it found; reopen it |
+| `GET /search` | Every kind of record, and actions, by words; only what you may open |
+| `GET` · `POST /views` · `PATCH` · `DELETE /views/{id}` | Saved views of a list: yours and the shared ones |
+| `GET /tidy` · `GET /similar` · `POST /tidy/not-duplicates` | What records are missing, likely duplicates, and what people who have left still hold; what a new name might already be; say two records are different things |
+| `GET /accounts/{id}/holdings` · `POST /accounts/{id}/handover` | What a person answers for, with who is standing in; pass it on |
+| `POST /indicators/{ref}/readings` · `PUT /indicators/{ref}/risks` · `GET /risks/{ref}/indicators` | Record what an indicator stood at on a day; say which risks it warns of; the indicators that warn of a risk |
+| `POST /questionnaires/check` | Check a document without saving it, and see which questions given answers would show |
+| `POST /questionnaires/{key}/responses` · `GET /responses/{id}` | Answer a questionnaire, as a draft or in full; read answers as they were asked |
+| `GET /jobs` · `POST /jobs/{key}/run` · `PUT /jobs/{key}` | Scheduled work: how it is going, run one job now, pause or resume one (administrators) |
+| `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
+| `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 
 ### People and units
 

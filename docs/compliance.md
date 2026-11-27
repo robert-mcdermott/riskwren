@@ -95,6 +95,7 @@ A requirement is as ready as the weakest control that answers it. Each control i
 Three things follow, and they are the point of the design:
 
 - **Saying a control is in place takes a requirement to in place, never to verified.** That takes a test by someone who does not own the control, confirmed by a second person. See [Evidence and testing](evidence-and-testing.md).
+- **An owner's attestation does not count as a test.** It never makes a requirement verified, and it can take one out of verified. See [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
 - **Readiness decays by itself.** When evidence passes its date, or a test becomes older than a rating may be, a verified requirement drops back to in place without anyone touching it.
 - **A failure shows everywhere at once.** When a provider's control fails a test, every scope that inherits it shows the requirements it answers as failing the same day.
 

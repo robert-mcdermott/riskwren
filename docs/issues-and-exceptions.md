@@ -46,7 +46,7 @@ Each severity has a written meaning, shown as you choose, and the issue is due a
 | Moderate | 180 days |
 | Low | 365 days |
 
-The table is part of the program and can be changed (see [Running the program](running-the-program.md#clocks-for-issues-and-exceptions)). Changing an issue's severity applies the rule again, counted from the day it was raised.
+The table is part of the program and can be changed (see [Running the program](running-the-program.md#cadences)). Changing an issue's severity applies the rule again, counted from the day it was raised.
 
 **Move the date** changes it by hand. That needs a reason, and where the date started and every move stay on the record, with a count beside the date wherever the issue is listed.
 

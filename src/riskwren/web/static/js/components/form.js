@@ -82,3 +82,8 @@ export async function submit({ button, fields = {}, banner = null, run }) {
 export function banner() {
   return h("div", { class: "alert alert-danger", role: "alert", hidden: true });
 }
+
+/** A titled group of fields in a long form. */
+export function section(title, ...children) {
+  return h("div", { class: "form-section stack" }, h("h3", {}, title), children);
+}

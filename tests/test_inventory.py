@@ -334,14 +334,17 @@ def test_owners(db: Database, people: People, stock: Stock) -> None:
         assert [row.ref for row in mine] == [stock.monitor]
         theirs, _ = records.search(session, steward, SYSTEM, {"owner": member})
         assert [row.ref for row in theirs] == [stock.monitor]
-    # When the owner's account is disabled, the record has nobody answering for it.
+    # When the owner's account is disabled, the record passes to the steward of its unit,
+    # so it is never left with nobody answering for it (tests/test_tidy.py has the rest).
     with db.write(ME.actor) as session:
         accounts.update(session, ME, accounts.get(session, member), {"status": "disabled"})
     with db.read() as session:
         record = find(session, SYSTEM, stock.monitor)
-        assert records.detail(session, steward, SYSTEM, record)["orphaned"]
-        rows, _ = records.search(session, steward, SYSTEM, {"q": "freezer"})
-        assert records.cards(session, SYSTEM, rows)[0]["orphaned"]
+        shown = records.detail(session, steward, SYSTEM, record)
+        assert not shown["orphaned"]
+        assert (people.accounts["steward"], "owner") in [
+            (o["account_id"], o["kind"]) for o in shown["owners"]
+        ]
 
 
 # --- Links --------------------------------------------------------------------------------

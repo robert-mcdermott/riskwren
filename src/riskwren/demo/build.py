@@ -26,6 +26,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from riskwren import reminders
 from riskwren.access.principal import Grant, Principal
 from riskwren.compliance import (
     assessments,
@@ -46,22 +47,29 @@ from riskwren.db.engine import Database
 from riskwren.db.models import (
     Acceptance,
     Action,
+    Campaign,
+    CampaignItem,
     Control,
     ControlTest,
     Evidence,
     EvidenceLink,
     ExceptionRequest,
+    Indicator,
     Issue,
     Risk,
+    RiskAnalysis,
+    RiskAnalysisItem,
     Scope,
     TreatmentPlan,
 )
 from riskwren.demo import content as c
-from riskwren.inventory import access, links, records
+from riskwren.inventory import access, links, records, views
 from riskwren.inventory.registry import INFORMATION, PROCESS, SYSTEM, THIRD_PARTY, RecordType
-from riskwren.people import accounts, units
+from riskwren.oversight import campaigns
+from riskwren.people import accounts, handover, units
 from riskwren.program import branding, packs, settings
-from riskwren.risk import categories, register
+from riskwren.risk import analysis, categories, indicators, register
+from riskwren.risk.indicators import INDICATOR
 from riskwren.risk.register import RISK
 from riskwren.treatment import service as treatment
 
@@ -1804,6 +1812,167 @@ class Builder:
         sample, note = c.TESTS["effective"][0]
         self._result(test_id, testers[test_id], ("effective", "effective", sample, note))
 
+    # --- Indicators -----------------------------------------------------------------------
+
+    def _story_indicators(self) -> Script:
+        """Numbers the institute already watches, read month by month. One has crossed its
+        limit this month, some are past their warning level, one is getting better, one has
+        not been read for two quarters, and one has never been read."""
+        days = {"monthly": 30.4, "quarterly": 91.3}
+        # Everything that happens, in the order it happens: each indicator is set up, then
+        # read once a period up to now.
+        steps: list[tuple[float, int, float | None]] = []
+        for index, spec in enumerate(c.INDICATORS):
+            values = spec[9] or []
+            # The freezer alarms have not been counted for two quarters: the last is long past.
+            late = 200 if spec[1] == "BIO" else 4
+            period = days[spec[6]]
+            steps.append((late + period * len(values) + 26 - index if values else 20, index, None))
+            steps += [
+                (late + period * (len(values) - 1 - at), index, value)
+                for at, value in enumerate(values)
+            ]
+        made: dict[int, tuple[int, int]] = {}
+        for ago, index, value in sorted(steps, key=lambda step: (-step[0], step[1])):
+            yield self._on(ago, hour=9)
+            if value is not None:
+                row_id, keeper = made[index]
+                with self.act(keeper) as (session, who):
+                    indicators.record_reading(
+                        session, who, session.get(Indicator, row_id), value=value
+                    )
+                self.tally("indicator readings")
+                continue
+            name, unit, measure, direction, warn, limit, frequency, source, warns_of, _ = (
+                c.INDICATORS[index]
+            )
+            keeper = self.steward(self.units[unit])
+            with self.act(keeper) as (session, who):
+                row = records.create(
+                    session, who, INDICATOR,
+                    {"name": name, "org_unit_id": self.units[unit], "measure": measure,
+                     "direction": direction, "warn_at": warn, "breach_at": limit,
+                     "frequency": frequency, "source": source},
+                )  # fmt: skip
+                risks = list(
+                    session.scalars(
+                        select(Risk.ref)
+                        .where(Risk.library_key.in_(warns_of), Risk.status == "open")
+                        .order_by(Risk.id)
+                        .limit(3)
+                    )
+                )
+                indicators.set_risks(session, self.principal(self.manager()), row, risks)
+                self.tally("indicators")
+                made[index] = (row.id, keeper)
+
+    # --- Campaigns ------------------------------------------------------------------------
+
+    def _on(self, days: float, hour: int = 11) -> datetime:
+        """A working moment that many days before the build, chosen without the dice, so that
+        what is added here leaves every other story as it was."""
+        moment = (self.end - timedelta(days=days)).replace(hour=hour, minute=20)
+        while moment.weekday() >= 5:
+            moment -= timedelta(days=1)
+        return moment
+
+    def _answer(self, campaign_id: int, item_id: int, answers: dict[str, Any]) -> None:
+        with self.db.read() as session:
+            asked = session.get(CampaignItem, item_id).account_id
+        if asked is None or asked in self.departed:
+            return
+        with self.act(asked) as (session, who):
+            campaigns.answer(
+                session, who, session.get(CampaignItem, item_id),
+                session.get(Campaign, campaign_id), answers,
+            )  # fmt: skip
+        self.tally("campaign answers")
+
+    def _story_campaigns(self) -> Script:
+        """Owners asked to look again and to attest. One campaign is closed, one is most of the
+        way through with two owners saying their control is not as described, one has only
+        just asked for evidence."""
+        lead, security = self.cast["risk2"], self.cast["assess1"]
+        spec = c.CAMPAIGNS
+        yield self._on(128)
+        with self.act(lead) as (session, who):
+            made = campaigns.launch(
+                session, who,
+                {"kind": "self_assessment", "name": f"{spec['risks']['name']} {self.end.year}",
+                 "summary": spec["risks"]["summary"], "org_unit_id": self.units["CORES"],
+                 "due_on": self.day(-100).isoformat()},
+            )  # fmt: skip
+            risks_id = made.id
+            asked = [item.id for item in session.scalars(
+                select(CampaignItem).where(CampaignItem.campaign_id == made.id)
+                .order_by(CampaignItem.id)
+            )]  # fmt: skip
+        self.tally("campaigns")
+        stands = {"relevant": True, "changed": ["nothing"], "controls_working": "yes",
+                  "rating_right": True, "plan": "none"}  # fmt: skip
+        for index, item_id in enumerate(asked):
+            if index % 9 == 8:
+                continue  # one in nine never answered
+            if index % 4 == 0:
+                yield self._on(126 - index % 20)
+            said = dict(stands)
+            if index % 7 == 3:
+                said.update(changed=["controls"], what_changed="A control was replaced this year.",
+                            controls_working="partly")  # fmt: skip
+            if index % 11 == 5:
+                said.update(rating_right=False,
+                            rating_note="Lower. The backlog that drove it has been cleared.")  # fmt: skip
+            self._answer(risks_id, item_id, said)
+        yield self._on(96)
+        with self.act(lead) as (session, who):
+            campaigns.end(session, who, session.get(Campaign, risks_id))
+
+        yield self._on(21)
+        with self.db.read() as session:
+            scope_ref = self._scope_named(session, c.SCOPE_PROVIDER["name"]).ref
+            clinic_ref = self._scope_named(session, c.SCOPE_CLINIC["name"]).ref
+        with self.act(security) as (session, who):
+            made = campaigns.launch(
+                session, who,
+                {"kind": "attestation", "name": f"{spec['attest']['name']} {self.end.year}",
+                 "summary": spec["attest"]["summary"], "scope": scope_ref,
+                 "due_on": self.day(6).isoformat()},
+            )  # fmt: skip
+            attest_id = made.id
+            asked_of = {
+                item.subject_id: item.id
+                for item in session.scalars(
+                    select(CampaignItem).where(CampaignItem.campaign_id == made.id)
+                )
+            }
+        self.tally("campaigns")
+        keys = {control_id: key for (key, _unit), control_id in self.controls.items()}
+        fine = {"operates": "yes", "statement_right": True, "evidence": "yes", "owner_right": True}
+        answering = sorted(asked_of.items())[: -spec["attest"]["waiting"]]
+        for index, (control_id, item_id) in enumerate(answering):
+            if index % 5 == 0:
+                yield self._on(19 - index // 5 * 2)
+            key = keys.get(control_id)
+            said = dict(fine)
+            if key in spec["attest"]["said"]:
+                operates, difference = spec["attest"]["said"][key]
+                said.update(operates=operates, difference=difference)
+            elif key == spec["attest"]["not_mine"][0]:
+                said.update(owner_right=False, owner_instead=spec["attest"]["not_mine"][1])
+            elif index % 6 == 4:
+                said.update(evidence="out_of_date", evidence_plan="Before the assessment closes.")
+            self._answer(attest_id, item_id, said)
+
+        yield self._on(3)
+        with self.act(security) as (session, who):
+            campaigns.launch(
+                session, who,
+                {"kind": "evidence", "name": spec["evidence"]["name"],
+                 "wanted": spec["evidence"]["wanted"], "scope": clinic_ref,
+                 "due_on": self.day(25).isoformat()},
+            )  # fmt: skip
+        self.tally("campaigns")
+
     # --- Issues and exceptions ------------------------------------------------------------
 
     def _story_issues_later(self) -> Script:
@@ -2084,8 +2253,8 @@ class Builder:
         )  # fmt: skip
 
     def _story_departure(self) -> Script:
-        """A principal investigator leaves; what they owned is orphaned, and one risk is
-        reassigned."""
+        """A principal investigator leaves. What they alone answered for passes to the
+        lab's steward, who keeps one risk for good; the rest still waits for a name."""
         lab = self.labs["CB"][0]
         head, by = self.heads[lab], self.steward(lab)
         yield self.ago(400)
@@ -2106,11 +2275,73 @@ class Builder:
         owned = [r for r in self.unit_risks[lab] if self.risks[r]["owner"] == head]
         for risk in owned[:1]:
             with self.act(by) as (session, who):
-                records.set_owners(
-                    session, who, RISK, session.get(Risk, risk),
-                    [{"account_id": by, "kind": "owner"}],
+                handover.pass_on(
+                    session, who, accounts.get(session, head), accounts.get(session, by),
+                    only=[("risk", risk)],
                 )  # fmt: skip
             self.risks[risk]["owner"] = by
+
+    def _story_analyses(self) -> Script:
+        """Two risk analyses by the assurance team: one of the clinic's systems, finished and
+        reported, and one of the data enclave, part of the way through."""
+        lead = self.cast["assess1"]
+        for spec in c.ANALYSES:
+            yield self._on(spec["began"])
+            with self.act(lead) as (session, who):
+                scope = session.scalars(select(Scope).where(Scope.name == spec["scope"])).one()
+                found = analysis.start(
+                    session, who,
+                    {"name": spec["name"], "summary": spec["summary"], "scope": scope.ref,
+                     "categories": spec["categories"]},
+                )  # fmt: skip
+                made = found.id
+                refs = list(dict.fromkeys(
+                    session.scalars(
+                        select(RiskAnalysisItem.subject_ref)
+                        .where(RiskAnalysisItem.analysis_id == made)
+                        .order_by(RiskAnalysisItem.id)
+                    )
+                ))  # fmt: skip
+            self.tally("risk analyses")
+            walked = refs[: max(1, round(len(refs) * spec["walked"]))]
+            raised = 0
+            for at, ref in enumerate(walked):
+                yield self._on(spec["began"] - 1 - at * spec["pace"], hour=14)
+                with self.act(lead) as (session, who):
+                    found = session.get(RiskAnalysis, made)
+                    page = analysis.asset(session, who, found, ref)
+                    for index, item in enumerate(page["items"]):
+                        row = session.get(RiskAnalysisItem, item["id"])
+                        if item["suggested"]:
+                            again = (at + index) % 5 == 0
+                            values = {"outcome": "covered", "risk": item["suggested"][0]["ref"],
+                                      "look_again": again,
+                                      "note": c.ANALYSIS_NOTES["again" if again else "covered"]}  # fmt: skip
+                        elif (at * 3 + index) % 11 == 4 and raised < spec["raises"]:
+                            values = {"outcome": "raised", "note": c.ANALYSIS_NOTES["raised"]}
+                            raised += 1
+                            self.tally("risks raised by an analysis")
+                        else:
+                            notes = c.ANALYSIS_NOTES["not_applicable"]
+                            values = {"outcome": "not_applicable",
+                                      "note": notes[(at + index) % len(notes)]}  # fmt: skip
+                        analysis.consider(session, who, found, row, values)
+            if spec.get("conclusion"):
+                yield self._on(spec["began"] - 2 - len(walked) * spec["pace"], hour=16)
+                with self.act(lead) as (session, who):
+                    analysis.close(
+                        session, who, session.get(RiskAnalysis, made), spec["conclusion"]
+                    )
+
+    def _story_views(self) -> Script:
+        """Lists people keep coming back to, saved and shared."""
+        yield self.ago(60)
+        for key, name, path, query in c.VIEWS:
+            with self.act(self.cast[key]) as (session, who):
+                views.create(
+                    session, who, {"name": name, "path": path, "query": query, "shared": True}
+                )
+            self.tally("saved views")
 
     # --- Everything -----------------------------------------------------------------------
 
@@ -2159,10 +2390,15 @@ class Builder:
             self._story_unassessed, self._story_worse, self._story_closed,
             self._story_escalated, self._story_departure, self._story_power,
             self._story_agreement, self._story_scopes, self._story_assessment,
-            self._story_issues_later, self._story_exceptions_later,
+            self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
+            self._story_indicators, self._story_views, self._story_analyses,
         ):  # fmt: skip
             self.schedule(story())
         self.run()
+        # The scheduler's turn, as it would take on a real server: whoever something is
+        # waiting on is reminded, and what has stayed late has gone up to a steward or leader.
+        with clock_set_to(lambda: self.end), self.db.bookkeeping() as session:
+            self.tally("reminders", sum(reminders.send(session).values()))
         with clock_set_to(lambda: self.end), self.db.write(ME.actor) as session:
             settings.put(
                 session, SETTING,

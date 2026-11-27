@@ -4,9 +4,157 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## Unreleased
+## 0.3.0 (2026-11-26)
 
-Nothing yet.
+Wave 3, *Keeping watch*: a register that stays true without a central team chasing it.
+People sign in with the identity they already have, the app knows what is due and says so,
+owners are asked on a schedule to confirm what they own, a number that warns of a risk is
+watched, and anything on record can be found, tidied, and passed on. The program itself is
+edited in the app, with a preview of every risk a change would move.
+
+### Upgrading from 0.2.1
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0014 to 0020). Every row is
+kept, and the history still verifies. The upgrade loads the four built-in questionnaires.
+Three things behave differently afterwards:
+
+- **Reminders start.** The server now runs scheduled work, and the first pass tells people
+  about everything already nearly due or late, once each. To hold that back, set
+  `scheduler = false` under `[server]` before starting the server, and run
+  `riskwren jobs run reminders` when you are ready. Nothing is emailed unless email is set
+  up; see [Configuration](docs/configuration.md#email).
+- **Disabling an account passes on what it owned.** Accounts already disabled are not
+  touched: what they alone owned still shows on Home as needing an owner, and under
+  Reports → Tidy.
+- **A risk's rating follows the scoring method in force.** Nothing changes at upgrade. The
+  next time a scoring method is published or a program pack is loaded, every open risk is
+  read again from it.
+
+Sign-in is unchanged: local accounts, until an administrator sets up single sign-on.
+
+### Added
+
+- **Optional single sign-on with OpenID Connect,** beside local accounts. A new installation
+  still signs in with an email address and a password and needs nothing else. Naming an
+  issuer and a client under `[sso]` adds a button for the organization's own sign-in, with
+  the password form folded beneath it. It works with Microsoft Entra ID and any provider that
+  follows the standard: the authorization-code flow with PKCE, and an ID token whose
+  signature, issuer, audience, expiry, and nonce are all checked, with no new dependency.
+- **Roles from the provider.** Under Admin, Single sign-on, an application role or a group at
+  the provider gives a role here, for the whole organization or one unit, with a leader's
+  limit, or membership of a unit. Those roles are set again at every sign-in; roles given by
+  hand are left alone; the last administrator is never removed.
+- **A way in that does not depend on the provider.** An administrator can always sign in with
+  a password. Passwords can be kept for everyone, or for administrators only.
+- **Admin, Single sign-on** shows what is set up, the redirect address to give the provider,
+  and a check that the provider answers. `riskwren doctor` makes the same check.
+- **Scheduled work.** The server brings risks up to date with the calendar, sends reminders,
+  and sends email, by itself. Each job is claimed in the database before it runs, so several
+  workers or servers run it once between them, and a server that was down catches up.
+  Admin, Scheduled work shows each job and its runs and can run or pause one;
+  `riskwren jobs` and `riskwren jobs run` do the same from the command line.
+- **Reminders and escalation.** Whoever an action, risk review, issue, piece of evidence,
+  acceptance, exception, or control test is waiting on is reminded two weeks before its date
+  and the day after. Actions and issues that stay late go to the unit's steward after a
+  week and its leader after three. Each is said once for a given date.
+- **Key controls are tested more often.** Each control shows when its next test is due:
+  twelve months after it was last rated, or six for a key control.
+- **Optional email.** Naming an SMTP server under `[mail]` sends notices to people's inboxes
+  as well as the bell. Each person chooses each notice as it happens, one summary a day, or
+  none. Messages wait in an outbox in the database, so a mail server that is down is tried
+  again, and turning email on does not send anyone their history. `riskwren mail test`
+  and `doctor` check the settings.
+- **Questionnaires as data.** A questionnaire is a document of sections and questions that
+  can appear only when an earlier answer makes them relevant. Four are built in: control
+  attestation, risk self-assessment, a unit completeness check, and a system security
+  profile. Those who run the program edit them in the app, with the form as it will be asked
+  shown as they go.
+- **Versions that are never changed.** Saving changed questions publishes a new version, and
+  an answer is always read against the version it was given to, so it reads as it was asked.
+- **One condition language,** evaluated by the server and by the browser with the same
+  rules, held together by shared test cases. No expression is ever run as code.
+- **Campaigns.** An assessor or manager asks a set of people for one thing by a date: owners
+  to attest that their controls still operate, owners to look again at their risks, stewards
+  to check a unit's records, owners to describe how a system is protected, or owners for a
+  named piece of evidence. A campaign is about a unit and what lies beneath it, or the
+  controls a scope uses. Its page shows how far it has got, what was answered, coverage by
+  unit, and every item, including anything with nobody to ask.
+- **Answers that set things in motion.** An owner who says a control does not operate as
+  described, that a risk's rating is no longer right, or that a unit's records need
+  attention is heard by the people who have to act. An evidence request closes by itself
+  when the evidence is attached.
+- **Attestation, shown apart from a test.** What a control's owner last said of it is on the
+  control with who and when. It never makes a requirement verified, and it takes one out of
+  verified when the owner says, after a test, that the control no longer operates.
+- **Indicators.** A number someone already reads, with which way is worse, a warning level,
+  a limit, how often it is read, and where it is read from. Readings are recorded by hand,
+  placed against the levels, charted, and given a trend. An indicator is linked to the risks
+  it warns of and shown on each of them.
+- **A breach is heard.** A reading past its limit tells the indicator's owners and the
+  owners of each risk it warns of, and marks those risks' ratings as in doubt until they are
+  assessed again. Readings that fall due are on Home and in the reminders, and the risk
+  dashboard counts indicators by where they stand.
+- **One search.** ⌘K and the box at the top of every page find records of every kind, and
+  actions, by name, reference, summary, or what they are called elsewhere. Every word must
+  be on the record. A search returns only what its searcher may open.
+- **Saved views.** Any list as it is filtered and sorted can be kept under a name, and
+  shared by those who look after a list. A view keeps the question, never the answer.
+- **What a record is missing.** Each kind of record has a short list of expected facts. A
+  record says which it lacks, any list can be cut to the records lacking one, and
+  **Reports → Tidy** counts them, each figure opening the list it counts.
+- **Likely duplicates.** Typing the name of a new record shows what it might already be,
+  and Tidy lists pairs that look like one thing. Nothing is merged: a person decides, or
+  says they are different things.
+- **Passing on what a person held.** A page lists everything someone answers for, and an
+  administrator, or a steward for their own units, passes it to someone else in one step.
+- **The program is edited where it is used.** Admin → Program has editors for the risk
+  categories, the scales and the matrix, appetite, the cadences, and the vocabularies.
+  Categories are added, renamed, ordered, and retired; values of a vocabulary are renamed,
+  ordered, added, and retired, and never re-keyed.
+- **A preview before anything moves.** A change to the matrix, to appetite, or to the
+  cadences is held as a draft. Preview lists every open risk whose rating, standing, or
+  next review would change, and publishing changes exactly those. The preview is the change
+  itself, made and then undone, so the two cannot disagree.
+- **Risk analyses.** A structured assessment over a scope or a unit: each thing in it is
+  taken against each threat from the risk library, and the answer is that it does not
+  apply, that a risk on the register covers it, or that a risk is raised for the thing's
+  owner. It closes when every question has an answer, and its report says what was
+  considered, what was decided, and why.
+- `scripts/dev_identity_provider.py`, a stand-in provider for trying single sign-on on a
+  laptop. Its signing key is public; it is not for real use.
+
+### Changed
+
+- **Disabling an account leaves nothing without an owner.** What the person alone answered
+  for (records, open actions, treatment plans, and what campaigns were waiting on them for)
+  passes to the steward of its unit, who is told, until someone is named for good. Before,
+  such records were shown as having nobody answering for them.
+- **Publishing a scoring method re-reads the register.** Every open risk takes its ratings
+  from the matrix now in force, then its standing and its next review, whether the method
+  is published in the app or loaded from a program pack. Before, a risk kept the rating its
+  last assessment gave it until it was assessed again. Each assessment still keeps the
+  rating it was given and the version it was made under.
+- **A list's search needs every word, in any order.** Before, the words had to appear
+  together as typed.
+- Risks are brought up to date with the calendar every hour by a scheduled job, as well as
+  when the register is read.
+- The accessibility audit and the screenshot capture start their demo on a port the
+  operating system says is free. A fixed port could already belong to something else on
+  the machine, which would then have been audited in its place.
+- `riskwren doctor` reports how people sign in, whether email is set up, and whether
+  scheduled work is being done.
+
+### Known limits
+
+- Single sign-on has been tested against the stand-in provider in
+  `scripts/dev_identity_provider.py`, which speaks the same protocol, and not yet against a
+  live Microsoft Entra ID tenant.
+- Email has been tested against a test server, not through an organization's mail service.
+- Two records that are the same thing can be found, and not yet merged.
+- The questionnaire editor writes a condition with one part. A condition with several parts
+  is written in the questionnaire's document.
+- Who may accept what, the number of levels and ratings, and how much a control may reduce
+  a rating are changed with a program pack, not in the app.
 
 ## 0.2.1 (2026-11-26)
 

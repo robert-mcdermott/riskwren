@@ -523,5 +523,11 @@ class Notice(Base):
     href: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
     read_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    # What became of it as email: queued, digest (waiting for a daily summary), or skipped.
+    # Empty until the mailer has looked at it, which it does only where email is set up.
+    mail_state: Mapped[str | None] = mapped_column(String(16))
 
-    __table_args__ = (Index("ix_notice_account_id_read_at", "account_id", "read_at"),)
+    __table_args__ = (
+        Index("ix_notice_account_id_read_at", "account_id", "read_at"),
+        Index("ix_notice_mail_state", "mail_state"),
+    )

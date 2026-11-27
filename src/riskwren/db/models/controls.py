@@ -47,6 +47,11 @@ class Control(RecordMixin, Base):
     design: Mapped[str] = mapped_column(String(16), default="not_assessed")
     operation: Mapped[str] = mapped_column(String(16), default="not_assessed")
     rated_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    # What its owner last said of it. An attestation is the owner's word, not a test, and is
+    # always shown apart from the rating.
+    attested_operates: Mapped[str | None] = mapped_column(String(16))
+    attested_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    attested_by_name: Mapped[str | None] = mapped_column(String(200))
     library_key: Mapped[str | None] = mapped_column(String(80))
 
     __table_args__ = (

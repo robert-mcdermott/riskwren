@@ -88,6 +88,8 @@ def config_file(tmp_path: Path, database_url: str, monkeypatch: pytest.MonkeyPat
     path.write_text(example_config_text(), encoding="utf-8")
     if database_url:
         monkeypatch.setenv("RISKWREN_DATABASE_URL", database_url)
+    # Tests run scheduled work themselves, when they mean to.
+    monkeypatch.setenv("RISKWREN_SERVER_SCHEDULER", "false")
     return path
 
 

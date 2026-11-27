@@ -22,6 +22,8 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 | [`riskwren frameworks`](#riskwren-frameworks) | See and load what the organization is held to |
 | [`riskwren program`](#riskwren-program) | Move the program between installations |
 | [`riskwren doctor`](#riskwren-doctor) | Check that this installation is healthy |
+| [`riskwren jobs`](#riskwren-jobs) | See scheduled work, or run it now |
+| [`riskwren mail`](#riskwren-mail) | Send waiting email, or test the mail settings |
 
 ## `riskwren init`
 
@@ -93,7 +95,7 @@ List every account with its status and roles.
 
 ### `riskwren users disable`
 
-Stop an account signing in and end its sessions. Its records and history are kept. The last active administrator cannot be disabled.
+Stop an account signing in and end its sessions. Its history is kept, and what the person alone answered for passes to the steward of its unit until someone is named for good. The last active administrator cannot be disabled.
 
 | Option | Meaning |
 |---|---|
@@ -169,7 +171,7 @@ Write the whole program as one JSON document, to a file or to standard output.
 
 ### `riskwren program import`
 
-Load a program pack. The whole pack is checked first, and nothing is loaded unless all of it can be. A new scoring method is published as a new version; assessments already made keep the version they were made under.
+Load a program pack. The whole pack is checked first, and nothing is loaded unless all of it can be. A new scoring method is published as a new version; assessments already made keep the version they were made under, and every open risk is read again from what was loaded: its ratings, its standing, and its next review.
 
 | Option | Meaning |
 |---|---|
@@ -179,3 +181,31 @@ Load a program pack. The whole pack is checked first, and nothing is loaded unle
 ## `riskwren doctor`
 
 Check the configuration, the data home, the database and its schema, and the history. Exits with 1 if anything must be fixed.
+
+## `riskwren jobs`
+
+Scheduled work brings risks up to date with the calendar, sends reminders, and sends email where that is set up. The server does this by itself while it runs. These commands are for seeing how it is going, and for running it from a scheduled task where the server's own scheduler is turned off.
+
+### `riskwren jobs run`
+
+Run every job that is due. With a job's name, run that one now whether or not it is due. A job another process is running is left to it.
+
+| Option | Meaning |
+|---|---|
+| `JOB` | one job to run now |
+
+## `riskwren mail`
+
+Email is optional. Where it is set up, the server sends it by itself while it runs. These commands are for testing the settings and for sending by hand.
+
+### `riskwren mail run`
+
+Queue notices and daily summaries, and send what is waiting. Exits with 1 if a message could not be sent.
+
+### `riskwren mail test`
+
+Send one message now to the account with this address, and say whether the mail server accepted it.
+
+| Option | Meaning |
+|---|---|
+| `EMAIL` | the account to send it to |

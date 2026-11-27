@@ -1,5 +1,6 @@
 // How a control and what is known of it are shown, and the forms that add, edit, and rate one.
 
+import { similarHint } from "./tidy.js";
 import { get, patch, post } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date } from "../core/format.js";
@@ -114,7 +115,7 @@ export function editControl({ record = null, vocab, units, from = null, unitId =
       } }, problem,
       record || from ? null : section("Start from the library", h("div", { class: "field" }, search, found),
         h("p", { class: "hint subtle" }, "Optional. Common controls in plain words, to make your own.")),
-      section("What is done", name.node, statement.node, objective.node),
+      section("What is done", name.node, similarHint("control", name.input, { unit: () => unit.input.value, apartFrom: record?.ref }), statement.node, objective.node),
       section("How", h("div", { class: "grid-2" }, kind.node, nature.node), h("div", { class: "grid-2" }, frequency.node, unit.node), key.node),
       section("Who may see it", restricted.node, status?.node ?? null)));
       saveButton.addEventListener("click", save);

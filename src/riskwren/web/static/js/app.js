@@ -83,10 +83,25 @@ async function boot() {
     route(`/${path}/:ref`, page("record", "recordPage", type));
   }
   if (can("configure")) route("/admin/program", page("admin-program", "adminProgram"));
+  route("/search", page("find", "searchPage"));
+  route("/tidy", page("find", "tidyPage"));
+  route("/handover/:id", page("find", "handoverPage"));
+  route("/risk-analyses", page("analyses", "analysisList"));
+  route("/risk-analyses/:ref", page("analyses", "analysisPage"));
+  route("/risk-analyses/:ref/:subject", page("analyses", "analysisAsset"));
+  route("/indicators", page("indicators", "indicatorList"));
+  route("/indicators/:ref", page("indicators", "indicatorPage"));
+  route("/campaigns", page("campaigns", "campaignList"));
+  route("/campaigns/:ref", page("campaigns", "campaignPage"));
+  route("/campaign-items/:id", page("campaigns", "campaignItem"));
+  route("/questionnaires", page("questionnaires", "questionnaireList"));
+  route("/questionnaires/:key", page("questionnaires", "questionnairePage"));
   if (can("admin")) {
     route("/admin/people", page("admin-people", "adminPeople"));
     route("/admin/units", page("admin-units", "adminUnits"));
     route("/admin/appearance", page("admin-appearance", "adminAppearance"));
+    route("/admin/sso", page("admin-sso", "adminSso"));
+    route("/admin/scheduled-work", page("admin-operations", "adminOperations"));
   }
   fallback(page("not-found", "notFound"));
 

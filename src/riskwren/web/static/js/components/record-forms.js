@@ -1,11 +1,12 @@
 // The forms that add and edit inventory records. One form, shaped by what each kind of record has.
 
+import { similarHint } from "./tidy.js";
 import { patch, post } from "../core/api.js";
 import { button, h, uid } from "../core/dom.js";
 import { options, unitOptions } from "../core/lookups.js";
 import { navigate } from "../core/router.js";
 import { can, session } from "../core/session.js";
-import { banner, checkbox, field, select, submit } from "./form.js";
+import { banner, checkbox, field, section, select, submit } from "./form.js";
 import { openOverlay } from "./overlay.js";
 import { statusLabel, TYPES } from "./record.js";
 import { toast } from "./toast.js";
@@ -36,9 +37,7 @@ export function dataClass(legend, vocab, chosen, hint) {
   };
 }
 
-export function section(title, ...children) {
-  return h("div", { class: "form-section stack" }, h("h3", {}, title), children);
-}
+export { section };
 
 /** The units a person may add records to: those they steward or manage, or all of them. */
 export function ownUnits() {
@@ -131,7 +130,7 @@ export function editRecord(type, { record = null, vocab, units, onDone }) {
         event.preventDefault();
         save();
       } }, problem,
-      section("What it is", name.node, h("div", { class: "grid-2" }, kind.node, unit.node), summary.node, extra.nodes),
+      section("What it is", name.node, similarHint(type, name.input, { unit: () => unit.input.value, apartFrom: record?.ref }), h("div", { class: "grid-2" }, kind.node, unit.node), summary.node, extra.nodes),
       section("What is at stake", critical.node, data.node),
       section("Who may see it", restricted.node, status?.node ?? null));
       saveButton.addEventListener("click", save);

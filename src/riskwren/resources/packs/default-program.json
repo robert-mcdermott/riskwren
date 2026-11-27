@@ -1097,7 +1097,13 @@
       "moderate": 180,
       "low": 365
     },
-    "exception_max_months": 12
+    "exception_max_months": 12,
+    "key_control_test_months": 6,
+    "reminders": {
+      "soon_days": 14,
+      "steward_after_days": 7,
+      "leader_after_days": 21
+    }
   },
   "authority": {
     "acceptance": {

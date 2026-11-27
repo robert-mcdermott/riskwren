@@ -48,6 +48,9 @@ function overview(control, ctx) {
         ["How often", label(v, "control_frequencies", control.frequency)],
         ["Unit", ctx.units.byId.get(control.org_unit_id)?.name],
         ["Last rated", control.rated_at ? date(control.rated_at) : "Never"],
+        ["Key control", control.is_key ? "Yes: tested more often" : null],
+        ["Attested by its owner", control.attested ? `${{ yes: "Operates as described", partly: "Operates only partly", no: "Does not operate" }[control.attested.operates] ?? control.attested.operates}, ${control.attested.by}, ${date(control.attested.at)}. An attestation is not a test.` : null],
+        ["Next test due", control.next_test_on ? h("span", { class: control.test_due ? "text-danger" : null }, date(control.next_test_on), control.test_due ? " (overdue)" : "") : null],
       ])),
       ownersCard(control, ctx)));
 }

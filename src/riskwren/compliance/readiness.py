@@ -14,7 +14,14 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from riskwren.core.clock import utc_now
-from riskwren.db.models import ControlRating, ControlTest, Evidence, EvidenceLink, TestResult
+from riskwren.db.models import (
+    Control,
+    ControlRating,
+    ControlTest,
+    Evidence,
+    EvidenceLink,
+    TestResult,
+)
 from riskwren.program import rules
 
 
@@ -23,12 +30,21 @@ def assurance(session: Session, control_ids: list[int]) -> dict[int, dict[str, A
     whether any evidence for it still counts."""
     today = utc_now().date()
     found: dict[int, dict[str, Any]] = {
-        control_id: {"test": None, "tested_on": None, "evidence": False}
+        control_id: {"test": None, "tested_on": None, "evidence": False, "attested": None}
         for control_id in control_ids
     }
     if not control_ids:
         return found
     months = int(rules.get(session, "cadences").get("control_rating_months", 12))
+    # What each control's owner last said of it, if that still holds. An attestation is the
+    # owner's word: it is shown, and it can take a control out of verified, but it never puts
+    # one there (AST-08).
+    for control in session.scalars(
+        select(Control).where(Control.id.in_(control_ids), Control.attested_at.is_not(None))
+    ):
+        when = control.attested_at.date()
+        if rules.add_months(when, months) >= today:
+            found[control.id]["attested"] = (control.attested_operates, when)
     for rating in session.scalars(
         select(ControlRating).where(
             ControlRating.control_id.in_(control_ids),
@@ -88,8 +104,27 @@ def of_control(standing: str, known: dict[str, Any]) -> tuple[str, str]:
         return "failing", f"Tested{on} and found {word}"
     if standing != "in_place":
         return "planned", "Not yet in place here"
-    if test == "effective" and known["evidence"]:
-        return "verified", f"Tested effective{on}, with evidence that still counts"
+    said, said_on = known.get("attested") or (None, None)
     if test == "effective":
+        if said in ("partly", "no") and when is not None and said_on > when:
+            # A test found it working, and since then its owner has said otherwise. That is
+            # not a failed test, and it is not something to go on calling verified.
+            word = "only partly operates" if said == "partly" else "no longer operates"
+            return "in_place", (
+                f"Tested effective{on}, but its owner said on {said_on.isoformat()} that it {word}"
+            )
+        if known["evidence"]:
+            return "verified", f"Tested effective{on}, with evidence that still counts"
         return "in_place", f"Tested effective{on}, but no evidence for it still counts"
+    if said == "yes":
+        return "in_place", (
+            f"In place, and attested by its owner on {said_on.isoformat()}. "
+            "No test result still holds"
+        )
+    if said in ("partly", "no"):
+        word = "only partly operates" if said == "partly" else "does not operate"
+        return "in_place", (
+            f"Said to be in place, but its owner said on {said_on.isoformat()} that it {word}. "
+            "No test result still holds"
+        )
     return "in_place", "In place, with no test result that still holds"

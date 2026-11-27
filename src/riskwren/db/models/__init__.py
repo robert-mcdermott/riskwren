@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
 from riskwren.db.models.compliance import (
     Assessment,
     Baseline,
@@ -33,6 +34,7 @@ from riskwren.db.models.controls import (
     RiskControl,
     TreatmentPlan,
 )
+from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.inventory import (
     ExternalRef,
     Information,
@@ -42,14 +44,25 @@ from riskwren.db.models.inventory import (
     System,
     ThirdParty,
 )
+from riskwren.db.models.jobs import Job, JobRun, OutboxMessage, Reminder
+from riskwren.db.models.oversight import (
+    Campaign,
+    CampaignItem,
+    Questionnaire,
+    QuestionnaireVersion,
+    Response,
+)
 from riskwren.db.models.people import (
     Account,
     Credential,
     FailedSignIn,
+    Identity,
     Membership,
     OrgUnit,
+    ProviderMapping,
     RoleGrant,
     SessionToken,
+    SignInRequest,
 )
 from riskwren.db.models.program import Setting
 from riskwren.db.models.risk import (
@@ -61,6 +74,7 @@ from riskwren.db.models.risk import (
     ScoringMethod,
 )
 from riskwren.db.models.system import ChainHead, Counter, Event
+from riskwren.db.models.tidy import Handover, NotDuplicate, SavedView
 
 __all__ = [
     "Acceptance",
@@ -69,6 +83,8 @@ __all__ = [
     "Assessment",
     "Baseline",
     "BaselineRequirement",
+    "Campaign",
+    "CampaignItem",
     "ChainHead",
     "Control",
     "ControlLibraryEntry",
@@ -84,24 +100,41 @@ __all__ = [
     "ExternalRef",
     "FailedSignIn",
     "Framework",
+    "Handover",
+    "Identity",
     "Implementation",
+    "Indicator",
+    "IndicatorReading",
+    "IndicatorRisk",
     "Information",
     "Issue",
     "IssueSubject",
+    "Job",
+    "JobRun",
     "Membership",
+    "NotDuplicate",
     "Notice",
     "OrgUnit",
+    "OutboxMessage",
     "Process",
+    "ProviderMapping",
+    "Questionnaire",
+    "QuestionnaireVersion",
     "RecordLink",
     "RecordOwner",
+    "Reminder",
     "Requirement",
+    "Response",
     "Risk",
+    "RiskAnalysis",
+    "RiskAnalysisItem",
     "RiskAssessment",
     "RiskCategory",
     "RiskControl",
     "RiskLibraryEntry",
     "RiskSubject",
     "RoleGrant",
+    "SavedView",
     "Scope",
     "ScopeFramework",
     "ScopeMember",
@@ -109,6 +142,7 @@ __all__ = [
     "ScoringMethod",
     "SessionToken",
     "Setting",
+    "SignInRequest",
     "StoredFile",
     "System",
     "TestResult",

@@ -230,9 +230,10 @@ def test_home_lists_what_each_person_owes(db: Database, world: People) -> None:
         )
     with frozen_at(NOW):
         steward = owes("steward")
-        assert ("orphan", "Name an owner for Orphan", False) in steward
-        assert ("orphan", "Name an owner for Instrument", False) in steward
-        assert ("orphan", "Name an owner for Dosing", False) not in steward  # another division
+        # Nothing is left without an owner: the steward stands in, and is asked to name
+        # who takes each thing for good.
+        assert not any(kind == "orphan" for kind, _, _ in steward)
+        assert ("handover", "Name who takes what Manager Person held", False) in steward
 
 
 def test_reports_through_the_api(as_role: Clients, world: People) -> None:

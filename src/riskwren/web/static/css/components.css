@@ -587,3 +587,4 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
      table scrolls. The picker tables in forms are left as they are. */
   .table:not(.table-compact) th:first-child, .table:not(.table-compact) td:first-child { min-width: 190px; }
 }
+.text-danger { color: var(--danger); font-weight: 500; }
