@@ -85,15 +85,18 @@ export function recordList(main, type) {
     title: meta.plural,
     load: async () => {
       const params = Object.fromEntries(query());
-      const [page, vocab, unitIndex] = await Promise.all([
-        get(`/api/v1/${meta.path}`, params, { fresh: true }), vocabularies(), units()]);
-      return { page, vocab, units: unitIndex };
+      const [page, vocab, unitIndex, tiers] = await Promise.all([
+        get(`/api/v1/${meta.path}`, params, { fresh: true }), vocabularies(), units(),
+        type === "third_party" ? get("/api/v1/tiers") : null]);
+      return { page, vocab, units: unitIndex, tiers: tiers?.data ?? [] };
     },
     view: (data, reload) => {
       const { vocab } = data;
       const rows = data.page.data;
       const total = data.page.meta.total;
       const mayAdd = can("steward");
+      const tiered = type === "third_party";
+      const tierName = new Map(data.tiers.map((tier) => [tier.key, tier.label]));
       const add = () => editRecord(type, { vocab, units: data.units, onDone: reload });
       const search = searchBox(`Search ${meta.nouns}`);
       keepSearchFocus(search);
@@ -102,17 +105,22 @@ export function recordList(main, type) {
         filterSelect("criticality", options(vocab, "criticalities", { blank: "Any criticality" }), "Criticality"),
         filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
         filterSelect("status", statusOptions(["active", "retired"], "Any status"), "Status"),
+        tiered ? filterSelect("tier", [["", "Any tier"], ...data.tiers.map((tier) => [tier.key, tier.label]), ["none", "Not tiered"]], "Tier") : null,
+        tiered ? filterSelect("review", [["", "Any review date"], ["due", "Review overdue"], ["soon", "Review due within a month"]], "Review") : null,
         mineToggle());
       const body = rows.length
         ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
           h("thead", {}, h("tr", {}, sortHeader(meta.label, "name"), h("th", { scope: "col" }, "Unit"), h("th", { scope: "col" }, "Owner"),
+            tiered ? sortHeader("Tier", "tier") : null,
             sortHeader("Criticality", "criticality"), h("th", { scope: "col" }, "Data"), sortHeader("Status", "status"),
             sortHeader("Updated", "updated_at"))),
           h("tbody", {}, rows.map((r) => h("tr", {},
             h("td", {}, h("a", { class: "cell-main", href: hrefOf(r.ref) }, r.name),
-              h("div", { class: "cell-sub" }, [r.ref, label(vocab, meta.kinds, r.kind), r.restricted ? "Restricted" : null].filter(Boolean).join(" · "))),
+              h("div", { class: "cell-sub" }, [r.ref, label(vocab, meta.kinds, r.kind), r.third_party ? `from ${r.third_party.name}` : null,
+                r.restricted ? "Restricted" : null].filter(Boolean).join(" · "))),
             h("td", {}, data.units.byId.get(r.org_unit_id)?.name ?? ""),
             ownerCell(r),
+            tiered ? h("td", {}, r.tier ? tierName.get(r.tier) ?? r.tier : h("span", { class: "subtle" }, "Not tiered")) : null,
             h("td", {}, criticality(vocab, r.criticality)),
             h("td", {}, r.data_class ? label(vocab, "data_classes", r.data_class) : h("span", { class: "subtle" }, "Not said")),
             h("td", {}, statusPill(r.status)),

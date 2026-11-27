@@ -64,6 +64,7 @@ class ActionBody(BaseModel):
     owner_id: int
     due_on: str
     detail: str | None = None
+    contact_id: int | None = None  # a third party's contact who does it; the owner follows up
 
 
 class DueBody(BaseModel):
@@ -196,7 +197,7 @@ def add_issue_action(request: Request, ref: str, body: ActionBody) -> dict[str, 
         issue = records.load(session, principal, ISSUE, ref)
         action = issues.add_action(
             session, principal, issue, title=body.title, owner_id=body.owner_id,
-            due_on=body.due_on, detail=body.detail,
+            due_on=body.due_on, detail=body.detail, contact_id=body.contact_id,
         )  # fmt: skip
         return envelope(treatment.action_view(session, principal, action))
 

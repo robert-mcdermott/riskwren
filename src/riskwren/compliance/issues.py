@@ -264,7 +264,13 @@ def subjects_of(session: Session, principal: Principal, issue: Issue) -> dict[st
 
 
 def source_of(session: Session, issue: Issue) -> dict[str, Any] | None:
-    """Where a test-raised issue came from: the assessment and what its test found."""
+    """Where a test-raised issue came from: the assessment and what its test found; or the
+    due diligence review a finding was raised from."""
+    if issue.source_type == "third_party_review" and issue.source_id is not None:
+        from riskwren.db.models import ThirdPartyReview
+
+        review = session.get(ThirdPartyReview, issue.source_id)
+        return {"review": {"ref": review.ref, "name": review.name}} if review else None
     if issue.source_type != "test_result" or issue.source_id is None:
         return None
     result = session.get(TestResult, issue.source_id)
@@ -303,6 +309,14 @@ def closure_evidence(session: Session, principal: Principal, issue: Issue) -> li
     ]
 
 
+def _contacts(session: Session, issue: Issue) -> list[dict[str, Any]]:
+    if "third_party" not in SUBJECTS:
+        return []
+    from riskwren.thirdparty import lifecycle  # it builds on this module
+
+    return lifecycle.contacts_for_issue(session, issue)
+
+
 def _detail(session: Session, principal: Principal, issue: Issue) -> dict[str, Any]:
     live = issue.status in LIVE
     editable = access.can_edit(session, principal, ISSUE, issue)
@@ -322,6 +336,8 @@ def _detail(session: Session, principal: Principal, issue: Issue) -> dict[str, A
         "subjects": subjects_of(session, principal, issue),
         "source": source_of(session, issue),
         "actions": actions_of(session, principal, issue),
+        # The people at the third parties it is about, whom an action may belong to.
+        "contacts": _contacts(session, issue) if editable else [],
         "closure_evidence": closure_evidence(session, principal, issue),
         "can_act": {
             "work": editable and issue.status == "open",
@@ -652,12 +668,21 @@ def add_action(
     owner_id: Any,
     due_on: Any,
     detail: str | None = None,
+    contact_id: Any = None,
 ) -> Action:
     _open(session, principal, issue)
+    contact = None
+    if contact_id not in (None, ""):
+        from riskwren.thirdparty import lifecycle  # it builds on this module
+
+        contact = lifecycle.contact_for_action(session, issue, contact_id)
     action = treatment.new_action(
         session, principal, KEY, issue.id, title=title, owner_id=owner_id, due_on=due_on,
         detail=detail,
     )  # fmt: skip
+    if contact is not None:
+        action.contact_id = contact.id
+        session.flush()
     issue.updated_at = utc_now()
     notices.tell(
         session, action.owner_id, "action",

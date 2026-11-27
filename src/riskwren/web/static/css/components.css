@@ -227,7 +227,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .chip[data-record="control"] .icon { color: var(--rec-control); }
 .chip[data-record="process"] .icon { color: var(--rec-process); }
 .chip[data-record="system"] .icon { color: var(--rec-system); }
-.chip[data-record="third_party"] .icon { color: var(--rec-party); }
+.chip[data-record="third_party"] .icon, .chip[data-record="service"] .icon { color: var(--rec-party); }
 .chip[data-record="information"] .icon { color: var(--rec-system); }
 
 .avatar {
@@ -330,7 +330,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: var(--space-2); }
 .record-icon[data-record="control"] { color: var(--rec-control); }
 .record-icon[data-record="process"] { color: var(--rec-process); }
 .record-icon[data-record="system"] { color: var(--rec-system); }
-.record-icon[data-record="third_party"] { color: var(--rec-party); }
+.record-icon[data-record="third_party"], .record-icon[data-record="service"] { color: var(--rec-party); }
 .record-icon[data-record="information"] { color: var(--rec-system); }
 .record-badges { margin-top: var(--space-2); }
 .prose { white-space: pre-wrap; max-width: 72ch; }
@@ -559,7 +559,7 @@ button.journey-step:hover { border-color: var(--border-strong); background: var(
 .gnode[data-record="control"] .gnode-kind { fill: var(--rec-control); }
 .gnode[data-record="process"] .gnode-kind { fill: var(--rec-process); }
 .gnode[data-record="system"] .gnode-kind, .gnode[data-record="information"] .gnode-kind { fill: var(--rec-system); }
-.gnode[data-record="third_party"] .gnode-kind { fill: var(--rec-party); }
+.gnode[data-record="third_party"] .gnode-kind, .gnode[data-record="service"] .gnode-kind { fill: var(--rec-party); }
 .gnode[data-record="issue"] .gnode-kind { fill: var(--danger); }
 .gnode[data-record="scope"] .gnode-kind, .gnode[data-record="exception"] .gnode-kind, .gnode[data-record="assessment"] .gnode-kind, .gnode[data-record="evidence"] .gnode-kind { fill: var(--accent); }
 .gnode-more > rect { fill: var(--surface-2); stroke: var(--border); stroke-dasharray: 4 3; }

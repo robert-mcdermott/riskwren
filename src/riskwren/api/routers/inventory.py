@@ -424,13 +424,17 @@ def list_third_parties(
     kind: str | None = None,
     criticality: str | None = None,
     data_class: str | None = None,
+    tier: str | None = Query(default=None, description="A tier's key, or none for untiered"),
+    review: str | None = Query(default=None, description="due: overdue; soon: within a month"),
     owner: int | None = None,
     mine: bool = MINE,
     sort: str = SORT,
     limit: int | None = LIMIT,
     cursor: str | None = None,
 ) -> dict[str, Any]:
-    filters = thing_filters(q, unit, status, kind, criticality, data_class, owner, mine)
+    filters = thing_filters(
+        q, unit, status, kind, criticality, data_class, owner, mine, tier=tier, review=review
+    )
     return list_records(request, THIRD_PARTY, filters, sort, limit, cursor)
 
 

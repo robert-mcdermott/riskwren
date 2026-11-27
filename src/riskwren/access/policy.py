@@ -230,8 +230,46 @@ def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], N
     return found
 
 
-for _path in ("processes", "systems", "third-parties", "information"):
+for _path in ("processes", "systems", "third-parties", "information", "services"):
     POLICIES.update(record_policies(_path))
+
+# Third parties as a program. Who may tier one is decided where it is written.
+POLICIES.update(
+    {
+        ("GET", "/api/v1/tiers"): Needs.MEMBER,
+        ("GET", "/api/v1/third-parties/{ref}/tiering"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/tiering"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/contacts"): Needs.MEMBER,
+        ("PATCH", "/api/v1/contacts/{contact_id}"): Needs.MEMBER,
+        ("GET", "/api/v1/reviews"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/reviews"): Needs.MEMBER,
+        ("GET", "/api/v1/reviews/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/reviews/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/reviews/{ref}/owners"): Needs.MEMBER,
+        ("GET", "/api/v1/reviews/{ref}/history"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/send"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/withdraw"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/conclude"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/cancel"): Needs.MEMBER,
+        # Someone without an account, holding a link: each route finds the link by the token
+        # in its header and reaches that link's questionnaire and nothing else.
+        ("GET", "/api/v1/respond"): Needs.PUBLIC,
+        ("PUT", "/api/v1/respond"): Needs.PUBLIC,
+        ("POST", "/api/v1/respond/submit"): Needs.PUBLIC,
+        ("POST", "/api/v1/respond/files"): Needs.PUBLIC,
+        ("GET", "/api/v1/coverage"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/call-review"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/offboarding"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/offboarding/steps/{step}"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/offboarding/cancel"): Needs.MEMBER,
+        ("POST", "/api/v1/reviews/{ref}/findings"): Needs.MEMBER,
+        ("PUT", "/api/v1/agreements/{ref}/parties"): Needs.MEMBER,
+        ("GET", "/api/v1/assurance-kinds"): Needs.MEMBER,
+        ("GET", "/api/v1/third-parties/{ref}/assurance"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/assurance"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/assurance/{document}/reviews"): Needs.MEMBER,
+    }
+)
 
 # The risk register
 POLICIES.update(record_policies("risks", links=False))

@@ -9,7 +9,8 @@ import { overallImpact, rating as ratingFor } from "../core/scoring.js";
 import { banner, checkbox, field, select, submit } from "./form.js";
 import { openOverlay } from "./overlay.js";
 import { recordChip, TYPES } from "./record.js";
-import { ownUnits, section } from "./record-forms.js";
+import { section } from "./form.js";
+import { ownUnits } from "../core/session.js";
 import { levelPicker, rating, suggestionView } from "./risk.js";
 import { toast } from "./toast.js";
 

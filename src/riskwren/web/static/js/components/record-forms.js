@@ -5,7 +5,7 @@ import { patch, post } from "../core/api.js";
 import { button, h, uid } from "../core/dom.js";
 import { options, unitOptions } from "../core/lookups.js";
 import { navigate } from "../core/router.js";
-import { can, session } from "../core/session.js";
+import { can, ownUnits } from "../core/session.js";
 import { banner, checkbox, field, section, select, submit } from "./form.js";
 import { openOverlay } from "./overlay.js";
 import { statusLabel, TYPES } from "./record.js";
@@ -39,13 +39,7 @@ export function dataClass(legend, vocab, chosen, hint) {
 
 export { section };
 
-/** The units a person may add records to: those they steward or manage, or all of them. */
-export function ownUnits() {
-  const me = session();
-  const scopes = [me.units?.steward, me.units?.manager].filter((scope) => scope !== undefined);
-  if (can("edit_all") || scopes.some((scope) => scope === null)) return null;
-  return new Set(scopes.flat());
-}
+export { ownUnits };
 
 // What each kind of record has beyond the name, unit, criticality, and data class they share.
 const EXTRA = {
@@ -69,6 +63,28 @@ const EXTRA = {
   },
 };
 
+// A service names the third party that provides it, chosen by searching.
+EXTRA.service = (record, vocab, preset = {}) => {
+  const chosen = record?.third_party ? [{ ...record.third_party, type: "third_party" }]
+    : preset.third_party ? [{ ...preset.third_party, type: "third_party" }] : [];
+  const error = h("div", { class: "error", role: "alert", hidden: true });
+  const holder = h("div");
+  const node = h("div", { class: "field" }, h("div", { class: "label" }, "Provided by", h("span", { class: "subtle" }, " (required)")), holder, error);
+  // The form's error display reads a field's input and error; the picker's search box stands
+  // in once it is drawn. The picker is fetched with the first service form.
+  const provider = { node, input: node, error, setError: (message) => {
+    error.hidden = !message;
+    error.textContent = message ?? "";
+  } };
+  import("./issue.js").then(({ recordPicker }) => {
+    holder.replaceChildren(recordPicker({ types: ["third_party"], chosen, label: "Find the third party",
+      placeholder: "Search third parties", empty: "No third party chosen yet." }));
+    provider.input = holder.querySelector("input") ?? node;
+  });
+  return { nodes: [node], fields: { third_party: provider },
+    values: () => ({ third_party: chosen.length ? chosen[chosen.length - 1].ref : null }) };
+};
+
 EXTRA.information = (record) => {
   const held = field("Where it is held", { type: "textarea", rows: 2, value: record?.held_in ?? "", hint: "The systems and places. Link the systems themselves once it is saved." });
   const shared = field("Who it is shared with", { type: "textarea", rows: 2, value: record?.shared_with ?? "" });
@@ -82,10 +98,11 @@ const NAME_HINTS = {
   process: "What is done, in a few words. For example: Specimen storage and retrieval.",
   system: "What people call it. For example: Freezer monitoring.",
   third_party: "The organization's legal or trading name.",
+  service: "What the organization gets from it. For example: Hosted participant surveys.",
 };
 
 /** Add a record of this type, or edit the one given. */
-export function editRecord(type, { record = null, vocab, units, onDone }) {
+export function editRecord(type, { record = null, vocab, units, onDone, preset = {} }) {
   const meta = TYPES[type];
   openOverlay({
     title: record ? `Edit ${meta.noun}` : `Add ${meta.article}`,
@@ -93,8 +110,8 @@ export function editRecord(type, { record = null, vocab, units, onDone }) {
     render: (body, footer, close) => {
       const name = field("Name", { value: record?.name ?? "", required: true, hint: NAME_HINTS[type] });
       const kind = select("Kind", options(vocab, meta.kinds, { blank: record ? null : "Choose…" }), { value: record?.kind ?? "", required: true });
-      const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record ? null : "Choose…" }),
-        { value: record?.org_unit_id ?? "", required: true, hint: "The unit that answers for it." });
+      const unit = select("Unit", unitOptions(units.tree, { only: preset.org_unit_id ? null : ownUnits(), blank: record ? null : "Choose…" }),
+        { value: record?.org_unit_id ?? preset.org_unit_id ?? "", required: true, hint: "The unit that answers for it." });
       const summary = field("Summary", { type: "textarea", value: record?.summary ?? "" });
       const critical = select("Criticality", options(vocab, "criticalities"), { value: record?.criticality ?? "moderate",
         hint: "How much the organization depends on it." });
@@ -102,7 +119,7 @@ export function editRecord(type, { record = null, vocab, units, onDone }) {
       const restricted = checkbox("Restricted", { checked: record?.restricted ?? false,
         hint: "Known only to its owners, its unit's stewards and leaders, managers, and auditors." });
       const status = record ? select("Status", [["active", statusLabel("active")], ["retired", statusLabel("retired")]], { value: record.status }) : null;
-      const extra = EXTRA[type](record, vocab);
+      const extra = EXTRA[type](record, vocab, preset);
 
       const problem = banner();
       const saveButton = button(record ? "Save" : "Add", { kind: "btn-primary" });

@@ -77,7 +77,9 @@ class Response(Base):
     version_id: Mapped[int] = mapped_column(ForeignKey("questionnaire_version.id"))
     subject_type: Mapped[str | None] = mapped_column(String(24))
     subject_id: Mapped[int | None] = mapped_column(Integer)
-    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"))
+    # Who answered: an account, or a contact at a third party answering through a link.
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    contact_id: Mapped[int | None] = mapped_column(ForeignKey("third_party_contact.id"))
     account_name: Mapped[str] = mapped_column(String(200))
     answers: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict)
     status: Mapped[str] = mapped_column(String(16), default="draft")

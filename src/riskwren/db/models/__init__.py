@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from riskwren.db.models.agreements import Agreement, AgreementCoverage
+from riskwren.db.models.agreements import Agreement, AgreementCoverage, AgreementParty
 from riskwren.db.models.analysis import RiskAnalysis, RiskAnalysisItem
 from riskwren.db.models.compliance import (
     Assessment,
@@ -59,6 +59,7 @@ from riskwren.db.models.inventory import (
     Process,
     RecordLink,
     RecordOwner,
+    Service,
     System,
     ThirdParty,
 )
@@ -92,6 +93,15 @@ from riskwren.db.models.risk import (
     ScoringMethod,
 )
 from riskwren.db.models.system import ChainHead, Counter, Event
+from riskwren.db.models.third_parties import (
+    AssuranceResponsibility,
+    AssuranceReview,
+    Offboarding,
+    RespondentLink,
+    ThirdPartyContact,
+    ThirdPartyReview,
+    TierAssessment,
+)
 from riskwren.db.models.tidy import Handover, NotDuplicate, SavedView
 
 __all__ = [
@@ -100,7 +110,10 @@ __all__ = [
     "Action",
     "Agreement",
     "AgreementCoverage",
+    "AgreementParty",
     "Assessment",
+    "AssuranceResponsibility",
+    "AssuranceReview",
     "Baseline",
     "BaselineRequirement",
     "Campaign",
@@ -140,6 +153,7 @@ __all__ = [
     "NotDuplicate",
     "Notice",
     "Objective",
+    "Offboarding",
     "OrgUnit",
     "OutboxMessage",
     "PolicyAcknowledgment",
@@ -155,6 +169,7 @@ __all__ = [
     "RecordOwner",
     "Reminder",
     "Requirement",
+    "RespondentLink",
     "Response",
     "Risk",
     "RiskAnalysis",
@@ -172,6 +187,7 @@ __all__ = [
     "ScopeMember",
     "ScopeRequirement",
     "ScoringMethod",
+    "Service",
     "SessionToken",
     "Setting",
     "SignInRequest",
@@ -180,5 +196,8 @@ __all__ = [
     "System",
     "TestResult",
     "ThirdParty",
+    "ThirdPartyContact",
+    "ThirdPartyReview",
+    "TierAssessment",
     "TreatmentPlan",
 ]

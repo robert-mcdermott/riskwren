@@ -31,6 +31,8 @@ PREFIXES = {
     "AGR": "Agreement",
     "OBJ": "Objective",
     "SES": "Committee session",
+    "SVC": "Service",
+    "DDR": "Due diligence review",
     "AUD": "Audit engagement",
     "INC": "Incident",
 }

@@ -18,3 +18,11 @@ export function can(permission) {
 export function csrfToken() {
   return current?.csrf_token ?? null;
 }
+
+/** The units a person may add records to: those they steward or manage, or all of them. */
+export function ownUnits() {
+  const me = session();
+  const scopes = [me.units?.steward, me.units?.manager].filter((scope) => scope !== undefined);
+  if (can("edit_all") || scopes.some((scope) => scope === null)) return null;
+  return new Set(scopes.flat());
+}

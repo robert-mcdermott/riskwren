@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.3.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.5.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
@@ -12,9 +12,10 @@ These guides describe RiskWren 0.3.0. Read them in this order if you are new, or
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
 | 6 | [Policies](policies.md) | Whoever writes, approves, or keeps the organization's policies | Policies, standards, procedures, and guidelines; writing a version; approval; publishing; comparing versions; review; what a document governs; exceptions to a document; who a document applies to; the policy library; acknowledgment |
-| 7 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, committee sessions, when someone leaves, reminders, the dashboards, the history, appearance |
-| 8 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
-| 9 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
+| 7 | [Third parties](third-parties.md) | Whoever looks after the organization's suppliers and partners, most often the security office | Third parties and their services; what each reaches and handles; tiering by the program's rules; contacts; due diligence questionnaires sent through a link that needs no account; reviewing the answers and their concerns; reports and certificates, and what each covers and leaves to the organization; who agreements are with, and the stop where shared information has no covering agreement; findings followed up with the third party; review again; offboarding; subcontractors |
+| 8 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, committee sessions, when someone leaves, reminders, the dashboards, the history, appearance |
+| 9 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
+| 10 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
 
 ## Reference
 
@@ -58,6 +59,14 @@ These two are written from the code, so they always match the version they ship 
 | A lab cannot meet a standard yet: how does it ask for an exception? | [Exceptions to a document](policies.md#exceptions-to-a-document) |
 | Where do staff read the policies that apply to them? | [The policy library](policies.md#the-policy-library) |
 | Who has not yet acknowledged the acceptable use policy? | [Who has acknowledged it](policies.md#who-has-acknowledged-it) |
+| Which suppliers hold our restricted information, and through what? | [Third parties and their services](third-parties.md#third-parties-and-their-services) |
+| Why is this supplier Tier 1? | [Tiering](third-parties.md#tiering) |
+| How do I send a supplier a security questionnaire without giving them an account? | [Send it](third-parties.md#send-it) |
+| Is the link we send a supplier safe? | [Send it](third-parties.md#send-it) |
+| What does a supplier's SOC 2 report leave for us to do? | [Review a report](third-parties.md#review-a-report) |
+| Who holds our patient records without a business associate agreement? | [Coverage](third-parties.md#coverage) |
+| A supplier told us of a breach. How do we review it again now? | [Review again](third-parties.md#review-again) |
+| How do we end a supplier relationship properly? | [Ending a relationship](third-parties.md#ending-a-relationship) |
 | How do I change appetite, the scales, or the review cadence? | [Shape the program](running-the-program.md#shape-the-program) |
 | Which risks would change if I changed the matrix? | [See what a change would do](running-the-program.md#see-what-a-change-would-do-before-you-make-it) |
 | How do I add a kind of system, or rename a data class? | [Vocabularies](running-the-program.md#vocabularies) |
@@ -80,7 +89,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.4.0 is the register, compliance, the means of keeping both current, and the organization's own word: policies approved by named people and acknowledged by those they apply to, agreements and the terms they impose, framework versions, strategic objectives, and committee sessions. It does not yet review suppliers, run audits, or handle incidents; those follow in later releases. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.5.0 is the register, compliance, the means of keeping both current, the organization's own word, and its third parties: services and tiers, due diligence through a link that needs no account, assurance reports read for what they cover, the stop where shared information has no covering agreement, and the relationship over time. It does not yet produce leadership reports, run audits, or handle incidents; those follow in later releases. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action; the action's owner here records it. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

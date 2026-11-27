@@ -609,6 +609,19 @@ def _names(session: Session, ids: set[int]) -> dict[int, str]:
     )
 
 
+def _contact_of(session: Session, action: Action) -> dict[str, Any] | None:
+    """Who at a third party does it, where someone outside does."""
+    if action.contact_id is None:
+        return None
+    from riskwren.db.models import ThirdParty, ThirdPartyContact
+
+    contact = session.get(ThirdPartyContact, action.contact_id)
+    party = session.get(ThirdParty, contact.third_party_id) if contact else None
+    if contact is None:
+        return None
+    return {"name": contact.name, "third_party": party.name if party else None}
+
+
 def action_view(
     session: Session, principal: Principal, action: Action, names: dict[int, str] | None = None
 ) -> dict[str, Any]:
@@ -623,6 +636,7 @@ def action_view(
         "title": action.title,
         "detail": action.detail,
         "owner": {"account_id": action.owner_id, "name": names.get(action.owner_id, "")},
+        "contact": _contact_of(session, action),
         "due_on": action.due_on,
         "original_due_on": action.original_due_on,
         "extensions": action.extensions,

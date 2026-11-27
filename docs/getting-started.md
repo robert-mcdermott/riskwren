@@ -119,7 +119,7 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 230 processes, systems, third parties, and information assets, 180 risks, and about 135 controls, with their assessments, ratings, plans, and acceptances. Four scopes are held to frameworks: central information technology, which provides controls; the clinical systems, under the HIPAA Security Rule; a controlled-access data enclave, under NIST SP 800-171, both of which inherit from the first; and a trial data platform still on SP 800-53 Rev. 4. There is an assessment in progress, evidence at every stage of freshness, a dozen issues from raised to closed, and exceptions waiting, in force, and ended. The security office's policies and the standards beneath them have their versions, approvals, and acknowledgments; four agreements carry their dates; and the risk and compliance committee has met twice and meets again soon. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.
+The demo is the Northmere Institute for Health Research, a fictional research institute with an outpatient clinic and two years of history: 60 units, about 210 people, 230 processes, systems, third parties, and information assets, 180 risks, and about 135 controls, with their assessments, ratings, plans, and acceptances. Four scopes are held to frameworks: central information technology, which provides controls; the clinical systems, under the HIPAA Security Rule; a controlled-access data enclave, under NIST SP 800-171, both of which inherit from the first; and a trial data platform still on SP 800-53 Rev. 4. There is an assessment in progress, evidence at every stage of freshness, a dozen issues from raised to closed, and exceptions waiting, in force, and ended. The security office's policies and the standards beneath them have their versions, approvals, and acknowledgments; agreements carry their dates and say who they are with; and the risk and compliance committee has met twice and meets again soon. Its suppliers and partners have their services and tiers; eleven due diligence reviews stand at every stage, from concluded to not yet sent; seven reports and certificates have been read for what they cover; and three gaps remain where no agreement covers what is shared. Nothing in it is real, and every record was made by the same code the app uses, so its history verifies like any other.
 
 ![Home for the demo's security leader: figures for what needs attention, then the list of what is waiting on them](img/home-ciso-light.webp)
 
@@ -128,11 +128,11 @@ Its sign-in page offers ten sample people and asks for no password:
 | Sign in as | To see |
 |---|---|
 | The risk manager | The whole register, the dashboard, the heat map, records that have lost their owner, and the committee's next session to prepare |
-| The steward of the Biospecimen Repository | A unit's inventory and risks, and a critical risk brought to high by controls, with its plan |
+| The steward of the Biospecimen Repository | A unit's inventory and risks, a critical risk brought to high by controls, with its plan, and the unit's suppliers due for review |
 | The unit leader | A leader whose limit is moderate, and a high risk they were not allowed to accept |
 | The division leader | Acceptances given, one of them expiring next month |
 | The executive | The one person who may accept a critical risk, with a new version of the information security policy to approve |
-| The security leader | The compliance dashboard, a critical finding from a penetration test, a closure to confirm, exceptions to decide, including one to a standard, and an agreement's notice date |
+| The security leader | The compliance dashboard, a critical finding from a penetration test, a closure to confirm, exceptions to decide, including one to a standard, a supplier's answers to read, a review called for by a breach notice, and the gaps in coverage |
 | The assessor | An assessment in progress: tests to do, a result to review, and the issues the failed tests opened |
 | The auditor | Everything, read-only, with the full history |
 | The administrator | People, units, and appearance, and no part in the register's judgments |

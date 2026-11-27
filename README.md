@@ -42,15 +42,15 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, and a risk committee that meets each quarter. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, and suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
 | Sign in as | To see |
 |---|---|
-| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies, an exception to one waiting for a decision, and an agreement whose notice date is near |
+| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies; a supplier's answers to a security questionnaire waiting to be read, with their concerns; a review called for by a supplier's breach notice; and Third parties → Coverage, where patient records are shared with no business associate agreement |
 | The risk manager | The whole register, the risk dashboard, the heat map, the program, where a change to the matrix can be previewed, and the risk committee's next session |
-| The steward | One unit's inventory and risks, and a critical risk brought to high by controls, with its plan |
+| The steward | One unit's inventory and risks, a critical risk brought to high by controls, with its plan, and the unit's suppliers that are due for review |
 | The unit leader | A high risk that is beyond their authority to accept |
 | The assessor | An assessment in progress, a result to review, an attestation campaign most of the way through, and a risk analysis half done |
 | The auditor | Everything, read-only, with every change in one place |
@@ -60,9 +60,18 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.4.0 is *Policy and obligations*: the organization's own word, and what it has promised others. It follows 0.3.0, which keeps the register current, and 0.2.0, which added compliance to it.
+Version 0.5.0 is *Third parties*: who the organization depends on, what each can reach, and whether the paper covers it. It follows 0.4.0, which added the organization's policies and agreements, and 0.3.0, which keeps the register current.
 
-**Policy and obligations, new in 0.4.0**
+**Third parties, new in 0.5.0**
+
+- **Services:** what each supplier or partner provides, with the systems each reaches and the information each handles.
+- **Tiering by the program's own rules,** from a few questions the inventory mostly answers, with the reasons shown. A different tier needs a reason, and both are kept.
+- **Due diligence without accounts:** the security questionnaire the tier names, sent to the supplier's contact through a link that expires, kept only as a digest, and reaching that one form and nothing else. The answers that are concerns come first, and the reviewer records the conclusion.
+- **Assurance documents** read for what they cover: a SOC 2 report's scope, opinion, carve-outs, exceptions, and what it leaves to the organization, joined to the controls that do it.
+- **Coverage:** where regulated information is shared with a supplier and no agreement of the kind the program requires covers it (a business associate agreement for patient records, a data use agreement for controlled-access data), every record involved shows a stop until one does.
+- **Over time:** findings followed up with the supplier's own people, review again on the tier's cadence or when an event calls for it, offboarding with a checklist, and subcontractors in the picture of connections.
+
+**Policy and obligations, from 0.4.0**
 
 - **Policies, standards, procedures, and guidelines** written here in a simple Markdown, linked to where they are kept, or attached as files, each implementing the one above it.
 - **Approval by named people,** none of whom wrote it, and **published versions that never change:** each is fingerprinted, and `riskwren verify` checks it. Any two versions compare side by side, and each document is reviewed on a cadence.
@@ -111,7 +120,7 @@ Version 0.4.0 is *Policy and obligations*: the organization's own word, and what
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Third parties come next, then reporting, audits, and incidents. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Reporting comes next, then audits and incidents. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 
@@ -125,6 +134,7 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Evidence and testing](docs/evidence-and-testing.md) | Control owners and assessors |
 | [Issues and exceptions](docs/issues-and-exceptions.md) | Whoever fixes, checks, or decides |
 | [Policies](docs/policies.md) | Whoever writes, approves, or keeps the organization's policies |
+| [Third parties](docs/third-parties.md) | Whoever looks after the organization's suppliers and partners |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
 | [API](docs/api.md) | Anyone connecting another system |

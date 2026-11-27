@@ -702,6 +702,274 @@ INFORMATION_LINKS: list[tuple[str, str, str]] = [
     ("donors", "holds", "info_donors"), ("storage", "holds", "info_results"), ("eln", "holds", "info_results"),
 ]  # fmt: skip
 
+# What each third party provides. key, name, party, unit, kind, criticality, data class, the
+# systems it reaches, and the information it handles. ``added`` is days before the build.
+SERVICES: list[tuple[str, str, str, str, str, str, str | None, list[str], list[str]]] = [
+    ("svc_tracking", "Hosted specimen tracking", "trackco", "BIO", "software_service", "high", "restricted", ["tracking"], ["info_specimens"]),
+    ("svc_freezers", "Freezer farm maintenance", "coldline", "BIO", "maintenance", "high", None, ["monitor", "freezers"], []),
+    ("svc_nitrogen", "Liquid nitrogen delivery", "cryogas", "BIO", "supply", "critical", None, [], []),
+    ("svc_courier", "Specimen shipping", "courier", "BIO", "logistics", "moderate", "restricted", [], ["info_specimens"]),
+    ("svc_chemistry", "Sequencing chemistry", "reagents", "GEN", "supply", "critical", None, [], []),
+    ("svc_sequencers", "Sequencer service contract", "seqmaker", "GEN", "maintenance", "high", "confidential", ["sequencer1", "sequencer2"], []),
+    ("svc_microscopes", "Microscope service and remote support", "optics", "IMG", "maintenance", "high", "internal", ["confocal", "cryo", "imgws"], []),
+    ("svc_feed", "Feed, bedding, and caging", "feed", "CMP", "supply", "high", None, [], []),
+    ("svc_record", "Hosted clinical record system", "recordco", "CLIN", "software_service", "critical", "restricted", ["record"], ["info_patients"]),
+    ("svc_pumps", "Infusion pump drug library and service", "pumpco", "INF", "maintenance", "high", "restricted", ["pumps"], []),
+    ("svc_cabinets", "Dispensing cabinet service", "pharmaco", "PHARM", "maintenance", "high", "restricted", ["cabinets"], ["info_patients"]),
+    ("svc_reference", "Reference laboratory testing", "labref", "CLAB", "laboratory", "high", "restricted", ["lis"], ["info_patients"]),
+    ("svc_edc", "Hosted data capture and trial management", "edcco", "CR", "software_service", "high", "restricted", ["edc", "ctms"], ["info_trials"]),
+    ("svc_monitoring", "Trial monitoring visits", "cro", "CR", "professional", "moderate", "restricted", ["edc"], ["info_trials"]),
+    ("svc_surveys", "Hosted participant surveys", "surveyco", "PS", "software_service", "moderate", "restricted", ["survey"], ["info_cohort"]),
+    ("svc_identity", "Identity and sign-in", "cloud", "IT", "software_service", "critical", "confidential", ["identity"], []),
+    ("svc_network", "Network equipment support", "netco", "IT", "maintenance", "high", "internal", ["network"], []),
+    ("svc_vault", "Offsite backup vaulting", "backupco", "IT", "hosting", "high", "restricted", ["backup"], ["info_patients", "info_people"]),
+    ("svc_watch", "Out-of-hours security monitoring", "soc", "SEC", "professional", "high", "confidential", ["siem"], []),
+    ("svc_notebook", "Hosted lab notebook", "elnco", "RC", "software_service", "high", "confidential", ["eln"], ["info_results"]),
+    ("svc_grants", "Hosted grants management", "grantsco", "SP", "software_service", "high", "confidential", ["grants"], ["info_awards"]),
+    ("svc_finance", "Hosted finance and payroll", "financeco", "FIN", "software_service", "critical", "restricted", ["finance", "payroll"], ["info_people", "info_awards"]),
+    ("svc_people", "Hosted people and learning systems", "hrco", "HR", "software_service", "high", "restricted", ["hris", "learning"], ["info_people"]),
+    ("svc_building", "Building controls support", "bmsco", "FAC", "maintenance", "critical", None, ["bms"], []),
+    ("svc_generators", "Generator service and load tests", "gensvc", "FAC", "maintenance", "high", None, ["generators"], []),
+    ("svc_waste", "Hazardous waste collection", "waste", "FAC", "logistics", "moderate", None, [], []),
+    ("svc_cleaning", "Laboratory and clinic cleaning", "cleaning", "FAC", "maintenance", "moderate", None, [], []),
+    ("svc_donors", "Hosted donor database", "donorco", "PHIL", "software_service", "moderate", "confidential", ["donors"], ["info_donors"]),
+    ("svc_website", "Website design and hosting", "webco", "COMM", "hosting", "low", "public", ["website"], []),
+    ("svc_counsel", "Outside counsel", "lawfirm", "LEGAL", "professional", "moderate", "confidential", [], []),
+    ("svc_insurance", "Property, liability, and cyber insurance", "insurer", "FIN", "professional", "high", "confidential", [], []),
+    ("svc_audit", "Annual financial audit", "auditfirm", "FIN", "professional", "moderate", "confidential", ["finance"], ["info_awards"]),
+    ("svc_staffing", "Temporary laboratory staff", "staffing", "HR", "staffing", "low", "internal", [], []),
+    ("svc_cohort", "The shared cohort", "univ1", "RES", "collaboration", "high", "restricted", [], ["info_cohort"]),
+    ("svc_linkage", "Data linkage for the community cohort", "sub2", "SP", "data_service", "moderate", "restricted", [], ["info_cohort"]),
+    ("svc_genomes", "Controlled-access genomic data", "genomevault", "RC", "data_service", "high", "restricted", ["enclave"], ["info_genomic"]),
+]  # fmt: skip
+# Added later than the rest: the email service, once the institute moved its mail to the
+# same supplier as its identity service. Its supplier is tiered again when it arrives.
+LATER_SERVICE = ("svc_mail", "Email and collaboration", "cloud", "IT", "software_service", "critical", "restricted", ["email"], ["info_people", "info_results"])  # fmt: skip
+
+# How each third party reaches the institute, beyond what its services' links suggest, and
+# anything else its tiering said that the inventory could not. The rest are suggested.
+TIERING_ANSWERS: dict[str, dict[str, object]] = {
+    "trackco": {"access": ["integration", "accounts"], "people": "many"},
+    "coldline": {"access": ["on_site", "physical", "remote"], "dependency": "stops"},
+    "cryogas": {"access": ["on_site"], "dependency": "stops"},
+    "courier": {"access": ["physical"], "people": "many"},
+    "reagents": {"dependency": "stops"},
+    "seqmaker": {"access": ["remote", "on_site"]},
+    "optics": {"access": ["remote", "on_site"]},
+    "feed": {"access": ["on_site"]},
+    "recordco": {"access": ["privileged", "integration", "accounts"], "people": "many", "subcontractors": True},
+    "pumpco": {"access": ["remote", "on_site"], "people": "many"},
+    "pharmaco": {"access": ["remote", "on_site", "integration"], "people": "many"},
+    "labref": {"access": ["integration"], "people": "many"},
+    "edcco": {"access": ["integration", "accounts"], "people": "many", "subcontractors": True},
+    "cro": {"access": ["accounts", "on_site"], "people": "few"},
+    "surveyco": {"access": ["integration"], "people": "many", "offshore": True},
+    "cloud": {"access": ["privileged", "integration", "accounts"], "people": "many", "subcontractors": True},
+    "netco": {"access": ["remote", "privileged"]},
+    "backupco": {"access": ["integration"], "people": "many"},
+    "soc": {"access": ["remote", "accounts"]},
+    "elnco": {"access": ["integration", "accounts"]},
+    "grantsco": {"access": ["integration", "accounts"]},
+    "financeco": {"access": ["integration", "accounts"], "people": "many"},
+    "hrco": {"access": ["integration", "accounts"], "people": "many"},
+    "bmsco": {"access": ["remote", "on_site"]},
+    "gensvc": {"access": ["on_site", "physical"]},
+    "waste": {"access": ["no_access"], "dependency": "little"},
+    "cleaning": {"access": ["physical"]},
+    "donorco": {"access": ["integration"], "people": "many"},
+    "webco": {"access": ["remote"]},
+    "lawfirm": {"access": ["no_access"]},
+    "insurer": {"access": ["no_access"]},
+    "auditfirm": {"access": ["accounts"]},
+    "staffing": {"access": ["accounts", "on_site", "physical"]},
+    "univ1": {"access": ["integration"], "people": "many"},
+    "sub2": {"access": ["integration"], "people": "many"},
+    "genomevault": {"access": ["integration"], "people": "many", "offshore": True},
+}  # fmt: skip
+# Where the person tiering it recorded a different tier from the rules', and why.
+TIERING_JUDGED: dict[str, tuple[str, str]] = {
+    "webco": (
+        "tier_3",
+        "It reaches only the public website, which holds nothing that is not "
+        "already published, and the site is kept apart from the campus network.",
+    ),
+}
+# Partners and sponsors not yet tiered: none of them holds or reaches anything of the
+# institute's through a service on record.
+UNTIERED = ("funder1", "funder2", "funder3", "pharma1", "hospital", "univ2", "sub1")
+
+# The people at third parties who answer questionnaires. They are not accounts.
+CONTACTS: dict[str, list[tuple[str, str, str]]] = {
+    "recordco": [("Dana Whitcombe", "dana.whitcombe@pellham.example", "Director of information security")],
+    "cloud": [("Priya Raman", "trust@quillon.example", "Customer trust team"),
+              ("Marcus Hale", "marcus.hale@quillon.example", "Account manager")],
+    "financeco": [("Ines Okafor", "security@ledgerwell.example", "Security and compliance manager")],
+    "edcco": [("Tomasz Wierzbicki", "t.wierzbicki@castellan.example", "Head of quality and security")],
+    "backupco": [("Ruth Calloway", "compliance@stonebridge.example", "Compliance officer")],
+    "surveyco": [("Ana Ruiz", "ana.ruiz@tallyfield.example", "Security lead")],
+    "trackco": [("Kenji Mori", "kenji.mori@specimenledger.example", "Chief technology officer")],
+    "labref": [("Helen Ashdown", "privacy@lakeshorelab.example", "Privacy and security officer")],
+    "soc": [("Femi Adeyemi", "femi@lanternwatch.example", "Service delivery manager")],
+    "genomevault": [("Lars Nygaard", "access@genomecommons.example", "Data access committee")],
+    "elnco": [("Sophie Brandt", "security@foliobench.example", "Security engineer")],
+    "hrco": [("Olivia Grant", "trust@peoplebook.example", "Trust and safety")],
+}  # fmt: skip
+
+# Due diligence reviews: the third party, who keeps the review, the questionnaire (by tier
+# unless named), and when each step happened, in days before the build. ``saved`` is when
+# the contact saved some answers without sending them. ``answers`` departs from a sound
+# answer to every question; ``link_days`` is how long the link lasted.
+REVIEWS: list[dict[str, object]] = [
+    {"party": "elnco", "by": "assess1", "started": 420, "sent": 418, "answered": 409,
+     "concluded": 404, "conclusion": "approved", "note": None},
+    {"party": "recordco", "by": "ciso", "started": 335, "sent": 332, "answered": 318,
+     "concluded": 311, "conclusion": "approved", "note": None,
+     "answers": {"phi": True, "baa": True, "hipaa_assessment": True, "subprocessors": True,
+                 "subprocessor_list": "A hosting provider for the servers, and a support desk for out-of-hours calls.",
+                 "subprocessor_terms": True, "subprocessor_review": True,
+                 "certifications": ["soc2_type2", "hitrust", "pentest"]}},
+    {"party": "cloud", "by": "ciso", "started": 302, "sent": 300, "answered": 291,
+     "concluded": 286, "conclusion": "conditions",
+     "note": "Administrators of the institute's tenant to use security keys by the end of June; their own staff already do.",
+     "answers": {"mfa_admin": False, "certifications": ["soc2_type2", "iso27001", "fedramp"],
+                 "subprocessors": True, "subprocessor_list": "Data centre operators in three regions.",
+                 "subprocessor_terms": True, "subprocessor_review": True}},
+    {"party": "financeco", "by": "assess1", "started": 262, "sent": 260, "answered": 251,
+     "concluded": 246, "conclusion": "approved", "note": None},
+    {"party": "edcco", "by": "ciso", "started": 204, "sent": 201, "answered": 188,
+     "concluded": 181, "conclusion": "conditions",
+     "note": "Restores to be tested before the next trial starts, and the result sent to Clinical Research.",
+     "answers": {"backups": False, "phi": True, "baa": True, "hipaa_assessment": True,
+                 "recovery": "week"}},
+    {"party": "backupco", "by": "ciso", "started": 158, "sent": 156, "answered": 149,
+     "concluded": 145, "conclusion": "approved", "note": None,
+     "answers": {"phi": True, "baa": True, "hipaa_assessment": True}},
+    # Answered last week, with four concerns: waiting for the security leader.
+    {"party": "surveyco", "by": "ciso", "started": 33, "sent": 31, "saved": 15, "answered": 6,
+     "sends": "SOC 2 Type II report 2026.pdf",
+     "answers": {"us_only": False, "locations": "Survey responses are processed by our team in Dublin, Ireland.",
+                 "breach_last": True,
+                 "breach_detail": "In 2025 a misconfigured export exposed one customer's survey links for two days. Exports now need a second person's approval.",
+                 "patching": "longer", "subprocessors": True,
+                 "subprocessor_list": "A cloud hosting provider and an email delivery service.",
+                 "subprocessor_terms": True, "subprocessor_review": False,
+                 "phi": True, "baa": True, "hipaa_assessment": False}},
+    # Sent, with some answers saved and not yet sent.
+    {"party": "trackco", "by": "assess1", "started": 13, "sent": 12, "saved": 3, "due": -9},
+    # Answers late: the date has passed and the link still works.
+    {"party": "labref", "by": "ciso", "started": 44, "sent": 40, "due": 19, "link_days": 60},
+    # The link ran out before anyone answered.
+    {"party": "soc", "by": "assess1", "started": 22, "sent": 20, "due": -1, "link_days": 14},
+    # Started, not yet sent.
+    {"party": "genomevault", "by": "ciso", "started": 2},
+]  # fmt: skip
+
+# Reports and certificates about third parties, and what a careful reading of each found.
+# Days are before the build (negative: after it). Each responsibility is what the report
+# leaves to the institute, with the control here that does it (by its library key and the
+# unit that runs it), or None.
+ASSURANCE: list[dict[str, object]] = [
+    {"party": "recordco", "by": "ciso", "name": "HITRUST r2 certification",
+     "kind": "hitrust", "issuer": "Calloway Certification Services", "opinion": "none",
+     "received": 320, "from": 380, "to": 380, "until": -350, "reviewed": 314,
+     "services": ["svc_record"], "reliance": "relies",
+     "duties": [("Customers remove their own users' access when they leave.",
+                 ("access_removed_on_leaving", "IT"), "in_place")]},
+    {"party": "cloud", "by": "ciso", "name": "SOC 2 Type II report, October 2024 to September 2025",
+     "kind": "soc2_type2", "issuer": "Harrowgate Assurance LLP", "opinion": "qualified",
+     "received": 282, "from": 785, "to": 422, "until": -40, "reviewed": 276,
+     "services": ["svc_identity"], "reliance": "partly",
+     "carve_outs": "The data centres the service runs in are carved out; their own reports cover them.",
+     "exceptions": [{"control": "CC6.2", "description": "For 3 of 25 leavers sampled, access was removed more than 30 days after they left.",
+                     "matters": True, "response": "The institute's own administrators are removed by its identity team on the day they leave."},
+                    {"control": "CC7.4", "description": "One incident's review was finished late.", "matters": False, "response": None}],
+     "duties": [("Customers require a second factor for their own users.", ("second_factor", "IT"), "in_place"),
+                ("Customers review who holds administrative roles in their tenant each quarter.", ("access_reviewed", "SEC"), "in_place"),
+                ("Customers set how long mail is kept, to meet their own obligations.", None, "not_in_place")],
+     "note": "The supplier's own removal of leavers is weak; the institute's administrators are removed by its own process. Mail, added since, is outside the report's period."},
+    {"party": "financeco", "by": "assess1", "name": "SOC 2 Type II report, 2024",
+     "kind": "soc2_type2", "issuer": "Pennock and Hale", "opinion": "unqualified",
+     "received": 430, "from": 790, "to": 425, "until": 60, "reviewed": 424,
+     "services": ["svc_finance"], "reliance": "relies",
+     "duties": [("Customers check each payment run before it is released.", ("payment_verification", "FIN"), "in_place")]},
+    {"party": "backupco", "by": "ciso", "name": "SOC 2 Type II report, 2025",
+     "kind": "soc2_type2", "issuer": "Harrowgate Assurance LLP", "opinion": "unqualified",
+     "received": 162, "from": 540, "to": 175, "until": -190, "reviewed": 152,
+     "services": ["svc_vault"], "reliance": "relies",
+     "duties": [("Customers test that they can restore what is vaulted.", ("backups_tested", "IT"), "in_place")]},
+    {"party": "edcco", "by": "ciso", "name": "ISO/IEC 27001 certificate",
+     "kind": "iso27001", "issuer": "Northway Registrar", "opinion": "none",
+     "received": 196, "from": None, "to": None, "until": -520, "reviewed": 190,
+     "services": [], "reliance": "partly",
+     "note": "The certificate's scope is the hosting operation, not the trial applications themselves."},
+    {"party": "trackco", "by": "assess1", "name": "Penetration test summary, 2026",
+     "kind": "pentest", "received": 38, "from": 70, "to": 60, "until": -320},
+]  # fmt: skip
+
+# Who the institute's agreements are with, and the agreements with its suppliers that the
+# third-party program entered. Days are before the build (negative: after it). Three gaps are
+# left: the pharmacy cabinets' supplier handles patient records with no business associate
+# agreement; the shared cohort with Calder Bay University went on after its memorandum was
+# closed; and the courier's contract has ended and is still open.
+AGREEMENT_PARTIES = {
+    "cohort_dua": ["funder3"], "genomic_cert": ["genomevault"], "vault_baa": ["backupco"],
+    "imaging_mou": ["univ1"],
+}  # fmt: skip
+# What an existing agreement also covers, now that services are on record.
+AGREEMENT_SERVICES = {"vault_baa": ["svc_vault"], "genomic_cert": ["svc_genomes"]}
+SUPPLIER_AGREEMENTS: list[dict[str, object]] = [
+    {"name": "Business associate agreement: Pellham Clinical Systems", "kind": "business_associate",
+     "party": "recordco", "unit": "CLIN", "starts": 1100, "ends": -295, "notice": 90, "renews": True,
+     "covers": ["svc_record"]},
+    {"name": "Business associate agreement: Lakeshore Reference Laboratory", "kind": "business_associate",
+     "party": "labref", "unit": "CLAB", "starts": 820, "ends": None, "covers": ["info_patients"]},
+    {"name": "Master services agreement: Quillon Cloud", "kind": "contract", "party": "cloud",
+     "unit": "IT", "starts": 1300, "ends": -210, "notice": 60, "renews": True,
+     "covers": ["svc_identity", "svc_mail"]},
+    {"name": "Hosting agreement: Ledgerwell", "kind": "contract", "party": "financeco",
+     "unit": "FIN", "starts": 1500, "ends": -500, "notice": 120, "covers": ["svc_finance"]},
+    {"name": "Subscription agreement: Peoplebook", "kind": "contract", "party": "hrco",
+     "unit": "HR", "starts": 700, "ends": -30, "notice": 60, "renews": True, "covers": ["svc_people"]},
+    {"name": "Services agreement: Castellan Trial Systems", "kind": "contract", "party": "edcco",
+     "unit": "CR", "starts": 600, "ends": -400, "covers": ["svc_edc"]},
+    {"name": "Monitoring services agreement: Halden Research Partners", "kind": "contract",
+     "party": "cro", "unit": "CR", "starts": 420, "ends": -310, "covers": ["svc_monitoring"]},
+    {"name": "Clinical trial agreement: Verdance Therapeutics", "kind": "contract", "party": "pharma1",
+     "unit": "CR", "starts": 480, "ends": -700, "covers": ["info_trials"]},
+    {"name": "Subscription: Tallyfield Surveys", "kind": "contract", "party": "surveyco",
+     "unit": "PS", "starts": 350, "ends": -15, "renews": True, "notice": 30, "covers": ["svc_surveys"]},
+    {"name": "Subaward: Northfield Data Collaborative", "kind": "award", "party": "sub2",
+     "unit": "SP", "starts": 300, "ends": -430, "covers": ["svc_linkage"]},
+    {"name": "Hosting agreement: Specimen Ledger Systems", "kind": "contract", "party": "trackco",
+     "unit": "BIO", "starts": 900, "ends": -365, "covers": ["svc_tracking"]},
+    {"name": "Courier agreement: Swiftcold Logistics", "kind": "contract", "party": "courier",
+     "unit": "BIO", "starts": 760, "ends": 25, "covers": ["svc_courier"]},
+]  # fmt: skip
+
+# A relationship over time. Days are before the build (negative: after it).
+SUBCONTRACTORS = [("recordco", "cloud"), ("surveyco", "cloud"), ("edcco", "cloud")]
+FINDINGS: list[dict[str, object]] = [
+    {"review": "cloud", "by": "ciso", "raised": 284, "severity": "high",
+     "name": "Quillon Cloud: administrators' second factor can be phished",
+     "summary": "Its own staff use security keys; the institute's tenant administrators still use codes sent by text.",
+     "action": "Move every tenant administrator to a security key", "contact": "cloud", "due": -20,
+     "agreed": "Agreed with the supplier: security keys for every tenant administrator with its next release."},
+    {"review": "edcco", "by": "ciso", "raised": 179, "severity": "moderate",
+     "name": "Castellan Trial Systems: restoring trial data has not been tested",
+     "summary": "It answered that backups are not restored to test them. The condition was a tested restore before the next trial starts.",
+     "action": "Restore a trial's data to a test system, and send the result to Clinical Research", "contact": "edcco", "due": 15},
+]  # fmt: skip
+CALLED_REVIEWS = [
+    {"party": "backupco", "by": "ciso", "on": 12, "event": "breach_notice",
+     "note": "On the 14th it told customers that a misconfigured storage area exposed other customers' backup catalogues for a day. It says the institute's were not among them."},
+]  # fmt: skip
+OFFBOARDING = {
+    "party": "webco", "started": 25,
+    "reason": "The public website moves to the institute's own platform at the end of the month.",
+    "steps": [("access", 20, "The supplier's accounts on the web servers and in the content system were removed."),
+              ("information", 9, "The site's content and analytics were exported, and the supplier deleted its copies.")],
+}  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

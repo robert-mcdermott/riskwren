@@ -4,6 +4,91 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.5.0 (2026-11-27)
+
+Wave 5, *Third parties*: who the organization depends on, what each can reach, and whether
+the paper covers it. A third party has services, each with the systems it reaches and the
+information it handles, and a tier set by the program's rules from a few questions the
+inventory mostly answers. A security questionnaire chosen by the tier is sent to its contact
+through a link that needs no account and reaches nothing else. Reports and certificates are
+read for what they cover and what they leave to the organization. Wherever regulated
+information is shared and no agreement of the kind the program requires covers it, every
+record involved shows a stop. Findings, review again, offboarding, and subcontractors follow
+the relationship over time.
+
+### Upgrading from 0.4.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0027 to 0031). Every row is
+kept, and the history still verifies. The upgrade loads the questionnaire tiering asks and the
+three due diligence questionnaires. A few things look different afterwards:
+
+- **Third parties have a menu of their own,** with Services, Due diligence, and Coverage;
+  Inventory keeps processes, systems, and information.
+- **Every third party is missing a tier** in Tidy until it is tiered, and has no review date
+  until then.
+- **Coverage shows stops as soon as information is linked as shared with a third party** and
+  no agreement says it is with that third party. Agreements made before 0.5.0 name their
+  parties in words only: say who each is with, on its page, and the stops it meets go.
+- **The program has two new tables,** the tiers and the sharing rules, taken from the default
+  program until the organization sets its own, and a new kind of link, *subcontracts to*.
+
+### Added
+
+- **Services** (`SVC`): what a third party provides, in the inventory beside it, with the
+  systems each reaches and the information each handles. Processes rely on services, and
+  systems are supplied by them. A third party's page lists its services, and both are in the
+  Connections picture.
+- **Tiering.** A few questions, answered partly from the inventory, give a third party's tier
+  by the program's rules, with each reason that applies. Those who keep a third party, and
+  assessors, tier it. The tier recorded is a judgment by a named person: a different tier from
+  the rules' needs a reason, and both are kept. Lists show,
+  sort, and cut by tier, and Tidy lists third parties not yet tiered.
+- **Contacts** at third parties: the people who can be asked. They are not accounts.
+- **Due diligence reviews** (`DDR`): a questionnaire, the one the third party's tier names, sent
+  to a contact through a link that needs no account. The link is a long random token kept only
+  as a digest, carried after `#` so that no server logs it, reaching that questionnaire and
+  nothing else, and ending when it expires, is withdrawn or replaced, or has been used. The
+  contact can save to finish later. The answers the questionnaire marks as concerns are listed
+  first, and the reviewer records the conclusion: approved, approved with conditions, or not
+  approved. Answers to read, and answers late, wait on the review's owners' Home.
+- **Three due diligence questionnaires,** short, standard, and full, written for organizations
+  in the United States. A choice or a yes-or-no question can mark an answer as a concern.
+- **A link sent by email is cleared once sent,** so the token is not kept in the outbox.
+- **Assurance documents:** reports and certificates as evidence of a third party, with their
+  period and expiry, kept to those who keep it and assessors. A review of each records what it
+  is, its opinion, the services it covers and does not, what is carved out, each exception and
+  whether it matters here, and each responsibility it leaves to the organization, joined to the
+  control that does it, which lists it. A contact can send reports through the review's link.
+- **Who an agreement is with:** the third parties it binds, beside the words of its parties.
+  An agreement can cover services as well as systems, information, and scopes, and a third
+  party's page lists the agreements it is party to.
+- **The stop for uncovered sharing.** The program's rules say which kinds of agreement
+  information needs when it is shared with a third party (a business associate agreement for
+  patient records handled for the organization, a data use agreement for controlled-access
+  data, and so on). Where information is shared, directly or through a service, and no open
+  agreement of a required kind with that third party covers it, the information, the third
+  party, and the service each show the stop, and **Third parties → Coverage** gathers them.
+- **Findings from a review** are issues about the third party, found by review, naming the
+  review they came from. An action on one can be done by the third party's contact, followed
+  up by its owner here.
+- **Review again** on the tier's cadence, from the last concluded review or from the first
+  tiering, or at once when an event calls for it (an incident, a breach notice, a change of
+  service or owner). A review due or late is on Home and in the reminders, and the list of
+  third parties can be cut to it.
+- **Offboarding:** ending a relationship opens a checklist (access removed, information
+  returned or destroyed, agreements ended, an attestation recorded), and the third party and
+  its services are retired when the last step is recorded.
+- **Subcontractors:** a third party *subcontracts to* others, shown on both and in the
+  Connections picture.
+- **A Third parties menu,** with third parties, services, and due diligence, and a new guide,
+  [Third parties](docs/third-parties.md).
+
+### Changed
+
+- A kind of link a release adds, or a pair of records it may now join, reaches an installation
+  that has renamed its kinds of link.
+- An answer to a questionnaire may be a contact's, given through a link, with no account.
+
 ## 0.4.0 (2026-11-27)
 
 Wave 4, *Policy and obligations*: the organization's own word, and what it has promised

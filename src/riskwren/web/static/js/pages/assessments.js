@@ -16,7 +16,7 @@ import { banner, field, select, submit } from "../components/form.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { personField } from "../components/people-picker.js";
 import { recordChip, TYPES } from "../components/record.js";
-import { section } from "../components/record-forms.js";
+import { section } from "../components/form.js";
 import { toast } from "../components/toast.js";
 import { alert, card, emptyState, pageHeader, pill } from "../components/ui.js";
 import { exportButton } from "../components/exchange.js";

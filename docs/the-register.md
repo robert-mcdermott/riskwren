@@ -24,6 +24,7 @@ The inventory is what the organization has and depends on. It has four kinds of 
 | **System** | What the work runs on: an application, a platform, an instrument, a device, a data store | `SYS-0001` |
 | **Third party** | Who it depends on: suppliers, service providers, collaborators, sponsors, subrecipients | `TP-0001` |
 | **Information asset** | A body of information it holds: what it is, where it is kept, and who it is shared with. The record describes the information and never contains it | `INF-0001` |
+| **Service** | What a third party provides: a hosted application, a maintenance contract, a test sent out. See [Third parties](third-parties.md) | `SVC-0001` |
 
 Every record has a name, a unit, a criticality, the most sensitive class of data it touches, and named owners. Systems also say how they are hosted and where they are in their life: planned, in service, being retired, or unsupported.
 
@@ -43,6 +44,9 @@ A record says what it relies on:
 | System | holds | Information asset |
 | Process | uses | Information asset |
 | Information asset | is shared with | Third party |
+| Service | reaches · handles | System · Information asset |
+| Process · System | relies on · is supplied by | Service |
+| Third party | subcontracts to | Another third party |
 | Process or system | depends on · is part of | Another of the same kind |
 
 A link is made once, from either end, and can be read from both. A lab can say that its work relies on central storage without anyone in central computing doing anything.
@@ -276,7 +280,8 @@ Each kind of record is expected to say a few things, and a record that does not 
 | Kind | Expected |
 | --- | --- |
 | Every kind below | An owner who can sign in |
-| Processes, systems, third parties, information | The class of data it handles; a link to anything else |
+| Processes, systems, third parties, information, services | The class of data it handles; a link to anything else |
+| Third parties | A tier |
 | Systems | Where it is hosted |
 | Information | Where it is held |
 | Risks | A rating; a control that bears on it |

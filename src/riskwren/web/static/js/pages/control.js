@@ -53,8 +53,19 @@ function overview(control, ctx) {
         ["Attested by its owner", control.attested ? `${{ yes: "Operates as described", partly: "Operates only partly", no: "Does not operate" }[control.attested.operates] ?? control.attested.operates}, ${control.attested.by}, ${date(control.attested.at)}. An attestation is not a test.` : null],
         ["Next test due", control.next_test_on ? h("span", { class: control.test_due ? "text-danger" : null }, date(control.next_test_on), control.test_due ? " (overdue)" : "") : null],
       ])),
-      directedBy(control),
+      directedBy(control), reliedOnBy(control),
       ownersCard(control, ctx)));
+}
+
+/** What third parties' reports leave to the organization, which this control does. */
+function reliedOnBy(control) {
+  const found = control.responsibilities ?? [];
+  if (!found.length) return null;
+  return card({ title: "Relied on by suppliers' reports" },
+    h("ul", { class: "plain-list stack" }, found.map((row) => h("li", { class: "stack-sm" },
+      h("div", {}, row.text),
+      h("div", { class: "cell-sub" }, `${row.third_party.name} · ${row.kind_label ?? "Report"} ${row.document.ref}`,
+        row.in_date ? "" : " · out of date", row.status === "in_place" ? "" : ` · ${row.status === "not_in_place" ? "not in place" : "does not apply"}`)))));
 }
 
 function directedBy(control) {

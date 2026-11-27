@@ -303,3 +303,36 @@ def test_a_message_is_safe_whatever_a_notice_says() -> None:
     )
     assert "http" not in bare and "Open RiskWren to see more." in bare
     _ = EmailMessage
+
+
+def test_a_link_to_a_questionnaire_is_sent_to_the_contact_and_not_kept(
+    db: Database, people: People, config: Config, inbox: Inbox
+) -> None:
+    from riskwren.inventory import records
+    from riskwren.inventory.registry import THIRD_PARTY
+    from riskwren.thirdparty import contacts, reviews, tiering
+    from tests.test_risks import who
+
+    steward = who(db, people, "steward")
+    with frozen_at(NINE), db.write(steward.actor) as session:
+        party = records.create(session, steward, THIRD_PARTY, {
+            "name": "Tallyfield Surveys", "kind": "service_provider",
+            "org_unit_id": people.units["IMM"]})  # fmt: skip
+        tiering.record(session, steward, party, {"information": "internal",
+                       "access": ["on_site"], "dependency": "little"}, None, None)  # fmt: skip
+        contact = contacts.add(session, steward, party,
+                               {"name": "Ana Ruiz", "email": "ana@tallyfield.example"})  # fmt: skip
+        review = reviews.start(session, steward, party, {})
+        token = reviews.send(session, steward, review, contact_id=contact.id)
+        url = f"https://riskwren.northmere.example/respond#{token}"
+        assert mail.queue_link(session, config, review, url)
+    with frozen_at(NINE):
+        assert mail.run_once(db, config)["sent"] == 1
+    (message,) = inbox.messages
+    assert message["To"] == "ana@tallyfield.example"
+    assert "Tallyfield Surveys" in message["Subject"]
+    assert url in text_of(message)
+    with db.read() as session:
+        kept = session.scalars(select(OutboxMessage)).one()
+        assert kept.status == "sent" and token not in kept.body_text
+        assert kept.body_html is None and kept.body_text == mail.CLEARED

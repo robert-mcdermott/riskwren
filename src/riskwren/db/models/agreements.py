@@ -30,8 +30,9 @@ AGREEMENT_KINDS = (
     "other",
 )  # fmt: skip
 AGREEMENT_STATUSES = ("active", "closed")
-# What an agreement can cover: the systems and information it is about, and scopes whole.
-COVERED = ("system", "information", "scope")
+# What an agreement can cover: the systems, information, and services it is about, and scopes
+# whole.
+COVERED = ("system", "information", "scope", "service")
 
 
 class Agreement(RecordMixin, Base):
@@ -59,6 +60,22 @@ class Agreement(RecordMixin, Base):
         CheckConstraint(one_of("status", AGREEMENT_STATUSES), name="status"),
         Index("ix_agreement_org_unit_id", "org_unit_id"),
         Index("ix_agreement_ends_on", "ends_on"),
+    )
+
+
+class AgreementParty(Base):
+    """A third party an agreement is with (TPR-05). The words of ``parties`` stay as written."""
+
+    __tablename__ = "agreement_party"
+    __audit_parent__ = ("agreement", "agreement_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    agreement_id: Mapped[int] = mapped_column(ForeignKey("agreement.id"))
+    third_party_id: Mapped[int] = mapped_column(ForeignKey("third_party.id"))
+
+    __table_args__ = (
+        UniqueConstraint("agreement_id", "third_party_id"),
+        Index("ix_agreement_party_third_party_id", "third_party_id"),
     )
 
 

@@ -205,6 +205,50 @@
   {{shot:session-held|A held session: the agenda drawn from the register, and the decision recorded on each item}}
 </section>
 
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Third parties</p>
+    <h2 id="tiered-by-your-rules">Every supplier tiered by your own rules, with the reasons</h2>
+    <p>A supplier's services say what it reaches and handles. A few questions, answered mostly from the inventory, give its tier by the program's rules, and every reason that applied is shown.</p>
+    <p>The tier is a judgment by a named person: a different one from the rules' needs a reason, and both are kept. The tier sets how often the supplier is reviewed.</p>
+    <p><a class="more" href="third-parties.html#tiering">Tiering</a></p>
+  </div>
+  {{shot:third-party-tiered|A cloud provider's page: Tier 1, with the three reasons that put it there, and the services it provides}}
+</section>
+
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">Due diligence</p>
+    <h2 id="questionnaires-without-accounts">A security questionnaire, without giving anyone an account</h2>
+    <p>The questionnaire the tier names goes to the supplier's contact through a link that expires. Only a digest of it is kept, it travels where no server logs it, and it opens that one form and nothing else.</p>
+    <p>The answers that are concerns are listed first, and the reviewer records what was concluded. A concern becomes a finding, followed up with the supplier's own people.</p>
+    <p><a class="more" href="third-parties.html#due-diligence">Due diligence</a></p>
+  </div>
+  {{shot:review-answered|A survey host's answers: five concerns listed first, then every answer as it was asked}}
+</section>
+
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Assurance</p>
+    <h2 id="what-the-report-covers">What a SOC 2 report actually covers</h2>
+    <p>Reports and certificates are kept with their period and expiry, and read for what they cover: the services in scope and those not, the carve-outs, the exceptions noted.</p>
+    <p>What a report leaves to the organization is joined to the control that does it, and that control's page says a supplier's assurance leans on it.</p>
+    <p><a class="more" href="third-parties.html#review-a-report">Reviewing a report</a></p>
+  </div>
+  {{shot:third-party-assurance|A supplier's SOC 2 report relied on with gaps: a service it does not cover, the data centres carved out, and the exceptions noted}}
+</section>
+
+<section class="feature flip">
+  <div class="feature-text">
+    <p class="eyebrow">Coverage</p>
+    <h2 id="a-stop-where-the-paper-is-missing">A stop wherever the paper is missing</h2>
+    <p>The program says which agreements shared information needs: a business associate agreement for patient records handled for you, a data use agreement for controlled-access data.</p>
+    <p>Where information is shared and no such agreement with that supplier covers it, the information, the supplier, and the service each show a stop, until one does.</p>
+    <p><a class="more" href="third-parties.html#coverage">Coverage</a></p>
+  </div>
+  {{shot:third-party-stop|A pharmacy supplier that handles patient records with no business associate agreement, and the stop at the top of its page}}
+</section>
+
 <section class="section">
   <h2 id="also-in-it">Also in it</h2>
   <div class="rest">
@@ -261,7 +305,7 @@
 
 <section class="section">
   <h2 id="try-it">Try it</h2>
-  <p>You need <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, which provides the right Python. Clone the repository and build the demo organization: a fictional research institute with a clinic, two years of history, four scopes held to frameworks, an assessment in progress, evidence going stale, issues and exceptions at every stage, policies being read and acknowledged, agreements with their dates, and a risk committee.</p>
+  <p>You need <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, which provides the right Python. Clone the repository and build the demo organization: a fictional research institute with a clinic, two years of history, four scopes held to frameworks, an assessment in progress, evidence going stale, issues and exceptions at every stage, policies being read and acknowledged, agreements with their dates, a risk committee, and suppliers tiered, questioned, and covered, or not.</p>
   <div class="code"><pre><code class="language-bash">git clone https://github.com/robert-mcdermott/riskwren.git
 cd riskwren
 uv sync
@@ -286,5 +330,5 @@ uv run riskwren --config demo/riskwren.toml serve</code></pre></div>
 
 <section class="section">
   <h2 id="where-it-stands">Where it stands</h2>
-  <p>These pages describe version {{version}}: the register, compliance, and the means of keeping both current. It signs in with local accounts or, if you set it up, single sign-on, and sends email only if you ask it to. Policies and obligations come next, then supplier reviews, reporting, audits, and incidents. The <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a> says what comes in what order, and the <a href="changelog.html">changelog</a> lists what is in each release.</p>
+  <p>These pages describe version {{version}}: the register, compliance, the means of keeping both current, the organization's policies and agreements, and its third parties. It signs in with local accounts or, if you set it up, single sign-on, and sends email only if you ask it to. Reporting comes next, then audits and incidents. The <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a> says what comes in what order, and the <a href="changelog.html">changelog</a> lists what is in each release.</p>
 </section>

@@ -124,7 +124,8 @@ def test_a_new_installation_has_the_built_in_questionnaires(db: Database, loaded
         held = {row.key: row for row in questionnaires.all_(session)}
         assert set(held) == {
             "control-attestation", "risk-self-assessment", "unit-completeness",
-            "system-security-profile",
+            "system-security-profile", "third-party-tiering", "due-diligence-short",
+            "due-diligence-standard", "due-diligence-full",
         }  # fmt: skip
         assert all((row.origin, row.current_version) == ("pack", 1) for row in held.values())
         assert [r.key for r in questionnaires.all_(session, purpose="attestation")] == [
@@ -278,7 +279,7 @@ def test_a_built_in_questionnaire_that_has_been_edited_is_left_alone(
         newer = json.loads(json.dumps(pack))
         for item in newer:
             item["document"]["sections"][0]["title"] += " (revised)"
-        assert questionnaires.install(session, newer) == 3  # the three nobody has touched
+        assert questionnaires.install(session, newer) == 7  # the seven nobody has touched
         assert row.current_version == 2 and other.current_version == 2
         assert questionnaires.view(session, other)["versions"][0]["published_by"] == "RiskWren"
 
@@ -286,7 +287,7 @@ def test_a_built_in_questionnaire_that_has_been_edited_is_left_alone(
 def test_questionnaires_through_the_api(as_role: Clients, people: People, loaded: None) -> None:
     manager, member = as_role("manager"), as_role("member")
     listed = member.get("/api/v1/questionnaires").json()["data"]
-    assert len(listed["questionnaires"]) == 4 and "yes_no" in listed["types"]
+    assert len(listed["questionnaires"]) == 8 and "yes_no" in listed["types"]
     shown = member.get("/api/v1/questionnaires/control-attestation").json()["data"]
     assert shown["version"] == 1 and shown["document"]["sections"][0]["key"] == "control"
     assert member.get("/api/v1/questionnaires/nothing").status_code == 404

@@ -68,6 +68,7 @@ from riskwren.db.models import (
     RiskAnalysisItem,
     RiskCategory,
     Scope,
+    ThirdParty,
     TreatmentPlan,
 )
 from riskwren.demo import content as c
@@ -84,6 +85,8 @@ from riskwren.risk import objectives as risk_objectives
 from riskwren.risk.indicators import INDICATOR
 from riskwren.risk.objectives import OBJECTIVE
 from riskwren.risk.register import RISK
+from riskwren.thirdparty import tiering
+from riskwren.thirdparty.services import SERVICE
 from riskwren.treatment import service as treatment
 
 SETTING = "demo"
@@ -1660,6 +1663,330 @@ class Builder:
                     )
                     agreements.close(session, who, agreement, why)
 
+    def _service(self, spec: tuple[Any, ...]) -> None:
+        """A service a third party provides, with the systems it reaches and the information
+        it handles, added by its unit's steward."""
+        key, name, party, code, kind, criticality, data_class, reaches, handles = spec
+        unit = self.units[code]
+        with self.act(self.steward(unit)) as (session, who):
+            made = records.create(
+                session, who, SERVICE,
+                {"name": name, "kind": kind, "criticality": criticality, "data_class": data_class,
+                 "org_unit_id": unit, "third_party": self.things[party][2]},
+                checked=True,
+            )  # fmt: skip
+            self.things[key] = (SERVICE, made.id, made.ref)
+            for relation, targets in (("reaches", reaches), ("handles", handles)):
+                for target in targets:
+                    target_type, target_id, _ = self.things[target]
+                    links.add(session, who, SERVICE, made, relation, target_type,
+                              session.get(target_type.model, target_id))  # fmt: skip
+                    self.tally("links")
+        self.tally("services")
+
+    def _tier(self, party: str, by: int | None = None) -> None:
+        """Tier a third party from what the inventory suggests and what its keeper knows."""
+        _, party_id, _ = self.things[party]
+        with self.db.read() as session:
+            unit = session.get(ThirdParty, party_id).org_unit_id
+        with self.act(by or self.steward(unit)) as (session, who):
+            record = session.get(ThirdParty, party_id)
+            known = tiering.facts(session, record)
+            answers: dict[str, Any] = {"information": "none", "access": ["no_access"],
+                                       "dependency": "little"}  # fmt: skip
+            answers.update(tiering.suggest(known))
+            answers.update(c.TIERING_ANSWERS.get(party, {}))
+            tier, why = c.TIERING_JUDGED.get(party, (None, None))
+            tiering.record(session, who, record, answers, tier, why)
+        self.tally("tierings")
+
+    def _story_third_parties(self) -> Script:
+        """What each supplier and partner provides, what each service reaches and handles, and
+        each third party's tier from the program's rules, on answers the inventory mostly
+        suggested. One keeper recorded a different tier from the rules', with the reason; the
+        supplier of identity was tiered again when the institute moved its email there; and
+        a few sponsors and partners are not tiered yet."""
+        yield self._on(560)
+        for spec in c.SERVICES:
+            self._service(spec)
+        tiered = [key for key in c.TIERING_ANSWERS if key not in c.UNTIERED]
+        for index, party in enumerate(tiered):
+            if index % 6 == 0:
+                yield self._on(540 - index * 6)
+            self._tier(party)
+        yield self._on(150)
+        self._service(c.LATER_SERVICE)
+        yield self._on(146)
+        self._tier("cloud", self.cast["ciso"])
+
+    def _sound(self, document: dict[str, Any], contact: str) -> dict[str, Any]:
+        """A sound answer to every question: yes where no is the concern, the first answer
+        that is not a concern, and a few words where words are asked for."""
+        out: dict[str, Any] = {}
+        for section in document["sections"]:
+            for question in section["questions"]:
+                kind, key = question["type"], question["key"]
+                if kind == "yes_no":
+                    out[key] = question.get("concern_if") is not True and "concern_if" in question
+                elif kind in ("choice", "choices"):
+                    good = [o["key"] for o in question["options"] if not o.get("concern")]
+                    out[key] = good[0] if kind == "choice" else good[:1]
+                elif key == "security_contact":
+                    out[key] = contact
+        return out
+
+    def _story_due_diligence(self) -> Script:
+        """Contacts at the suppliers that matter most, and due diligence at every stage:
+        reviews concluded over the year, one answered and waiting for the security leader,
+        one half answered, one whose answers are late, one whose link ran out, and one not
+        yet sent."""
+        from riskwren.db.models import Questionnaire, QuestionnaireVersion
+        from riskwren.thirdparty import contacts, respondent, reviews
+
+        yield self._on(430)
+        people: dict[str, list[int]] = {}
+        for party, listed in c.CONTACTS.items():
+            _, party_id, _ = self.things[party]
+            with self.act(self.cast["ciso"]) as (session, who):
+                record = session.get(ThirdParty, party_id)
+                people[party] = [
+                    contacts.add(session, who, record,
+                                 {"name": name, "email": email, "role": role}).id
+                    for name, email, role in listed
+                ]  # fmt: skip
+            self.tally("contacts at third parties", len(listed))
+        steps: list[tuple[float, int, str, dict[str, Any]]] = []
+        for index, spec in enumerate(c.REVIEWS):
+            for step in ("started", "sent", "saved", "answered", "concluded"):
+                if step in spec:
+                    steps.append((float(spec[step]), index, step, spec))  # type: ignore[arg-type]
+        refs: dict[int, str] = {}
+        tokens: dict[int, str] = {}
+        order = {"started": 0, "sent": 1, "saved": 2, "answered": 3, "concluded": 4}
+        for days, index, step, spec in sorted(steps, key=lambda s: (-s[0], s[1], order[s[2]])):
+            yield self._on(days)
+            party = str(spec["party"])
+            by = self.cast[str(spec["by"])]
+            _, party_id, _ = self.things[party]
+            if step == "started":
+                with self.act(by) as (session, who):
+                    made = reviews.start(session, who, session.get(ThirdParty, party_id), {})
+                    refs[index] = made.ref
+                self.tally("due diligence reviews")
+            elif step == "sent":
+                due = spec.get("due")
+                with self.act(by) as (session, who):
+                    review = reviews.find(session, refs[index])
+                    tokens[index] = reviews.send(
+                        session, who, review, contact_id=people[party][0],
+                        due_on=self.day(-float(due)).isoformat() if due is not None else None,
+                        days=int(spec.get("link_days", 30)),  # type: ignore[arg-type]
+                    )  # fmt: skip
+            elif step in ("saved", "answered"):
+                with self.db.read() as session:
+                    link = respondent.find(session, tokens[index])
+                    actor = respondent.actor_for(session, link)
+                    review = reviews.find(session, refs[index])
+                    asked = session.get(Questionnaire, review.questionnaire_id)
+                    version = session.scalars(
+                        select(QuestionnaireVersion).where(
+                            QuestionnaireVersion.questionnaire_id == asked.id,
+                            QuestionnaireVersion.number == review.version_number,
+                        )
+                    ).one()
+                    contact = c.CONTACTS[party][0]
+                    answers = {
+                        **self._sound(version.document, f"{contact[0]}, {contact[1]}"),
+                        **dict(spec.get("answers") or {}),
+                    }  # type: ignore[arg-type]
+                if step == "saved":
+                    half = dict(list(answers.items())[: len(answers) // 2])
+                    with self.db.write(actor) as session:
+                        respondent.save(session, respondent.find(session, tokens[index]), half,
+                                        submit=False)  # fmt: skip
+                else:
+                    with self.db.write(actor) as session:
+                        if spec.get("sends") and self.files is not None:
+                            respondent.attach(
+                                session, respondent.find(session, tokens[index]), self.files,
+                                _pdf([str(spec["sends"]), "Demo data. Not a real report."]),
+                                str(spec["sends"]),
+                            )  # fmt: skip
+                        respondent.save(session, respondent.find(session, tokens[index]),
+                                        answers, submit=True)  # fmt: skip
+            else:
+                with self.act(by) as (session, who):
+                    reviews.conclude(
+                        session,
+                        who,
+                        reviews.find(session, refs[index]),
+                        str(spec["conclusion"]),
+                        spec.get("note"),
+                    )  # type: ignore[arg-type]
+
+    def _story_assurance(self) -> Script:
+        """Reports and certificates from the suppliers that matter most, each read for what
+        it covers and what it leaves to the institute: one relied on with gaps, one expired,
+        one certificate whose scope stops short of the service, and a test summary not yet
+        read."""
+        from riskwren.thirdparty import assurance
+
+        steps = []
+        for index, spec in enumerate(c.ASSURANCE):
+            steps.append((float(spec["received"]), index, "received", spec))  # type: ignore[arg-type]
+            if "reviewed" in spec:
+                steps.append((float(spec["reviewed"]), index, "reviewed", spec))  # type: ignore[arg-type]
+        made: dict[int, str] = {}
+        for days, index, step, spec in sorted(
+            steps, key=lambda s: (-s[0], s[1], s[2] != "received")
+        ):
+            yield self._on(days)
+            by = self.cast[str(spec["by"])]
+            _, party_id, _ = self.things[str(spec["party"])]
+            with self.act(by) as (session, who):
+                party = session.get(ThirdParty, party_id)
+                if step == "received":
+                    on = {
+                        key: self.day(-float(spec[key])).isoformat()  # type: ignore[arg-type]
+                        if spec.get(key) is not None
+                        else None
+                        for key in ("received", "from", "to", "until")
+                    }
+                    item = assurance.add(session, who, party, {
+                        "name": spec["name"], "collected_on": self.today.isoformat(),
+                        "covers_from": on["from"], "covers_to": on["to"],
+                        "valid_until": on["until"],
+                    })  # fmt: skip
+                    if self.files is not None:
+                        evidence.attach_file(
+                            session, who, item, self.files,
+                            _pdf([str(spec["name"]), str(party.name), "Demo data. Not a real report."]),
+                            f"{spec['kind']}.pdf",
+                        )  # fmt: skip
+                    made[index] = item.ref
+                    self.tally("reports and certificates")
+                else:
+                    duties = []
+                    for text, control, state in spec.get("duties", []):  # type: ignore[attr-defined]
+                        found = (
+                            self.controls.get((control[0], self.units[control[1]]))
+                            if control
+                            else None
+                        )
+                        ref = session.get(Control, found).ref if found else None
+                        duties.append({"text": text, "control": ref,
+                                       "status": state if ref or state != "in_place" else "not_in_place"})  # fmt: skip
+                    assurance.record(session, who, assurance.find_document(session, made[index]), party, {
+                        "kind": spec["kind"], "issuer": spec.get("issuer"), "opinion": spec.get("opinion"),
+                        "services": [self.things[key][2] for key in spec.get("services", [])],  # type: ignore[attr-defined]
+                        "carve_outs": spec.get("carve_outs"), "exceptions": spec.get("exceptions", []),
+                        "responsibilities": duties, "reliance": spec["reliance"], "note": spec.get("note"),
+                    })  # fmt: skip
+
+    def _story_coverage(self) -> Script:
+        """Who the institute's agreements are with, and the agreements with its suppliers
+        entered when the third-party program began: enough to cover most of what is shared,
+        and not all of it."""
+        from riskwren.thirdparty import coverage
+
+        lead = self.cast["risk2"]
+        yield self._on(96)
+        for key, parties in c.AGREEMENT_PARTIES.items():
+            with self.act(lead) as (session, who):
+                agreement = records.load(session, who, AGREEMENT, self._agreement_refs[key])
+                if agreement.status == "active":  # a closed one is with nobody any more
+                    coverage.set_parties(session, who, agreement,
+                                         [self.things[p][2] for p in parties])  # fmt: skip
+        for key, services in c.AGREEMENT_SERVICES.items():
+            with self.act(lead) as (session, who):
+                agreement = records.load(session, who, AGREEMENT, self._agreement_refs[key])
+                have = [row["ref"] for row in agreements.covers(session, who, agreement)["records"]]
+                agreements.set_coverage(session, who, agreement,
+                                        have + [self.things[s][2] for s in services])  # fmt: skip
+        yield self._on(92)
+        for spec in c.SUPPLIER_AGREEMENTS:
+            unit = self.units[str(spec["unit"])]
+            with self.act(lead) as (session, who):
+                party = self.things[str(spec["party"])]
+                values = {
+                    "name": spec["name"], "kind": spec["kind"],
+                    "parties": session.get(ThirdParty, party[1]).name, "org_unit_id": unit,
+                    "starts_on": self.day(-float(spec["starts"])).isoformat(),  # type: ignore[arg-type]
+                    "ends_on": self.day(-float(spec["ends"])).isoformat()  # type: ignore[arg-type]
+                    if spec.get("ends") is not None else None,
+                    "notice_days": spec.get("notice"), "renews": bool(spec.get("renews")),
+                }  # fmt: skip
+                made = records.create(session, who, AGREEMENT, values)
+                records.set_owners(session, who, AGREEMENT, made,
+                                   [{"account_id": self.steward(unit), "kind": "owner"}])  # fmt: skip
+                coverage.set_parties(session, who, made, [party[2]])
+                agreements.set_coverage(
+                    session, who, made, [self.things[k][2] for k in spec["covers"]]
+                )  # type: ignore[attr-defined]
+            self.tally("agreements")
+
+    def _story_lifecycle(self) -> Script:
+        """Relationships over time: the suppliers the clinical systems rely on in turn, two
+        findings followed up with the suppliers' own people, a review called for by a breach
+        notice, and a supplier being offboarded."""
+        from riskwren.compliance import issues as issue_service
+        from riskwren.db.models import ThirdPartyContact, ThirdPartyReview
+        from riskwren.thirdparty import lifecycle
+
+        yield self._on(300)
+        for host, sub in c.SUBCONTRACTORS:
+            with self.db.read() as session:
+                unit = session.get(ThirdParty, self.things[host][1]).org_unit_id
+            self.link_things(self.steward(unit), host, "subcontracts", sub)
+        for spec in c.FINDINGS:
+            yield self._on(float(spec["raised"]))  # type: ignore[arg-type]
+            by = self.cast[str(spec["by"])]
+            _, party_id, _ = self.things[str(spec["review"])]
+            with self.act(by) as (session, who):
+                review = session.scalars(select(ThirdPartyReview).where(
+                    ThirdPartyReview.third_party_id == party_id,
+                    ThirdPartyReview.status == "concluded")).first()  # fmt: skip
+                assert review is not None
+                issue = lifecycle.raise_finding(
+                    session,
+                    who,
+                    review,
+                    {
+                        "name": spec["name"],
+                        "summary": spec["summary"],
+                        "severity": spec["severity"],
+                    },
+                )
+                contact = session.scalars(select(ThirdPartyContact).where(
+                    ThirdPartyContact.third_party_id == party_id)).first()  # fmt: skip
+                due = self.day(-float(spec["due"]))  # type: ignore[arg-type]
+                if spec.get("agreed"):
+                    issue_service.reschedule(session, who, issue, due_on=due,
+                                             reason=str(spec["agreed"]))  # fmt: skip
+                issue_service.add_action(
+                    session, who, issue, title=str(spec["action"]), owner_id=by,
+                    due_on=due.isoformat(), contact_id=contact.id if contact else None,
+                )  # fmt: skip
+            self.tally("findings from reviews")
+        spec = c.OFFBOARDING
+        yield self._on(float(spec["started"]))  # type: ignore[arg-type]
+        _, party_id, _ = self.things[str(spec["party"])]
+        with self.db.read() as session:
+            unit = session.get(ThirdParty, party_id).org_unit_id
+        keeper = self.steward(unit)
+        with self.act(keeper) as (session, who):
+            lifecycle.start(session, who, session.get(ThirdParty, party_id), spec["reason"])
+        for key, days, note in spec["steps"]:  # type: ignore[attr-defined]
+            yield self._on(float(days))
+            with self.act(keeper) as (session, who):
+                lifecycle.record_step(session, who, session.get(ThirdParty, party_id), key, note)
+        for called in c.CALLED_REVIEWS:
+            yield self._on(float(called["on"]))  # type: ignore[arg-type]
+            _, party_id, _ = self.things[str(called["party"])]
+            with self.act(self.cast[str(called["by"])]) as (session, who):
+                lifecycle.call_review(session, who, session.get(ThirdParty, party_id),
+                                      str(called["event"]), str(called["note"]))  # fmt: skip
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -2909,7 +3236,8 @@ class Builder:
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
             self._story_documents, self._story_agreements, self._story_framework_update,
-            self._story_governance,
+            self._story_governance, self._story_third_parties, self._story_due_diligence,
+            self._story_assurance, self._story_coverage, self._story_lifecycle,
         ):  # fmt: skip
             self.schedule(story())
         self.run()
