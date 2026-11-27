@@ -72,6 +72,8 @@ async function boot() {
   route("/notices", page("notices", "noticeList"));
   route("/scopes", page("scopes", "scopeList"));
   route("/scopes/:ref", page("scopes", "scopePage"));
+  route("/frameworks/:key/changes", page("framework-versions", "frameworkChanges"));
+  route("/frameworks/:key/suggestions", page("framework-versions", "frameworkSuggestions"));
   route("/frameworks/:key", page("frameworks", "frameworkPage"));
   route("/plans", page("actions", "planList"));
   route("/acceptances", page("actions", "acceptanceList"));

@@ -768,7 +768,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     held_load.add_argument("file", nargs="?", metavar="FILE", help="the pack to load")
     held_load.add_argument(
-        "--builtin", action="store_true", help="load the built-in frameworks not yet here"
+        "--builtin",
+        action="store_true",
+        help="load the built-in frameworks not yet here, and the publishers' mappings for "
+        "those that are",
     )
     held_load.add_argument(
         "--dry-run", action="store_true", help="check the pack, and load nothing"

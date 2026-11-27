@@ -146,7 +146,7 @@ Load a framework from a pack file, or the built-in ones that are missing. A pack
 | Option | Meaning |
 |---|---|
 | `FILE` | the pack to load |
-| `--builtin` | load the built-in frameworks not yet here |
+| `--builtin` | load the built-in frameworks not yet here, and the publishers' mappings for those that are |
 | `--dry-run` | check the pack, and load nothing |
 
 ### `riskwren frameworks show`

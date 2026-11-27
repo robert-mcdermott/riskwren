@@ -14,6 +14,7 @@ from riskwren.db.models.compliance import (
     EvidenceLink,
     ExceptionRequest,
     Framework,
+    FrameworkMapping,
     Implementation,
     Issue,
     IssueSubject,
@@ -24,6 +25,7 @@ from riskwren.db.models.compliance import (
     ScopeMember,
     ScopeRequirement,
     StoredFile,
+    SuggestionSetAside,
     TestResult,
 )
 from riskwren.db.models.controls import (
@@ -114,6 +116,7 @@ __all__ = [
     "ExternalRef",
     "FailedSignIn",
     "Framework",
+    "FrameworkMapping",
     "Handover",
     "Identity",
     "Implementation",
@@ -163,6 +166,7 @@ __all__ = [
     "Setting",
     "SignInRequest",
     "StoredFile",
+    "SuggestionSetAside",
     "System",
     "TestResult",
     "ThirdParty",

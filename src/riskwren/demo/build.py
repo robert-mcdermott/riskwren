@@ -38,6 +38,7 @@ from riskwren.compliance import (
     issues,
     scopes,
 )
+from riskwren.compliance import packs as framework_packs
 from riskwren.compliance.agreements import AGREEMENT
 from riskwren.compliance.evidence import EVIDENCE
 from riskwren.compliance.scopes import SCOPE
@@ -1651,6 +1652,48 @@ class Builder:
                     )
                     agreements.close(session, who, agreement, why)
 
+    def _story_framework_update(self) -> Script:
+        """The trial data platform was set up on SP 800-53 Rev. 4, loaded beside Rev. 5 for
+        it. It has not moved yet. Crosswalks the publisher's mapping between SP 800-171 and
+        SP 800-53 suggests are being worked through: some mapped, one set aside."""
+        lead = self.cast["risk2"]
+        spec = c.SCOPE_TRIALS
+        yield self._on(spec["loaded"])
+        with self.act(lead) as (session, who):
+            framework_packs.load(
+                session, framework_packs.builtin("nist-800-53-r4"), account_id=who.account_id
+            )
+        self.tally("frameworks loaded beside another version")
+        yield self._on(spec["made"])
+        made = self._scope(lead, spec)
+        with self.act(lead) as (session, who):
+            scope = session.get(Scope, made)
+            for code, applicable, reason in spec["decisions"]:
+                scopes.decide(
+                    session, who, scope, framework=spec["framework"][0], code=code,
+                    applicable=applicable, reason=reason,
+                )  # fmt: skip
+            for key, unit, code in spec["mapped"]:
+                found = self.controls.get((key, self.units[unit]))
+                if found is not None:
+                    crosswalk.map_(
+                        session, who, session.get(Control, found),
+                        framework=spec["framework"][0], code=code, coverage="partial",
+                    )  # fmt: skip
+                    self.tally("requirements mapped by hand")
+        yield self._on(spec["reviewed"])
+        with self.act(lead) as (session, who):
+            sp53 = frameworks.by_key(session, "nist-800-53")
+            found = crosswalk.publisher_suggestions(session, who, sp53)
+            for group in found["controls"][:4]:
+                control = records.load(session, who, CONTROL, group["control"]["ref"])
+                first, *rest = group["suggestions"]
+                crosswalk.confirm_suggestion(session, who, sp53, control, first["code"])
+                self.tally("suggested crosswalks confirmed")
+                if rest:
+                    crosswalk.set_aside(session, who, sp53, control, rest[-1]["code"])
+                    self.tally("suggested crosswalks set aside")
+
     def _scope(self, by: int, spec: dict[str, Any]) -> int:
         """A scope with its boundary and the framework it is held to."""
         values = {"name": spec["name"], "org_unit_id": self.units[spec["unit"]],
@@ -2736,7 +2779,7 @@ class Builder:
             self._story_agreement, self._story_scopes, self._story_assessment,
             self._story_issues_later, self._story_exceptions_later, self._story_campaigns,
             self._story_indicators, self._story_views, self._story_analyses,
-            self._story_documents, self._story_agreements,
+            self._story_documents, self._story_agreements, self._story_framework_update,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

@@ -27,7 +27,9 @@ from riskwren.db.models import (
     ControlLibraryEntry,
     ControlRequirement,
     Framework,
+    FrameworkMapping,
     Requirement,
+    SuggestionSetAside,
 )
 from riskwren.db.models.compliance import COVERAGE
 from riskwren.events import audit
@@ -285,3 +287,137 @@ def coverage(session: Session, principal: Principal, framework: Framework) -> di
         "mapped": int(mapped),
         "unmapped": framework.citable_count - int(mapped),
     }
+
+
+# --- What a publisher's mapping suggests ------------------------------------------------------
+
+
+def _publisher_pairs(session: Session, framework: Framework) -> list[tuple[str, str, str]]:
+    """(code here, other framework's key, its code): what a publisher says relates this
+    framework's requirements to another's, in either direction."""
+    found: list[tuple[str, str, str]] = []
+    for row in session.scalars(
+        select(FrameworkMapping).where(
+            FrameworkMapping.relation == "derived_from",
+            (FrameworkMapping.from_key == framework.key)
+            | (FrameworkMapping.to_key == framework.key),
+        )
+    ):
+        if row.from_key == framework.key:
+            found.append((row.from_code, row.to_key, row.to_code))
+        else:
+            found.append((row.to_code, row.from_key, row.from_code))
+    return found
+
+
+def publisher_suggestions(
+    session: Session, principal: Principal, framework: Framework
+) -> dict[str, Any]:
+    """Crosswalks suggested by a publisher's mapping: a control mapped to a requirement of
+    another framework, which the publisher relates to one of this framework's, and not mapped
+    to that one yet nor set aside. Grouped by control; each says what suggests it."""
+    pairs = _publisher_pairs(session, framework)
+    if not pairs:
+        return {"controls": [], "total": 0, "sources": []}
+    keys = {other for _here, other, _there in pairs}
+    others = {
+        row.key: row for row in session.scalars(select(Framework).where(Framework.key.in_(keys)))
+    }
+    wanted_codes = {(other, there) for _here, other, there in pairs if other in others}
+    requirement_of: dict[tuple[str, str], Requirement] = {}
+    for row, key in session.execute(
+        select(Requirement, Framework.key)
+        .join(Framework, Framework.id == Requirement.framework_id)
+        .where(Framework.key.in_([*keys, framework.key]), Requirement.is_citable.is_(True))
+    ).all():
+        requirement_of[(key, row.code)] = row
+    mapped: dict[int, set[int]] = {}
+    for control_id, requirement_id in session.execute(
+        select(ControlRequirement.control_id, ControlRequirement.requirement_id)
+    ).all():
+        mapped.setdefault(requirement_id, set()).add(control_id)
+    set_aside = set(
+        session.execute(
+            select(SuggestionSetAside.control_id, SuggestionSetAside.requirement_id)
+        ).all()
+    )
+    found: dict[tuple[int, int], dict[str, Any]] = {}
+    for here, other, there in pairs:
+        target = requirement_of.get((framework.key, here))
+        source = requirement_of.get((other, there))
+        if target is None or source is None or (other, there) not in wanted_codes:
+            continue
+        for control_id in mapped.get(source.id, set()):
+            if control_id in mapped.get(target.id, set()) or (control_id, target.id) in set_aside:
+                continue
+            entry = found.setdefault(
+                (control_id, target.id),
+                {"code": target.code, "title": target.title,
+                 "excerpt": frameworks.card(target)["excerpt"], "because": []},
+            )  # fmt: skip
+            entry["because"].append({"framework": others[other].title, "key": other, "code": there})
+    by_control: dict[int, list[dict[str, Any]]] = {}
+    for (control_id, _requirement_id), entry in found.items():
+        by_control.setdefault(control_id, []).append(entry)
+    shown = []
+    for control in session.scalars(
+        select(Control).where(Control.id.in_(list(by_control) or [0])).order_by(Control.ref)
+    ):
+        if control.status != "active" or not access.can_see(session, principal, CONTROL, control):
+            continue
+        shown.append({
+            "control": records.chip(CONTROL, control),
+            "can_edit": access.can_edit(session, principal, CONTROL, control),
+            "suggestions": sorted(by_control[control.id], key=lambda each: each["code"]),
+        })  # fmt: skip
+    return {
+        "controls": shown,
+        "total": sum(len(each["suggestions"]) for each in shown),
+        "sources": sorted(
+            {others[other].title for _here, other, _there in pairs if other in others}
+        ),
+    }
+
+
+def confirm_suggestion(
+    session: Session, principal: Principal, framework: Framework, control: Control, code: str
+) -> ControlRequirement:
+    """A person agrees with a suggestion: the control is mapped, in part, and it is theirs."""
+    suggested = [
+        each for each in publisher_suggestions(session, principal, framework)["controls"]
+        if each["control"]["ref"] == control.ref
+    ]  # fmt: skip
+    match = next(
+        (each for group in suggested for each in group["suggestions"] if each["code"] == code), None
+    )
+    if match is None:
+        raise NotFound(f"{code} is not suggested for {control.ref}.")
+    because = ", ".join(f"{each['code']} of {each['framework']}" for each in match["because"])
+    return map_(
+        session, principal, control, framework=framework.key, code=code, coverage="partial",
+        note=f"Suggested by the publisher's mapping from {because}."[:300],
+    )  # fmt: skip
+
+
+def set_aside(
+    session: Session, principal: Principal, framework: Framework, control: Control, code: str
+) -> None:
+    """A person says a suggestion does not hold: it is not suggested again."""
+    if not access.can_edit(session, principal, CONTROL, control):
+        raise PermissionDenied("You cannot edit this control.")
+    requirement = frameworks.find(session, framework, code)
+    exists_already = session.scalars(
+        select(SuggestionSetAside.id).where(
+            SuggestionSetAside.control_id == control.id,
+            SuggestionSetAside.requirement_id == requirement.id,
+        )
+    ).first()
+    if exists_already is None:
+        with audit.operation(session, "control.set_aside", code=code, framework=framework.title):
+            session.add(
+                SuggestionSetAside(
+                    control_id=control.id, requirement_id=requirement.id,
+                    account_id=principal.account_id, set_aside_at=utc_now(),
+                )
+            )  # fmt: skip
+            session.flush()

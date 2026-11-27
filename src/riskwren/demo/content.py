@@ -1535,6 +1535,39 @@ AGREEMENTS = [
     },
 ]
 
+# A scope set up on SP 800-53 Rev. 4, because the industry sponsor's contract named it. Rev. 5
+# is loaded beside it; the platform has not moved yet. One of its decisions is about a control
+# Rev. 5 withdrew, and would be left behind.
+SCOPE_TRIALS = {
+    "name": "Trial data platform",
+    "unit": "CR",
+    "summary": "The hosted systems that hold the institute's clinical trial data, kept to the "
+    "control baseline the industry sponsor's contract names.",
+    "boundary": "Electronic data capture and the trial management system, and the trial "
+    "participant data they hold. The hosting company runs both; the institute decides who may "
+    "use them.",
+    "members": ["edc", "ctms", "info_trials"],
+    "units": [],
+    "framework": ("nist-800-53-r4", "moderate"),
+    "loaded": 560,
+    "made": 520,
+    "decisions": [
+        ("PE-3", False, "The hosting company runs the data center; its physical access "
+         "controls are covered by its own attestation report."),
+        ("PE-6", False, "As for PE-3: watching physical access is the hosting company's."),
+        ("SA-12", True, "The sponsor's contract asks for supply chain protection, though the "
+         "moderate baseline does not."),
+    ],
+    "reviewed": 20,  # days ago, when crosswalks the publisher's mapping suggests were looked at
+    # The central controls the platform's keepers mapped to Rev. 4 when it was set up. One is
+    # to a control Rev. 5 moved into the supply chain family.
+    "mapped": [
+        ("access_approved", "IT", "AC-2"), ("second_factor", "IT", "IA-2(1)"),
+        ("backups_tested", "IT", "CP-9"), ("encryption_at_rest", "IT", "SC-28"),
+        ("access_reviewed", "SEC", "AC-2(3)"), ("supplier_assessed", "SEC", "SA-19"),
+    ],
+}  # fmt: skip
+
 # Saved views: who shares it, its name, the list, and its filters.
 VIEWS = [
     (

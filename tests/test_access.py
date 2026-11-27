@@ -357,6 +357,7 @@ for _route in (
     ("PUT", "/api/v1/agreements/{ref}/covers"),
     ("POST", "/api/v1/agreements/{ref}/close"),
     ("POST", "/api/v1/agreements/{ref}/reopen"),
+    ("GET", "/api/v1/framework-packs"),
     ("PUT", "/api/v1/documents/{ref}/controls"),
     ("DELETE", "/api/v1/documents/{ref}/controls/{link_id}"),
     ("PUT", "/api/v1/documents/{ref}/requirements"),
@@ -388,6 +389,7 @@ REACH[("GET", "/api/v1/program")] = EVERYONE
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
+REACH[("POST", "/api/v1/framework-packs")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/risk-library")] = EVERYONE
 for (_method, _template), _needs in POLICIES.items():
     if _template.startswith("/api/v1/frameworks"):

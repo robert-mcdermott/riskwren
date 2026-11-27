@@ -24,7 +24,7 @@ from riskwren.api.routers.inventory import (
     show_record,
     update_record,
 )
-from riskwren.compliance import scopes
+from riskwren.compliance import scopes, versions
 from riskwren.compliance.scopes import SCOPE
 from riskwren.controls.service import CONTROL
 from riskwren.inventory import records
@@ -155,6 +155,23 @@ def release_from(request: Request, ref: str, key: str) -> dict[str, Any]:
         scope = records.load(session, principal, SCOPE, ref)
         scopes.release_from(session, principal, scope, key)
         return envelope(records.detail(session, principal, SCOPE, scope))
+
+
+class MoveBody(BaseModel):
+    to: str = Field(description="The key of the later version")
+
+
+@router.post(
+    "/scopes/{ref}/frameworks/{key}/move", summary="Move a scope to a later version of a framework"
+)
+def move_scope(request: Request, ref: str, key: str, body: MoveBody) -> dict[str, Any]:
+    """Its decisions and exceptions go with it where the code is unchanged; the crosswalks
+    and documents mapped to the earlier version are carried for everyone."""
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        scope = records.load(session, principal, SCOPE, ref)
+        moved = versions.move(session, principal, scope, key, body.to)
+        return envelope({**records.detail(session, principal, SCOPE, scope), "moved": moved})
 
 
 @router.get(

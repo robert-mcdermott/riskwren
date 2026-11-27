@@ -66,7 +66,7 @@ def loaded(db: Database, people: People) -> None:
 
 def test_every_built_in_pack_is_sound_and_says_where_it_comes_from() -> None:
     sizes = {}
-    for key in packs.BUILTIN:
+    for key in packs.AVAILABLE:
         pack = packs.builtin(key)
         assert packs.problems(pack) == [], key
         head = pack["pack"]
@@ -77,6 +77,13 @@ def test_every_built_in_pack_is_sound_and_says_where_it_comes_from() -> None:
     # The publishers' own counts: 106 outcomes, 97 requirements, and the active controls.
     assert sizes["nist-csf"] == 106 and sizes["nist-800-171"] == 97
     assert sizes["nist-800-53"] == 1014 and sizes["hipaa-security"] > 80
+    assert sizes["nist-800-53-r4"] == 922  # Rev. 4's controls and enhancements not withdrawn
+    # What a pack says of other frameworks names only codes that exist on both sides.
+    r4 = {item["code"] for item, _ in packs.walk(packs.builtin("nist-800-53-r4")["requirements"])}
+    r5 = {item["code"] for item, _ in packs.walk(packs.builtin("nist-800-53")["requirements"])}
+    assert all(old in r4 and new in r5 for old, _how, new in packs.builtin("nist-800-53")["moved"])
+    derived = packs.builtin("nist-800-171")["mappings"][0]
+    assert derived["framework"] == "nist-800-53" and all(code in r5 for _, code in derived["pairs"])
 
 
 def test_a_pack_may_carry_only_the_text_its_policy_allows() -> None:

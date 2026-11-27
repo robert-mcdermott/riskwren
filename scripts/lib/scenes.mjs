@@ -193,6 +193,17 @@ export const SCENES = [
       const change = card && [...card.querySelectorAll("button")].find((each) => each.textContent.trim() === "Change");
       if (change) change.click(); else window.__sceneMissed = "the Change button of What it covers"; })()` },
   { name: "scope-agreement", as: "cro", path: async (page) => `/scopes/${await first("/api/v1/scopes?q=central+information")(page)}` },
+  { name: "framework-load", as: "cro", path: "/frameworks", step: click("Load a framework") },
+  { name: "framework-changes", as: "cro", path: "/frameworks/nist-800-53/changes?from=nist-800-53-r4" },
+  { name: "framework-changes-withdrawn", as: "auditor", path: "/frameworks/nist-800-53/changes?from=nist-800-53-r4&show=withdrawn" },
+  { name: "framework-change-diff", as: "cro", path: "/frameworks/nist-800-53/changes?from=nist-800-53-r4", step: click("Show the difference") },
+  { name: "framework-move", as: "cro", path: "/frameworks/nist-800-53/changes?from=nist-800-53-r4",
+    step: `(() => { const b = [...document.querySelectorAll("button")].find((each) => each.textContent.trim().startsWith("Move to"));
+      if (b) b.click(); else window.__sceneMissed = "a Move to button"; })()` },
+  { name: "framework-earlier", as: "cro", path: "/frameworks/nist-800-53-r4" },
+  { name: "framework-suggestions", as: "cro", path: "/frameworks/nist-800-53/suggestions" },
+  { name: "framework-new-version", as: "cro", path: "/frameworks/data-use-agreement-open-cohort-trust", step: click("Start a new version") },
+  { name: "scope-later-version", as: "cro", path: async (page) => `/scopes/${await first("/api/v1/scopes?q=trial+data")(page)}` },
   { name: "library", as: "member", path: "/library" },
   { name: "library-everything", as: "member", path: "/library?all=true" },
   { name: "library-search", as: "member", path: "/library?all=true&q=backup" },

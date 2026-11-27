@@ -196,7 +196,8 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         from riskwren.compliance import frameworks
 
         held = {row.key: row for row in frameworks.all_(session)}
-        assert len(held) == 5 and held["nist-800-53"].citable_count == 1014
+        # The four that ship with every installation, Rev. 4 loaded beside Rev. 5, and its own.
+        assert len(held) == 6 and held["nist-800-53"].citable_count == 1014
         agreement = held["data-use-agreement-open-cohort-trust"]
         assert (agreement.origin, agreement.citable_count) == ("local", 9)
         assert frameworks.find(session, agreement, "DUA-5.1").guidance
@@ -218,6 +219,7 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         by_name = {scope.name: scope for scope in session.scalars(select(Scope))}
         assert set(by_name) == {
             "Central information technology", "Clinical systems", "Controlled-access data enclave",
+            "Trial data platform",
         }  # fmt: skip
         assert by_name["Central information technology"].offers_controls
         clinic = scopes.statement(session, reader, by_name["Clinical systems"], "hipaa-security")
@@ -389,6 +391,22 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
             if row["agreement"]
         ]
         assert imposed == [pacts["Open Cohort Trust data use agreement"].ref]
+        # A scope still on SP 800-53 Rev. 4, with Rev. 5 loaded beside it; suggestions from
+        # the publisher's mapping, some confirmed and one set aside.
+        from riskwren.compliance import versions
+        from riskwren.db.models import ControlRequirement, SuggestionSetAside
+
+        trials = session.scalars(select(Scope).where(Scope.name == "Trial data platform")).one()
+        assert [row["key"] for row in scope_service.held_to(session, trials)] == ["nist-800-53-r4"]
+        assert scope_service.held_to(session, trials)[0]["later"][0]["key"] == "nist-800-53"
+        old = framework_service.by_key(session, "nist-800-53-r4")
+        new = framework_service.by_key(session, "nist-800-53")
+        changed = versions.changes(session, old, new)["counts"]
+        assert changed["withdrawn"] > 100 and changed["added"] > 200
+        assert session.scalars(
+            select(ControlRequirement).where(ControlRequirement.note.like("Suggested by%"))
+        ).all()
+        assert session.scalars(select(SuggestionSetAside)).all()
     assert built.counts["acceptances refused"] == 1
 
 

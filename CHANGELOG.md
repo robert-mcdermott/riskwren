@@ -6,6 +6,12 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 
 ## Unreleased
 
+### Upgrading
+
+Run `riskwren frameworks load --builtin` after upgrading. It loads nothing new, but brings
+the publisher's mappings into the frameworks already loaded: where each SP 800-53 Rev. 4
+control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement comes from.
+
 ### Added
 
 - **Policy documents.** Policies, standards, procedures, and guidelines as records, each
@@ -31,6 +37,17 @@ release. Before 1.0, a release may contain breaking changes; they are listed und
 - **Documents in the web of records:** in the Connections picture, in search, in Tidy (a
   policy, standard, or procedure that governs nothing is listed as missing it), and with
   what each governs in the export of the document list.
+- **New versions of a framework, loaded beside the old.** What changed is listed by code
+  (changed, with the words that differ; added; withdrawn, with where each went), with what
+  uses the old version. Nothing changes until a scope is moved; then its decisions and
+  exceptions go with it where the code is unchanged, and the organization's crosswalks and
+  documents are carried across. A framework of your own can start a new version.
+- **NIST SP 800-53 Rev. 4,** with its Low, Moderate, and High baselines, ships to be loaded
+  when a program or an agreement still names it; Rev. 5 records where 179 of the 182 Rev. 4
+  controls it withdrew went.
+- **Crosswalks suggested by a publisher's mapping:** SP 800-171 Rev. 3 names the SP 800-53
+  controls each requirement comes from, so a control mapped to one is suggested for the
+  other. A person maps each suggestion, or sets it aside.
 - **Agreements** (`AGR`): awards, data use agreements, business associate agreements,
   contracts, and the like, with their parties, dates, notice periods, and what they cover.
   The framework an agreement imposes is held by every scope that holds what it covers, and

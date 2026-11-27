@@ -152,6 +152,23 @@ def _conditions(session: Session, principal: Principal, filters: Mapping[str, An
 
 def _history_title(event: Any, lookups: Any) -> str | None:
     context = event.context or {}
+    if context.get("op") == "scope.move":
+        was, now = context.get("was") or "the earlier version", context.get("now") or "the new one"
+        if event.subject_type == "scope_framework":
+            return (
+                f"Moved from {was} to {now}"
+                if event.action == "created"
+                else f"No longer held to {was}"
+            )
+        if event.subject_type == "scope_requirement":
+            changes = event.changes or {}
+            pair = changes.get("requirement_id") or [None, None]
+            ident = pair[1] if event.action == "updated" else (pair[0] or pair[1])
+            row = lookups.session.get(Requirement, ident) if ident else None
+            code = row.code if row is not None else "a requirement"
+            if event.action == "updated":
+                return f"Carried its decision on {code} across to {now}"
+            return f"Left its decision on {code} behind: {now} has no such requirement"
     if context.get("op") == "agreement.scopes" and event.subject_type == "scope_framework":
         framework, agreement = context.get("framework") or "a framework", context.get("agreement")
         if context.get("held"):
@@ -180,6 +197,7 @@ SCOPE = register(
             "conditions": _conditions,
             "history_labels": {"offers_controls": "Offers its controls", "boundary": "Boundary"},
             "history_title": _history_title,
+            "history_keeps_titled": True,
         },
     )
 )
@@ -286,6 +304,15 @@ def held_to(session: Session, scope: Scope) -> list[dict[str, Any]]:
             "agreement": {"ref": by[held.agreement_id].ref, "name": by[held.agreement_id].name}
             if held.agreement_id in by
             else None,
+            # A later version loaded beside it, which the scope can be moved to.
+            "later": [
+                {"key": each.key, "title": each.title}
+                for each in session.scalars(
+                    select(Framework).where(
+                        Framework.follows == framework.key, Framework.status == "active"
+                    )
+                )
+            ],
         }
         for held, framework, baseline in rows
     ]

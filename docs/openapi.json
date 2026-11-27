@@ -2650,6 +2650,20 @@
         "title": "MembersBody",
         "type": "object"
       },
+      "MoveBody": {
+        "properties": {
+          "to": {
+            "description": "The key of the later version",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "title": "MoveBody",
+        "type": "object"
+      },
       "NewAccount": {
         "properties": {
           "display_name": {
@@ -2862,6 +2876,38 @@
           "owners"
         ],
         "title": "OwnersBody",
+        "type": "object"
+      },
+      "PackBody": {
+        "description": "A framework to load: one that ships, by its key, or a whole pack.",
+        "properties": {
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The key of a pack that ships",
+            "title": "Key"
+          },
+          "pack": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A whole framework pack",
+            "title": "Pack"
+          }
+        },
+        "title": "PackBody",
         "type": "object"
       },
       "PairBody": {
@@ -4038,6 +4084,26 @@
         "title": "SubmitBody",
         "type": "object"
       },
+      "SuggestionBody": {
+        "properties": {
+          "code": {
+            "description": "The requirement's code in this framework",
+            "title": "Code",
+            "type": "string"
+          },
+          "control": {
+            "description": "The control's reference",
+            "title": "Control",
+            "type": "string"
+          }
+        },
+        "required": [
+          "control",
+          "code"
+        ],
+        "title": "SuggestionBody",
+        "type": "object"
+      },
       "SystemBody": {
         "properties": {
           "criticality": {
@@ -4519,6 +4585,34 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "VersionBody": {
+        "properties": {
+          "title": {
+            "description": "The new version's title",
+            "maxLength": 400,
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What it is called",
+            "title": "Version"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "VersionBody",
         "type": "object"
       },
       "ViewBody": {
@@ -11705,6 +11799,71 @@
         ]
       }
     },
+    "/api/v1/framework-packs": {
+      "get": {
+        "operationId": "framework_packs_api_v1_framework_packs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Framework Packs Api V1 Framework Packs Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The frameworks that ship, and which are loaded",
+        "tags": [
+          "frameworks"
+        ]
+      },
+      "post": {
+        "description": "A pack that ships, by its key, or a whole pack: a publisher's new version, or a\nframework an organization keeps for itself. It is loaded beside what is there, never over\nit, and changes nothing that uses another.",
+        "operationId": "load_pack_api_v1_framework_packs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PackBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Load Pack Api V1 Framework Packs Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Load a framework beside the others",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
     "/api/v1/frameworks": {
       "get": {
         "operationId": "list_frameworks_api_v1_frameworks_get",
@@ -11882,6 +12041,128 @@
           }
         },
         "summary": "Change a framework of your own, or retire any",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
+    "/api/v1/frameworks/{key}/change": {
+      "get": {
+        "operationId": "framework_change_api_v1_frameworks__key__change_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The key of the earlier version",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "description": "The key of the earlier version",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The requirement's code, such as AC-2 or 164.308(a)(1)(i)",
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "description": "The requirement's code, such as AC-2 or 164.308(a)(1)(i)",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Framework Change Api V1 Frameworks  Key  Change Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One requirement in both versions",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
+    "/api/v1/frameworks/{key}/changes": {
+      "get": {
+        "description": "Requirements added, changed, and withdrawn since the earlier version, and what uses the\nearlier one: the scopes held to it, the controls, exceptions, and documents mapped to what\nchanged, and how many crosswalks a move would carry.",
+        "operationId": "framework_changes_api_v1_frameworks__key__changes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The key of the earlier version",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "description": "The key of the earlier version",
+              "title": "From",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Framework Changes Api V1 Frameworks  Key  Changes Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What changed from an earlier version",
         "tags": [
           "frameworks"
         ]
@@ -12363,6 +12644,213 @@
           }
         },
         "summary": "Add many requirements from pasted lines, after a dry run",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
+    "/api/v1/frameworks/{key}/suggestions": {
+      "get": {
+        "operationId": "suggestions_api_v1_frameworks__key__suggestions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Suggestions Api V1 Frameworks  Key  Suggestions Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crosswalks a publisher's mapping suggests",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
+    "/api/v1/frameworks/{key}/suggestions/confirm": {
+      "post": {
+        "operationId": "confirm_suggestion_api_v1_frameworks__key__suggestions_confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Confirm Suggestion Api V1 Frameworks  Key  Suggestions Confirm Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Map a suggested crosswalk",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
+    "/api/v1/frameworks/{key}/suggestions/set-aside": {
+      "post": {
+        "operationId": "set_suggestion_aside_api_v1_frameworks__key__suggestions_set_aside_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Suggestion Aside Api V1 Frameworks  Key  Suggestions Set Aside Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a suggestion aside",
+        "tags": [
+          "frameworks"
+        ]
+      }
+    },
+    "/api/v1/frameworks/{key}/versions": {
+      "post": {
+        "description": "A copy of a framework of the organization's own, beside it, to be edited.",
+        "operationId": "start_version_api_v1_frameworks__key__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Version Api V1 Frameworks  Key  Versions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start a new version of your own",
         "tags": [
           "frameworks"
         ]
@@ -19627,6 +20115,70 @@
           }
         },
         "summary": "Take a framework off a scope",
+        "tags": [
+          "scopes"
+        ]
+      }
+    },
+    "/api/v1/scopes/{ref}/frameworks/{key}/move": {
+      "post": {
+        "description": "Its decisions and exceptions go with it where the code is unchanged; the crosswalks\nand documents mapped to the earlier version are carried for everyone.",
+        "operationId": "move_scope_api_v1_scopes__ref__frameworks__key__move_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Move Scope Api V1 Scopes  Ref  Frameworks  Key  Move Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Move a scope to a later version of a framework",
         "tags": [
           "scopes"
         ]
