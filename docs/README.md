@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.3.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.5.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
@@ -89,7 +89,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.4.0 is the register, compliance, the means of keeping both current, and the organization's own word: policies approved by named people and acknowledged by those they apply to, agreements and the terms they impose, framework versions, strategic objectives, and committee sessions. It does not yet review suppliers, run audits, or handle incidents; those follow in later releases. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.5.0 is the register, compliance, the means of keeping both current, the organization's own word, and its third parties: services and tiers, due diligence through a link that needs no account, assurance reports read for what they cover, the stop where shared information has no covering agreement, and the relationship over time. It does not yet produce leadership reports, run audits, or handle incidents; those follow in later releases. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action; the action's owner here records it. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

@@ -109,7 +109,7 @@ Detail: [waves/wave-3.md](waves/wave-3.md)
 
 Detail: [waves/wave-4.md](waves/wave-4.md)
 
-## Wave 5: Third parties (v0.5.0) ☐
+## Wave 5: Third parties (v0.5.0) ☑
 
 **Goal:** know who the organization depends on, what each can reach, and whether the paper covers it.
 
@@ -120,7 +120,7 @@ Detail: [waves/wave-4.md](waves/wave-4.md)
 | 3 | Assurance documents | Reports and certificates with validity; a structured review of scope, exceptions, and the organization's own responsibilities | ☑ |
 | 4 | Coverage | Agreements joined to services, systems, and information; the stop for regulated information with no covering agreement | ☑ |
 | 5 | Lifecycle | Findings tracked with the third party, re-assessment by tier and by event, offboarding, subcontractors | ☑ |
-| 6 | Release prep | Guides, changelog, release | ☐ |
+| 6 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-5.md](waves/wave-5.md)
 

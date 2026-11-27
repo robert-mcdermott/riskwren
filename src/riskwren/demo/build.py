@@ -1959,10 +1959,13 @@ class Builder:
                 )
                 contact = session.scalars(select(ThirdPartyContact).where(
                     ThirdPartyContact.third_party_id == party_id)).first()  # fmt: skip
+                due = self.day(-float(spec["due"]))  # type: ignore[arg-type]
+                if spec.get("agreed"):
+                    issue_service.reschedule(session, who, issue, due_on=due,
+                                             reason=str(spec["agreed"]))  # fmt: skip
                 issue_service.add_action(
                     session, who, issue, title=str(spec["action"]), owner_id=by,
-                    due_on=self.day(-float(spec["due"])).isoformat(),  # type: ignore[arg-type]
-                    contact_id=contact.id if contact else None,
+                    due_on=due.isoformat(), contact_id=contact.id if contact else None,
                 )  # fmt: skip
             self.tally("findings from reviews")
         spec = c.OFFBOARDING

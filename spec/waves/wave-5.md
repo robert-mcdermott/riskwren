@@ -2,7 +2,7 @@
 
 **Goal:** know who the organization depends on, what each can reach, and whether the paper covers it. Waves 1 to 4 made a register of what could go wrong, what must be complied with, and what the organization has said and promised. Its third parties have been names in the inventory since wave 1. Wave 5 makes them a program: what each provides and touches, how much is at stake with each, what they say about themselves and what independent reports say about them, whether an agreement covers what is shared with them, and what happens when a relationship changes or ends.
 
-**Branch:** `wave-5` · **Target version:** `0.5.0` · **Status:** ☐ in progress
+**Branch:** `wave-5` · **Target version:** `0.5.0` · **Status:** ☑ released as v0.5.0
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security team, third-party risk is mostly a question of information and access: who holds the organization's restricted information, who can reach its systems, and what independent assurance there is that each is careful. In this wave that means: a tier for each third party set by the program's own rules from what it holds and reaches, with the reasons shown; a security questionnaire, chosen by tier, that the supplier's contact answers through a link without an account; assurance reports read for what they actually cover, with the responsibilities they leave to the organization joined to its own controls; and a stop wherever identifiable health information, controlled-access data, or other regulated information is shared with someone and no agreement of the right kind covers it.
 
@@ -93,9 +93,11 @@ The wave is done when, on a fresh checkout:
 
 **Done:** a finding is an issue raised from a review that has answers, about the third party (issues may now be about one), found by `review`, with the review as its source. An issue's action may be done by a contact at a third party the issue is about (`action.contact_id`); the owner here follows it up, and the action shows who. A third party's next review (`next_review_on`) is its tier's months from its last concluded review, or from its first tiering; it is set again when it is tiered and when a review is concluded. Calling for a review (an incident, a breach notice, a change of service or owner, a finding, or something else, with what happened) makes it due that day, says why in `review_called`, and is answered by the next concluded review; the history tells it. A review due within a month, or late, is on its keepers' Home and in the reminders, and `review=due` or `soon` cuts the list. Offboarding (`offboarding`) opens four steps, each recorded with what was done by those who keep the third party; the last retires the third party and its services; it can be stopped. A new kind of link, `subcontracts` (third party to third party), shows on both and in the Connections picture. The demo has three suppliers that subcontract to the cloud provider, two findings with actions done by the suppliers' own people (one late), a review called for by a breach notice, and the website's builder half way through offboarding. The acceptance tests are in `tests/test_lifecycle.py`.
 
-### Slice 6: Release prep ☐
+### Slice 6: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.4.0 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.4.0 on both databases, audits, release, and the site republished
+
+**Done:** version 0.5.0; the changelog's 0.5.0 section with what to expect after upgrading; the README, the guide index, Getting started, and Configuration brought up to the release, with a new guide, Third parties; the site's home page with four sections on third parties, and its closing paragraph brought up to date; every picture retaken. The upgrade from 0.4.0 was run from that release's own code with its demo organization on SQLite and PostgreSQL: migrations 0027 to 0031 applied, every row kept, the history still verifies, the four new questionnaires loaded, the third-party work run over the old data, and a second upgrade changing nothing.
 
 ## Notes
 
@@ -103,3 +105,8 @@ The wave is done when, on a fresh checkout:
 - The **tier** is a judgment, like every rating here ([ADR-0011](../decisions/0011-judgment-over-arithmetic.md)): the rules suggest and show their working; a named person records it.
 - The respondent link follows [security.md](../security.md): long random tokens, single-purpose, expiring, reaching one form. The token travels after `#` in the address, which browsers do not send to servers, so it is not in any server's or proxy's logs.
 - Nothing in this wave reaches out to a third party's systems. A questionnaire is answered by a person; a report is read by a person ([ADR-0003](../decisions/0003-passive-by-design.md)).
+- **Assessors** may tier a third party, keep its contacts, and run its reviews, as well as those who keep it: in most organizations this is the security team's work, and the security team assesses rather than keeps the units' records.
+- **A report is confidential.** It is evidence of the third party, but the third party is not one of evidence's ordinary subjects, so being able to see a supplier does not mean being able to read its SOC 2 report.
+- **Coverage is computed, never stored.** Stops are worked out from the links, services, and agreements each time they are shown, so they cannot drift from what they read.
+- **A stop is shown, not enforced.** RiskWren is passive: it says where the paper is missing on every record involved, and blocks nothing.
+- **Not done:** a contact cannot yet be sent a link to report progress on an action, so the action's owner here records it; the conditions of the tiers and the sharing rules are changed through a program pack, not in the app.

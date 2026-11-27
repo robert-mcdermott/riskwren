@@ -376,12 +376,15 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
 
         pacts = {row.name: row for row in session.scalars(select(Agreement))}
         states = {name: agreement_service.state_of(row, TODAY) for name, row in pacts.items()}
-        assert states == {
+        assert {name: states[name] for name in (
+            "Open Cohort Trust data use agreement", "Genomic data access certification",
+            "Offsite backup vaulting", "Imaging pilot data sharing")} == {
             "Open Cohort Trust data use agreement": "in_force",
             "Genomic data access certification": "ending",
             "Offsite backup vaulting": "notice",
             "Imaging pilot data sharing": "closed",
-        }
+        }  # fmt: skip
+        assert states["Courier agreement: Swiftcold Logistics"] == "ended"
         central = session.scalars(
             select(Scope).where(Scope.name == "Central information technology")
         ).one()
@@ -435,6 +438,34 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
             select(CommitteeItem).where(CommitteeItem.session_id == meetings[-1].id)
         ).all()
         assert len(coming) >= 4 and not any(item.outcome for item in coming)
+        # Third parties: tiered by the rules, one recorded lower with its reason; reviews at
+        # every stage; reports read; three gaps in coverage; a supplier being offboarded.
+        from riskwren.db.models import (
+            Offboarding,
+            ThirdParty,
+            ThirdPartyReview,
+            TierAssessment,
+        )
+        from riskwren.thirdparty import coverage
+
+        current = session.scalars(
+            select(TierAssessment).where(TierAssessment.superseded_by.is_(None))
+        ).all()
+        assert len(current) == 36 and sum(row.tier != row.suggested for row in current) == 1
+        statuses = sorted(row.status for row in session.scalars(select(ThirdPartyReview)))
+        assert statuses == ["answered", "concluded", "concluded", "concluded", "concluded",
+                            "concluded", "concluded", "draft", "sent", "sent", "sent"]  # fmt: skip
+        gaps = {(s["sharing"].information.name, s["sharing"].third_party.name)
+                for s in coverage.stops(session)}  # fmt: skip
+        assert gaps == {
+            ("Patient records", "Meridian Pharmacy Automation"),
+            ("Cohort survey responses", "Calder Bay University"),
+            ("Specimen records", "Swiftcold Logistics"),
+        }
+        leaving = session.scalars(select(Offboarding)).one()
+        assert leaving.status == "open" and sum(bool(s["done_at"]) for s in leaving.steps) == 2
+        called = session.scalars(select(ThirdParty).where(ThirdParty.review_called.is_not(None)))
+        assert [row.name for row in called] == ["Stonebridge Data Vaulting"]
     assert built.counts["acceptances refused"] == 1
 
 

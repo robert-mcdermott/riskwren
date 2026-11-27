@@ -4,9 +4,33 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## 0.5.0 (unreleased)
+## 0.5.0 (2026-11-27)
 
-Wave 5, *Third parties*.
+Wave 5, *Third parties*: who the organization depends on, what each can reach, and whether
+the paper covers it. A third party has services, each with the systems it reaches and the
+information it handles, and a tier set by the program's rules from a few questions the
+inventory mostly answers. A security questionnaire chosen by the tier is sent to its contact
+through a link that needs no account and reaches nothing else. Reports and certificates are
+read for what they cover and what they leave to the organization. Wherever regulated
+information is shared and no agreement of the kind the program requires covers it, every
+record involved shows a stop. Findings, review again, offboarding, and subcontractors follow
+the relationship over time.
+
+### Upgrading from 0.4.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0027 to 0031). Every row is
+kept, and the history still verifies. The upgrade loads the questionnaire tiering asks and the
+three due diligence questionnaires. A few things look different afterwards:
+
+- **Third parties have a menu of their own,** with Services, Due diligence, and Coverage;
+  Inventory keeps processes, systems, and information.
+- **Every third party is missing a tier** in Tidy until it is tiered, and has no review date
+  until then.
+- **Coverage shows stops as soon as information is linked as shared with a third party** and
+  no agreement says it is with that third party. Agreements made before 0.5.0 name their
+  parties in words only: say who each is with, on its page, and the stops it meets go.
+- **The program has two new tables,** the tiers and the sharing rules, taken from the default
+  program until the organization sets its own, and a new kind of link, *subcontracts to*.
 
 ### Added
 
