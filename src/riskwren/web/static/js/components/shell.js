@@ -139,6 +139,13 @@ export function brand(meta, { large = false } = {}) {
   return [wren(large ? "brand-mark" : "brand-mark"), h("span", { class: "brand-name" }, words)];
 }
 
+/** The organization's own links: its policy, its help desk. */
+export function footerLinks(meta) {
+  const links = meta.branding.footer_links ?? [];
+  return links.length ? h("nav", { class: "foot-links", "aria-label": "More from your organization" },
+    links.map((link) => h("a", { href: link.url, target: "_blank", rel: "noopener noreferrer" }, link.label))) : null;
+}
+
 export async function signOut() {
   try {
     await del("/api/v1/session");
@@ -264,7 +271,7 @@ export function mountShell(root, meta) {
     : h("div", { class: "powered" }, meta.branding.organization_name || `Version ${meta.version}`);
 
   shell.append(
-    h("aside", { class: "sidebar" }, brandLink, nav, h("div", { class: "sidebar-foot" }, powered)),
+    h("aside", { class: "sidebar" }, brandLink, nav, h("div", { class: "sidebar-foot" }, footerLinks(meta), powered)),
     h("div", { class: "main-column" },
       h("header", { class: "topbar" },
         iconButton("menu", "Menu", { class: "icon-button menu-toggle", onclick: () => {

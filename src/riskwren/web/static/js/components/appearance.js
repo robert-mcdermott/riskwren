@@ -47,7 +47,8 @@ export function openAppearance(meta) {
       const note = h("p", { class: "subtle" });
       body.append(h("div", { class: "stack-lg" },
         h("div", { class: "stack-sm" }, h("div", { class: "label" }, "Mode"), modeSwitch()),
-        h("div", { class: "stack-sm" }, h("div", { class: "label" }, "Palette"), palettes, note)));
+        meta.branding.colors_fixed ? h("p", { class: "subtle" }, "Your organization has set its own colors, so there is no palette to choose.")
+          : h("div", { class: "stack-sm" }, h("div", { class: "label" }, "Palette"), palettes, note)));
       draw();
     },
   });

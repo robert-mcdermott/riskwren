@@ -43,6 +43,14 @@ Wave 8, *Incidents and resilience*.
   shows what each restores and what that relies on, whom to call, a copy that prints or
   downloads as one file for when the systems are down, and its exercises, whose findings are
   issues. A plan is exercised on a new `plan_exercise_months` cadence.
+- **Branding fixed in the configuration file:** a `[branding]` section in `riskwren.toml`
+  sets the look exactly: every color by day and after dark (checked for readability when the
+  server starts), logo files for light and dark backgrounds, the tab icon, a sign-in picture,
+  the logo's height, and the typefaces, besides the names and the accent. What it sets wins
+  over the app and shows as locked under **Admin → Appearance**; the rest stays editable.
+- **More of the look in the app:** an accent of its own after dark, a picture and a message
+  on the sign-in page, up to five links of the organization's own, and the last line of every
+  email.
 - **Business impact and recovery:** a process's business impact analysis (how its loss hurts
   over time, how soon it must be back, how much information it can lose, and the least it
   needs), what each system and service can deliver and what that rests on, and every shortfall

@@ -448,9 +448,12 @@ A dossier holds only what the person taking it may see. A file they may not open
 **Admin → Appearance** makes the product yours, with a live preview:
 
 - the product's name and your organization's name;
-- a logo for light and for dark mode, and a tab icon;
-- the default palette (Wren, Slate, or Garnet) and an accent color, which is adjusted for dark mode and refused if text on it could not be read;
-- how ratings are colored: an **ordinal** ramp from light to dark in one hue, which keeps rating apart from the colors of standing, or a **signal** ramp from green to red.
+- a logo for light and for dark mode, a tab icon, and a picture for the sign-in page;
+- the default palette (Wren, Slate, or Garnet) and an accent color, which is adjusted for dark mode (or given its own shade after dark) and refused if text on it could not be read;
+- how ratings are colored: an **ordinal** ramp from light to dark in one hue, which keeps rating apart from the colors of standing, or a **signal** ramp from green to red;
+- a message on the sign-in page, up to five links of your own at the foot of the sidebar and the sign-in page, and the last line of every email.
+
+An organization that needs its brand exact (every color by day and after dark, its logo files, its typefaces) sets it in the configuration file's [`[branding]`](configuration.md#branding) section instead. What the file sets is shown here, locked; the rest stays editable here.
 
 Each person chooses light, dark, or system mode and a palette for themselves, from the appearance button at the top right.
 

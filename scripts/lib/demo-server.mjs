@@ -2,7 +2,7 @@
 // the screenshot capture. Nothing here touches an installation you care about.
 
 import { spawn, spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { appendFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -30,6 +30,11 @@ export async function startDemo({ port = null, seed = 1 } = {}) {
   const built = spawnSync("uv", ["run", "riskwren", "demo", home, "--seed", String(seed), "--port", String(port)],
     { cwd: ROOT, encoding: "utf8" });
   if (built.status !== 0) throw new Error(`The demo did not build:\n${built.stdout}${built.stderr}`);
+  // To audit or capture with a brand of your own, name a file that holds a [branding] section
+  // (and nothing else) in RISKWREN_DEMO_BRANDING. Give its images as full paths.
+  if (process.env.RISKWREN_DEMO_BRANDING) {
+    appendFileSync(join(home, "riskwren.toml"), `\n${readFileSync(process.env.RISKWREN_DEMO_BRANDING, "utf8")}\n`);
+  }
   const server = spawn("uv", ["run", "riskwren", "--config", join(home, "riskwren.toml"), "serve"],
     { cwd: ROOT, stdio: "ignore" });
   const base = `http://127.0.0.1:${port}`;

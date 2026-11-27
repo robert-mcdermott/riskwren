@@ -13,6 +13,8 @@ RiskWren keeps two kinds of settings apart.
 
 This guide is about the first. For the second, see [Running the program](running-the-program.md).
 
+The look is the one thing that can live in either place. Most organizations set it in the app. One that needs its brand reproduced exactly can fix it in the file: see [`[branding]`](#branding).
+
 ## Where the file is found
 
 `uv run riskwren init` writes a commented `riskwren.toml` in the current directory. Every command looks for the file in this order:
@@ -87,6 +89,83 @@ Email is optional and off until both `host` and `from_address` are set. See [Ema
 | `from_address` | `""` | The address messages come from |
 | `from_name` | `""` | The name beside it. Empty means the product's name |
 | `digest_hour` | `7` | The hour of the day, in UTC, after which daily summaries are sent |
+
+### `[branding]`
+
+Optional. Leave it out and the look is set in the app, under **Admin → Appearance**, as before.
+
+Use this section when the look has to be exact: every color by day and after dark, the official logo files, the brand's typefaces. It is also the way to keep a brand in version control, or to give several installations the same look.
+
+**What is set here wins** over what the app stores, and shows under Admin → Appearance as locked, marked *Set in the configuration file*. Whatever this section leaves out can still be changed in the app. Nothing here is written to the database, so taking a line out gives that setting back to the app. A change takes effect when the server is restarted.
+
+| Key | Meaning |
+|---|---|
+| `product_name` | The name in the sidebar, the browser tab, and email. Up to 40 characters |
+| `organization_name` | Your organization's name, on the sign-in page |
+| `show_powered_by` | `false` to hide the small "Powered by RiskWren" link |
+| `logo_light`, `logo_dark` | Image files for light and dark backgrounds. With no `logo_dark`, the light one is used for both |
+| `favicon` | The browser tab icon |
+| `sign_in_image` | The picture beside the sign-in form |
+| `logo_height` | The logo's height in the sidebar, in pixels, from 20 to 48. The usual is 30. Use it where a brand sets a least width for its logo |
+| `font` | The typeface for everything, as a list of font names in order of preference |
+| `font_headings` | A different typeface for page titles and section headings |
+| `sign_in_message` | A message on the sign-in page, up to 600 characters |
+| `email_footer` | The last line of every email |
+| `footer_links` | Up to five links, each `{ label = "…", url = "…" }` |
+| `palette` | One of the built-in palettes: `wren`, `slate`, `garnet` |
+| `accent`, `accent_dark` | An accent color over a built-in palette, as hex. Not needed when `[branding.colors]` is set |
+| `rating_ramp` | How ratings are colored: `ordinal`, one hue from pale to deep, or `signal`, green through amber to red |
+
+Image paths are relative to the file's folder. Images are PNG, JPEG, WebP, or SVG, up to 2 MB, and are served as they are: RiskWren scales a logo and changes nothing else about it.
+
+Fonts are named, never shipped. A name works on a computer that has the font installed, and the next name in the list is tried on one that does not, so end the list with fonts every computer has. A font that is licensed, as most brand typefaces are, cannot be put on the server for everyone.
+
+#### Exact colors
+
+`[branding.colors.day]` and `[branding.colors.night]` replace the built-in palettes. Give both, or neither. Each color is a hex value.
+
+| Color | What it is | If left out |
+|---|---|---|
+| `bg` | The page behind everything | Needed |
+| `surface` | Cards, panels, and fields | Needed |
+| `text` | Ordinary text | Needed |
+| `muted` | Secondary text | Needed |
+| `accent` | Links, primary buttons, and the selected page | Needed |
+| `on_accent` | Text on a primary button | Black or white, whichever reads better |
+| `stripe` | The second color of the stripe across the top of the page | The accent |
+| `border` | Hairlines between things | A step from the surface |
+| `border_strong`, `surface_2`, `surface_3`, `subtle`, `accent_hover`, `accent_soft` | Finer shades: stronger lines, the sidebar and quieter panels, the faintest text, a button under the pointer, the background of a selected item | Worked out from the colors above, a step lighter or darker on the same hue |
+
+```toml
+[branding]
+product_name = "Lantern"
+organization_name = "Northmere Institute for Health Research"
+logo_light = "brand/northmere.svg"
+logo_dark = "brand/northmere-white.svg"
+favicon = "brand/northmere-icon.png"
+font = ["Inter", "Arial"]
+
+[branding.colors.day]
+bg = "#f6f5f2"
+surface = "#ffffff"
+text = "#1d2733"
+muted = "#57606b"
+accent = "#1f5f8b"
+
+[branding.colors.night]
+bg = "#12171d"
+surface = "#1a222b"
+text = "#ffffff"
+muted = "#b9c2cc"
+accent = "#6cb6e6"
+on_accent = "#0f1a24"
+```
+
+RiskWren refuses to start with colors that cannot be read. Text on the page and on a card, secondary text, the accent on a card, and text on the accent must each reach a contrast of 4.5 to 1, by day and after dark, and the message says which pair fell short and by how much. A brand color that is too pale for text on white, as a bright yellow or a light blue often is, belongs in `stripe`, not `accent`.
+
+Three things are left alone, because they carry meaning: the colors for within appetite, warning, and above it; the colors of the ratings (chosen with `rating_ramp`); and the colors that tell kinds of record apart. When exact colors are set, people are no longer offered a palette of their own to choose, since there is nothing for it to change. Light and dark mode remain each person's choice.
+
+To check a brand on every screen, run the accessibility audit with it: put the `[branding]` section in a file of its own, with full paths for its images, and name that file in `RISKWREN_DEMO_BRANDING` when you run `node scripts/a11y-audit.mjs`.
 
 RiskWren also gives advice that does not stop it running. `serve` and `doctor` warn when several workers share one SQLite file, when `base_url` is `http://` on a host other than localhost, and when email is set up without a `base_url` for its links.
 

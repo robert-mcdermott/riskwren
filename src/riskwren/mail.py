@@ -102,6 +102,7 @@ def look(session: Session, config: Config) -> Look:
         brand.product_name or PRODUCT_NAME,
         brand.organization_name,
         config.server.base_url,
+        brand.email_footer,
     )
 
 

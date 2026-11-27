@@ -31,6 +31,7 @@ from riskwren.demo import build as demo_build
 from riskwren.events import chain
 from riskwren.home import DataHome
 from riskwren.people import accounts
+from riskwren.program import branding
 
 log = logging.getLogger("riskwren.cli")
 
@@ -40,6 +41,7 @@ EXIT_ERROR = 1
 
 def _load(args: argparse.Namespace) -> tuple[Config, DataHome]:
     config = load_config(args.config)
+    branding.pin(config.branding)
     home = DataHome(config.data.home)
     if home.is_initialized():
         logs.configure(args.verbose, quiet=args.quiet, log_dir=home.logs)

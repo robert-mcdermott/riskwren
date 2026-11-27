@@ -49,6 +49,7 @@ from riskwren.api.static import install_static
 from riskwren.config import ENV_CONFIG, Config, load_config
 from riskwren.db.engine import Database
 from riskwren.home import DataHome
+from riskwren.program import branding as brand_rules
 
 ROUTERS = (
     system, session, sso, people, branding, inventory, risks, controls, treatment, frameworks,
@@ -59,6 +60,7 @@ ROUTERS = (
 
 
 def create_app(config: Config) -> FastAPI:
+    brand_rules.pin(config.branding)
     home = DataHome(config.data.home)
 
     @asynccontextmanager
