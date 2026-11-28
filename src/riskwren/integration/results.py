@@ -196,6 +196,8 @@ def confirm(
                 "source_kind": "security_test", "subjects": subjects,
                 "owner_id": values.get("owner_id")})  # fmt: skip
             row.issue_id = found.id
+            if not values.get("owner_id"):
+                _to_control_owners(session, principal, found, control)
         elif row.kind == "evidence":
             until = values.get("valid_until") or (row.observed_at.date() + timedelta(days=365))
             item = records.create(session, principal, evidence.EVIDENCE, {
@@ -214,6 +216,33 @@ def confirm(
         )
         session.flush()
     return row
+
+
+def _to_control_owners(
+    session: Session, principal: Principal, issue: Any, control: Control
+) -> None:
+    """As a failed test's issue is: the control's owners put it right, and are told."""
+    from riskwren.compliance import issues
+    from riskwren.db.models import RecordOwner
+    from riskwren.people import notices
+
+    owners = list(
+        session.scalars(
+            select(RecordOwner.account_id).where(
+                RecordOwner.record_type == _control_type().key,
+                RecordOwner.record_id == control.id,
+                RecordOwner.kind.in_(access.EDITING_KINDS),
+            )
+        )
+    )
+    if not owners:
+        return  # nobody answers for the control: the confirmer keeps it
+    issues._hand_to(session, issue, owners)
+    notices.tell_all(
+        session, owners, "issue",
+        f"{issue.ref} was raised from what {control.name} was reported to show, and you own it",
+        f"/issues/{issue.ref}", by=principal,
+    )  # fmt: skip
 
 
 def set_aside(

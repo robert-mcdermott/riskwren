@@ -329,6 +329,18 @@ def test_owners(db: Database, people: People, stock: Stock) -> None:
         assert [(o["account_id"], o["kind"]) for o in shown["owners"]] == [
             (member, "owner"), (me, "delegate"),
         ]  # fmt: skip
+        # An owner with no role saves their record where it is, as the form sends it, and
+        # cannot move it to a unit they do not look after.
+        member_person = who(db, people, "member")
+        unit = record.org_unit_id
+        records.update(session, member_person, SYSTEM, record,
+                       {"summary": "Kept by its owner.", "org_unit_id": unit},
+                       version=record.version)  # fmt: skip
+        assert record.summary == "Kept by its owner." and record.org_unit_id == unit
+        with pytest.raises(PermissionDenied, match="move a record"):
+            records.update(session, member_person, SYSTEM, record,
+                           {"org_unit_id": people.units["CANCER"]},
+                           version=record.version)  # fmt: skip
         # The lists narrow to what a person is named on.
         mine, _ = records.search(session, who(db, people, "member"), SYSTEM, {"mine": True})
         assert [row.ref for row in mine] == [stock.monitor]

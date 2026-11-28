@@ -76,7 +76,7 @@ export function adminUnits(main) {
       const importer = () => openImport({
         kind: "units", title: "Import units",
         intro: "Units are matched by code, so importing again updates them.",
-        sample: "code,name,kind,parent_code\nALD,Northmere Institute,organization,\nIMM,Immunology,division,NMI\nHALE,Hale Lab,lab,IMM",
+        sample: "code,name,kind,parent_code\nNMI,Northmere Institute,organization,\nIMM,Immunology,division,NMI\nHALE,Hale Lab,lab,IMM",
         onDone: reload,
       });
       return h("div", { class: "stack-lg" },

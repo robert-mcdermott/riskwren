@@ -164,11 +164,11 @@ Version 0.10.0 is *Connected*: RiskWren fits into the systems around it and stil
 - **Standing, apart from rating:** within appetite, being treated, accepted, or needing a decision.
 - **Treatment:** plans with owned, dated actions, and acceptance by a leader with the authority for that rating, until a date, never of their own risk.
 - **Home, a heat map, and a risk dashboard.**
-- **Roles and units:** seven roles, four of them limited to a unit and everything beneath it, and a hierarchy of any depth.
+- **Roles and units:** seven roles, four of which can be held for one unit and everything beneath it, and a hierarchy of any depth.
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Connections to the systems around it come next: results pushed in, a reference others can check, and an optional assistant, all off until they are wanted. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Version 1.0 waits for what the first organizations to adopt it ask for. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 
@@ -176,6 +176,8 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 
 | Guide | For |
 |---|---|
+| [How RiskWren works](docs/concepts.md) | Everyone, first: the pieces, how they fit, the rules it keeps, and its words |
+| [Your part in it](docs/roles.md) | Everyone: what each role does, the first week, and which role to give whom |
 | [Getting started](docs/getting-started.md) | Whoever installs RiskWren and sets it up |
 | [Adopting RiskWren](docs/adopting.md) | Whoever decides whether to use it, and puts it into use |
 | [The program handbook](docs/handbook.md) | The risk and compliance team, from first decisions to the yearly rhythm |
@@ -188,8 +190,10 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Internal audit](docs/internal-audit.md) | Internal audit, the third line |
 | [Incidents](docs/incidents.md) | Everyone who reports something, and those who triage and handle it |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
+| [Other systems and assistants](docs/other-systems.md) | Whoever connects other systems, and those who see what they send |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
 | [Deployment](docs/deployment.md) | Whoever puts it into production |
+| [When something goes wrong](docs/help.md) | Anyone who is stuck, and whoever looks after the installation |
 | [API](docs/api.md) | Anyone connecting another system |
 | [Command reference](docs/cli.md) | Every `riskwren` command and option |
 

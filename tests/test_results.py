@@ -66,6 +66,8 @@ def test_a_failed_check_counts_once_a_person_confirms_it(as_role: Clients, peopl
     assert confirmed.json()["data"]["status"] == "confirmed" and issue["ref"].startswith("ISS-")
     raised = as_role("manager").get(f"/api/v1/issues/{issue['ref']}").json()["data"]
     assert raised["source_kind"] == "security_test" and raised["severity"] == "high"
+    # As a failed test's issue is: the control's owners put it right, not the confirmer.
+    assert {owner["account_id"] for owner in raised["owners"]} == {people.accounts["manager"]}
     again = as_role("assessor").post(f"/api/v1/reported/{report['id']}/confirm", json={})
     assert again.status_code == 409
 

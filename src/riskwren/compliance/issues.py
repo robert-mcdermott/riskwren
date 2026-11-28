@@ -389,7 +389,7 @@ def _detail(session: Session, principal: Principal, issue: Issue) -> dict[str, A
             "propose": editable and issue.status == "open",
             "validate": issue.status == "proposed" and can_validate(session, principal, issue),
             "owns": _owns(session, principal, issue),
-            "cancel": live and second,
+            "cancel": live and second and not _owns(session, principal, issue),
             "reopen": not live and second,
         },
     }
@@ -920,6 +920,8 @@ def cancel(session: Session, principal: Principal, issue: Issue, *, reason: str 
     could cancel their own issue would never need to have its closure confirmed."""
     if not confirms(principal, issue):
         raise PermissionDenied("An issue is withdrawn by an assessor or a manager for the unit.")
+    if _owns(session, principal, issue):
+        raise PermissionDenied("Someone who does not own the issue withdraws it.")
     if issue.status not in LIVE:
         raise Conflict("This issue is already closed.")
     why = records.text(reason)

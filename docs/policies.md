@@ -1,6 +1,6 @@
 # Policies
 
-This guide is for whoever writes, approves, or keeps the organization's policies, standards, procedures, and guidelines: most often the security office and the compliance office, and the leaders who approve what they write.
+This guide is for whoever writes, approves, or keeps the organization's policies, standards, procedures, and guidelines: most often the security office and the compliance office, and the leaders who approve what they write. It covers documents and how they sit beneath one another, writing a version, whom to ask to approve it, who may publish it, review, what a document governs, exceptions to it, who it applies to, the policy library, and acknowledgment. [A policy, from first draft to yearly review](#a-policy-from-first-draft-to-yearly-review) puts it in order, using the demo's information security policy.
 
 RiskWren holds each document with its versions, who approved each one, and when it is next looked at. The words can be written here, or stay where the organization already keeps them; either way the lifecycle is tracked here. Everyone reads what applies to them in the [policy library](#the-policy-library), and says they have where a document asks them to.
 
@@ -22,30 +22,41 @@ Each names the document it **implements**: a standard implements a policy, a pro
 
 **Add a document** (a steward or leader of the unit, or a manager) gives it a title, its kind, its unit, and what it implements. It starts with its first draft. Like any record it has owners and a history, it can be found by search, and it can be restricted.
 
+A document is changed by its owners, or by the steward, leader, or manager of its unit: they write its versions, send them for approval, publish them, review it, and say what it governs and who it applies to.
+
 ## Writing a version
 
 A document's words are in its versions. The **Next version** tab is where the next one is written, in one of three ways:
 
 - **Write it here**, in a simple Markdown: `#` for a heading, `-` for a list, `**bold**`, `*emphasis*`, `[a link](https://…)`, and tables. **Preview** shows it as it will read. A document of three or more sections gets a list of contents.
 - **Link to where it is kept**, such as a page on the intranet or a file in the document library. RiskWren keeps its approvals, its dates, and its address.
-- **Attach a file**: a PDF or a Word document, up to 25 MB.
+- **Attach a file**, up to 25 MB. It is checked by what it contains and takes the same kinds of file as [evidence](evidence-and-testing.md#files): a PDF, a Word document in its current format (`.docx`), plain text, and the others listed there. An older `.doc` file, or an OpenDocument `.odt`, is refused: save it as `.docx` or as a PDF first.
 
-A new version starts as a copy of the one in force. **What changed, and why** is needed before a second or later version is sent; it is shown with the version once published. A draft nobody needs can be discarded; the version in force stays as it is.
+A new version starts as a copy of the one in force. **What changed, and why** is needed before a second or later version is sent; it is shown with the version once published. **Save the draft** keeps it. A draft nobody needs can be discarded (**Discard the draft**); the version in force stays as it is.
 
 ## Approval
 
-**Send it for approval** names the people who must approve it. Each is told, and it appears on their Home.
+**Send for approval**, on the **Next version** tab, names the people who must approve it. Each is told, and it appears on their Home.
 
-- **Nobody approves their own work.** The person who sends a version, and the person who started it, cannot be among those who approve it.
-- **Each approves it, or returns it with a reason.** A return sends it back to its author with the reason on the draft; those still to decide are no longer asked. When the author sends it again, everyone named is asked again.
-- **What is under review is not changed.** To change it, **take it back**. Those not yet asked are told they no longer need to approve it.
+Name whoever your organization's own rules say must approve this kind of document: the executive for a policy, a director for a standard. RiskWren does not decide who that is, and nothing requires a leader. It checks only that:
+
+- each person named can see the document and has an account that is not disabled;
+- there are no more than ten;
+- **nobody approves their own work.** The person who sends a version, and the person who started it, cannot be among those who approve it.
+
+An account that is only invited, whose holder has never signed in, can be named too, and the version then waits until they sign in and decide. Name people who will sign in to approve it.
+
+Then:
+
+- **Each approves it, or returns it with a reason** (**Approve** or **Return it**). A return sends it back to its author with the reason on the draft; those still to decide are no longer asked. When the author sends it again, everyone named is asked again.
+- **What is under review is not changed.** To change it, **Take it back to change it**. Those not yet asked are told they no longer need to approve it.
 - **When everyone has approved it,** its owners are told and it can be published.
 
 ![The president is asked to approve a new version of the information security policy: approve it, or return it with what needs to change](img/document-draft-approve-light.webp)
 
 ## Publishing
 
-**Publish** puts the approved version in force. It is numbered (version 1, 2, 3), the version before it is superseded, and its next review is set from that day.
+**Publish as version N** puts the approved version in force. It is for the document's owners, or its unit's steward, leader, or manager: the approvers approve, and those who keep the document publish. It is numbered (version 1, 2, 3), the version before it is superseded, and its next review is set from that day.
 
 **A published version is never changed.** No screen or route edits it; a correction is a new version. The history keeps each version's **fingerprint**, taken when it was published, and `riskwren verify` checks every published version against it: text altered in the database, or a file changed in the data home, is reported.
 
@@ -62,7 +73,7 @@ When a review comes due it shows on the document, on its owners' Home, and in th
 - **Review and keep**, saying what was looked at. The version stays in force and the next review moves on; the review is in the history.
 - **Start a new version**, and send it for approval as above. Publishing it sets the next review.
 
-A document no longer needed is **retired**, with the reason. Its versions and history stay on record, and it can be put back in use. A document that others still implement is not retired until they are moved or retired first.
+A document no longer needed is **retired** (**Retire**), with the reason. Its versions and history stay on record, and **Put back in use** restores it. A document that others still implement is not retired until they are moved or retired first.
 
 ## What it governs
 
@@ -72,6 +83,8 @@ A document is connected to what it governs on its **What it governs** tab, by th
 - **The requirements it answers.** A requirement a document answers is one the organization meets, at least in part, by saying so in it: the information security policy answers the Cybersecurity Framework's GV.PO-01 and the HIPAA Security Rule's 164.316(a). **Add a requirement** chooses a framework and finds the requirement by code or words.
 
 Each side shows the other. A control's page lists the documents that **direct** it. A requirement, opened in its framework, lists the **documents that answer it**, beside the controls that do, but only documents in force: a draft, or a document never published or retired, says nothing yet. So "is there a policy for this?" has an answer with a version and a date on it. The history of the document keeps each control and requirement added and taken off.
+
+A document that answers a requirement does not change that requirement's readiness in any scope: readiness follows the controls. The document is the written rule; the control is how it is done, and the test says whether it works.
 
 ![The information security policy's What it governs tab: the three controls it directs, with how well each works, and the requirements it answers, framework by framework](img/document-governs-light.webp)
 
@@ -91,7 +104,7 @@ An exception to a document does not change how a scope stands: a scope counts ex
 
 ## Who it applies to
 
-A document applies to **everyone**, as shipped, or to the people chosen under **Who it applies to** on its page:
+A document applies to **everyone**, as shipped, or to the people chosen under **Who it applies to → Change** on its page:
 
 - **those who work in chosen units**, and in the units beneath them, and
 - **those who hold chosen roles**, wherever they hold them: every steward, say, or every manager.
@@ -120,8 +133,21 @@ A document can ask the people it applies to to say they have read it: tick **Ask
 
 The document's **Acknowledgments** tab shows everyone it applies to, split by whether they have acknowledged the version they must: as a count, by unit with the units that have most still to do first, and person by person. Someone who acknowledged an earlier version that no longer counts is shown with it. The tab is for the document's owners and editors, assessors of its unit, and those who read everything.
 
-![Who has acknowledged the incident response procedure: 51 of 67, by unit, with the button to ask the rest](img/document-acknowledgments-light.webp)
+![Who has acknowledged the incident response procedure: most of those it applies to, by unit, with the button to ask the rest](img/document-acknowledgments-light.webp)
 
 ### Asking for it by a date
 
-**Ask for acknowledgment** on that tab (an assessor or a manager) starts an **acknowledgment campaign**: those it applies to, or only those in one unit and beneath it, are asked by a date. Those who have already acknowledged the version they must are counted as answered from the start. Everyone else finds it on their Home with the date, is reminded as it approaches, and answers by acknowledging it in the library; the campaign's page shows coverage by unit as they do. The same campaign can be started from **Compliance → Campaigns** ([Running the program](running-the-program.md#campaigns)).
+**Ask for acknowledgment** on that tab (an assessor or a manager) starts an **acknowledgment campaign**: those it applies to, or only those in one unit and beneath it (**Only those in**), are asked by a date (**Due**). **Start, and tell those asked** begins it. Those who have already acknowledged the version they must are counted as answered from the start. Everyone else finds it on their Home with the date, is reminded as it approaches, and answers by acknowledging it in the library; the campaign's page shows coverage by unit as they do. The same campaign can be started from **Compliance → Campaigns** ([Running the program](running-the-program.md#campaigns)).
+
+## A policy, from first draft to yearly review
+
+The demo's **Information security policy** has been through this twice and is part way through a third time. The security leader wrote it; version 3 waits for the president's approval, the chief risk and compliance officer having approved it already. Sign in to the demo as the executive to approve it, and then as the security leader to publish it.
+
+1. **Add the document.** **Policies → Documents → Add a document**: its title, **Kind** (Policy), **Unit** (the security office), **Implements** (nothing, for a policy at the top), and **Reviewed every** if it should not follow the program's cadence. Tick **Ask those it applies to to say they have read it** if everyone must acknowledge it.
+2. **Write the first version.** Adding the document started its first draft. On the **Next version** tab, write it here, link to where it is kept, or attach a file, and **Save the draft**. (If that draft was discarded, the tab offers **Start the first version** to begin another.)
+3. **Send it for approval.** **Send for approval**, naming whoever must approve a policy: the demo names the president. Each is told, and approves it or returns it with what to change.
+4. **Publish it.** Once every approval is in, its owners are told, and one of them, or the unit's steward, leader, or manager, chooses **Publish as version 1**. Its next review is set from that day.
+5. **Say what it governs.** On **What it governs**, **Add a control** for each control it directs, such as security oversight and security roles, and **Add a requirement** for each requirement it answers, such as the Cybersecurity Framework's GV.PO-01. A requirement opened in its framework then lists the policy, with its version.
+6. **Say who it applies to.** **Who it applies to → Change**. A policy for everyone stays as it is; a procedure for those who act in an incident might apply to Information Technology, Information Security, Research Computing, and every steward, as the demo's incident response procedure does.
+7. **Ask people to acknowledge it.** Publishing asks everyone it applies to, on their Home and in the library. The **Acknowledgments** tab shows who has, by unit. To set a date and chase the rest, **Ask for acknowledgment**: the demo's assessor did that for version 3 of the acceptable use policy, and the campaign's page shows coverage by unit as people answer.
+8. **Review it each year.** When the review comes due, its owners see it on Home. **Review and keep** says what was looked at and moves the date on. Or **Start a new version**, say **What changed, and why**, send it for approval, and publish it; untick **Everyone must acknowledge this version again** if the change does not alter what anyone must do.

@@ -163,8 +163,15 @@ def cmd_init(args: argparse.Namespace) -> int:
         loaded = _install_program(db)
         if any(loaded.values()):
             print("Program: loaded the default program and the starter libraries")
-        if args.program and args.program != "research-institute" and any(loaded.values()):
-            _load_starter(db, args.program)
+        if args.program and args.program != "research-institute":
+            # A starter is the beginning of a program, never laid over one already in use:
+            # running init again, after an upgrade adds to the libraries, leaves it alone.
+            if loaded["scoring_method"]:
+                _load_starter(db, args.program)
+            else:
+                hint = f"`riskwren program import {args.program}`"
+                print(f"Program: already set up, so --program was not applied. To load a "
+                      f"starter over it, run {hint}.")  # fmt: skip
         users.first_admin(db, config, args)
     finally:
         db.dispose()
@@ -817,8 +824,9 @@ def build_parser() -> argparse.ArgumentParser:
     upgrade = db_commands.add_parser(
         "upgrade",
         help="bring the schema up to this version",
-        description="Apply any migrations the database has not had. Export first: "
-        "an upgrade cannot be undone except by restoring.",
+        description="Apply any migrations the database has not had, and add what is new in "
+        "the default program and the starter libraries without changing what is there. Back "
+        "up first, with `riskwren backup`: an upgrade cannot be undone except by restoring.",
     )
     upgrade.set_defaults(handler=cmd_db_upgrade)
     current = db_commands.add_parser(
@@ -1056,7 +1064,8 @@ def build_parser() -> argparse.ArgumentParser:
         "doctor",
         help="check that this installation is healthy",
         description="Check the configuration, the data home, the database and its schema, "
-        "and the history. Exits with 1 if anything must be fixed.",
+        "the history, single sign-on and email where they are set up, and scheduled work. "
+        "Exits with 1 if anything must be fixed.",
     )
     doctor.add_argument(
         "--production",
@@ -1070,18 +1079,25 @@ def build_parser() -> argparse.ArgumentParser:
         "jobs",
         help="see scheduled work, or run it now",
         description="Scheduled work brings risks up to date with the calendar, sends reminders, "
-        "and sends email where that is set up. The server does this by itself while it runs. "
-        "These commands are for seeing how it is going, and for running it from a scheduled "
-        "task where the server's own scheduler is turned off.",
+        "sends email where that is set up, tells webhooks what has happened, takes the daily "
+        "snapshot of the measures, and tidies RiskWren's own bookkeeping. The server does this "
+        "by itself while it runs. These commands are for seeing how it is going, and for "
+        "running it from a scheduled task where the server's own scheduler is turned off.",
     )
     job_commands = scheduled.add_subparsers(title="commands", metavar="COMMAND")
     job_run = job_commands.add_parser(
         "run",
         help="run the jobs that are due, or one job now",
-        description="Run every job that is due. With a job's name, run that one now whether "
-        "or not it is due. A job another process is running is left to it.",
+        description="Run every job that is due and not paused. With a job's key (calendar, "
+        "reminders, mail, webhooks, measures, or tidy), run that one now whether or not it is "
+        "due or paused. A job another process is running is left to it.",
     )
-    job_run.add_argument("key", nargs="?", metavar="JOB", help="one job to run now")
+    job_run.add_argument(
+        "key",
+        nargs="?",
+        metavar="JOB",
+        help="one job to run now: calendar, reminders, mail, webhooks, measures, or tidy",
+    )
     job_run.set_defaults(handler=cmd_jobs, action="run")
     scheduled.set_defaults(handler=cmd_jobs, action="list")
 

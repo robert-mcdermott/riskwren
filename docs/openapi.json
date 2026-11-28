@@ -6957,7 +6957,7 @@
       "WebhookBody": {
         "properties": {
           "events": {
-            "description": "*, a family such as issue.*, or names such as issue.close",
+            "description": "*, a family such as issue.*, or names such as issue.create",
             "items": {
               "type": "string"
             },

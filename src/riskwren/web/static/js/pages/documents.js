@@ -209,7 +209,7 @@ function draftEditor(record, version, reload) {
   const text = field("Text", { type: "textarea", rows: 18, value: version.body ?? "", class: "textarea doc-editor",
     hint: "# for a heading, - for a list, **bold**, *emphasis*, and [a link](https://…). A blank line starts a new paragraph." });
   const url = field("Where it is kept", { type: "url", value: version.url ?? "", placeholder: "https://", hint: "The page or file in the place the organization already keeps it. RiskWren tracks its approvals and dates." });
-  const fileInput = h("input", { type: "file", class: "input", id: "doc-file", accept: ".pdf,.doc,.docx,.odt,.txt,.md,.rtf" });
+  const fileInput = h("input", { type: "file", class: "input", id: "doc-file", accept: ".pdf,.docx,.xlsx,.pptx,.txt,.md,.rtf,.png,.jpg,.jpeg" });
   const fileField = h("div", { class: "field" }, h("label", { for: "doc-file" }, "File"), fileInput,
     h("div", { class: "hint" }, version.form === "file" && version.file ? `Now: ${version.file.name}. Choosing another replaces it.` : "A PDF or Word document, up to 25 MB."));
   const note = field("What changed, and why", { type: "textarea", rows: 3, value: version.change_note ?? "",

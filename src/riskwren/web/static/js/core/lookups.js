@@ -41,10 +41,12 @@ export function options(vocab, name, { blank = null } = {}) {
 }
 
 /** Units as select options, indented to show the hierarchy. only: a set of unit ids to offer. */
-export function unitOptions(tree, { only = null, blank = null } = {}) {
+/** ``keep``: the unit a record already belongs to, always offered, so that editing a record
+ *  never moves it, even when the editor may not add records there or the unit is closed. */
+export function unitOptions(tree, { only = null, blank = null, keep = null } = {}) {
   const out = blank == null ? [] : [["", blank]];
   const walk = (node, depth) => {
-    const offered = node.status === "active" && (!only || only.has(node.id));
+    const offered = node.id === keep || (node.status === "active" && (!only || only.has(node.id)));
     if (offered) out.push([node.id, `${" ".repeat(depth)}${node.name}`]);
     for (const child of node.children) walk(child, depth + (offered ? 1 : 0));
   };

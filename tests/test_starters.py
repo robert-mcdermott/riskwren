@@ -54,6 +54,15 @@ def test_init_starts_from_a_starter(
         assert found["research"] == "retired" and "fundraising" in kinds
     # Loading it again by name changes nothing.
     assert main(["--config", str(path), "program", "import", key]) == 0
+    # Running init again never lays a starter over the program in use.
+    assert main(["--config", str(path), "init", "--program", "research-institute"]) == 0
+    assert main(["--config", str(path), "init", "--program", key]) == 0
+    db = Database(load_config(path).database_url)
+    try:
+        with db.read() as session:
+            assert {row.key: row.status for row in categories.all_(session)} == found
+    finally:
+        db.dispose()
 
 
 def test_a_framework_of_codes_takes_a_licence_holders_words(

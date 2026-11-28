@@ -257,8 +257,14 @@ def package(session: Session, access: OutsideAccess) -> dict[str, Any]:
         if engagement is None:
             raise AccessRefused(None)
         shown = engagements.view(session, Principal.for_command("Outside access"), engagement)
-        for key in ("can", "role", "next", "waiting"):
+        # What the page draws, and no more: requests to the audited, with their answers, and
+        # the team's review notes stay with the organization.
+        for key in ("can", "role", "next", "waiting", "requests"):
             shown.pop(key, None)
+        shown["workpapers"] = [
+            {key: value for key, value in paper.items() if key not in ("notes", "mine")}
+            for paper in shown["workpapers"]
+        ]
         return {"about": about, "engagement": shown}
     scope = session.get(SCOPE.model, access.subject_id)
     if scope is None:

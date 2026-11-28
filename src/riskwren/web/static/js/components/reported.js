@@ -42,7 +42,7 @@ function decide(row, mode, onDone) {
       });
       body.append(h("div", { class: "stack" }, problem,
         h("p", { class: "muted" }, mode === "confirm"
-          ? (failure ? "Confirming it raises an issue on the control, as a person's finding would." : row.kind === "evidence" ? "Confirming it files the evidence with the control, counting for a year unless it says otherwise." : "Confirming it keeps it on record as checked.")
+          ? (failure ? "Confirming it raises an issue on the control for the control's owners, as a failed test does." : row.kind === "evidence" ? "Confirming it files the evidence with the control, counting for a year from when it was observed." : "Confirming it keeps it on record as checked. Nothing else changes.")
           : "Setting it aside keeps it on record, with why, and changes nothing else."),
         severity?.node ?? null, note.node));
       footer.hidden = false;
