@@ -1135,6 +1135,279 @@ OUTSIDE = [
      "kind": "scope", "ref": "SCP-0001", "days": 14},
 ]  # fmt: skip
 
+# Business impact: what the critical processes cannot afford to lose (days ago, process, impacts
+# over time, back within hours, loses at most hours, the least it needs), and what the systems
+# they rely on can deliver (days ago, system, back within, loses at most, what it rests on).
+IMPACT = [
+    (60, "Research data storage", [("4h", 2), ("1d", 3), ("3d", 4), ("1w", 5)], 72, 24,
+     "The storage administrators, the backup service, and the cluster network."),
+    (55, "Medication dispensing", [("4h", 4), ("1d", 5)], 4, 1,
+     "Two pharmacists, the dispensing cabinets or the paper override procedure, and the clinical record."),
+    (50, "Clinical laboratory testing", [("4h", 3), ("1d", 4), ("3d", 5)], 8, 1,
+     "The laboratory information system, the chemistry analyzers, and their technologists."),
+    (45, "Sequencing service", [("1d", 2), ("3d", 3), ("1w", 4), ("1m", 5)], 168, 24,
+     "One sequencer, the sample manager, and research storage."),
+]  # fmt: skip
+CAPABILITY = [
+    (58, "Research storage", 24, 24, "Replicated to the second data center; failed over in a test in June."),
+    (58, "Backup service", 120, 24, "Partial restores only; a full restore of research storage was last done two years ago and took five days."),
+    (52, "Dispensing cabinets", 2, 0, "Each cabinet runs on its own when the network is down; tested in the spring drill."),
+    (52, "Clinical record system", 4, 0, "The supplier's hosted service: four hours and no loss, in the contract."),
+    (48, "Laboratory information system", 12, 1, "Restored to the standby server in last year's exercise in twelve hours."),
+    (44, "Genomics sample manager", 24, 4, "Nightly backups, restored on request."),
+]  # fmt: skip
+
+# Incidents, near misses, and concerns, each reported some days ago by one of the cast or by
+# someone without a name (None), triaged, written about, and perhaps closed. A step's first
+# number is days ago; a message is (days ago, who wrote it or "reporter", shared, what).
+# Reporting without a name was opened this many days ago, and the demo's reports made that
+# way take these codes, so that the follow-up page can be shown.
+ANONYMOUS_OPENED = 200
+INCIDENTS = [
+    {"by": "member", "on": 96, "kind": "near_miss", "unit": "BIO", "occurred": 96, "where": "Email",
+     "name": "Email asking me to confirm my mailbox password",
+     "summary": "An email that looked as if it came from IT asked me to sign in to keep my "
+                "mailbox. The link went to a site that was not ours. I did not sign in, and I "
+                "forwarded it to the security team.",
+     "triage": (96, "assess1", "security", "low", [("system", "Email and collaboration")],
+                "sec_mgr"),
+     "said": [(96, "sec_mgr", True, "Thank you for sending it on. We blocked the sender and "
+                                    "took the same email out of 46 other mailboxes.")],
+     "closed": (95, "sec_mgr", "Sender blocked and 46 copies removed. The sign-in records show "
+                               "that nobody entered a password on the false site.")},
+    {"by": "rc_dir", "on": 61, "kind": "near_miss", "unit": "RC", "occurred": 61,
+     "where": "Compute cluster, login node 2",
+     "name": "Ransomware stopped on a cluster login node",
+     "summary": "Endpoint protection quarantined a file that began encrypting a user's scratch "
+                "directory on login node 2. The account had signed in from an unusual country "
+                "an hour before. We took the node out of service.",
+     "triage": (61, "ciso", "security", "high",
+                [("system", "Compute cluster"), ("system", "Research storage"),
+                 ("risk", "Ransomware reaching research storage")], "sec_mgr"),
+     "said": [(61, "sec_mgr", False, "The account's password was reused from a breached site. "
+                                     "Reset, sessions revoked, and the node rebuilt from its "
+                                     "image."),
+              (60, "sec_mgr", True, "The node is back in service. Nothing reached research "
+                                    "storage: its snapshots were checked file by file.")],
+     "learned": (59, "ciso", {
+         "realized": ["Ransomware reaching research storage",
+                      "Staff accounts taken over through stolen passwords"],
+         "failed": ["Second factor at sign-in"],
+         "held": ["Protection against malicious software", "Backups tested by restoring"],
+         "root_cause": "design",
+         "lessons": "The cluster's login nodes were outside the second-factor rollout, so a "
+                    "password reused from a breached site was enough. Endpoint protection and "
+                    "the tested snapshots held. Every system that faces the internet is now on "
+                    "the second-factor list, and the list is checked each quarter.",
+     }),
+     "losses": [(59, "sec_mgr", "response", 6400, "Forty hours of the security team and "
+                                                   "the cluster administrators."),
+                (58, "sec_mgr", "recovery", 1800, "Rebuilding the node and checking the "
+                                                  "snapshots.")],
+     "closed": (58, "sec_mgr", "Contained on one node; no data lost or taken. Multi-factor "
+                               "sign-in is now required on the cluster's login nodes.")},
+    {"by": "sp_mgr", "on": 23, "kind": "incident", "unit": "CR", "occurred": 24,
+     "where": "Email to a trial sponsor",
+     "name": "Spreadsheet with participant names sent to a sponsor",
+     "summary": "A monthly enrollment report went to the sponsor with a tab that still had "
+                "participants' names and dates of birth. It should have had study numbers only.",
+     "triage": (23, "assess2", "privacy", "high", [("system", "Electronic data capture")],
+                "assess2"),
+     # Whether it must be notified: still being decided, and the clock is running.
+     "breach": (22, "assess2", {
+         "information": ["participant", "personal"], "people": 38, "most_in_one_state": 31,
+         "factors": {
+             "nature": ("moderate", "Names and dates of birth, with the study the person is in."),
+             "recipient": ("low", "The sponsor, bound by the clinical trial agreement."),
+             "acquired": ("high", "The sponsor's coordinator opened the file."),
+             "mitigated": ("moderate", "Deleted, and confirmed in writing; backups take a week to "
+                                       "roll off."),
+         },
+         "conclusion": "undecided",
+         "regimes": [{"key": "contract", "name": "The sponsor's clinical trial agreement", "days": 5},
+                     {"key": "state", "name": "Washington", "days": 30}],
+     }),
+     "notified": [(21, "assess2", "contract:The sponsor's clinical trial agreement", "party",
+                   "The sponsor's privacy office, by email", "Email")],
+     "said": [(22, "assess2", False, "The sponsor's privacy office confirmed in writing that "
+                                     "the file was deleted from the inbox and from backups."),
+              (22, "assess2", True, "Thank you for reporting it the same day. We are working "
+                                    "out with the privacy office whether anyone must be told.")]},
+    {"by": None, "on": 15, "kind": "concern", "unit": None, "occurred": None,
+     "where": "Infusion, third floor",
+     "code": "7KQ2M-PX4RT-9WZ3H-C6V8N",
+     "name": "Shared password on the infusion pumps' admin console",
+     "summary": "The pump management console at the nurses' station is signed in with one "
+                "account that everyone uses. Its password is on a note under the keyboard.",
+     "triage": (14, "ciso", "security", "moderate", [("system", "Infusion pumps")], "sec_mgr",
+                "INF"),
+     "said": [(13, "sec_mgr", True, "Thank you. Is it the console at the nurses' station by "
+                                    "the elevators, or the one in the medication room?"),
+              (12, "reporter", True, "By the elevators. The note has been there since the "
+                                     "summer.")],
+     "issue": (11, "ciso", {
+         "name": "Infusion pump console signed in with a shared account", "severity": "high",
+         "summary": "Everyone at the nurses' station uses one account, and its password is on "
+                    "a note. Each nurse needs their own sign-in, through single sign-on.",
+         "subjects": ["Compromised account: Infusion therapy"], "owner": "it_mgr"})},
+    # A restricted case: known only to those named on it, not to the pharmacy's leaders.
+    {"by": "pharm_mgr", "on": 9, "kind": "concern", "unit": "PHARM", "occurred": 10,
+     "where": "Pharmacy, the controlled substance vault",
+     "name": "Controlled substance counts signed without counting",
+     "summary": "On two night shifts this month the end-of-shift count was signed by both "
+                "witnesses, but only one of them was in the vault. The cabinet's own log shows "
+                "a single badge both times.",
+     "triage": (9, "cro", "compliance", "high", [("system", "Dispensing cabinets")], "assess2"),
+     "restrict": (9, "cro", []),
+     "said": [(8, "assess2", False, "The cabinet's access log for the month is exported and "
+                                    "kept with the case, not on the shared drive."),
+              (8, "assess2", True, "Thank you for raising this. Only the people named on this "
+                                   "case can see it. We may ask you more here.")]},
+    {"by": "gen_mgr", "on": 6, "kind": "incident", "unit": "GEN", "occurred": 7,
+     "where": "A parked car, overnight",
+     "name": "Laptop stolen from a car",
+     "summary": "A core laptop was taken from my car overnight. It had the sample manager's "
+                "export of last month's runs on it, with sample identifiers but no names.",
+     "triage": (6, "assess1", "security", "high",
+                [("system", "Endpoint management"), ("system", "Genomics sample manager")],
+                "sec_mgr"),
+     "breach": (5, "sec_mgr", {
+         "information": ["participant"], "people": 212, "secured": True,
+         "factors": {"nature": ("low", "Sample identifiers, with no names or dates of birth.")},
+         "conclusion": "no_notification",
+         "rationale": "The disk was encrypted and the laptop was locked; endpoint management "
+                      "shows the encryption key was never used after it was taken. It is not a "
+                      "breach of unsecured information.",
+         "regimes": [{"key": "contract", "name": "The genomics data use agreement", "days": 10}],
+     }),
+     "losses": [(4, "sec_mgr", "recovery", 2150, "A replacement laptop, set up.")],
+     "learned": (4, "ciso", {"realized": [], "failed": [],
+                                "held": ["Devices and storage encrypted"]}),
+     "said": [(6, "sec_mgr", False, "Endpoint management shows the disk was encrypted and the "
+                                    "laptop last checked in at 7:12 pm. Remote wipe sent."),
+              (5, "sec_mgr", True, "Thank you. Please file a police report and send us its "
+                                   "number when you have it.")]},
+    {"by": None, "on": 2, "kind": "concern", "unit": None, "occurred": None,
+     "where": "Imaging Core, the back door",
+     "code": "4DHN8-T2WQ6-MB9KX-3RF7P",
+     "name": "Visitors let into the imaging core without a badge",
+     "summary": "Visitors are being let in through the back door without signing in or wearing "
+                "a badge, and are left alone with the microscopes."},
+    {"by": "bio_mgr", "on": 1, "kind": "incident", "unit": "BIO", "occurred": 1,
+     "where": "Freezer room B",
+     "name": "Freezer alarm did not page anyone overnight",
+     "summary": "Freezer 12 rose to minus 62 at 2 am. The monitor showed the alarm, but no page "
+                "reached whoever was on call. The morning shift moved its boxes to the spare."},
+]  # fmt: skip
+
+# Privacy impact assessments: a campaign started some days ago over every process and system
+# that handles restricted information; some answered, one reviewed. Answers by system name.
+PRIVACY_CAMPAIGN = 40
+PRIVACY_ANSWERS = {
+    "Scheduling system": (36, {
+        "information": ["contact", "health"], "whose": ["patients"], "how_many": 18000,
+        "purpose": "Booking appointments and sending reminders.", "basis": "care",
+        "least": True, "shared": True, "shared_with": "The supplier hosts it.",
+        "agreement": "business_associate", "access": True,
+        "retention": "Seven years after the last visit, then deleted.", "deidentified": "cannot",
+        "harms": "Someone could learn that a person is a patient here.",
+        "reduced": "Only clinic staff sign in, with the organization's single sign-on.",
+    }, "ciso", "Nothing to change. Reviewed with the clinic's privacy lead."),
+    "Survey platform": (30, {
+        "information": ["contact", "health", "research"], "whose": ["participants"],
+        "how_many": 2600, "purpose": "Population study questionnaires.", "basis": "protocol",
+        "least": False, "least_why": "It keeps email addresses after the survey closes.",
+        "shared": True, "shared_with": "The survey supplier hosts it.", "agreement": "none",
+        "access": True, "retention": "Until the study ends.", "deidentified": "partly",
+        "harms": "Participants' answers about their health could be linked to their email.",
+        "reduced": "Answers are exported with study numbers only.",
+    }, None, None),
+}  # fmt: skip
+
+# Continuity plans: documents of their own kind, approved and published, the processes each
+# restores, and their exercises. Days ago for each step; an exercise's finding is an issue.
+CONTINUITY_PLANS = [
+    {"name": "Research data storage continuity plan", "unit": "RC", "by": "rc_dir",
+     "approver": "cio", "written": 150, "published": 140,
+     "summary": "Keeping research computing's storage going, or bringing it back, when the "
+                "primary data center is lost or the storage is encrypted.",
+     "body": """# When research storage is lost
+
+## First hour
+1. The on-call storage administrator declares an outage and calls the **security operations
+   manager** if encryption or tampering is suspected.
+2. Stop jobs that write to storage. Do not power off encrypted volumes: they are evidence.
+3. Tell the core directors that research storage is down, and how long it is expected to be.
+
+## Bringing it back
+- Fail over to the second data center's replica if it is clean.
+- If the replica is not clean, restore from the offline copy, newest first: lab shares,
+  then project data, then scratch.
+- Check each restore against its snapshot list before anyone is let back in.
+
+## Telling people
+Every four hours, the director of research computing writes to the core directors and the
+lab heads: what is back, what is next, and when.
+""",
+     "covers": ["Research data storage"],
+     "exercises": [
+         {"days": 34, "by": "ciso", "kind": "tabletop", "result": "partly", "achieved": 120,
+          "scenario": "Ransomware encrypts the primary storage and its replica on a Friday night.",
+          "participants": "Research computing, security operations, two core directors.",
+          "outcome": "Restoring everything from the offline copy took five days on paper, "
+                     "against the three days research needs. Lab shares came back first, "
+                     "as planned.",
+          "finding": {"name": "A full restore of research storage takes five days",
+                      "severity": "high", "owner": "rc_dir",
+                      "summary": "The exercise found that a restore from the offline copy "
+                                 "takes five days; research needs storage back in three."}},
+     ]},
+    {"name": "Medication dispensing downtime plan", "unit": "PHARM", "by": "pharm_mgr",
+     "approver": "clinic_lead", "written": 120, "published": 112,
+     "summary": "Dispensing medication when the cabinets or the network are down.",
+     "body": """# When the dispensing cabinets are down
+
+1. Switch the cabinets to their own override mode; each runs without the network.
+2. Pharmacists dispense from the paper override log, two signatures for each dose.
+3. When the cabinets are back, enter every override within four hours.
+""",
+     "covers": ["Medication dispensing"],
+     "exercises": [
+         {"days": 70, "by": "pharm_mgr", "kind": "simulation", "result": "met", "achieved": 1,
+          "scenario": "The network to the pharmacy is cut for four hours during the day shift.",
+          "participants": "The pharmacy team and the infusion nurses on shift.",
+          "outcome": "Override mode came up in minutes; every dose was logged and entered "
+                     "within the hour after."},
+     ]},
+]  # fmt: skip
+
+# Sites: the places work depends on, what relies on each, and how soon work goes on again
+# after one is lost. name, unit, kind, criticality, address, processes, systems (by key),
+# then (days ago, hours, what that rests on). And a third party's own recovery: (days ago,
+# third party key, hours, information lost, what it rests on).
+SITES = [
+    ("Primary data center", "IT", "data_center", "critical", "Administration building, level B1",
+     ["Research data storage"], ["storage", "cluster", "enclave", "servers", "network"],
+     (58, 48, "Fail over to the second data center: storage was tested in March; the cluster "
+              "has no warm standby, and is rebuilt there by hand.")),
+    ("Second data center", "IT", "data_center", "high", "Colocation facility, Northgate",
+     [], ["backup"],
+     (58, 24, "Its own power and cooling; the backup service moves to the primary if it is "
+              "lost.")),
+    ("Freezer rooms A and B", "BIO", "storage", "critical", "Research building, level 1",
+     ["Specimen storage and retrieval"], ["freezers", "monitor"],
+     (52, 4, "The spare freezers on level 2 take the boxes; moved in four hours in the last "
+             "exercise.")),
+    ("Clinic building", "CLIN", "clinic", "critical", "Northmere Research Clinic",
+     ["Medication dispensing", "Infusion therapy", "Clinical laboratory testing"],
+     ["cabinets", "pumps", "lis", "analyzers"],
+     (50, 24, "The outpatient unit on the second campus takes infusions and dispensing within "
+              "a day; nothing is set up there to start sooner.")),
+]  # fmt: skip
+THIRD_PARTY_RECOVERY = [
+    (48, "labref", 24, 0, "Its contract: results within a day of a sample arriving."),
+]  # fmt: skip
+
 # Scopes. Central IT provides; the clinic and the enclave rely on it.
 SCOPE_PROVIDER = {
     "name": "Central information technology",

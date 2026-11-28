@@ -266,6 +266,7 @@ def _shown(value: Any) -> Any:
 def everywhere(
     session: Session,
     *,
+    principal: Any = None,
     actor: int | None = None,
     about: tuple[RecordType, Any] | None = None,
     kind: str | None = None,
@@ -277,6 +278,19 @@ def everywhere(
     """Every change, newest first, for those who may read everything: narrowed to a person,
     a record, a kind of record, or a span of dates. Each entry says which record it was."""
     conditions: list[Any] = []
+    # A record type may hide some of its records even from those who read everything, as
+    # a restricted case is hidden from all but those named on it; its events go with it.
+    for key, record_type in TYPES.items():
+        hide = record_type.extra.get("hidden")
+        ids = hide(session, principal) if hide is not None and principal is not None else None
+        if ids is None:
+            continue
+        conditions.append(
+            or_(Event.subject_type != key, Event.subject_id.is_(None), Event.subject_id.not_in(ids))
+        )
+        conditions.append(
+            or_(Event.parent_type.is_(None), Event.parent_type != key, Event.parent_id.not_in(ids))
+        )
     if actor is not None:
         conditions += [Event.actor_kind == "account", Event.actor_id == actor]
     if about is not None:

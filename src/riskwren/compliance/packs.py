@@ -30,8 +30,9 @@ from riskwren.db.models.compliance import FRAMEWORK_KINDS, MAPPING_RELATIONS
 from riskwren.events import audit
 
 BUILTIN = ("nist-csf", "nist-800-53", "nist-800-171", "hipaa-security")
-# Shipped, and loaded when someone asks: an earlier version that some programs still name.
-OPTIONAL = ("nist-800-53-r4",)
+# Shipped, and loaded when someone asks: an earlier version that some programs still name,
+# and the privacy and breach frameworks a privacy office holds itself to.
+OPTIONAL = ("nist-800-53-r4", "hipaa-breach", "nist-privacy")
 AVAILABLE = BUILTIN + OPTIONAL
 KEY_CHARACTERS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.")
 # What a pack may declare. ``own`` is for frameworks entered here, never for a pack.

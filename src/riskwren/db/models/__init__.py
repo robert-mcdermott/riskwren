@@ -62,6 +62,15 @@ from riskwren.db.models.governance import (
     Objective,
     RiskObjective,
 )
+from riskwren.db.models.incidents import (
+    BreachAssessment,
+    BreachNotification,
+    Incident,
+    IncidentLoss,
+    IncidentMember,
+    IncidentMessage,
+    IncidentSubject,
+)
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.insight import LeadershipReport, MeasureSnapshot
 from riskwren.db.models.inventory import (
@@ -71,6 +80,7 @@ from riskwren.db.models.inventory import (
     RecordLink,
     RecordOwner,
     Service,
+    Site,
     System,
     ThirdParty,
 )
@@ -95,6 +105,12 @@ from riskwren.db.models.people import (
     SignInRequest,
 )
 from riskwren.db.models.program import Setting
+from riskwren.db.models.resilience import (
+    ContinuityCover,
+    ContinuityExercise,
+    ImpactAnalysis,
+    RecoveryCapability,
+)
 from riskwren.db.models.risk import (
     Risk,
     RiskAssessment,
@@ -131,11 +147,15 @@ __all__ = [
     "AuditRequest",
     "Baseline",
     "BaselineRequirement",
+    "BreachAssessment",
+    "BreachNotification",
     "Campaign",
     "CampaignItem",
     "ChainHead",
     "CommitteeItem",
     "CommitteeSession",
+    "ContinuityCover",
+    "ContinuityExercise",
     "Control",
     "ControlLibraryEntry",
     "ControlRating",
@@ -157,7 +177,13 @@ __all__ = [
     "FrameworkMapping",
     "Handover",
     "Identity",
+    "ImpactAnalysis",
     "Implementation",
+    "Incident",
+    "IncidentLoss",
+    "IncidentMember",
+    "IncidentMessage",
+    "IncidentSubject",
     "Indicator",
     "IndicatorReading",
     "IndicatorRisk",
@@ -187,6 +213,7 @@ __all__ = [
     "QuestionnaireVersion",
     "RecordLink",
     "RecordOwner",
+    "RecoveryCapability",
     "Reminder",
     "Requirement",
     "RespondentLink",
@@ -215,6 +242,7 @@ __all__ = [
     "SessionToken",
     "Setting",
     "SignInRequest",
+    "Site",
     "StoredFile",
     "SuggestionSetAside",
     "System",

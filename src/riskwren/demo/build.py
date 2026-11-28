@@ -2277,6 +2277,330 @@ class Builder:
                     outside.package(session, found)
                     outside.record_view(session, found)
 
+    def _story_resilience(self) -> Script:
+        """The risk office facilitates business impact analyses of the critical processes, and
+        those who keep the systems say what each can deliver."""
+        from riskwren.db.models import Process, Site, System, ThirdParty
+        from riskwren.inventory.registry import SITE
+        from riskwren.resilience import analyse, record_capability
+
+        steps = sorted([(spec[0], "impact", spec) for spec in c.IMPACT]
+                       + [(spec[0], "capability", spec) for spec in c.CAPABILITY]
+                       + [(70, "site", spec) for spec in c.SITES]
+                       + [(spec[-1][0], "site_capability", spec) for spec in c.SITES]
+                       + [(spec[0], "third_party", spec) for spec in c.THIRD_PARTY_RECOVERY],
+                       key=lambda step: -step[0])  # fmt: skip
+        for days, what, spec in steps:
+            yield self._on(days, hour=10)
+            with self.act(self.cast["cro"]) as (session, who):
+                if what == "site":
+                    name, unit, kind, critical, address, processes, systems, _ = spec
+                    site = records.create(session, who, SITE, {
+                        "name": name, "kind": kind, "criticality": critical, "address": address,
+                        "org_unit_id": self.units[unit]})  # fmt: skip
+                    for process_name in processes:
+                        process = session.scalars(
+                            select(Process).where(Process.name == process_name)
+                        ).first()
+                        if process is not None:
+                            links.add(session, who, PROCESS, process, "relies_on", SITE, site)
+                    for key in systems:
+                        system = session.scalars(
+                            select(System).where(
+                                System.name == {row[0]: row[1] for row in c.SYSTEMS}[key]
+                            )
+                        ).first()
+                        if system is not None:
+                            links.add(session, who, SYSTEM, system, "relies_on", SITE, site)
+                    self.tally("sites")
+                elif what == "site_capability":
+                    _, back, basis = spec[-1]
+                    site = session.scalars(select(Site).where(Site.name == spec[0])).one()
+                    record_capability(session, who, "site", site,
+                                      {"recovery_hours": back, "basis": basis})  # fmt: skip
+                elif what == "third_party":
+                    _, key, back, loss, basis = spec
+                    party = session.scalars(
+                        select(ThirdParty).where(
+                            ThirdParty.name == {row[0]: row[1] for row in c.PARTIES}[key]
+                        )
+                    ).first()
+                    if party is not None:
+                        record_capability(session, who, "third_party", party, {
+                            "recovery_hours": back, "data_loss_hours": loss, "basis": basis})  # fmt: skip
+                elif what == "impact":
+                    _, name, impacts, back, loss, minimum = spec
+                    process = session.scalars(select(Process).where(Process.name == name)).one()
+                    analyse(
+                        session,
+                        who,
+                        process,
+                        {
+                            "impacts": [{"after": a, "level": lv} for a, lv in impacts],
+                            "recovery_hours": back,
+                            "data_loss_hours": loss,
+                            "minimum": minimum,
+                        },
+                    )
+                    self.tally("impact analyses")
+                else:
+                    _, name, back, loss, basis = spec
+                    system = session.scalars(select(System).where(System.name == name)).one()
+                    record_capability(
+                        session,
+                        who,
+                        "system",
+                        system,
+                        {"recovery_hours": back, "data_loss_hours": loss, "basis": basis},
+                    )
+
+    def _story_incidents(self) -> Script:
+        """Reports from staff and, once an administrator opened it, from people without a name:
+        triaged by the security team and the compliance office, written about, and closed."""
+        from riskwren.db.models import Incident, OrgUnit, Risk, System
+        from riskwren.events.actor import Actor
+        from riskwren.incidents import anonymous, breach, learning
+        from riskwren.incidents import reports as incident_reports
+
+        steps: list[tuple[float, int, str, Any]] = [(c.ANONYMOUS_OPENED, 9, "open", None)]
+        for spec in c.INCIDENTS:
+            steps.append((spec["on"], 9, "report", spec))
+            if "triage" in spec:
+                steps.append((spec["triage"][0], 11, "triage", spec))
+            if "restrict" in spec:
+                steps.append((spec["restrict"][0], 12, "restrict", spec))
+            if "breach" in spec:
+                steps.append((spec["breach"][0], 13, "breach", spec))
+            if "learned" in spec:
+                steps.append((spec["learned"][0], 10, "learned", spec))
+            for index, loss in enumerate(spec.get("losses", [])):
+                steps.append((loss[0], 12 + index, "loss", (spec, loss)))
+            if "issue" in spec:
+                steps.append((spec["issue"][0], 15, "issue", spec))
+            for index, sent in enumerate(spec.get("notified", [])):
+                steps.append((sent[0], 15 + index, "notified", (spec, sent)))
+            for index, said in enumerate(spec.get("said", [])):
+                steps.append((said[0], 14 + index, "say", (spec, said)))
+            if "closed" in spec:
+                steps.append((spec["closed"][0], 16, "close", spec))
+        steps.sort(key=lambda step: (-step[0], step[1]))
+
+        def find(session: Session, spec: dict[str, Any]) -> Incident:
+            return session.scalars(select(Incident).where(Incident.name == spec["name"])).one()
+
+        def unit_of(session: Session, code: str) -> int:
+            return session.scalars(select(OrgUnit.id).where(OrgUnit.code == code)).one()
+
+        for days, hour, what, item in steps:
+            yield self._on(days, hour=hour)
+            if what == "open":
+                with self.act(self.cast["admin"]) as (session, who):
+                    anonymous.set_open(session, who, True)
+                continue
+            if what == "loss":
+                spec, (_, by, kind, amount, note) = item
+                with self.act(self.cast[by]) as (session, who):
+                    learning.add_loss(session, who, find(session, spec),
+                                      {"kind": kind, "amount": amount, "note": note})  # fmt: skip
+                continue
+            if what == "notified":
+                spec, (_, by, regime, duty, recipient, method) = item
+                with self.act(self.cast[by]) as (session, who):
+                    breach.notify(session, who, find(session, spec), {
+                        "regime": regime, "duty": duty, "recipient": recipient, "method": method,
+                        "sent_on": self.now.date()})  # fmt: skip
+                continue
+            if what == "say":
+                spec, (_, writer, shared, body) = item
+                if writer == "reporter" and spec["by"] is None:
+                    with self.db.write(Actor.system("Reported without a name")) as session:
+                        incident_reports.written_by_reporter(session, find(session, spec), body)
+                    continue
+                key = spec["by"] if writer == "reporter" else writer
+                with self.act(self.cast[key]) as (session, who):
+                    incident_reports.write(session, who, find(session, spec), body, shared=shared)
+                continue
+            spec = item
+            values = {
+                "kind": spec["kind"], "name": spec["name"], "summary": spec["summary"],
+                "location": spec["where"],
+                # Counted back from the day it was reported, which never falls on a weekend.
+                "occurred_on": self._on(spec["on"]).date()
+                - timedelta(days=spec["occurred"] - spec["on"])
+                if spec["occurred"] is not None else None,
+            }  # fmt: skip
+            if what == "report" and spec["by"] is None:
+                made = anonymous.new_code
+                anonymous.new_code = lambda code=spec["code"]: code  # type: ignore[assignment]
+                try:
+                    with self.db.write(Actor.system("Reported without a name")) as session:
+                        anonymous.report(session, values)
+                finally:
+                    anonymous.new_code = made  # type: ignore[assignment]
+                self.tally("incidents")
+            elif what == "report":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    values["org_unit_id"] = unit_of(session, spec["unit"])
+                    incident_reports.create(session, who, values)
+                self.tally("incidents")
+            elif what == "triage":
+                _, by, category, severity, subjects, handler, *moved = spec["triage"]
+                with self.act(self.cast[by]) as (session, who):
+                    refs = []
+                    for kind, name in subjects:
+                        model: Any = System if kind == "system" else Risk
+                        found = session.scalars(select(model).where(model.name == name)).first()
+                        if found is not None:
+                            refs.append(found.ref)
+                    incident_reports.triage(session, who, find(session, spec), {
+                        "category": category, "severity": severity, "subjects": refs,
+                        "handler_id": self.cast[handler],
+                        **({"org_unit_id": unit_of(session, moved[0])} if moved else {}),
+                    })  # fmt: skip
+            elif what == "breach":
+                _, by, given = spec["breach"]
+                with self.act(self.cast[by]) as (session, who):
+                    incident = find(session, spec)
+                    breach.assess(session, who, incident, {
+                        **given, "discovered_at": incident.created_at,
+                        "factors": {key: {"level": level, "note": note}
+                                    for key, (level, note) in given["factors"].items()},
+                    })  # fmt: skip
+            elif what == "learned":
+                _, by, given = spec["learned"]
+                with self.act(self.cast[by]) as (session, who):
+                    from riskwren.db.models import Control
+
+                    def refs(model: Any, names: list[str]) -> list[str]:
+                        return [found.ref for name in names
+                                if (found := session.scalars(
+                                    select(model).where(model.name == name)).first())]  # fmt: skip
+
+                    incident = find(session, spec)
+                    learning.set_links(session, who, incident, {
+                        "realized": refs(Risk, given.get("realized", [])),
+                        "failed": refs(Control, given.get("failed", [])),
+                        "held": refs(Control, given.get("held", []))})  # fmt: skip
+                    if given.get("lessons"):
+                        learning.learn(session, who, incident, given)
+            elif what == "issue":
+                _, by, given = spec["issue"]
+                with self.act(self.cast[by]) as (session, who):
+                    subjects = [found.ref for name in given["subjects"]
+                                if (found := session.scalars(
+                                    select(Risk).where(Risk.name == name)).first())]  # fmt: skip
+                    learning.raise_issue(session, who, find(session, spec), {
+                        **given, "subjects": subjects, "owner_id": self.cast[given["owner"]]})  # fmt: skip
+            elif what == "restrict":
+                _, by, members = spec["restrict"]
+                with self.act(self.cast[by]) as (session, who):
+                    incident_reports.set_case(
+                        session, who, find(session, spec), True, [self.cast[m] for m in members]
+                    )
+            elif what == "close":
+                _, by, note = spec["closed"]
+                with self.act(self.cast[by]) as (session, who):
+                    incident_reports.close(session, who, find(session, spec), note)
+
+    def _story_privacy(self) -> Script:
+        """The risk office asks for a privacy impact assessment of everything that handles
+        restricted information; some owners answer, and the security leader reviews one."""
+        from riskwren.db.models import Campaign, CampaignItem
+        from riskwren.oversight import campaigns
+
+        yield self._on(c.PRIVACY_CAMPAIGN, hour=10)
+        with self.act(self.cast["cro"]) as (session, who):
+            campaign = campaigns.launch(session, who, {
+                "kind": "privacy_impact", "name": "Privacy impact assessments",
+                "summary": "Everything that handles restricted information, assessed once.",
+                "due_on": (self.now + timedelta(days=60)).date().isoformat()})  # fmt: skip
+            campaign_id = campaign.id
+        for name, (days, answers, reviewer, note) in sorted(
+            c.PRIVACY_ANSWERS.items(), key=lambda pair: -pair[1][0]
+        ):
+            yield self._on(days, hour=14)
+            with self.db.read() as session:
+                item = session.scalars(
+                    select(CampaignItem).where(
+                        CampaignItem.campaign_id == campaign_id, CampaignItem.subject_name == name
+                    )
+                ).first()
+                asked = item.account_id if item else None
+                item_id = item.id if item else None
+            if item_id is None or asked is None or asked in self.departed:
+                continue
+            with self.act(asked) as (session, who):
+                found = session.get(CampaignItem, item_id)
+                campaigns.answer(session, who, found, session.get(Campaign, campaign_id), answers)
+            self.tally("privacy impact assessments")
+            if reviewer:
+                yield self._on(days - 2, hour=11)
+                from riskwren.compliance import privacy
+
+                with self.act(self.cast[reviewer]) as (session, who):
+                    privacy.review(session, who, item_id, note)
+
+    def _story_continuity(self) -> Script:
+        """Continuity plans for two critical processes: written, approved, published, said to
+        restore their processes, and exercised; one exercise's finding is an issue."""
+        from riskwren.db.models import PolicyDocument, Process
+        from riskwren.policy import documents
+        from riskwren.resilience import plans
+
+        steps: list[tuple[float, int, str, Any]] = []
+        for spec in c.CONTINUITY_PLANS:
+            steps += [(spec["written"], 10, "write", spec), (spec["published"] + 2, 10, "send", spec),
+                      (spec["published"] + 1, 11, "approve", spec),
+                      (spec["published"], 12, "publish", spec)]  # fmt: skip
+            for exercise in spec["exercises"]:
+                steps.append((exercise["days"], 15, "exercise", (spec, exercise)))
+        steps.sort(key=lambda step: (-step[0], step[1]))
+
+        def plan(session: Session, spec: dict[str, Any]) -> Any:
+            return session.scalars(
+                select(PolicyDocument).where(PolicyDocument.name == spec["name"])
+            ).one()
+
+        for days, hour, what, item in steps:
+            yield self._on(days, hour=hour)
+            spec = item[0] if what == "exercise" else item
+            if what == "write":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    document = documents.create(session, who, {
+                        "name": spec["name"], "kind": "plan", "summary": spec["summary"],
+                        "org_unit_id": self.units[spec["unit"]], "body": spec["body"]})  # fmt: skip
+                    processes = [
+                        found.ref for name in spec["covers"]
+                        if (found := session.scalars(
+                            select(Process).where(Process.name == name)).first())
+                    ]  # fmt: skip
+                    plans.set_covers(session, who, document, processes)
+            elif what == "send":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    documents.submit(
+                        session, who, plan(session, spec), [self.cast[spec["approver"]]]
+                    )
+            elif what == "approve":
+                with self.act(self.cast[spec["approver"]]) as (session, who):
+                    documents.decide(session, who, plan(session, spec), "approved", None)
+            elif what == "publish":
+                with self.act(self.cast[spec["by"]]) as (session, who):
+                    documents.publish(session, who, plan(session, spec))
+                self.tally("continuity plans")
+            else:
+                exercise = item[1]
+                with self.act(self.cast[exercise["by"]]) as (session, who):
+                    document = plan(session, spec)
+                    row = plans.record_exercise(session, who, document, {
+                        "kind": exercise["kind"], "held_on": self.now.date(),
+                        "scenario": exercise["scenario"], "participants": exercise["participants"],
+                        "outcome": exercise["outcome"], "result": exercise["result"],
+                        "achieved_hours": exercise["achieved"]})  # fmt: skip
+                    finding = exercise.get("finding")
+                    if finding:
+                        plans.raise_finding(session, who, document, row.id, {
+                            **finding, "owner_id": self.cast[finding["owner"]]})  # fmt: skip
+
     def _story_governance(self) -> Script:
         """The strategic plan's objectives, named by the risks that threaten them; and the risk
         and compliance committee: two sessions held, with decisions and minutes, and the next
@@ -3530,6 +3854,8 @@ class Builder:
             self._story_assurance, self._story_coverage, self._story_lifecycle,
             self._story_measures, self._story_leadership, self._story_scenarios,
             self._story_internal_audit, self._story_engagements, self._story_outside,
+            self._story_resilience, self._story_incidents, self._story_privacy,
+            self._story_continuity,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

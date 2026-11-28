@@ -221,7 +221,12 @@ LINK_KINDS: list[dict[str, Any]] = [
         "key": "relies_on",
         "label": "Relies on",
         "reverse": "Supports",
-        "between": [["process", "system"], ["process", "service"]],
+        "between": [
+            ["process", "system"],
+            ["process", "service"],
+            ["process", "site"],
+            ["system", "site"],
+        ],
     },
     {
         "key": "performed_by",
@@ -464,8 +469,85 @@ COMPLIANCE_VOCABULARIES: dict[str, list[dict[str, Any]]] = {
         ),
         ("audit", "Audit", "A finding from an internal or external audit"),
         ("incident", "Incident", "Something that went wrong showed it"),
+        ("exercise", "Exercise", "An exercise of a continuity plan showed it"),
         ("review", "Review", "A review of a supplier, a system, or a process"),
         ("observation", "Observation", "Somebody noticed it and said so"),
+    ),
+    # What kind of place a site is.
+    "site_kinds": items(
+        (
+            "data_center",
+            "Data center",
+            "Where systems run: a room, a building, or a colocation cage",
+        ),
+        ("building", "Building", "A building, or a floor of one, where people work"),
+        ("laboratory", "Laboratory", "Where research is done, with its instruments"),
+        ("clinic", "Clinic", "Where patients are seen and treated"),
+        ("storage", "Storage", "Where specimens, records, or supplies are kept"),
+        ("other", "Other"),
+    ),
+    # What protected information an incident involved, in a breach assessment. Each suggests
+    # the rules that may require it to be notified.
+    "protected_information": items(
+        (
+            "health",
+            "Health information",
+            "Identifiable health information a covered entity or its business associate holds",
+        ),
+        (
+            "personal",
+            "Personal information under a state's law",
+            "A name with a Social Security, license, or account number, or another identifier a "
+            "state's breach law names",
+        ),
+        (
+            "financial",
+            "Customer financial information",
+            "Information about customers of a financial product or service",
+        ),
+        (
+            "participant",
+            "Research participants' information",
+            "Identifiable information about people in a study",
+        ),
+        (
+            "controlled",
+            "Controlled or covered defense information",
+            "Controlled unclassified information, or covered defense information under a contract",
+        ),
+        (
+            "credentials",
+            "Sign-in credentials",
+            "Usernames with passwords, or keys that unlock accounts",
+        ),
+        ("other", "Other", "None of these"),
+    ),
+    # What an incident, a near miss, or a concern is about, given at triage.
+    "incident_categories": items(
+        (
+            "security",
+            "Security",
+            "Systems, accounts, or information reached, changed, or put at risk by someone who "
+            "should not have",
+        ),
+        (
+            "privacy",
+            "Privacy",
+            "Personal or health information used, shared, or lost in a way it should not be",
+        ),
+        ("safety", "Safety", "Harm, or the chance of harm, to people"),
+        (
+            "conduct",
+            "Conduct",
+            "How someone behaved: misconduct, harassment, or a conflict of interest",
+        ),
+        (
+            "compliance",
+            "Compliance",
+            "A law, a regulation, a contract, or the organization's own policy not followed",
+        ),
+        ("operations", "Operations", "Something the organization depends on failed or stopped"),
+        ("other", "Other", "None of these, or not yet known"),
     ),
     # Why it happened, said when an issue is closed, so that causes can be counted.
     "root_causes": items(
@@ -507,6 +589,8 @@ CADENCES: dict[str, Any] = {
     "key_control_test_months": 6,
     # How long a policy, standard, procedure, or guideline goes before it is looked at again.
     "document_review_months": 12,
+    # How often a continuity plan is exercised: tried out, on a table or for real.
+    "plan_exercise_months": 12,
     # When reminders go: so many days before a date, and how long something stays late
     # before the unit's steward, and then its leader, is told.
     "reminders": {"soon_days": 14, "steward_after_days": 7, "leader_after_days": 21},
@@ -803,6 +887,13 @@ CATEGORIES = [
     ),
 ]  # fmt: skip
 
+# Privacy: which classes of data need a privacy impact assessment of each process and system
+# that handles them, and how often it is done again.
+PRIVACY: dict[str, Any] = {
+    "impact_assessment_classes": ["restricted"],
+    "impact_assessment_months": 36,
+}
+
 PACK: dict[str, Any] = {
     "pack": {
         "key": "default-program",
@@ -821,6 +912,7 @@ PACK: dict[str, Any] = {
     "authority": AUTHORITY,
     "tiering": TIERING,
     "sharing": SHARING,
+    "privacy": PRIVACY,
 }
 
 # --- The risk library -------------------------------------------------------------------

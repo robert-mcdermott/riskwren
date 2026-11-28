@@ -38,6 +38,7 @@ const KINDS = {
   approve: ["document", "Approve"], acknowledge: ["document", "Read"], publish: ["document", "Publish"], rework: ["document", "Rework"], document_review: ["document", "Review"], agreement_notice: ["agreement", "Notice"], session: ["session", "Prepare"], agreement_end: ["agreement", "Renew"],
   review_answers: ["file", "Read"], review_chase: ["file", "Chase"], third_party_review: ["third_party", "Review"],
   audit_request: ["evidence", "Answer"], audit_answer: ["file", "Read"],
+  incident_triage: ["alert", "Triage"], incident_handle: ["alert", "Handle"], incident_notify: ["bell", "Notify"], plan_exercise: ["document", "Exercise"],
 };
 
 function owed(listing) {

@@ -283,6 +283,7 @@ RECORD_PATHS = {
     "third-parties": "TP",
     "information": "INF",
     "services": "SVC",
+    "sites": "SIT",
     "risks": "RSK",
     "controls": "CTL",
     "scopes": "SCP",
@@ -405,6 +406,30 @@ for _route in (
     REACH[_route] = EVERYONE
 # Through a link, without an account: reached by anyone, and answered by the link.
 REACH[("GET", "/api/v1/outside")] = EVERYONE | {"nobody"}  # an outsider's link, in a header
+for _key in POLICIES:  # resilience is decided by the record
+    if (
+        _key[1] in ("/api/v1/resilience",)
+        or _key[1].startswith("/api/v1/continuity")
+        or _key[1].endswith(("/impact", "/recovery"))
+    ):
+        REACH[_key] = EVERYONE
+# Incidents: anyone reports one, and the record decides the rest; triage is for those who
+# assess. Reporting without a name is reached by anyone, and closed unless it is opened.
+for _key in POLICIES:
+    if _key[1].startswith("/api/v1/incidents"):
+        REACH[_key] = EVERYONE
+for _route in (
+    ("POST", "/api/v1/incidents/{ref}/triage"),
+    ("POST", "/api/v1/incidents/{ref}/reopen"),
+):
+    REACH[_route] = {"manager", "assessor"}
+REACH[("GET", "/api/v1/privacy")] = EVERYONE
+REACH[("POST", "/api/v1/privacy/reviews/{item_id}")] = {"manager", "assessor"}
+REACH[("GET", "/api/v1/admin/anonymous-reporting")] = {"admin", "manager"}
+REACH[("PUT", "/api/v1/admin/anonymous-reporting")] = {"admin"}
+for _key in POLICIES:
+    if _key[1].startswith("/api/v1/anonymous-reports"):
+        REACH[_key] = EVERYONE | {"nobody"}
 for _route in (("GET", "/api/v1/respond"), ("PUT", "/api/v1/respond"),
                ("POST", "/api/v1/respond/submit"), ("POST", "/api/v1/respond/files")):  # fmt: skip
     REACH[_route] = EVERYONE | {"nobody"}
@@ -445,9 +470,13 @@ REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/measures")] = {"admin", "manager", "auditor"}
 REACH[("GET", "/api/v1/portfolio")] = EVERYONE
 # Leadership reports are read by those who read everything (and those who lead all of it,
-# whom this organization does not have), and prepared and issued by managers.
+# whom this organization does not have), and, by default, anyone whose role covers the whole
+# organization, as the assessor's does; they are prepared and issued by managers. Who else
+# reads them is chosen by those who configure the program.
 for _template in ("/api/v1/leadership-reports", "/api/v1/leadership-reports/{ref}"):
-    REACH[("GET", _template)] = {"admin", "manager", "auditor"}
+    REACH[("GET", _template)] = {"admin", "manager", "auditor", "assessor"}
+for _method in ("GET", "PUT"):
+    REACH[(_method, "/api/v1/admin/leadership-readers")] = {"admin", "manager"}
 REACH[("GET", "/api/v1/leadership-reports/next")] = {"manager"}
 REACH[("POST", "/api/v1/leadership-reports")] = {"manager"}
 REACH[("GET", "/api/v1/as-of")] = EVERYONE
@@ -675,6 +704,8 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 body = {"unit_id": None}
             elif template == "/api/v1/admin/visibility":
                 body = {"visibility": "unit"}
+            elif template == "/api/v1/admin/leadership-readers":
+                body = {"reach": "organization", "people": []}
             elif template.endswith("/owners"):
                 body = {"owners": []}
             elif template.endswith("/links"):

@@ -6,9 +6,11 @@ import { button, h, iconButton } from "../core/dom.js";
 import { date, plural, titleCase } from "../core/format.js";
 import { program as loadProgram, units } from "../core/lookups.js";
 import { query } from "../core/router.js";
+import { can } from "../core/session.js";
 import { banner, checkbox, field, select, submit } from "../components/form.js";
 import { matrixGrid } from "../components/matrix.js";
 import { closeOverlay, openOverlay } from "../components/overlay.js";
+import { peoplePicker } from "../components/people-picker.js";
 import { rating, STANDING } from "../components/risk.js";
 import { toast } from "../components/toast.js";
 import { alert, card, pageHeader, pill } from "../components/ui.js";
@@ -286,7 +288,8 @@ function cadencesTab(program, ctx, vocab) {
       number("A key control is tested every", () => draft.key_control_test_months, (value) => { draft.key_control_test_months = value; }, "months"),
       number("An exception may run for", () => draft.exception_max_months, (value) => { draft.exception_max_months = value; }, "months"),
       number("A document is reviewed every", () => draft.document_review_months, (value) => { draft.document_review_months = value; }, "months",
-        "A document may set its own. Changing this moves the next review of those that do not."))),
+        "A document may set its own. Changing this moves the next review of those that do not."),
+      number("A continuity plan is exercised every", () => draft.plan_exercise_months, (value) => { draft.plan_exercise_months = value; }, "months"))),
     card({ title: "How long an issue is given" }, h("div", { class: "stack" },
       h("p", { class: "muted" }, "From the day it is raised, by its severity. A more severe issue is never given longer. Issues already raised keep the date they were given."),
       h("div", { class: "grid-3" }, severities.map((item) =>
@@ -387,6 +390,63 @@ function visibilityTab(seen) {
       h("p", { class: "subtle" }, "Leaders and stewards always see their unit and everything beneath it; managers, auditors, and assessors see what their role covers. A record marked restricted is seen only by its owners, its unit's steward and leaders, managers, and auditors. The inventory of processes, systems, and third parties is open to everyone signed in.")));
 }
 
+function readersTab(seen) {
+  let reach = seen.reach;
+  let people = seen.people.map((person) => ({ ...person }));
+  const node = h("select", { class: "select", id: "leadership-reach" },
+    Object.entries(seen.choices).map(([key, text]) => h("option", { value: key, selected: key === reach }, text)));
+  const list = h("ul", { class: "plain-list stack-sm", "aria-label": "People named as readers" });
+  const save = async (next) => {
+    try {
+      const saved = (await put("/api/v1/admin/leadership-readers", { reach: next.reach, people: next.people.map((person) => person.account_id) })).data;
+      reach = saved.reach;
+      people = saved.people;
+      toast("Saved. It applies from each person's next page.");
+    } catch (error) {
+      toast(said(error));
+    }
+    node.value = reach;
+    draw();
+  };
+  const draw = () => list.replaceChildren(...(people.length ? people.map((person) => h("li", { class: "row" },
+    h("span", { class: "grow" }, h("span", { class: "cell-main" }, person.name), h("span", { class: "cell-sub" }, ` ${person.email}`)),
+    button("Remove", { kind: "btn-ghost btn-sm", "aria-label": `Stop ${person.name} reading the reports`,
+      onclick: () => save({ reach, people: people.filter((other) => other.account_id !== person.account_id) }) })))
+    : [h("li", { class: "subtle" }, "Nobody is named.")]));
+  node.addEventListener("change", () => save({ reach: node.value, people }));
+  const picker = peoplePicker({ label: "Name someone who reads them", exclude: (account) => people.some((person) => person.account_id === account.id),
+    onPick: (account) => save({ reach, people: [...people, { account_id: account.id, name: account.display_name, email: account.email }] }) });
+  draw();
+  return card({ title: "Who reads the leadership reports" },
+    h("div", { class: "stack-sm" },
+      h("p", { class: "subtle" }, "Managers for the whole organization, administrators, auditors, and those who lead the whole organization always read them. Choose how much further they reach: in a smaller organization the security leader, or those who run the program, may be the most senior people who use it."),
+      h("label", { class: "label", for: "leadership-reach" }, "Who else reads them"),
+      node,
+      h("h3", {}, "Named readers"),
+      h("p", { class: "subtle" }, "Anyone named here reads them whatever the choice above."),
+      list, picker,
+      h("p", { class: "subtle" }, "A reader who may not see a record a report names sees where it stands, but not what it is.")));
+}
+
+function anonymousTab(setting, reload) {
+  const open = setting.open;
+  const flip = can("admin") ? button(open ? "Close it" : "Open it", { kind: open ? "" : "btn-primary", onclick: async () => {
+    try {
+      await put("/api/v1/admin/anonymous-reporting", { open: !open });
+      toast(open ? "Reporting without a name is closed." : "Reporting without a name is open.");
+      reload();
+    } catch (error) {
+      toast(said(error));
+    }
+  } }) : null;
+  return card({ title: "Reporting without a name", actions: pill(open ? "Open" : "Closed", open ? "ok" : "") },
+    h("div", { class: "stack-sm" },
+      h("p", {}, open ? h("span", {}, "Anyone may report a concern at ", h("a", { href: "/report" }, "/report"), " without signing in. The sign-in page offers it.")
+        : "Closed: everyone reports signed in. An administrator opens it."),
+      h("p", { class: "subtle" }, `When it is open, nothing about who sends a report is kept: no account, no name, and no address. The reporter is shown a code once, and follows the report up with it. Failed codes are not counted against the address they came from, and at most ${setting.most_an_hour} reports are taken in an hour, from everyone together. Whether the web server's own log keeps addresses is set where it runs.`),
+      flip ? h("div", {}, flip) : null));
+}
+
 function rules(program) {
   const months = (count) => (count == null ? "" : plural(count, "month"));
   return card({ title: "What follows from a rating", flush: true }, h("div", { class: "table-wrap" }, h("table", { class: "table" },
@@ -407,7 +467,8 @@ export function adminProgram(main) {
     load: async () => {
       const [program, unitIndex, extra] = await Promise.all([loadProgram({ fresh: true }), units(),
         tab === "vocabularies" ? get("/api/v1/admin/vocabularies", undefined, { fresh: true })
-          : tab === "visibility" ? get("/api/v1/admin/visibility", undefined, { fresh: true })
+          : tab === "visibility" ? Promise.all(["visibility", "leadership-readers", "anonymous-reporting"].map((name) => get(`/api/v1/admin/${name}`, undefined, { fresh: true })))
+            .then(([seen, readers, anonymous]) => ({ data: { seen: seen.data, readers: readers.data, anonymous: anonymous.data } }))
             : tab === "cadences" ? get("/api/v1/vocabularies", undefined, { fresh: true }) : null]);
       return { program, unitIndex, extra: extra?.data };
     },
@@ -417,7 +478,7 @@ export function adminProgram(main) {
       const body = tab === "method" ? methodTab(data.program, ctx)
         : tab === "cadences" ? cadencesTab(data.program, ctx, data.extra)
           : tab === "vocabularies" ? vocabulariesTab(data.extra, reload)
-            : tab === "visibility" ? visibilityTab(data.extra)
+            : tab === "visibility" ? [visibilityTab(data.extra.seen), readersTab(data.extra.readers), anonymousTab(data.extra.anonymous, reload)]
               : [categoriesTab(data.program, ctx), rules(data.program)];
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Admin", title: "Program",

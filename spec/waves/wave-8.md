@@ -1,0 +1,95 @@
+# Wave 8: Incidents and resilience (v0.8.0)
+
+**Goal:** when something goes wrong, it is reported, handled, and learned from; and the organization knows what it cannot afford to lose. Waves 1 to 7 made a record of what could go wrong, what is done about it, what is promised, who is depended on, and how all of it is checked. Wave 8 adds what actually happens: incidents, near misses, and concerns reported by anyone, triaged and handled, kept to those who need to know when they are sensitive, assessed for whether they must be notified, and joined back to the risks they realized and the controls that failed; and, for resilience, what each process needs to recover and whether what it relies on can deliver it.
+
+**Branch:** `wave-8` · **Target version:** `0.8.0` · **Status:** ☑ released
+
+The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security team, this wave is incident handling on the same record as the risks and controls: a report that takes a minute from anyone, triage that names the systems, information, and third parties involved, a breach assessment with its clock, and the risks an incident realized and the controls that failed, so that the register learns from what happened.
+
+## Exit criteria
+
+The wave is done when, on a fresh checkout:
+
+1. Anyone signed in can report an incident, a near miss, or a concern in one short form (INC-01).
+2. Where the organization opens it, a concern can be reported through a link with no sign-in and no identity kept, and the reporter follows it up with a code (INC-02).
+3. Each report is triaged: a category, a severity, the records it concerns, and who handles it (INC-03).
+4. A case can be limited to named people, and its existence is hidden from everyone else, in search and history too (INC-04).
+5. An incident involving protected information has a structured breach assessment with its factors, conclusion, deadlines, and each notification made (INC-05).
+6. An incident links to the risks it realized and the controls that failed, opens corrective actions, and records what was learned (INC-06).
+7. A process has a business impact analysis, and its recovery needs are checked against what its dependencies can deliver (RES-01, RES-02).
+8. Continuity plans are versioned and print for use offline; exercises record findings that become issues (RES-03, RES-04).
+9. The role-by-route matrix covers every new route; the demo has something worth reading on every new screen; the accessibility audit passes over them.
+
+## Slices
+
+### Slice 1: Reporting and triage ☑
+
+**Goal:** a report from anyone in a minute, and each one triaged.
+
+- [x] Report an incident, a near miss, or a concern: what happened, when, and where, in one short form (INC-01)
+- [x] Reporting without a name, where the organization opens it, with a code to follow up (INC-02)
+- [x] Triage: category, severity, the records it concerns, and who handles it (INC-03)
+
+**Acceptance:** a report takes one form; it is seen by its reporter, those who triage, its handlers, its unit's leaders and stewards, and those who read everything, and by nobody else; triage gives it a category, a severity, its records, and an owner, and is in the history.
+
+**Done:** `incident` (`INC`) is a record of its own, with `incident_subject` for the records it concerns and `incident_message` for what is said, each shared with the reporter or kept among those handling it (migration 0040). `riskwren.incidents.reports` holds the rule of who sees one, as a check and as a condition for lists and search, which agree; its reporter sees only their report, where it stands, and what is said to them, and the views of a whole record (its history, as of a date, its connections) refuse them. Triage is for managers and the unit's assessors; it names one handler, who is told, and the reporter is told when it is being handled and when it is closed. `riskwren.incidents.anonymous` takes reports without a name once an administrator opens it: a 20-character code shown once and kept as a SHA-256 digest, no address kept or counted, and a cap of 30 an hour from everyone together. Incident categories are a new vocabulary. The demo has seven: closed, being handled, made without a name, and waiting for triage. The acceptance test is `tests/test_incidents.py`.
+
+### Slice 2: Cases ☑
+
+- [x] Restricted cases with named members, hidden from everyone else in lists, search, and history (INC-04)
+
+**Acceptance:** a restricted case is known only to those named on it (its members and its handlers) and its reporter; everyone else, those who read everything included, finds nothing by its reference, in lists, counts, search, the history of everything, or their notices; naming someone lets them see it; lifting the restriction gives it back to those who would see it.
+
+**Done:** `incident_member` names people on a case (migration 0041). `riskwren.incidents.reports` decides sight of a restricted case by whether the person is named on it, ahead of every role, in the check and the condition alike; a record type may now hide records from the history of everything (`hidden`), and **Reports → History** leaves out the events of cases the asker is not named on, while the chain keeps them. Restricting a case takes back the notices of those not named on it. When a handler leaves, a restricted case passes to someone else named on it (`stand_in`), never to a unit's stand-in. Its handlers, and its triagers who are named on it, restrict it, change who is named, and lift it. The demo restricts a pharmacy compliance concern to the risk manager and the compliance analyst handling it. The acceptance tests are in `tests/test_incidents.py`. Any later view of incidents beside another record (slice 4) must use the same condition.
+
+### Slice 3: Breach assessment ☑
+
+- [x] The structured assessment, deadlines, and notifications; privacy impact assessments; privacy and breach framework packs (INC-05, INC-07)
+
+**Acceptance:** an assessment records discovery, the information involved, how many people, whether it was secured, any exception, the four factors, and the conclusion with its reason and the rules that apply; what each rule requires and by when follows from it, including the HIPAA threshold of 500 for the Secretary and the media; each notification is recorded and marks its duty done; a process or system whose data class the program names is asked for a privacy impact assessment by campaign, its answers' concerns flagged and reviewed.
+
+**Done:** `breach_assessment` (superseded, never edited) and `breach_notification` (migration 0042, which also lets a campaign ask for a privacy impact assessment). `riskwren.incidents.breach` holds the rules built in (HIPAA as a covered entity and as a business associate, the FTC Safeguards Rule, DFARS 252.204-7012) and those the organization names (a state's law, a contract), works out each duty's due date from discovery, and lists what is still to send on the handler's home page. `riskwren.compliance.privacy` decides which processes and systems need an assessment from the new `privacy` rule, asks for them through a new campaign kind with a built-in questionnaire, flags concerns in the answers, and records a review; a process's or system's **Privacy** tab and **Compliance → Privacy impact** show where each stands. The HIPAA Breach Notification Rule and the NIST Privacy Framework 1.0 are built from the eCFR and from NIST's reference tool, and loaded on request. The demo assesses two incidents and runs a privacy impact campaign. The acceptance tests are `tests/test_breach.py`.
+
+### Slice 4: Learning and losses ☑
+
+- [x] Incidents joined to risks and controls; corrective actions; loss events and near misses (INC-06)
+
+**Acceptance:** an incident names the risks it realized and the controls that failed or held, why it happened, and what was learned, and a high or critical incident cannot be closed without it; its costs are recorded; issues raised from it carry it as their source; a risk and a control show the incidents that bear on them, and the incidents list the last year, never showing a restricted case to someone not named on it.
+
+**Done:** `incident_subject` gains a `role` (concerns, realized, failed, held), `incident` its `lessons` and `root_cause`, and `incident_loss` holds each cost, never edited (migration 0043). `riskwren.incidents.learning` sets what an incident showed without touching what triage named, records costs (totals kept per currency), raises issues for the incident's unit with `source_type` incident (restricted with a restricted case, and naming it only to those who may see it), and adds `incidents` to a risk's and a control's answers through the incidents' own visibility condition. The demo's ransomware near miss realized two risks, showed a control that failed and two that held, and cost $8,200; the shared-password concern raised an issue. The acceptance tests are `tests/test_learning.py`.
+
+### Slice 5: Business impact ☑
+
+- [x] Impact analysis per process; recovery needs checked against what dependencies can deliver (RES-01, RES-02)
+- [x] Sites, as dependencies of their own; third parties that perform a process
+
+**Acceptance:** an analysis says how a process's loss hurts over time, its recovery time and point, and the least it needs; each system and service it relies on is checked against that, and every shortfall is listed, including a capability nobody has said.
+
+**Done:** built first, while slices 1 and 2 wait on the decisions below. `impact_analysis` holds, for one process, the impact at each of five times (never lessening), the recovery time and point in hours, and the least it needs, by a named person, superseded and never edited. `recovery_capability` holds what a system or service can be restored within and lose, and what that rests on. `riskwren.resilience` checks a process's current analysis against the current capability of each system and service it relies on and lists the shortfalls in words; both appear in the record's history with titles of their own. A process's **Business impact** tab, a system's or service's **Recovery** tab with the processes that rely on it, and **Reports → Resilience**, most shortfalls first. The demo analyses four critical processes and the systems they rely on: research storage relies on a backup service whose full restore takes five days against the three days it needs. The acceptance test is `tests/test_resilience.py`. Finished after slice 6: `site` (`SIT`) is a record of the inventory, with a `site_kinds` vocabulary and `relies_on` links from processes and systems (migration 0045, which also lets a site or a third party have a recovery capability). A process is now checked against the sites it relies on (how soon work goes on again; a site loses no information of its own) and the third parties that perform it, and a site's **Recovery** tab lists the systems at it. The demo has four sites, among them the clinic building that takes a day to replace against medication dispensing's four hours, and the reference laboratory's one-day turnaround against clinical testing's eight hours. The acceptance test is `tests/test_resilience.py`.
+
+### Slice 6: Plans and exercises ☑
+
+- [x] Versioned plans that print for use offline; exercises with findings (RES-03, RES-04)
+
+**Acceptance:** a plan has versions, owners, and a review date; says which processes it restores, with what each needs and relies on and whom to call; prints cleanly and downloads as one file that needs nothing else; and is exercised, each exercise recording what was tried, what happened, and whether its objectives were met, with findings raised as issues.
+
+**Done:** a continuity plan is a document of the new kind `plan`, so its versions, approval, owners, and review are a document's (migration 0044 widens the kind, and adds `continuity_cover` and `continuity_exercise`). `riskwren.resilience.plans` says what a plan restores, gathers whom to call from the owners of the plan, its processes, and what they rely on, writes the version in force as one self-contained HTML file, records exercises against the version in force, raises findings as issues with the exercise as their source, and puts an exercise due within a month on its owner's home page, on a new `plan_exercise_months` cadence. A process's business impact names the plans that restore it. The demo has two plans; the research storage plan's tabletop exercise found the five-day restore. The acceptance tests are `tests/test_continuity.py`.
+
+### Slice 7: Release prep ☑
+
+- [x] Guides, changelog, upgrade from 0.7.0 on both databases, audits, release, and the site republished
+
+**Done:** a new guide, Incidents, written slice by slice, in the guides' index and the site's menu; the register guide covers sites, business impact, and continuity plans, and the configuration guide the look fixed in the file. Before the release, at the user's request, the look can be fixed in `riskwren.toml` (`[branding]`: exact colors by day and after dark, checked for readability at start, logo files, a sign-in picture, typefaces), and the app gained an accent of its own after dark, a sign-in message and picture, footer links, and an email footer; what the file sets is locked under Admin → Appearance. The README, the guides' index, and the site's home page describe 0.8.0, with new sections on incidents, breach assessment, and resilience, and the changelog has its upgrade notes. The upgrade from 0.7.0 was run from that release's own code with its demo organization on both databases: migrations 0039 to 0045 applied, every row of every table kept (the history and the questionnaires only grew, by the privacy impact questionnaire the upgrade loads, and the counters gained `INC` and `SIT`), the history still verifies, and over the old data an incident was reported, triaged, learned from, costed, and closed, a process analysed, a site added and relied on, and its recovery checked; `riskwren verify` passing and a second upgrade changing nothing. The demo's storyline test checks the wave's stories.
+
+## Decisions
+
+Settled on 2026-11-27, before slices 1 and 2 were built.
+
+- **Who sees an incident.** Its reporter, the people handling it (its owners), those who triage (managers, and assessors for its unit), the leaders and stewards of its unit and the units above it, and those who read everything. An incident that concerns people in its own unit is made a restricted case (slice 2), which its unit's leaders and stewards do not see unless they are named on it.
+- **Who triages.** Managers, and assessors for the incident's unit, which includes a security team whose assessors work across the organization. Triage sets the category, the severity (on the issue scale), the unit, the records it concerns, and the owner who handles it.
+- **Reporting without a name is off until an administrator opens it.** When it is open, a report through the link keeps no account, no name, and no address. The follow-up code is shown once, kept only as a digest, and long enough that guessing it is hopeless, so, unlike the other links, failed codes are not counted against the address that sent them, and nothing ties a report to where it came from. Whether the server's own access log may keep addresses is the operator's to decide, and the guide will say so.
+- **Categories** are a vocabulary of the program, editable like the others, starting as security, privacy, safety, conduct, compliance, operations, and other.
+
+## Notes
+
+- An incident is a record of its own (`INC`), not an issue: an issue is something to put right, an incident is something that happened. Triage may raise issues from an incident; slice 4 joins it to the risks it realized and the controls that failed.

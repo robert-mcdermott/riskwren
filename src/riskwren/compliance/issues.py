@@ -276,7 +276,9 @@ def subjects_of(session: Session, principal: Principal, issue: Issue) -> dict[st
     return {"records": shown, "requirements": required, "hidden": hidden}
 
 
-def source_of(session: Session, issue: Issue) -> dict[str, Any] | None:
+def source_of(
+    session: Session, issue: Issue, principal: Principal | None = None
+) -> dict[str, Any] | None:
     """Where a test-raised issue came from: the assessment and what its test found; or the
     due diligence review a finding was raised from."""
     if issue.source_type == "third_party_review" and issue.source_id is not None:
@@ -284,6 +286,29 @@ def source_of(session: Session, issue: Issue) -> dict[str, Any] | None:
 
         review = session.get(ThirdPartyReview, issue.source_id)
         return {"review": {"ref": review.ref, "name": review.name}} if review else None
+    if issue.source_type == "exercise" and issue.source_id is not None:
+        from riskwren.db.models import ContinuityExercise, PolicyDocument
+
+        exercise = session.get(ContinuityExercise, issue.source_id)
+        plan = session.get(PolicyDocument, exercise.document_id) if exercise else None
+        if exercise is None or plan is None:
+            return None
+        return {
+            "exercise": {"held_on": exercise.held_on, "plan": {"ref": plan.ref, "name": plan.name}}
+        }
+    if issue.source_type == "incident" and issue.source_id is not None:
+        from riskwren.db.models import Incident
+        from riskwren.incidents import reports as incidents  # it builds on this module
+
+        incident = session.get(Incident, issue.source_id)
+        # An incident is named only to those who may know of it.
+        if (
+            incident is None
+            or principal is None
+            or not incidents.can_see(session, principal, incident)
+        ):
+            return None
+        return {"incident": {"ref": incident.ref, "name": incident.name}}
     if issue.source_type == "engagement" and issue.source_id is not None:
         from riskwren.db.models import Engagement
 
@@ -354,7 +379,7 @@ def _detail(session: Session, principal: Principal, issue: Issue) -> dict[str, A
         else None,
         "due_days": due_days(session, issue.severity),
         "subjects": subjects_of(session, principal, issue),
-        "source": source_of(session, issue),
+        "source": source_of(session, issue, principal),
         "actions": actions_of(session, principal, issue),
         # The people at the third parties it is about, whom an action may belong to.
         "contacts": _contacts(session, issue) if editable else [],

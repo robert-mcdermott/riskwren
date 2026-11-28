@@ -129,7 +129,7 @@ class Campaign(Base):
         CheckConstraint("status IN ('open', 'closed', 'cancelled')", name="status"),
         CheckConstraint(
             "kind IN ('attestation', 'self_assessment', 'completeness', 'profile', 'evidence', "
-            "'acknowledgment')",
+            "'acknowledgment', 'privacy_impact')",
             name="kind",
         ),
     )

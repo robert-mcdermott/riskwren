@@ -42,27 +42,38 @@ uv run riskwren demo                                 # builds ./demo
 uv run riskwren --config demo/riskwren.toml serve    # runs it at http://127.0.0.1:8020
 ```
 
-The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared, half a year of measures, a leadership report each quarter, a ransomware scenario worked through in dollars, and a year of internal audit: a plan approved for the committee, two engagements reported and one in fieldwork, and a finding confirmed closed. Nothing in it is real.
+The demo is the Northmere Institute for Health Research, a fictional research institute with a clinic and two years of history: 60 units, about 210 people, 230 inventory records, 180 risks, and about 135 controls, with four scopes held to frameworks and between a half and three quarters ready, an assessment in progress, evidence going stale, issues and exceptions at every stage, the security office's policies and the standards and procedures beneath them, agreements with their dates, a risk committee that meets each quarter, suppliers tiered, questioned through a link, and read for what their reports cover, with three gaps where no agreement covers what is shared, half a year of measures, a leadership report each quarter, a ransomware scenario worked through in dollars, a year of internal audit: a plan approved for the committee, two engagements reported and one in fieldwork, and a finding confirmed closed; incidents, near misses, and concerns reported, triaged, and learned from, two of them assessed for whether they must be notified and one a restricted case; and the critical processes' business impact, checked against what their systems, sites, and suppliers can deliver, with two continuity plans and their exercises. Nothing in it is real.
 
 Its sign-in page offers ten sample people and asks for no password. Try a few:
 
 | Sign in as | To see |
 |---|---|
-| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies; a supplier's answers to a security questionnaire waiting to be read, with their concerns; a review called for by a supplier's breach notice; Third parties → Coverage, where patient records are shared with no business associate agreement; and Risks → Scenarios, where two weeks of ransomware is worked through, with the risk's bow-tie and its estimate in numbers |
-| The risk manager | The whole register, the risk dashboard, the heat map, the program, where a change to the matrix can be previewed, the risk committee's next session, Reports → Measures and Portfolio, and the leadership reports with the next one ready to issue |
+| The security leader | The compliance dashboard: readiness by scope, controls failing a test, issues by age, and exceptions about to end; the security policies; a supplier's answers to a security questionnaire waiting to be read, with their concerns; a review called for by a supplier's breach notice; Third parties → Coverage, where patient records are shared with no business associate agreement; Risks → Scenarios, where two weeks of ransomware is worked through, with the risk's bow-tie and its estimate in numbers; and Incidents: a concern reported without a name, a spreadsheet sent to a sponsor whose breach assessment is still open, a stolen laptop that need not be notified because its disk was encrypted, and a near miss joined to the risks it realized and the control that failed |
+| The risk manager | The whole register, the risk dashboard, the heat map, the program, where a change to the matrix can be previewed, the risk committee's next session, Reports → Measures and Portfolio, the leadership reports with the next one ready to issue, a restricted case, and Reports → Resilience, where the clinic building cannot be replaced in time for medication dispensing |
 | The steward | One unit's inventory and risks, a critical risk brought to high by controls, with its plan, and the unit's suppliers that are due for review |
 | The unit leader | A high risk that is beyond their authority to accept |
 | The assessor | An assessment in progress, a result to review, an attestation campaign most of the way through, and a risk analysis half done |
 | The auditor | Everything, read-only, with every change in one place, the register as it stood on any day, and a dossier of any scope to check; and internal audit's own work: the universe, this year's plan, an engagement in fieldwork with a review note waiting, and the report for the committee |
-| A staff member | Home for someone with one action to finish and a policy to acknowledge, the policy library, and only their own unit's part of the register |
+| A staff member | Home for someone with one action to finish and a policy to acknowledge, the policy library, Incidents → Report something, and only their own unit's part of the register |
 
 A demo listens only on the machine it runs on. See [Configuration](docs/configuration.md#the-demo-and-the-network) before changing that.
 
 ## What is in this release
 
-Version 0.7.0 is *Audit*: internal audit's own workspace on the same record, without compromising its independence. It follows 0.6.0, which read the record back as measures, reports, and packages that prove themselves, and 0.5.0, which added third parties.
+Version 0.8.0 is *Incidents and resilience*: when something goes wrong, it is reported, handled, and learned from, and the organization knows what it cannot afford to lose. It follows 0.7.0, which gave internal audit its own workspace on the same record, and 0.6.0, which read the record back as measures, reports, and packages that prove themselves.
 
-**Audit, new in 0.7.0**
+**Incidents and resilience, new in 0.8.0**
+
+- **Report something in a minute:** an incident, a near miss, or a concern, from anyone signed in, and, where the organization opens it, from anyone without giving a name, followed up with a code.
+- **Triage and handling:** a category, a severity, the systems, information, and third parties involved, and who handles it. The reporter sees where it stands and what is said to them, not the handling.
+- **Restricted cases,** known only to those named on them: lists, search, counts, and the history leave them out, for those who read everything too.
+- **Breach assessment:** the factors, the conclusion, and what each rule that applies requires, to whom, and by when (the HIPAA Breach Notification Rule as a covered entity or a business associate, the FTC Safeguards Rule, DFARS 252.204-7012, a state's law, or a contract), with each notification recorded; and **privacy impact assessments** of everything that handles protected information.
+- **What it taught:** the risks it realized, the controls that failed or held, why it happened, the lessons, and what it cost, shown on each risk and control, with issues raised from it.
+- **Business impact and recovery:** what each process needs (how its loss hurts over time, how soon it must be back, how much information it can lose, and the least it needs), checked against what its systems, services, sites, and third parties can deliver, with every shortfall listed.
+- **Continuity plans** that say what they restore and whom to call, and print or download as one file for when the systems are down; **exercises** whose findings are issues.
+- **Branding fixed in the configuration file:** exact colors by day and after dark, logo files, a sign-in picture and message, typefaces, and links of the organization's own.
+
+**Audit, from 0.7.0**
 
 - **The audit universe:** every unit, process, system, third party, and scope, ranked from the register (worst open risk, risks above appetite, open issues, criticality, readiness, and time since the last audit), with each part of the ranking shown, and moved by audit only with a reason.
 - **A plan for each period,** approved by someone other than its drafter, and tracked against.
@@ -138,7 +149,7 @@ Version 0.7.0 is *Audit*: internal audit's own workspace on the same record, wit
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Incidents and resilience come next, then adoption by other organizations. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Adoption comes next: what an organization needs to run RiskWren in production and make it its own, then connections to the systems around it. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 
@@ -154,6 +165,7 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Policies](docs/policies.md) | Whoever writes, approves, or keeps the organization's policies |
 | [Third parties](docs/third-parties.md) | Whoever looks after the organization's suppliers and partners |
 | [Internal audit](docs/internal-audit.md) | Internal audit, the third line |
+| [Incidents](docs/incidents.md) | Everyone who reports something, and those who triage and handle it |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
 | [API](docs/api.md) | Anyone connecting another system |

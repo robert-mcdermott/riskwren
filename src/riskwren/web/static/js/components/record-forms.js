@@ -93,10 +93,16 @@ EXTRA.information = (record) => {
     values: () => ({ held_in: held.input.value, shared_with: shared.input.value, agreement: agreement.input.value }) };
 };
 
+EXTRA.site = (record) => {
+  const address = field("Address", { value: record?.address ?? "", maxlength: 300, hint: "Where it is: a street address, a building and floor, or a room." });
+  return { nodes: [address.node], fields: { address }, values: () => ({ address: address.input.value || null }) };
+};
+
 const NAME_HINTS = {
   information: "What people call it. For example: Cohort survey responses. Never the information itself.",
   process: "What is done, in a few words. For example: Specimen storage and retrieval.",
   system: "What people call it. For example: Freezer monitoring.",
+  site: "What people call it. For example: Freezer room B, or the primary data center.",
   third_party: "The organization's legal or trading name.",
   service: "What the organization gets from it. For example: Hosted participant surveys.",
 };

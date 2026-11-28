@@ -24,6 +24,10 @@ NO_TOKEN = {
     ("PUT", "/api/v1/respond"),
     ("POST", "/api/v1/respond/submit"),
     ("POST", "/api/v1/respond/files"),
+    # Reporting without a name answers to nobody's session, signed in or not.
+    ("POST", "/api/v1/anonymous-reports"),
+    ("POST", "/api/v1/anonymous-reports/follow-up"),
+    ("POST", "/api/v1/anonymous-reports/messages"),
 }
 MAX_BODY = 32 * 1024 * 1024  # a little over the largest file anyone may send
 

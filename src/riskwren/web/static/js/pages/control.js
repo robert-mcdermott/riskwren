@@ -14,6 +14,7 @@ import { toast } from "../components/toast.js";
 import { hrefOf } from "../components/record.js";
 import { rating, standingPill } from "../components/risk.js";
 import { card, emptyState, pill } from "../components/ui.js";
+import { incidentsCard } from "../components/incident-links.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 
@@ -54,6 +55,7 @@ function overview(control, ctx) {
         ["Next test due", control.next_test_on ? h("span", { class: control.test_due ? "text-danger" : null }, date(control.next_test_on), control.test_due ? " (overdue)" : "") : null],
       ])),
       directedBy(control), reliedOnBy(control),
+      incidentsCard(control.incidents),
       ownersCard(control, ctx)));
 }
 

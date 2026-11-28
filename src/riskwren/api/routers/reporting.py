@@ -66,6 +66,7 @@ def graph_around(request: Request, ref: str) -> dict[str, Any]:
     with reading(request) as session:
         record_type, found = find_any(session, ref)
         record = records.load(session, principal, record_type, found.ref)
+        records.require_whole(session, principal, record_type, record)
         return envelope(graph.around(session, principal, record_type, record))
 
 
@@ -97,12 +98,21 @@ def whole_history(
         moment = datetime(found.year, found.month, found.day, tzinfo=UTC)
         return moment + timedelta(days=1) if end else moment
 
+    principal = current(request)
     with reading(request) as session:
+        found = None
+        if about:
+            record_type, record = find_any(session, about)
+            # What the asker may not know of, they may not read the history of.
+            record = records.load(session, principal, record_type, record.ref)
+            records.require_whole(session, principal, record_type, record)
+            found = (record_type, record)
         return envelope(
             history.everywhere(
                 session,
+                principal=principal,
                 actor=actor,
-                about=find_any(session, about) if about else None,
+                about=found,
                 kind=kind or None,
                 since=day(since, "since"),
                 until=day(until, "until", end=True),
@@ -215,6 +225,28 @@ def leadership_report(request: Request, ref: str) -> dict[str, Any]:
     principal = current(request)
     with reading(request) as session:
         return envelope(leadership.view(session, principal, ref.strip().upper()))
+
+
+class LeadershipReadersBody(BaseModel):
+    reach: str = Field(description="executives, organization, or leaders")
+    people: list[int] = Field(default_factory=list, description="Accounts named as readers")
+
+
+@router.get("/admin/leadership-readers", summary="Who reads the leadership reports")
+def show_leadership_readers(request: Request) -> dict[str, Any]:
+    from riskwren.insight import readers
+
+    with reading(request) as session:
+        return envelope(readers.view(session))
+
+
+@router.put("/admin/leadership-readers", summary="Change who reads the leadership reports")
+def save_leadership_readers(request: Request, body: LeadershipReadersBody) -> dict[str, Any]:
+    from riskwren.insight import readers
+
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        return envelope(readers.save(session, principal, body.reach, body.people))
 
 
 # --- As of ------------------------------------------------------------------------------------

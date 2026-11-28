@@ -171,7 +171,7 @@ export function decisionsCard(record) {
 
 function ownersOnly(record, ctx) {
   const canEdit = record.can?.edit;
-  return card({ title: "Owners", actions: canEdit ? button("Edit", { kind: "btn-sm", onclick: () => editOwners(record, ctx) }) : null },
+  return card({ title: ctx.ownersTitle ?? "Owners", actions: canEdit ? button("Edit", { kind: "btn-sm", onclick: () => editOwners(record, ctx) }) : null },
     record.orphaned ? alert("warn", icon("alert"), h("div", {}, record.owners.some((o) => o.kind === "owner")
       ? "Its owner's account is disabled. Name a new owner." : "Nobody answers for this record. Name an owner.")) : null,
     record.owners.length ? h("div", { class: "stack" }, record.owners.map((owner) => h("div", { class: "row" },
@@ -357,8 +357,9 @@ export function recordHeader(record, { badges = [], actions = null } = {}) {
         h("div", { class: "row-sm wrap record-badges" }, badges,
           record.restricted ? h("span", { class: "pill" }, icon("lock"), "Restricted") : null,
           h("span", { class: "subtle" }, `Updated ${relative(record.updated_at)}`),
-          h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
-          h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"),
+          // A reporter who sees only their report is not offered the views of the whole record.
+          record.everything === false ? null : h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
+          record.everything === false ? null : h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"),
           DOSSIERS.has(record.type) ? h("a", { class: "connections-link", href: `/api/v1/dossiers/${record.ref}`, download: "" }, icon("download", "icon icon-sm"), "Dossier") : null)),
       actions),
     missingNote(record),
@@ -378,18 +379,28 @@ export function stopsOf(record) {
   return holder;
 }
 
+// Resilience: a process's needs, and what a system or service delivers.
+const MORE = { process: ["impact", "Business impact"], system: ["recovery", "Recovery"], service: ["recovery", "Recovery"], site: ["recovery", "Recovery"] };
+
+// Privacy impact: for a process or a system whose data class needs an assessment.
+const PRIVACY = new Set(["process", "system"]);
+
 export function recordPage(main, type, params) {
   const meta = TYPES[type];
-  const tab = query().get("tab") === "history" ? "history" : "overview";
+  const more = MORE[type];
+  const wanted = query().get("tab");
+  const tab = wanted === "history" || (more && wanted === more[0]) || (PRIVACY.has(type) && wanted === "privacy") ? wanted : "overview";
   return show(main, {
     title: params.ref,
     load: async () => {
       const base = `/api/v1/${meta.path}/${params.ref}`;
       const [record, vocab, unitIndex, entries, programData, risks] = await Promise.all([
         get(base, null, { fresh: true }), vocabularies(), units(),
-        tab === "history" ? get(`${base}/history`, null, { fresh: true }) : null,
+        tab === "overview" || tab === "privacy" ? null : get(`${base}/${tab}`, null, { fresh: true }),
         loadProgram(), get("/api/v1/risks", { subject: params.ref, limit: 50 }, { fresh: true })]);
-      return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [], program: programData, risks: risks.data };
+      const views = more && tab === more[0] ? await import("../components/resilience.js") : null;
+      const privacy = tab === "privacy" ? await import("../components/privacy.js") : null;
+      return { record: record.data, vocab, units: unitIndex, history: entries?.data ?? [], program: programData, risks: risks.data, views, privacy };
     },
     view: (data, reload) => {
       const record = data.record;
@@ -400,8 +411,10 @@ export function recordPage(main, type, params) {
       return h("div", { class: "stack" },
         recordHeader(record, { badges: [statusPill(record.status), criticality(data.vocab, record.criticality)], actions: edit }),
         stopsOf(record),
-        tabBar([["overview", "Overview"], ["history", "History"]], tab),
-        tab === "history" ? card({ flush: true }, timeline(data.history)) : overview(record, ctx));
+        tabBar([["overview", "Overview"], ...(more ? [more] : []), ...(record.privacy_impact?.state ? [["privacy", "Privacy"]] : []), ["history", "History"]], tab),
+        tab === "history" ? card({ flush: true }, timeline(data.history))
+          : data.privacy ? data.privacy.privacyTab(record, reload)
+            : data.views ? data.views.resilienceTab(type, record, data.history, reload) : overview(record, ctx));
     },
   });
 }

@@ -45,6 +45,7 @@ export const NAV = [
       { href: "/issues", label: "Issues", iconName: "issue" },
       { href: "/exceptions", label: "Exceptions", iconName: "exception" },
       { href: "/agreements", label: "Agreements", iconName: "agreement" },
+      { href: "/privacy", label: "Privacy impact", iconName: "shield-check" },
       { href: "/campaigns", label: "Campaigns", iconName: "bell", when: ["assess", "read_all"] },
     ],
   },
@@ -53,6 +54,13 @@ export const NAV = [
     items: [
       { href: "/library", label: "Policy library", iconName: "document" },
       { href: "/documents", label: "Documents", iconName: "edit", when: ["steward", "lead", "assess", "read_all"] },
+    ],
+  },
+  {
+    heading: "Incidents",
+    items: [
+      { href: "/incidents", label: "Incidents", iconName: "alert" },
+      { href: "/incidents/new", label: "Report something", iconName: "plus" },
     ],
   },
   {
@@ -70,6 +78,7 @@ export const NAV = [
       { href: "/processes", label: "Processes", iconName: "process" },
       { href: "/systems", label: "Systems", iconName: "system" },
       { href: "/information", label: "Information", iconName: "information" },
+      { href: "/sites", label: "Sites", iconName: "units" },
     ],
   },
   {
@@ -79,7 +88,9 @@ export const NAV = [
       { href: "/dashboard", label: "Risk", iconName: "chart" },
       { href: "/measures", label: "Measures", iconName: "chart", when: "read_all" },
       { href: "/portfolio", label: "Portfolio", iconName: "grid" },
-      { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "reports" },
+      { href: "/leadership-reports", label: "Leadership reports", iconName: "document", when: "leadership" },
+      { href: "/resilience", label: "Resilience", iconName: "process" },
+      { href: "/continuity", label: "Continuity plans", iconName: "document" },
       { href: "/as-of", label: "As of a date", iconName: "history" },
       { href: "/check-dossier", label: "Check a dossier", iconName: "check" },
       { href: "/tidy", label: "Tidy", iconName: "check" },
@@ -90,9 +101,9 @@ export const NAV = [
   {
     heading: "Audit",
     items: [
-      { href: "/audit/universe", label: "Universe", iconName: "grid", when: "reports" },
-      { href: "/audit/plans", label: "Plans", iconName: "file", when: "reports" },
-      { href: "/audit/outside", label: "Outside access", iconName: "key", when: "reports" },
+      { href: "/audit/universe", label: "Universe", iconName: "grid", when: "oversight" },
+      { href: "/audit/plans", label: "Plans", iconName: "file", when: "oversight" },
+      { href: "/audit/outside", label: "Outside access", iconName: "key", when: "oversight" },
     ],
   },
   {
@@ -126,6 +137,13 @@ export function brand(meta, { large = false } = {}) {
   // "RiskWren" is set as Risk + Wren; any other name is shown as it is.
   const words = name === "RiskWren" ? ["Risk", h("strong", {}, "Wren")] : [h("strong", {}, name)];
   return [wren(large ? "brand-mark" : "brand-mark"), h("span", { class: "brand-name" }, words)];
+}
+
+/** The organization's own links: its policy, its help desk. */
+export function footerLinks(meta) {
+  const links = meta.branding.footer_links ?? [];
+  return links.length ? h("nav", { class: "foot-links", "aria-label": "More from your organization" },
+    links.map((link) => h("a", { href: link.url, target: "_blank", rel: "noopener noreferrer" }, link.label))) : null;
 }
 
 export async function signOut() {
@@ -253,7 +271,7 @@ export function mountShell(root, meta) {
     : h("div", { class: "powered" }, meta.branding.organization_name || `Version ${meta.version}`);
 
   shell.append(
-    h("aside", { class: "sidebar" }, brandLink, nav, h("div", { class: "sidebar-foot" }, powered)),
+    h("aside", { class: "sidebar" }, brandLink, nav, h("div", { class: "sidebar-foot" }, footerLinks(meta), powered)),
     h("div", { class: "main-column" },
       h("header", { class: "topbar" },
         iconButton("menu", "Menu", { class: "icon-button menu-toggle", onclick: () => {

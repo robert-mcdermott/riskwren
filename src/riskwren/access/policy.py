@@ -206,6 +206,8 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("GET", "/api/v1/vocabularies"): Needs.MEMBER,
     ("GET", "/api/v1/admin/visibility"): Needs.CONFIGURE,
     ("PUT", "/api/v1/admin/visibility"): Needs.CONFIGURE,
+    ("GET", "/api/v1/admin/leadership-readers"): Needs.CONFIGURE,
+    ("PUT", "/api/v1/admin/leadership-readers"): Needs.CONFIGURE,
     ("GET", "/api/v1/admin/vocabularies"): Needs.CONFIGURE,
     ("PUT", "/api/v1/vocabularies/{name}"): Needs.CONFIGURE,
     ("POST", "/api/v1/risk-categories"): Needs.CONFIGURE,
@@ -232,7 +234,7 @@ def record_policies(path: str, *, links: bool = True) -> dict[tuple[str, str], N
     return found
 
 
-for _path in ("processes", "systems", "third-parties", "information", "services"):
+for _path in ("processes", "systems", "third-parties", "information", "services", "sites"):
     POLICIES.update(record_policies(_path))
 
 # Third parties as a program. Who may tier one is decided where it is written.
@@ -308,6 +310,58 @@ POLICIES.update(
         # An outside auditor has no account: their link, in a header, opens one engagement or
         # scope, read-only, and each use is recorded.
         ("GET", "/api/v1/outside"): Needs.PUBLIC,
+        # Incidents: anyone reports one; the service decides who sees, triages, and handles
+        # each (its reporter, handlers, triagers, its unit's leaders and stewards).
+        ("GET", "/api/v1/incidents"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/{ref}"): Needs.MEMBER,
+        ("PATCH", "/api/v1/incidents/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/incidents/{ref}/owners"): Needs.MEMBER,
+        ("PUT", "/api/v1/incidents/{ref}/case"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/triage"): Needs.ASSESS,
+        ("POST", "/api/v1/incidents/{ref}/close"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/reopen"): Needs.ASSESS,
+        ("POST", "/api/v1/incidents/{ref}/messages"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/{ref}/history"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/summary"): Needs.MEMBER,
+        ("PUT", "/api/v1/incidents/{ref}/learning"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/losses"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/issues"): Needs.MEMBER,
+        ("GET", "/api/v1/incidents/{ref}/breach"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/breach"): Needs.MEMBER,
+        ("POST", "/api/v1/incidents/{ref}/notifications"): Needs.MEMBER,
+        # Privacy impact assessments: where each process and system stands, read by everyone
+        # as the inventory is; reviewed by those who assess.
+        ("GET", "/api/v1/privacy"): Needs.MEMBER,
+        ("POST", "/api/v1/privacy/reviews/{item_id}"): Needs.ASSESS,
+        ("GET", "/api/v1/admin/anonymous-reporting"): Needs.CONFIGURE,
+        ("PUT", "/api/v1/admin/anonymous-reporting"): Needs.ADMIN,
+        # Reporting without a name: no account, and nothing kept of who sent it. Closed
+        # unless an administrator opens it.
+        ("GET", "/api/v1/anonymous-reports"): Needs.PUBLIC,
+        ("POST", "/api/v1/anonymous-reports"): Needs.PUBLIC,
+        ("POST", "/api/v1/anonymous-reports/follow-up"): Needs.PUBLIC,
+        ("POST", "/api/v1/anonymous-reports/messages"): Needs.PUBLIC,
+        # Resilience: read with the record, changed by those who keep it.
+        ("GET", "/api/v1/resilience"): Needs.MEMBER,
+        ("GET", "/api/v1/processes/{ref}/impact"): Needs.MEMBER,
+        ("POST", "/api/v1/processes/{ref}/impact"): Needs.MEMBER,
+        ("GET", "/api/v1/systems/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/systems/{ref}/recovery"): Needs.MEMBER,
+        ("GET", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/services/{ref}/recovery"): Needs.MEMBER,
+        ("GET", "/api/v1/sites/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/sites/{ref}/recovery"): Needs.MEMBER,
+        ("GET", "/api/v1/third-parties/{ref}/recovery"): Needs.MEMBER,
+        ("POST", "/api/v1/third-parties/{ref}/recovery"): Needs.MEMBER,
+        # Continuity plans: documents of their own kind; the service decides who may change
+        # what a plan restores and who records its exercises.
+        ("GET", "/api/v1/continuity"): Needs.MEMBER,
+        ("GET", "/api/v1/continuity/{ref}"): Needs.MEMBER,
+        ("PUT", "/api/v1/continuity/{ref}/covers"): Needs.MEMBER,
+        ("POST", "/api/v1/continuity/{ref}/exercises"): Needs.MEMBER,
+        ("POST", "/api/v1/continuity/{ref}/exercises/{exercise_id}/issues"): Needs.MEMBER,
+        ("GET", "/api/v1/continuity/{ref}/offline"): Needs.MEMBER,
         # Dossiers and a scope's plans hold what the person may see, checked by the record.
         ("GET", "/api/v1/dossiers/{ref}"): Needs.MEMBER,
         ("POST", "/api/v1/dossiers/check"): Needs.MEMBER,

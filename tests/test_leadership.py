@@ -13,7 +13,7 @@ from riskwren.access.principal import Grant
 from riskwren.compliance import issues
 from riskwren.core.clock import frozen_at, utc_now
 from riskwren.db.engine import Database
-from riskwren.db.models import LeadershipReport
+from riskwren.db.models import Event, LeadershipReport
 from riskwren.insight import leadership
 from riskwren.people import accounts
 from tests.people import ME, People, sign_in
@@ -113,15 +113,90 @@ def test_who_may_read_and_issue_reports(as_role: Clients, people: People, db: Da
         )  # fmt: skip
     ref = as_role("manager").post("/api/v1/leadership-reports", json={}).json()["data"]["ref"]
     head = sign_in(as_role(None), "head@northmere.example")
-    assert head.get("/api/v1/session").json()["data"]["permissions"]["reports"] is True
+    assert head.get("/api/v1/session").json()["data"]["permissions"]["leadership"] is True
     assert head.get(f"/api/v1/leadership-reports/{ref}").status_code == 200
     assert head.post("/api/v1/leadership-reports", json={}).status_code == 403
     assert as_role("auditor").get("/api/v1/leadership-reports").status_code == 200
     assert as_role("auditor").post("/api/v1/leadership-reports", json={}).status_code == 403
-    for role in ("leader", "steward", "member", "assessor"):
+    # By default, anyone whose role covers the whole organization reads them too: as a
+    # security leader who assesses everywhere does.
+    assessor = as_role("assessor")
+    assert assessor.get("/api/v1/session").json()["data"]["permissions"]["leadership"] is True
+    assert assessor.get(f"/api/v1/leadership-reports/{ref}").status_code == 200
+    assert assessor.post("/api/v1/leadership-reports", json={}).status_code == 403
+    for role in ("leader", "steward", "member"):
         client = as_role(role)
         assert client.get("/api/v1/leadership-reports").status_code == 403, role
         assert client.get(f"/api/v1/leadership-reports/{ref}").status_code == 403, role
+
+
+def test_who_else_reads_the_reports_is_the_programs_choice(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    manager = as_role("manager")
+    ref = manager.post("/api/v1/leadership-reports", json={}).json()["data"]["ref"]
+    shown = manager.get("/api/v1/admin/leadership-readers").json()["data"]
+    assert shown["reach"] == "organization" and shown["people"] == []
+    assert set(shown["choices"]) == {"executives", "organization", "leaders"}
+
+    def reads(role: str) -> bool:
+        return as_role(role).get(f"/api/v1/leadership-reports/{ref}").status_code == 200
+
+    def choose(reach: str, named: list[int] | None = None) -> None:
+        saved = manager.put("/api/v1/admin/leadership-readers",
+                            json={"reach": reach, "people": named or []})  # fmt: skip
+        assert saved.status_code == 200, saved.text
+
+    # For a large organization: its executives alone, with those who read everything.
+    choose("executives")
+    assert [reads(role) for role in ("auditor", "assessor", "leader")] == [True, False, False]
+    # For a smaller one: every leader and every manager, of any unit.
+    choose("leaders")
+    assert [reads(role) for role in ("assessor", "leader", "steward", "member")] == [
+        True, True, False, False,
+    ]  # fmt: skip
+    # Anyone may be named, whatever the reach; and it applies from their next request.
+    choose("executives", [people.accounts["member"]])
+    assert [reads(role) for role in ("member", "leader")] == [True, False]
+    listed = manager.get("/api/v1/admin/leadership-readers").json()["data"]["people"]
+    assert [person["account_id"] for person in listed] == [people.accounts["member"]]
+
+    wrong = manager.put("/api/v1/admin/leadership-readers", json={"reach": "everyone"})
+    assert wrong.status_code == 422 and "reach" in wrong.text
+    nobody = manager.put("/api/v1/admin/leadership-readers",
+                         json={"reach": "leaders", "people": [999999]})  # fmt: skip
+    assert nobody.status_code == 422 and "people" in nobody.text
+    assert as_role("assessor").put("/api/v1/admin/leadership-readers",
+                                   json={"reach": "leaders"}).status_code == 403  # fmt: skip
+    # Each change is in the history.
+    with db.read() as session:
+        ops = [event.context.get("op") for event in session.scalars(select(Event))]
+    assert ops.count("leadership_readers.edit") == 3
+
+
+def test_a_reader_does_not_see_the_names_of_records_they_may_not_see(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    more_record(db, people)
+    with db.write(ME.actor) as session:
+        sealed = raise_risk(session, ME, people.units["HALE"], "Sealed matter", restricted=True)
+        judge(session, ME, sealed, "inherent", 5, safety=5)
+        judge(session, ME, sealed, "residual", 5, safety=5)
+        sealed_ref = sealed.ref
+    issued = as_role("manager").post("/api/v1/leadership-reports", json={}).json()["data"]
+    assert sealed_ref in [row["ref"] for row in issued["body"]["top_risks"]]
+    assert issued["withheld"] == 0
+
+    # The assessor reads the reports, but never sees what is restricted.
+    seen = as_role("assessor").get(f"/api/v1/leadership-reports/{issued['ref']}").json()["data"]
+    assert seen["withheld"] >= 1 and seen["check"]["verified"] is True
+    top = seen["body"]["top_risks"]
+    assert sealed_ref not in [row["ref"] for row in top]
+    hidden = [row for row in top if row.get("withheld")]
+    assert hidden and all(row["name"] is None and row["owners"] == [] for row in hidden)
+    assert all(row["rating"] for row in hidden)  # where it stands, but not what it is
+    assert all(row["name"] for row in top if not row.get("withheld"))
+    assert "Sealed matter" not in str(seen)
 
 
 def test_a_report_covers_days_that_have_happened(as_role: Clients, people: People) -> None:

@@ -477,6 +477,8 @@ export function documentPage(main, params) {
         recordHeader(record, { badges: [kindPill(record.kind), record.status === "retired" ? statusPill("retired") : null,
           record.working_status ? workingPill(record.working_status) : null, reviewPill(record.review_state, record.next_review_on)],
         actions: h("div", { class: "row-sm wrap" }, review, edit, more) }),
+        record.kind === "plan" ? alert("info", "A continuity plan: what it restores, whom to call, its exercises, and a copy to print or download for when the systems are down are under ",
+          h("a", { href: `/continuity/${record.ref}` }, "Continuity"), ".") : null,
         tabBar(tabs, tab),
         h("div", { class: "split" }, h("div", { class: "stack-lg" }, body),
           h("div", { class: "stack-lg" }, glance(record, data), audienceCard(record, data, reload), exceptionsCard(record, reload), ownersCard(record, { vocab: data.vocab, units: data.units, reload }),

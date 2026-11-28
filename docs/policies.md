@@ -6,13 +6,14 @@ RiskWren holds each document with its versions, who approved each one, and when 
 
 ## Documents
 
-**Policies → Documents** lists them all, broadest first. It is in the menu of stewards, leaders, assessors, managers, and those who read everything; anyone named an owner of a document reaches it from the document in the library. A document is one of four kinds:
+**Policies → Documents** lists them all, broadest first. It is in the menu of stewards, leaders, assessors, managers, and those who read everything; anyone named an owner of a document reaches it from the document in the library. A document is one of five kinds:
 
 | Kind | What it is |
 |---|---|
 | **Policy** | What the organization requires, and why. Approved by its leadership. |
 | **Standard** | The particular rules that meet a policy: how long a password, which encryption. |
 | **Procedure** | The steps someone follows to meet a standard or a policy. |
+| **Continuity plan** | What to do to keep a process going, or to bring it back, when something stops it. Written, approved, and reviewed like any document; what it restores, its exercises, and a copy for when the systems are down are under [Continuity plans](the-register.md#continuity-plans-and-exercises). |
 | **Guideline** | Advice that helps people do it well. Recommended, not required. |
 
 Each names the document it **implements**: a standard implements a policy, a procedure a standard or a policy. A document may implement one of its own kind or a broader one, never a narrower one, so an access control policy can sit beneath the information security policy, but a policy never sits beneath a procedure. The document's page lists what implements it.
@@ -74,7 +75,7 @@ Each side shows the other. A control's page lists the documents that **direct** 
 
 ![The information security policy's What it governs tab: the three controls it directs, with how well each works, and the requirements it answers, framework by framework](img/document-governs-light.webp)
 
-Documents are in the **Connections** picture (what each implements, what implements it, the controls it directs, and the exceptions to it), in search, and in **Tidy**: a policy, standard, or procedure that directs no control and answers no requirement is listed as missing what it governs. A guideline is advice, and is not expected to. The export of the document list counts the controls and requirements of each.
+Documents are in the **Connections** picture (what each implements, what implements it, the controls it directs, and the exceptions to it), in search, and in **Tidy**: a policy, standard, or procedure that directs no control and answers no requirement is listed as missing what it governs. A guideline is advice, and a continuity plan restores processes, so neither is expected to. The export of the document list counts the controls and requirements of each.
 
 ## Exceptions to a document
 

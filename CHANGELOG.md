@@ -4,6 +4,114 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.8.0 (2026-11-27)
+
+Wave 8, *Incidents and resilience*: when something goes wrong, it is reported, handled, and
+learned from, and the organization knows what it cannot afford to lose. Anyone signed in
+reports an incident, a near miss, or a concern in one short form and, where the organization
+opens it, anyone can without giving a name. Each report is triaged and handled on the same
+record as the risks and controls, a sensitive case is kept to those named on it, and an
+incident involving protected information is assessed for whether it must be notified, to
+whom, and by when. What an incident realized, which controls failed or held, and what it cost
+are kept, so the register learns from what happened. For resilience, a process says what it
+needs to recover, and everything it relies on (systems, services, sites, and the third
+parties that perform it) is checked against that; continuity plans print for when the systems
+are down, and are exercised.
+
+### Upgrading from 0.7.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0039 to 0045). Every row is
+kept, and the history still verifies. A few things look different afterwards:
+
+- **The menu has a new group, Incidents,** for everyone signed in. **Inventory** has **Sites**,
+  **Reports** has **Resilience** and **Continuity plans**, and **Compliance** has **Privacy
+  impact**.
+- **A security leader who assesses everywhere now reads the leadership reports,** as does
+  anyone else whose role covers the whole organization. To keep the reports to those who lead
+  the whole organization, as before, choose **Nobody else** under **Admin → Program → Who sees
+  what**.
+- **Reporting without a name is closed** until an administrator opens it there.
+- **The new vocabularies start with their usual values:** incident categories, protected
+  information, and site kinds. A program whose kinds of link were edited gains the links a
+  site may have, and keeps its own names for the rest.
+- **Nothing is analysed yet:** Reports → Resilience lists a process once someone records its
+  business impact, and a system, service, site, or third party says what it can deliver once
+  someone records that.
+- **The look can be fixed in `riskwren.toml`.** Nothing changes unless a `[branding]` section is
+  added; see [Configuration](docs/configuration.md#branding).
+
+### Added
+
+- **Incidents:** anyone signed in reports an incident, a near miss, or a concern in one short
+  form, under **Incidents → Report something**. A report is seen by its reporter, those who
+  handle it, those who triage for its unit (managers, and its unit's assessors), the leaders
+  and stewards of its unit, and those who read everything; its reporter sees what they
+  reported, where it stands, and what is said to them, not the handling. Triage gives it a
+  category, a severity, the records it concerns, and a handler, who handles it on their home
+  page until it is closed. A new guide, **Incidents**.
+- **Restricted cases:** an incident can be kept to those named on it, its handlers, and its
+  reporter. Nobody else learns that it exists, those who read everything included: lists,
+  search, counts, the history of everything, and their notices leave it out.
+- **What an incident taught:** the risks it realized, the controls that failed or held, why it
+  happened, and what was learned (needed before a high or critical incident is closed); what
+  it cost; and the issues raised from it. A risk shows the incidents that realized it and
+  their cost, a control where it failed or held, and **Incidents** opens on the last year.
+- **Breach assessment:** whether an incident involving protected information must be
+  notified: when it was discovered, what was involved, the four factors, any exception, and the
+  conclusion, with the rules that apply. What each rule requires, to whom, and by when follows
+  from it (the HIPAA Breach Notification Rule, as a covered entity or a business associate,
+  the FTC Safeguards Rule, DFARS 252.204-7012, and any state's law or contract named), each
+  notification is recorded, and what is still to send waits on the handler's home page.
+- **Reporting without a name,** closed until an administrator opens it under **Admin →
+  Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
+  name, or address, with a follow-up code shown once.
+- **Privacy impact assessments:** a built-in questionnaire, asked by a new kind of campaign of
+  every process and system whose data class the program's new `privacy` rule names, with the
+  answers' concerns flagged, a review, and **Compliance → Privacy impact**.
+- **Two frameworks, loaded on request:** the HIPAA Breach Notification Rule (45 CFR Part 164
+  Subpart D) and the NIST Privacy Framework 1.0.
+- **Business impact and recovery:** a process's business impact analysis (how its loss hurts
+  over time, how soon it must be back, how much information it can lose, and the least it
+  needs), what each system and service can deliver and what that rests on, and every shortfall
+  between them. A process's **Business impact** tab, a system's or service's **Recovery** tab,
+  and **Reports → Resilience**. **Sites** are a new kind of inventory record (`SIT`): the
+  places work depends on, relied on by processes and systems, with a **Recovery** tab of their
+  own; third parties that perform a process have one too, and both are checked with the rest.
+- **Continuity plans and exercises:** a plan is a document of the new kind **Continuity
+  plan**, versioned, approved, and reviewed like any document. **Reports → Continuity plans**
+  shows what each restores and what that relies on, whom to call, a copy that prints or
+  downloads as one file for when the systems are down, and its exercises, whose findings are
+  issues. A plan is exercised on a new `plan_exercise_months` cadence.
+- **Who reads the leadership reports is the program's choice,** under **Admin → Program → Who
+  sees what**: only those who lead the whole organization, anyone whose role covers the whole
+  organization (the default), or every leader and manager, with named readers on top. A reader
+  who may not see a record a report names sees where it stands but not what it is.
+- **Branding fixed in the configuration file:** a `[branding]` section in `riskwren.toml`
+  sets the look exactly: every color by day and after dark (checked for readability when the
+  server starts), logo files for light and dark backgrounds, the tab icon, a sign-in picture,
+  the logo's height, and the typefaces, besides the names and the accent. What it sets wins
+  over the app and shows as locked under **Admin → Appearance**; the rest stays editable.
+- **More of the look in the app:** an accent of its own after dark, a picture and a message
+  on the sign-in page, up to five links of the organization's own, and the last line of every
+  email.
+
+### Changed
+
+- **A security leader who assesses everywhere now reads the leadership reports,** as does
+  anyone else whose role covers the whole organization. Choose **Nobody else** under
+  **Admin → Program → Who sees what** to keep them to those who lead the whole organization.
+- **Reports → History leaves out restricted incident cases** for managers, auditors, and
+  administrators who are not named on them. Their events stay in the chain that
+  `riskwren verify` checks.
+- **Protected information** is a new vocabulary, and the program pack has a `privacy` rule.
+- **Documents have a fifth kind, Continuity plan;** `issue_sources` gains `exercise`.
+- **The inventory has a sixth kind of record, Site,** with a `site_kinds` vocabulary; `relies_on`
+  links may now join a process or a system to a site.
+- **Incident categories** are a new vocabulary, editable under **Admin → Program →
+  Vocabularies**. The menu has a new group, **Incidents**.
+- In the session's `permissions`, `reports` is now `oversight` (the audit universe and plans),
+  and `leadership` says whether the person reads the leadership reports.
+
 ## 0.7.0 (2026-11-27)
 
 Wave 7, *Audit*: the third line's own workspace on the same record, without compromising its

@@ -24,6 +24,7 @@ from riskwren.api.routers import (
     exchange,
     frameworks,
     governance,
+    incidents,
     indicators,
     internal_audit,
     inventory,
@@ -32,6 +33,7 @@ from riskwren.api.routers import (
     people,
     questionnaires,
     reporting,
+    resilience,
     risks,
     scopes,
     session,
@@ -47,16 +49,18 @@ from riskwren.api.static import install_static
 from riskwren.config import ENV_CONFIG, Config, load_config
 from riskwren.db.engine import Database
 from riskwren.home import DataHome
+from riskwren.program import branding as brand_rules
 
 ROUTERS = (
     system, session, sso, people, branding, inventory, risks, controls, treatment, frameworks,
     scopes, evidence, assessments, issues, exchange, reporting, operations, questionnaires,
     campaigns, indicators, tidy, analyses, documents, agreements, governance, third_parties,
-    internal_audit,
+    internal_audit, resilience, incidents,
 )  # fmt: skip
 
 
 def create_app(config: Config) -> FastAPI:
+    brand_rules.pin(config.branding)
     home = DataHome(config.data.home)
 
     @asynccontextmanager

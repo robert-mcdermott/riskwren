@@ -134,7 +134,11 @@ def cover(session: Session, principal: Principal, account: Account) -> dict[str,
             ).all()
             if _active(session, others, but=account.id):
                 continue  # someone else already answers for it
-            to = stand_in(session, record.org_unit_id, account.id, principal.account_id)
+            own = record_type.extra.get("stand_in")
+            default = lambda record=record: stand_in(  # noqa: E731
+                session, record.org_unit_id, account.id, principal.account_id
+            )
+            to = own(session, record, account.id, default) if own is not None else default()
             if to is None:
                 left += 1
                 continue

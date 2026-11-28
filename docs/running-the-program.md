@@ -39,7 +39,7 @@ Four roles can be limited to a unit, and then cover that unit and everything ben
 | Decide an exception | | | | ✓ not their own request | | ✓ not their own request | | |
 | Export a list they can see | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Import records from a spreadsheet | | | ✓ | | | ✓ | | |
-| Read the full history | | | | | | ✓ | ✓ | ✓ |
+| Read the full history, except restricted incident cases they are not named on | | | | | | ✓ | ✓ | ✓ |
 | Shape the program; keep the organization's own frameworks | | | | | | ✓ | | ✓ |
 | Manage accounts, units, and appearance | | | | | | | | ✓ |
 
@@ -81,7 +81,7 @@ One consequence is worth knowing. Under the default setting a steward cannot lin
 | Scales and matrix | What each level of likelihood and impact means, the ratings, and the matrix that combines them |
 | Cadences | How often risks are reviewed and key controls tested, how long a rating stands, how long an issue is given, and when reminders go |
 | Vocabularies | The lists records choose from: kinds of system, data classes, root causes, and the rest |
-| Who sees what | How much of the register a person with no role sees |
+| Who sees what | How much of the register a person with no role sees, and who reads the [leadership reports](#leadership-reports) |
 
 ![Admin, Program: the categories with their appetite, the matrix, and the written definition of every level](img/program-light.webp)
 
@@ -126,7 +126,8 @@ Every word in the method can be changed: the name and meaning of each level of l
 | How long a control's rating, a test result, and evidence hold | 12 months |
 | How often a key control is tested | 6 months |
 | The longest an exception may run | 12 months |
-| How often a policy, standard, procedure, or guideline is reviewed | 12 months, unless the document sets its own |
+| How often a policy, standard, procedure, plan, or guideline is reviewed | 12 months, unless the document sets its own |
+| How often a continuity plan is exercised | 12 months; a new plan within three months |
 | How long an issue is given, by severity | Critical 30 days, high 90, moderate 180, low 365 |
 | Reminders | 14 days before; the steward 7 days late; the leader 21 days late |
 
@@ -156,7 +157,7 @@ A leader's limit is set with the role. A sensible start: unit leaders at moderat
 
 ### Change the program with a pack
 
-The scoring method, cadences, the acceptance table, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
+The scoring method, cadences, the acceptance table, the privacy rule, and the vocabularies (kinds of system, data classes, owner kinds, and so on) are held as one document, a **program pack**.
 
 ```bash
 uv run riskwren program export --output program.json    # write the one in force
@@ -214,6 +215,7 @@ A campaign asks a set of people for one thing by a date, and shows who has answe
 | **System security profile** | The owners of systems | What each system holds, who can reach it, and who patches, backs up, and watches it |
 | **Evidence request** | The owners of controls | A named piece of evidence for each control |
 | **Acknowledgment** | The people a document applies to | Read the version in force, and say they have |
+| **Privacy impact assessment** | The owners of processes and systems that handle restricted information | What each handles about people, why, who else sees it, how long it is kept, and what could go wrong for them ([below](#privacy-impact-assessments)) |
 
 Choose what to ask, give it a name and a date, and say what it is about: everything in a unit and beneath it, or, for controls, only those a compliance scope uses. Before it starts, the form says how many people would be asked about how many things. Each person is told once, with a count, and finds each thing on their **Home**.
 
@@ -242,8 +244,23 @@ Answers are kept as given, and some need someone else to act. Those people are t
 | Someone else should own this control | The unit's stewards |
 | A risk no longer stands, or its rating is no longer right | The unit's stewards, assessors, and managers |
 | A unit's records need attention | The assessors and managers who cover it |
+| A privacy impact assessment is answered | The assessors and managers who cover its unit, to review it; with concerns, it says so |
 
 An attestation is recorded on the control, with who said it and when. It is **never a test**: see [An attestation is not a test](evidence-and-testing.md#an-attestation-is-not-a-test).
+
+### Privacy impact assessments
+
+A process or a system that handles a class of data the program names needs a privacy impact assessment: what it handles about people, whose information it is and how much, why and on what basis, who else sees it and what covers that, how long it is kept, and what could go wrong for the people it is about. To begin with the class is **restricted**, and an assessment is done again every 36 months; both are set in the program pack's `privacy` rule:
+
+```json
+"privacy": {"impact_assessment_classes": ["restricted"], "impact_assessment_months": 36}
+```
+
+**Compliance → Privacy impact** lists every process and system in use that needs one, and where each stands: never assessed, asked, answered and waiting for review, reviewed, or due again. A **Privacy impact assessment** campaign asks the owner of each that has none current; one that is current, asked, or waiting for review is not asked again.
+
+When an owner answers, the assessors and managers for its unit are told. The answers are checked for what wants a closer look: more collected than the purpose needs, sharing outside the organization with nothing covering it, more people able to see it than need to, and information not de-identified though it could be. The record's **Privacy** tab shows the last assessment, its concerns, and its answers; one of those who assess for its unit reads it and **Reviews it**, saying what was made of it. The review, and the answers, are kept with the record.
+
+![A system's privacy impact assessment: answered, with the concerns in its answers, waiting for review](img/system-privacy-light.webp)
 
 ## Committee sessions
 
@@ -373,7 +390,17 @@ Until a report is issued nothing of it is kept: it is worked out afresh each tim
 
 An issued report carries a **fingerprint**: the SHA-256 of what it says, written canonically (keys sorted, no spaces, UTF-8). The history records the issue with the same fingerprint, in its hash chain. Whenever the report is opened, what it says is hashed again and compared with both, and **The fingerprint verifies** means it is the report that was given. A report changed afterwards no longer matches, and the page says so. A report is never edited or withdrawn: the next report is the place to correct one. **Print** prints it without the application around it.
 
-Leadership reports are the organization's. Those who read everything (managers, auditors, and administrators) and those who lead the whole organization read them; only managers for the whole organization prepare and issue them.
+Leadership reports are the organization's, and only managers for the whole organization prepare and issue them. Who reads them depends on the organization's size, so **Admin → Program → Who sees what** chooses it. Those who read everything (managers for the whole organization, auditors, and administrators) and those who lead the whole organization always read them. Beyond them:
+
+| Who else reads them | For |
+| --- | --- |
+| Nobody else | A large organization, whose executives are the reports' audience |
+| Anyone whose role covers the whole organization (the default) | Most organizations: a security leader who assesses everywhere, as a CISO usually does, reads them, and so does anyone else who assesses, stewards, or leads across the whole organization |
+| Every leader and every manager, of any unit | A smaller organization, where the people who run the program day to day are its most senior users |
+
+People can also be named as readers, whatever the choice: a CISO who leads only the security unit, say, or a GRC director. A change applies from each person's next page, and is in the history.
+
+A reader who may not see a record that a report names (a restricted risk, say) sees where it stands, its rating and how it moved, but not its reference, name, unit, or owners; the page says how many entries are withheld. The report itself is unchanged, and its fingerprint is checked against it as it was issued.
 
 ![A leadership report as it was issued: the fingerprint verifies, then the summary, what happened in the period, and the top risks with how each moved](img/leadership-report-light.webp)
 
@@ -382,7 +409,7 @@ Leadership reports are the organization's. Those who read everything (managers, 
 Every change to every record is written to an append-only history in the same transaction as the change: who, when, and each value before and after. Each event is hashed together with the one before it, and the database itself refuses updates and deletes on the history.
 
 - Each record's **History** tab shows its own events in plain words.
-- **Reports → History** shows every change in one place, for managers, auditors, and administrators: narrowed to a person, a record, a kind of record, or a span of dates. It opens on changes to records; sign-ins, exports, and settings are one choice away.
+- **Reports → History** shows every change in one place, for managers, auditors, and administrators: narrowed to a person, a record, a kind of record, or a span of dates. It opens on changes to records; sign-ins, exports, and settings are one choice away. A [restricted incident case](incidents.md#restricted-cases) is left out for anyone not named on it; its events are still in the chain that `riskwren verify` checks.
 - Reading is recorded where it matters: every download of an evidence file and every export of a list is an event, with who and what.
 - `uv run riskwren verify` recomputes the chain and reports the first event that has been altered, removed, or cut from the end.
 - `uv run riskwren doctor` checks that the database still refuses changes to the history.
@@ -421,9 +448,12 @@ A dossier holds only what the person taking it may see. A file they may not open
 **Admin → Appearance** makes the product yours, with a live preview:
 
 - the product's name and your organization's name;
-- a logo for light and for dark mode, and a tab icon;
-- the default palette (Wren, Slate, or Garnet) and an accent color, which is adjusted for dark mode and refused if text on it could not be read;
-- how ratings are colored: an **ordinal** ramp from light to dark in one hue, which keeps rating apart from the colors of standing, or a **signal** ramp from green to red.
+- a logo for light and for dark mode, a tab icon, and a picture for the sign-in page;
+- the default palette (Wren, Slate, or Garnet) and an accent color, which is adjusted for dark mode (or given its own shade after dark) and refused if text on it could not be read;
+- how ratings are colored: an **ordinal** ramp from light to dark in one hue, which keeps rating apart from the colors of standing, or a **signal** ramp from green to red;
+- a message on the sign-in page, up to five links of your own at the foot of the sidebar and the sign-in page, and the last line of every email.
+
+An organization that needs its brand exact (every color by day and after dark, its logo files, its typefaces) sets it in the configuration file's [`[branding]`](configuration.md#branding) section instead. What the file sets is shown here, locked; the rest stays editable here.
 
 Each person chooses light, dark, or system mode and a palette for themselves, from the appearance button at the top right.
 

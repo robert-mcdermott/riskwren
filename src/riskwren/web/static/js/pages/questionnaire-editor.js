@@ -10,7 +10,7 @@ import { card } from "../components/ui.js";
 const TYPES = [["yes_no", "Yes or no"], ["choice", "One of a list"], ["choices", "Any of a list"], ["text", "A line of text"],
   ["long_text", "A paragraph"], ["number", "A number"], ["date", "A date"]];
 const PURPOSES = [["attestation", "Attestation"], ["self_assessment", "Self-assessment"], ["completeness", "Completeness check"],
-  ["due_diligence", "Due diligence"], ["review", "Review"], ["other", "Other"]];
+  ["due_diligence", "Due diligence"], ["review", "Review"], ["privacy_impact", "Privacy impact"], ["other", "Other"]];
 const slug = (text, fallback) => (text.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").replace(/^[^a-z]+/, "").slice(0, 32) || fallback);
 
 /** A rule this editor can show as three choices: one earlier question, compared one way. */

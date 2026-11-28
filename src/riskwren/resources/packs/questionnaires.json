@@ -1,1800 +1,2078 @@
 {
-  "pack": {
-    "key": "questionnaires",
-    "kind": "questionnaires",
-    "title": "Built-in questionnaires",
-    "version": "1",
-    "pack_version": "0.5.0",
-    "publisher": "The RiskWren Authors",
-    "license": "Apache-2.0"
+ "pack": {
+  "key": "questionnaires",
+  "kind": "questionnaires",
+  "title": "Built-in questionnaires",
+  "version": "1",
+  "pack_version": "0.6.0",
+  "publisher": "The RiskWren Authors",
+  "license": "Apache-2.0"
+ },
+ "questionnaires": [
+  {
+   "key": "control-attestation",
+   "title": "Control attestation",
+   "purpose": "attestation",
+   "summary": "A control's owner confirms that it still operates as described, or says what has changed. An attestation is the owner's word. It is not a test.",
+   "document": {
+    "sections": [
+     {
+      "key": "control",
+      "title": "The control",
+      "questions": [
+       {
+        "key": "operates",
+        "label": "Does this control still operate as its statement describes?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "yes",
+          "label": "Yes"
+         },
+         {
+          "key": "partly",
+          "label": "Partly"
+         },
+         {
+          "key": "no",
+          "label": "No"
+         }
+        ]
+       },
+       {
+        "key": "difference",
+        "label": "What is different from the statement?",
+        "type": "long_text",
+        "help": "Say what is done now, and since when.",
+        "required": true,
+        "show_when": {
+         "field": "answers.operates",
+         "op": "in",
+         "value": [
+          "partly",
+          "no"
+         ]
+        }
+       },
+       {
+        "key": "statement_right",
+        "label": "Is the statement itself still the right description of what should be done?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "statement_change",
+        "label": "What should it say?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.statement_right",
+         "op": "eq",
+         "value": false
+        }
+       }
+      ]
+     },
+     {
+      "key": "proof",
+      "title": "Proof",
+      "questions": [
+       {
+        "key": "evidence",
+        "label": "Is there evidence on record, still in date, that shows it?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "yes",
+          "label": "Yes"
+         },
+         {
+          "key": "out_of_date",
+          "label": "There is, and it is out of date"
+         },
+         {
+          "key": "none",
+          "label": "None is kept"
+         }
+        ]
+       },
+       {
+        "key": "evidence_plan",
+        "label": "Who will collect it, and by when?",
+        "type": "text",
+        "required": true,
+        "show_when": {
+         "field": "answers.evidence",
+         "op": "in",
+         "value": [
+          "out_of_date",
+          "none"
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "key": "people",
+      "title": "Who answers for it",
+      "questions": [
+       {
+        "key": "owner_right",
+        "label": "Are you still the right person to answer for this control?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "owner_instead",
+        "label": "Who should it be?",
+        "type": "text",
+        "required": true,
+        "show_when": {
+         "field": "answers.owner_right",
+         "op": "eq",
+         "value": false
+        }
+       }
+      ]
+     }
+    ]
+   }
   },
-  "questionnaires": [
-    {
-      "key": "control-attestation",
-      "title": "Control attestation",
-      "purpose": "attestation",
-      "summary": "A control's owner confirms that it still operates as described, or says what has changed. An attestation is the owner's word. It is not a test.",
-      "document": {
-        "sections": [
-          {
-            "key": "control",
-            "title": "The control",
-            "questions": [
-              {
-                "key": "operates",
-                "label": "Does this control still operate as its statement describes?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "yes",
-                    "label": "Yes"
-                  },
-                  {
-                    "key": "partly",
-                    "label": "Partly"
-                  },
-                  {
-                    "key": "no",
-                    "label": "No"
-                  }
-                ]
-              },
-              {
-                "key": "difference",
-                "label": "What is different from the statement?",
-                "type": "long_text",
-                "help": "Say what is done now, and since when.",
-                "required": true,
-                "show_when": {
-                  "field": "answers.operates",
-                  "op": "in",
-                  "value": [
-                    "partly",
-                    "no"
-                  ]
-                }
-              },
-              {
-                "key": "statement_right",
-                "label": "Is the statement itself still the right description of what should be done?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "statement_change",
-                "label": "What should it say?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.statement_right",
-                  "op": "eq",
-                  "value": false
-                }
-              }
-            ]
-          },
-          {
-            "key": "proof",
-            "title": "Proof",
-            "questions": [
-              {
-                "key": "evidence",
-                "label": "Is there evidence on record, still in date, that shows it?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "yes",
-                    "label": "Yes"
-                  },
-                  {
-                    "key": "out_of_date",
-                    "label": "There is, and it is out of date"
-                  },
-                  {
-                    "key": "none",
-                    "label": "None is kept"
-                  }
-                ]
-              },
-              {
-                "key": "evidence_plan",
-                "label": "Who will collect it, and by when?",
-                "type": "text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.evidence",
-                  "op": "in",
-                  "value": [
-                    "out_of_date",
-                    "none"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "key": "people",
-            "title": "Who answers for it",
-            "questions": [
-              {
-                "key": "owner_right",
-                "label": "Are you still the right person to answer for this control?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "owner_instead",
-                "label": "Who should it be?",
-                "type": "text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.owner_right",
-                  "op": "eq",
-                  "value": false
-                }
-              }
-            ]
-          }
+  {
+   "key": "risk-self-assessment",
+   "title": "Risk self-assessment",
+   "purpose": "self_assessment",
+   "summary": "A risk's owner looks at it again: whether it still stands, what has changed, and whether its rating and its plan are still right.",
+   "document": {
+    "sections": [
+     {
+      "key": "standing",
+      "title": "Does it still stand?",
+      "questions": [
+       {
+        "key": "relevant",
+        "label": "Could this still happen here?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "why_not",
+        "label": "Why not?",
+        "type": "long_text",
+        "help": "For example: the system was retired, or the work has stopped.",
+        "required": true,
+        "show_when": {
+         "field": "answers.relevant",
+         "op": "eq",
+         "value": false
+        }
+       }
+      ]
+     },
+     {
+      "key": "changes",
+      "title": "What has changed",
+      "show_when": {
+       "field": "answers.relevant",
+       "op": "eq",
+       "value": true
+      },
+      "questions": [
+       {
+        "key": "changed",
+        "label": "Since it was last assessed, what has changed?",
+        "type": "choices",
+        "required": true,
+        "options": [
+         {
+          "key": "cause",
+          "label": "What could cause it"
+         },
+         {
+          "key": "likelihood",
+          "label": "How likely it is"
+         },
+         {
+          "key": "impact",
+          "label": "What it would cost"
+         },
+         {
+          "key": "controls",
+          "label": "The controls, or how well they work"
+         },
+         {
+          "key": "nothing",
+          "label": "Nothing"
+         }
         ]
-      }
-    },
-    {
-      "key": "risk-self-assessment",
-      "title": "Risk self-assessment",
-      "purpose": "self_assessment",
-      "summary": "A risk's owner looks at it again: whether it still stands, what has changed, and whether its rating and its plan are still right.",
-      "document": {
-        "sections": [
+       },
+       {
+        "key": "what_changed",
+        "label": "Say what has changed.",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.changed",
+         "op": "contains_any",
+         "value": [
+          "cause",
+          "likelihood",
+          "impact",
+          "controls"
+         ]
+        }
+       },
+       {
+        "key": "controls_working",
+        "label": "Are the controls linked to it working?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "yes",
+          "label": "Yes"
+         },
+         {
+          "key": "partly",
+          "label": "Partly"
+         },
+         {
+          "key": "no",
+          "label": "No"
+         },
+         {
+          "key": "unknown",
+          "label": "I do not know"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "key": "rating",
+      "title": "Rating and plan",
+      "show_when": {
+       "field": "answers.relevant",
+       "op": "eq",
+       "value": true
+      },
+      "questions": [
+       {
+        "key": "rating_right",
+        "label": "Is the residual rating on record still right?",
+        "type": "yes_no",
+        "help": "If it is not, assess the risk again after answering.",
+        "required": true
+       },
+       {
+        "key": "rating_note",
+        "label": "Should it be higher or lower, and why?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.rating_right",
+         "op": "eq",
+         "value": false
+        }
+       },
+       {
+        "key": "plan",
+        "label": "Is the treatment plan on track?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "yes",
+          "label": "Yes"
+         },
+         {
+          "key": "late",
+          "label": "It is running late"
+         },
+         {
+          "key": "none",
+          "label": "There is no plan"
+         }
+        ]
+       },
+       {
+        "key": "plan_note",
+        "label": "What is holding it up?",
+        "type": "long_text",
+        "show_when": {
+         "field": "answers.plan",
+         "op": "eq",
+         "value": "late"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "unit-completeness",
+   "title": "Unit completeness check",
+   "purpose": "completeness",
+   "summary": "A unit's steward confirms that what the unit has and depends on is on record, and that the right people are named.",
+   "document": {
+    "sections": [
+     {
+      "key": "inventory",
+      "title": "What the unit has",
+      "questions": [
+       {
+        "key": "complete",
+        "label": "Are the unit's processes, systems, third parties, and information all on record?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "yes",
+          "label": "Yes"
+         },
+         {
+          "key": "mostly",
+          "label": "Mostly"
+         },
+         {
+          "key": "no",
+          "label": "No"
+         }
+        ]
+       },
+       {
+        "key": "missing",
+        "label": "What is missing?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.complete",
+         "op": "in",
+         "value": [
+          "mostly",
+          "no"
+         ]
+        }
+       },
+       {
+        "key": "new_this_year",
+        "label": "In the past year, has the unit taken on a system, a supplier, or a body of sensitive data that is not yet on record?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "new_detail",
+        "label": "What, and who looks after it?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.new_this_year",
+         "op": "eq",
+         "value": true
+        }
+       },
+       {
+        "key": "retired",
+        "label": "Is anything on record that the unit no longer has?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "retired_detail",
+        "label": "What should be retired?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.retired",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     },
+     {
+      "key": "people",
+      "title": "Who answers for it",
+      "questions": [
+       {
+        "key": "owners_right",
+        "label": "Does every record name an owner who is still here and still the right person?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "owners_detail",
+        "label": "Which records need a new owner?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.owners_right",
+         "op": "eq",
+         "value": false
+        }
+       }
+      ]
+     },
+     {
+      "key": "risks",
+      "title": "What could go wrong",
+      "questions": [
+       {
+        "key": "unrecorded",
+        "label": "Is there something that worries you about the unit's work that is not in the register?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "unrecorded_detail",
+        "label": "What is it?",
+        "type": "long_text",
+        "help": "A sentence is enough. Someone will follow up.",
+        "required": true,
+        "show_when": {
+         "field": "answers.unrecorded",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "system-security-profile",
+   "title": "System security profile",
+   "purpose": "self_assessment",
+   "summary": "Whoever runs a system says how it is protected: what it holds, who can reach it, and who patches, backs up, and watches it.",
+   "document": {
+    "sections": [
+     {
+      "key": "exposure",
+      "title": "What it holds and who can reach it",
+      "questions": [
+       {
+        "key": "data",
+        "label": "What does the system hold or handle?",
+        "type": "choices",
+        "required": true,
+        "options": [
+         {
+          "key": "public",
+          "label": "Only what is public"
+         },
+         {
+          "key": "internal",
+          "label": "Internal information"
+         },
+         {
+          "key": "personal",
+          "label": "Personal information"
+         },
+         {
+          "key": "health",
+          "label": "Health information"
+         },
+         {
+          "key": "research",
+          "label": "Controlled research data"
+         },
+         {
+          "key": "financial",
+          "label": "Financial or payment information"
+         }
+        ]
+       },
+       {
+        "key": "internet",
+        "label": "Can it be reached from the internet?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "users",
+        "label": "About how many people can sign in to it?",
+        "type": "number"
+       }
+      ]
+     },
+     {
+      "key": "access",
+      "title": "Signing in",
+      "questions": [
+       {
+        "key": "sign_in",
+        "label": "How do people sign in?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "sso",
+          "label": "With the organization's single sign-on"
+         },
+         {
+          "key": "own",
+          "label": "With accounts the system keeps itself"
+         },
+         {
+          "key": "shared",
+          "label": "With an account that people share"
+         }
+        ]
+       },
+       {
+        "key": "second_factor",
+        "label": "Is a second factor required?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "all",
+          "label": "For everyone"
+         },
+         {
+          "key": "admins",
+          "label": "For administrators only"
+         },
+         {
+          "key": "none",
+          "label": "No"
+         }
+        ]
+       },
+       {
+        "key": "second_factor_why",
+        "label": "Why is no second factor required for everyone?",
+        "type": "long_text",
+        "help": "It can be reached from the internet, or it holds sensitive information.",
+        "required": true,
+        "show_when": {
+         "all": [
           {
-            "key": "standing",
-            "title": "Does it still stand?",
-            "questions": [
-              {
-                "key": "relevant",
-                "label": "Could this still happen here?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "why_not",
-                "label": "Why not?",
-                "type": "long_text",
-                "help": "For example: the system was retired, or the work has stopped.",
-                "required": true,
-                "show_when": {
-                  "field": "answers.relevant",
-                  "op": "eq",
-                  "value": false
-                }
-              }
-            ]
+           "field": "answers.second_factor",
+           "op": "in",
+           "value": [
+            "admins",
+            "none"
+           ]
           },
           {
-            "key": "changes",
-            "title": "What has changed",
-            "show_when": {
-              "field": "answers.relevant",
-              "op": "eq",
-              "value": true
+           "any": [
+            {
+             "field": "answers.internet",
+             "op": "eq",
+             "value": true
             },
-            "questions": [
-              {
-                "key": "changed",
-                "label": "Since it was last assessed, what has changed?",
-                "type": "choices",
-                "required": true,
-                "options": [
-                  {
-                    "key": "cause",
-                    "label": "What could cause it"
-                  },
-                  {
-                    "key": "likelihood",
-                    "label": "How likely it is"
-                  },
-                  {
-                    "key": "impact",
-                    "label": "What it would cost"
-                  },
-                  {
-                    "key": "controls",
-                    "label": "The controls, or how well they work"
-                  },
-                  {
-                    "key": "nothing",
-                    "label": "Nothing"
-                  }
-                ]
-              },
-              {
-                "key": "what_changed",
-                "label": "Say what has changed.",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.changed",
-                  "op": "contains_any",
-                  "value": [
-                    "cause",
-                    "likelihood",
-                    "impact",
-                    "controls"
-                  ]
-                }
-              },
-              {
-                "key": "controls_working",
-                "label": "Are the controls linked to it working?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "yes",
-                    "label": "Yes"
-                  },
-                  {
-                    "key": "partly",
-                    "label": "Partly"
-                  },
-                  {
-                    "key": "no",
-                    "label": "No"
-                  },
-                  {
-                    "key": "unknown",
-                    "label": "I do not know"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "rating",
-            "title": "Rating and plan",
-            "show_when": {
-              "field": "answers.relevant",
-              "op": "eq",
-              "value": true
-            },
-            "questions": [
-              {
-                "key": "rating_right",
-                "label": "Is the residual rating on record still right?",
-                "type": "yes_no",
-                "help": "If it is not, assess the risk again after answering.",
-                "required": true
-              },
-              {
-                "key": "rating_note",
-                "label": "Should it be higher or lower, and why?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.rating_right",
-                  "op": "eq",
-                  "value": false
-                }
-              },
-              {
-                "key": "plan",
-                "label": "Is the treatment plan on track?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "yes",
-                    "label": "Yes"
-                  },
-                  {
-                    "key": "late",
-                    "label": "It is running late"
-                  },
-                  {
-                    "key": "none",
-                    "label": "There is no plan"
-                  }
-                ]
-              },
-              {
-                "key": "plan_note",
-                "label": "What is holding it up?",
-                "type": "long_text",
-                "show_when": {
-                  "field": "answers.plan",
-                  "op": "eq",
-                  "value": "late"
-                }
-              }
-            ]
+            {
+             "field": "answers.data",
+             "op": "contains_any",
+             "value": [
+              "personal",
+              "health",
+              "research",
+              "financial"
+             ]
+            }
+           ]
           }
+         ]
+        }
+       },
+       {
+        "key": "leavers",
+        "label": "When someone leaves, how is their access removed?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "automatic",
+          "label": "By itself, with their organization account"
+         },
+         {
+          "key": "request",
+          "label": "When someone asks"
+         },
+         {
+          "key": "review",
+          "label": "At a periodic review"
+         },
+         {
+          "key": "unknown",
+          "label": "I do not know"
+         }
         ]
-      }
-    },
-    {
-      "key": "unit-completeness",
-      "title": "Unit completeness check",
-      "purpose": "completeness",
-      "summary": "A unit's steward confirms that what the unit has and depends on is on record, and that the right people are named.",
-      "document": {
-        "sections": [
-          {
-            "key": "inventory",
-            "title": "What the unit has",
-            "questions": [
-              {
-                "key": "complete",
-                "label": "Are the unit's processes, systems, third parties, and information all on record?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "yes",
-                    "label": "Yes"
-                  },
-                  {
-                    "key": "mostly",
-                    "label": "Mostly"
-                  },
-                  {
-                    "key": "no",
-                    "label": "No"
-                  }
-                ]
-              },
-              {
-                "key": "missing",
-                "label": "What is missing?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.complete",
-                  "op": "in",
-                  "value": [
-                    "mostly",
-                    "no"
-                  ]
-                }
-              },
-              {
-                "key": "new_this_year",
-                "label": "In the past year, has the unit taken on a system, a supplier, or a body of sensitive data that is not yet on record?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "new_detail",
-                "label": "What, and who looks after it?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.new_this_year",
-                  "op": "eq",
-                  "value": true
-                }
-              },
-              {
-                "key": "retired",
-                "label": "Is anything on record that the unit no longer has?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "retired_detail",
-                "label": "What should be retired?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.retired",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
-          {
-            "key": "people",
-            "title": "Who answers for it",
-            "questions": [
-              {
-                "key": "owners_right",
-                "label": "Does every record name an owner who is still here and still the right person?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "owners_detail",
-                "label": "Which records need a new owner?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.owners_right",
-                  "op": "eq",
-                  "value": false
-                }
-              }
-            ]
-          },
-          {
-            "key": "risks",
-            "title": "What could go wrong",
-            "questions": [
-              {
-                "key": "unrecorded",
-                "label": "Is there something that worries you about the unit's work that is not in the register?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "unrecorded_detail",
-                "label": "What is it?",
-                "type": "long_text",
-                "help": "A sentence is enough. Someone will follow up.",
-                "required": true,
-                "show_when": {
-                  "field": "answers.unrecorded",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          }
+       },
+       {
+        "key": "admins",
+        "label": "How many people have administrative rights?",
+        "type": "number",
+        "required": true
+       }
+      ]
+     },
+     {
+      "key": "upkeep",
+      "title": "Keeping it sound",
+      "questions": [
+       {
+        "key": "supported",
+        "label": "Does its maker still supply security updates?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "unsupported_plan",
+        "label": "What is the plan for it?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.supported",
+         "op": "eq",
+         "value": false
+        }
+       },
+       {
+        "key": "patched_by",
+        "label": "Who applies updates?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "central",
+          "label": "Central information technology"
+         },
+         {
+          "key": "unit",
+          "label": "The unit that runs it"
+         },
+         {
+          "key": "supplier",
+          "label": "Its supplier"
+         },
+         {
+          "key": "nobody",
+          "label": "Nobody, as far as I know"
+         }
         ]
-      }
-    },
-    {
-      "key": "system-security-profile",
-      "title": "System security profile",
-      "purpose": "self_assessment",
-      "summary": "Whoever runs a system says how it is protected: what it holds, who can reach it, and who patches, backs up, and watches it.",
-      "document": {
-        "sections": [
-          {
-            "key": "exposure",
-            "title": "What it holds and who can reach it",
-            "questions": [
-              {
-                "key": "data",
-                "label": "What does the system hold or handle?",
-                "type": "choices",
-                "required": true,
-                "options": [
-                  {
-                    "key": "public",
-                    "label": "Only what is public"
-                  },
-                  {
-                    "key": "internal",
-                    "label": "Internal information"
-                  },
-                  {
-                    "key": "personal",
-                    "label": "Personal information"
-                  },
-                  {
-                    "key": "health",
-                    "label": "Health information"
-                  },
-                  {
-                    "key": "research",
-                    "label": "Controlled research data"
-                  },
-                  {
-                    "key": "financial",
-                    "label": "Financial or payment information"
-                  }
-                ]
-              },
-              {
-                "key": "internet",
-                "label": "Can it be reached from the internet?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "users",
-                "label": "About how many people can sign in to it?",
-                "type": "number"
-              }
-            ]
-          },
-          {
-            "key": "access",
-            "title": "Signing in",
-            "questions": [
-              {
-                "key": "sign_in",
-                "label": "How do people sign in?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "sso",
-                    "label": "With the organization's single sign-on"
-                  },
-                  {
-                    "key": "own",
-                    "label": "With accounts the system keeps itself"
-                  },
-                  {
-                    "key": "shared",
-                    "label": "With an account that people share"
-                  }
-                ]
-              },
-              {
-                "key": "second_factor",
-                "label": "Is a second factor required?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "all",
-                    "label": "For everyone"
-                  },
-                  {
-                    "key": "admins",
-                    "label": "For administrators only"
-                  },
-                  {
-                    "key": "none",
-                    "label": "No"
-                  }
-                ]
-              },
-              {
-                "key": "second_factor_why",
-                "label": "Why is no second factor required for everyone?",
-                "type": "long_text",
-                "help": "It can be reached from the internet, or it holds sensitive information.",
-                "required": true,
-                "show_when": {
-                  "all": [
-                    {
-                      "field": "answers.second_factor",
-                      "op": "in",
-                      "value": [
-                        "admins",
-                        "none"
-                      ]
-                    },
-                    {
-                      "any": [
-                        {
-                          "field": "answers.internet",
-                          "op": "eq",
-                          "value": true
-                        },
-                        {
-                          "field": "answers.data",
-                          "op": "contains_any",
-                          "value": [
-                            "personal",
-                            "health",
-                            "research",
-                            "financial"
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
-                "key": "leavers",
-                "label": "When someone leaves, how is their access removed?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "automatic",
-                    "label": "By itself, with their organization account"
-                  },
-                  {
-                    "key": "request",
-                    "label": "When someone asks"
-                  },
-                  {
-                    "key": "review",
-                    "label": "At a periodic review"
-                  },
-                  {
-                    "key": "unknown",
-                    "label": "I do not know"
-                  }
-                ]
-              },
-              {
-                "key": "admins",
-                "label": "How many people have administrative rights?",
-                "type": "number",
-                "required": true
-              }
-            ]
-          },
-          {
-            "key": "upkeep",
-            "title": "Keeping it sound",
-            "questions": [
-              {
-                "key": "supported",
-                "label": "Does its maker still supply security updates?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "unsupported_plan",
-                "label": "What is the plan for it?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.supported",
-                  "op": "eq",
-                  "value": false
-                }
-              },
-              {
-                "key": "patched_by",
-                "label": "Who applies updates?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "central",
-                    "label": "Central information technology"
-                  },
-                  {
-                    "key": "unit",
-                    "label": "The unit that runs it"
-                  },
-                  {
-                    "key": "supplier",
-                    "label": "Its supplier"
-                  },
-                  {
-                    "key": "nobody",
-                    "label": "Nobody, as far as I know"
-                  }
-                ]
-              },
-              {
-                "key": "backed_up",
-                "label": "Is it backed up, and has a restore been tried?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "tested",
-                    "label": "Backed up, and a restore has been tested"
-                  },
-                  {
-                    "key": "untested",
-                    "label": "Backed up, and a restore has not been tried"
-                  },
-                  {
-                    "key": "no",
-                    "label": "Not backed up"
-                  },
-                  {
-                    "key": "not_needed",
-                    "label": "It holds nothing that would need restoring"
-                  }
-                ]
-              },
-              {
-                "key": "logs",
-                "label": "Do its logs go to central security monitoring?",
-                "type": "yes_no",
-                "required": true
-              }
-            ]
-          }
+       },
+       {
+        "key": "backed_up",
+        "label": "Is it backed up, and has a restore been tried?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "tested",
+          "label": "Backed up, and a restore has been tested"
+         },
+         {
+          "key": "untested",
+          "label": "Backed up, and a restore has not been tried"
+         },
+         {
+          "key": "no",
+          "label": "Not backed up"
+         },
+         {
+          "key": "not_needed",
+          "label": "It holds nothing that would need restoring"
+         }
         ]
-      }
-    },
-    {
-      "key": "third-party-tiering",
-      "title": "Third-party tiering",
-      "summary": "A few questions about what a third party holds, how it reaches the organization, and what relies on it. The answers set its tier by the program's rules.",
-      "purpose": "tiering",
-      "document": {
-        "sections": [
-          {
-            "key": "information",
-            "title": "Information",
-            "questions": [
-              {
-                "key": "information",
-                "label": "What is the most sensitive of the organization's information it will hold, receive, or be able to see?",
-                "type": "choice",
-                "required": true,
-                "help": "Count every service it provides. The classes are the organization's own.",
-                "options": [
-                  {
-                    "key": "none",
-                    "label": "None"
-                  },
-                  {
-                    "key": "public",
-                    "label": "Public only"
-                  },
-                  {
-                    "key": "internal",
-                    "label": "Internal"
-                  },
-                  {
-                    "key": "confidential",
-                    "label": "Confidential"
-                  },
-                  {
-                    "key": "restricted",
-                    "label": "Restricted"
-                  }
-                ]
-              },
-              {
-                "key": "regulated",
-                "label": "Is any of it one of these?",
-                "type": "choices",
-                "show_when": {
-                  "field": "answers.information",
-                  "op": "in",
-                  "value": [
-                    "internal",
-                    "confidential",
-                    "restricted"
-                  ]
-                },
-                "options": [
-                  {
-                    "key": "health",
-                    "label": "Identifiable health information, as HIPAA defines it"
-                  },
-                  {
-                    "key": "participant",
-                    "label": "Identifiable information about research participants"
-                  },
-                  {
-                    "key": "controlled",
-                    "label": "Data held under another party's terms, such as controlled-access genomic data"
-                  },
-                  {
-                    "key": "cards",
-                    "label": "Payment card numbers"
-                  },
-                  {
-                    "key": "identifiers",
-                    "label": "Government identifiers, such as Social Security numbers"
-                  },
-                  {
-                    "key": "students",
-                    "label": "Student education records, as FERPA defines them"
-                  },
-                  {
-                    "key": "export",
-                    "label": "Export-controlled information"
-                  },
-                  {
-                    "key": "none_of_these",
-                    "label": "None of these"
-                  }
-                ]
-              },
-              {
-                "key": "people",
-                "label": "About how many people does it hold records about?",
-                "type": "choice",
-                "show_when": {
-                  "field": "answers.information",
-                  "op": "in",
-                  "value": [
-                    "internal",
-                    "confidential",
-                    "restricted"
-                  ]
-                },
-                "help": "A breach of health information about 500 or more people must be reported at once, and to the press.",
-                "options": [
-                  {
-                    "key": "none",
-                    "label": "It holds no records about people"
-                  },
-                  {
-                    "key": "few",
-                    "label": "Fewer than 500"
-                  },
-                  {
-                    "key": "many",
-                    "label": "500 or more"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "access",
-            "title": "Access",
-            "questions": [
-              {
-                "key": "access",
-                "label": "How will it reach the organization?",
-                "type": "choices",
-                "required": true,
-                "options": [
-                  {
-                    "key": "privileged",
-                    "label": "Administrator or privileged access to the organization's systems"
-                  },
-                  {
-                    "key": "remote",
-                    "label": "Remote access to the network or to systems"
-                  },
-                  {
-                    "key": "accounts",
-                    "label": "Accounts in the organization's identity system"
-                  },
-                  {
-                    "key": "integration",
-                    "label": "A connection that sends or receives the organization's data"
-                  },
-                  {
-                    "key": "on_site",
-                    "label": "Work on the premises"
-                  },
-                  {
-                    "key": "physical",
-                    "label": "Unescorted access to laboratories, the clinic, or equipment rooms"
-                  },
-                  {
-                    "key": "no_access",
-                    "label": "None of these"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "dependence",
-            "title": "Dependence",
-            "questions": [
-              {
-                "key": "dependency",
-                "label": "If it stopped tomorrow, what would happen to the work that relies on it?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "stops",
-                    "label": "Critical research, care, or operations would stop within a day"
-                  },
-                  {
-                    "key": "slows",
-                    "label": "Work would slow, and could be kept going another way for weeks"
-                  },
-                  {
-                    "key": "little",
-                    "label": "Little: it could be replaced without much trouble"
-                  }
-                ]
-              },
-              {
-                "key": "subcontractors",
-                "label": "Does it pass the organization's information or access on to others it uses?",
-                "type": "yes_no"
-              },
-              {
-                "key": "offshore",
-                "label": "Is any of the organization's information held or reached from outside the United States?",
-                "type": "yes_no",
-                "show_when": {
-                  "field": "answers.information",
-                  "op": "in",
-                  "value": [
-                    "internal",
-                    "confidential",
-                    "restricted"
-                  ]
-                }
-              }
-            ]
-          }
+       },
+       {
+        "key": "logs",
+        "label": "Do its logs go to central security monitoring?",
+        "type": "yes_no",
+        "required": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "third-party-tiering",
+   "title": "Third-party tiering",
+   "summary": "A few questions about what a third party holds, how it reaches the organization, and what relies on it. The answers set its tier by the program's rules.",
+   "purpose": "tiering",
+   "document": {
+    "sections": [
+     {
+      "key": "information",
+      "title": "Information",
+      "questions": [
+       {
+        "key": "information",
+        "label": "What is the most sensitive of the organization's information it will hold, receive, or be able to see?",
+        "type": "choice",
+        "required": true,
+        "help": "Count every service it provides. The classes are the organization's own.",
+        "options": [
+         {
+          "key": "none",
+          "label": "None"
+         },
+         {
+          "key": "public",
+          "label": "Public only"
+         },
+         {
+          "key": "internal",
+          "label": "Internal"
+         },
+         {
+          "key": "confidential",
+          "label": "Confidential"
+         },
+         {
+          "key": "restricted",
+          "label": "Restricted"
+         }
         ]
-      }
-    },
-    {
-      "key": "due-diligence-short",
-      "title": "Due diligence: short",
-      "summary": "Eight questions for a third party with little at stake: how it protects what it holds, and what it does when something goes wrong.",
-      "purpose": "due_diligence",
-      "document": {
-        "sections": [
-          {
-            "key": "about",
-            "title": "About you",
-            "questions": [
-              {
-                "key": "security_contact",
-                "label": "Who answers for information security, and how can they be reached?",
-                "type": "text",
-                "required": true,
-                "help": "A name or role, and an email address."
-              },
-              {
-                "key": "certifications",
-                "label": "Which independent reports or certifications cover the service you provide to us?",
-                "type": "choices",
-                "required": true,
-                "help": "Choose each that is current. You can be asked for a copy.",
-                "options": [
-                  {
-                    "key": "soc2_type2",
-                    "label": "SOC 2 Type II report"
-                  },
-                  {
-                    "key": "soc2_type1",
-                    "label": "SOC 2 Type I report"
-                  },
-                  {
-                    "key": "iso27001",
-                    "label": "ISO/IEC 27001 certificate"
-                  },
-                  {
-                    "key": "hitrust",
-                    "label": "HITRUST certification"
-                  },
-                  {
-                    "key": "fedramp",
-                    "label": "FedRAMP authorization"
-                  },
-                  {
-                    "key": "pci",
-                    "label": "PCI DSS attestation of compliance"
-                  },
-                  {
-                    "key": "pentest",
-                    "label": "A penetration test by an independent firm in the last 12 months"
-                  },
-                  {
-                    "key": "none",
-                    "label": "None of these",
-                    "concern": true
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "protection",
-            "title": "Protecting our information",
-            "questions": [
-              {
-                "key": "mfa",
-                "label": "Does everyone who can reach our information or systems sign in with a second factor?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "encryption",
-                "label": "Is our information encrypted when it is stored and when it is sent?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "access_removed",
-                "label": "Is a person's access removed when they leave, or no longer need it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "breach_notice",
-                "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "return_destroy",
-                "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "more",
-            "title": "Anything else",
-            "questions": [
-              {
-                "key": "notes",
-                "label": "Is there anything else we should know?",
-                "type": "long_text",
-                "required": false
-              }
-            ]
-          }
+       },
+       {
+        "key": "regulated",
+        "label": "Is any of it one of these?",
+        "type": "choices",
+        "show_when": {
+         "field": "answers.information",
+         "op": "in",
+         "value": [
+          "internal",
+          "confidential",
+          "restricted"
+         ]
+        },
+        "options": [
+         {
+          "key": "health",
+          "label": "Identifiable health information, as HIPAA defines it"
+         },
+         {
+          "key": "participant",
+          "label": "Identifiable information about research participants"
+         },
+         {
+          "key": "controlled",
+          "label": "Data held under another party's terms, such as controlled-access genomic data"
+         },
+         {
+          "key": "cards",
+          "label": "Payment card numbers"
+         },
+         {
+          "key": "identifiers",
+          "label": "Government identifiers, such as Social Security numbers"
+         },
+         {
+          "key": "students",
+          "label": "Student education records, as FERPA defines them"
+         },
+         {
+          "key": "export",
+          "label": "Export-controlled information"
+         },
+         {
+          "key": "none_of_these",
+          "label": "None of these"
+         }
         ]
-      }
-    },
-    {
-      "key": "due-diligence-standard",
-      "title": "Due diligence: standard",
-      "summary": "A security questionnaire for a third party that holds confidential information or reaches systems.",
-      "purpose": "due_diligence",
-      "document": {
-        "sections": [
-          {
-            "key": "about",
-            "title": "About you",
-            "questions": [
-              {
-                "key": "security_contact",
-                "label": "Who answers for information security, and how can they be reached?",
-                "type": "text",
-                "required": true,
-                "help": "A name or role, and an email address."
-              },
-              {
-                "key": "certifications",
-                "label": "Which independent reports or certifications cover the service you provide to us?",
-                "type": "choices",
-                "required": true,
-                "help": "Choose each that is current. You can be asked for a copy.",
-                "options": [
-                  {
-                    "key": "soc2_type2",
-                    "label": "SOC 2 Type II report"
-                  },
-                  {
-                    "key": "soc2_type1",
-                    "label": "SOC 2 Type I report"
-                  },
-                  {
-                    "key": "iso27001",
-                    "label": "ISO/IEC 27001 certificate"
-                  },
-                  {
-                    "key": "hitrust",
-                    "label": "HITRUST certification"
-                  },
-                  {
-                    "key": "fedramp",
-                    "label": "FedRAMP authorization"
-                  },
-                  {
-                    "key": "pci",
-                    "label": "PCI DSS attestation of compliance"
-                  },
-                  {
-                    "key": "pentest",
-                    "label": "A penetration test by an independent firm in the last 12 months"
-                  },
-                  {
-                    "key": "none",
-                    "label": "None of these",
-                    "concern": true
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "program",
-            "title": "Your security program",
-            "questions": [
-              {
-                "key": "policy",
-                "label": "Do you have written information security policies, approved by your leadership and reviewed each year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "training",
-                "label": "Do your staff complete security awareness training when they join and each year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "background",
-                "label": "Are staff who can reach our information checked before they start, as the law allows?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "access",
-            "title": "Access",
-            "questions": [
-              {
-                "key": "mfa",
-                "label": "Does everyone who can reach our information or systems sign in with a second factor?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "privileged",
-                "label": "Is administrator access limited to named people, and reviewed at least every quarter?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "access_removed",
-                "label": "Is a person's access removed within a day of their leaving, or no longer needing it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "sso",
-                "label": "Can our people sign in to your service with our own identity provider?",
-                "type": "yes_no",
-                "required": true
-              }
-            ]
-          },
-          {
-            "key": "data",
-            "title": "Our information",
-            "questions": [
-              {
-                "key": "encryption_rest",
-                "label": "Is our information encrypted where it is stored?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "encryption_transit",
-                "label": "Is it encrypted whenever it is sent over a network?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "us_only",
-                "label": "Is our information stored and reached only from within the United States?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "locations",
-                "label": "Where is it stored or reached from, outside the United States?",
-                "type": "text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.us_only",
-                  "op": "eq",
-                  "value": false
-                }
-              },
-              {
-                "key": "return_destroy",
-                "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "operations",
-            "title": "Operations",
-            "questions": [
-              {
-                "key": "patching",
-                "label": "How soon are critical security updates applied to the systems that hold our information?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "week",
-                    "label": "Within a week"
-                  },
-                  {
-                    "key": "month",
-                    "label": "Within a month"
-                  },
-                  {
-                    "key": "longer",
-                    "label": "Longer, or it varies",
-                    "concern": true
-                  }
-                ]
-              },
-              {
-                "key": "logging",
-                "label": "Are access to our information and changes to your systems logged, and the logs kept at least a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "backups",
-                "label": "Is our information backed up, and is restoring it tested at least once a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "incidents",
-            "title": "Incidents",
-            "questions": [
-              {
-                "key": "ir_plan",
-                "label": "Do you have an incident response plan, tested in the last year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "breach_notice",
-                "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "breach_last",
-                "label": "Have you had a security incident that had to be reported to customers or regulators in the last three years?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": true
-              },
-              {
-                "key": "breach_detail",
-                "label": "What happened, and what changed afterwards?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.breach_last",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
-          {
-            "key": "others",
-            "title": "Others you use",
-            "questions": [
-              {
-                "key": "subprocessors",
-                "label": "Do others you use (subcontractors or cloud providers) hold or reach our information?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "subprocessor_list",
-                "label": "Who are they, and what does each do?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.subprocessors",
-                  "op": "eq",
-                  "value": true
-                }
-              },
-              {
-                "key": "subprocessor_terms",
-                "label": "Do they agree to terms at least as strict as yours with us?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false,
-                "show_when": {
-                  "field": "answers.subprocessors",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          }
+       },
+       {
+        "key": "people",
+        "label": "About how many people does it hold records about?",
+        "type": "choice",
+        "show_when": {
+         "field": "answers.information",
+         "op": "in",
+         "value": [
+          "internal",
+          "confidential",
+          "restricted"
+         ]
+        },
+        "help": "A breach of health information about 500 or more people must be reported at once, and to the press.",
+        "options": [
+         {
+          "key": "none",
+          "label": "It holds no records about people"
+         },
+         {
+          "key": "few",
+          "label": "Fewer than 500"
+         },
+         {
+          "key": "many",
+          "label": "500 or more"
+         }
         ]
-      }
-    },
-    {
-      "key": "due-diligence-full",
-      "title": "Due diligence: full",
-      "summary": "The full security questionnaire, for a third party that holds restricted or regulated information or is relied on for critical work.",
-      "purpose": "due_diligence",
-      "document": {
-        "sections": [
-          {
-            "key": "about",
-            "title": "About you",
-            "questions": [
-              {
-                "key": "security_contact",
-                "label": "Who answers for information security, and how can they be reached?",
-                "type": "text",
-                "required": true,
-                "help": "A name or role, and an email address."
-              },
-              {
-                "key": "certifications",
-                "label": "Which independent reports or certifications cover the service you provide to us?",
-                "type": "choices",
-                "required": true,
-                "help": "Choose each that is current. You can be asked for a copy.",
-                "options": [
-                  {
-                    "key": "soc2_type2",
-                    "label": "SOC 2 Type II report"
-                  },
-                  {
-                    "key": "soc2_type1",
-                    "label": "SOC 2 Type I report"
-                  },
-                  {
-                    "key": "iso27001",
-                    "label": "ISO/IEC 27001 certificate"
-                  },
-                  {
-                    "key": "hitrust",
-                    "label": "HITRUST certification"
-                  },
-                  {
-                    "key": "fedramp",
-                    "label": "FedRAMP authorization"
-                  },
-                  {
-                    "key": "pci",
-                    "label": "PCI DSS attestation of compliance"
-                  },
-                  {
-                    "key": "pentest",
-                    "label": "A penetration test by an independent firm in the last 12 months"
-                  },
-                  {
-                    "key": "none",
-                    "label": "None of these",
-                    "concern": true
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "governance",
-            "title": "Governance",
-            "questions": [
-              {
-                "key": "policy",
-                "label": "Do you have written information security policies, approved by your leadership and reviewed each year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "security_lead",
-                "label": "Is a named person accountable for information security across your organization?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "risk_assessment",
-                "label": "Do you assess the risks to the information you hold at least once a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "training",
-                "label": "Do your staff complete security awareness training when they join and each year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "background",
-                "label": "Are staff who can reach our information checked before they start, as the law allows?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "insurance",
-                "label": "Do you carry cyber liability insurance?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "access",
-            "title": "Access",
-            "questions": [
-              {
-                "key": "mfa",
-                "label": "Does everyone who can reach our information or systems sign in with a second factor?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "mfa_admin",
-                "label": "Do administrators use a second factor that resists phishing, such as a security key?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "privileged",
-                "label": "Is administrator access limited to named people, and reviewed at least every quarter?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "access_review",
-                "label": "Is everyone's access to our information reviewed at least twice a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "access_removed",
-                "label": "Is a person's access removed within a day of their leaving, or no longer needing it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "sso",
-                "label": "Can our people sign in to your service with our own identity provider?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "remote_into_us",
-                "label": "Will your staff reach our network or systems remotely?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "remote_how",
-                "label": "How, and how is that access controlled and recorded?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.remote_into_us",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
-          {
-            "key": "data",
-            "title": "Our information",
-            "questions": [
-              {
-                "key": "encryption_rest",
-                "label": "Is our information encrypted where it is stored, with keys you manage separately from the data?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "encryption_transit",
-                "label": "Is it encrypted whenever it is sent over a network?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "segregated",
-                "label": "Is our information kept apart from other customers' so that none of them can reach it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "us_only",
-                "label": "Is our information stored and reached only from within the United States?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "locations",
-                "label": "Where is it stored or reached from, outside the United States?",
-                "type": "text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.us_only",
-                  "op": "eq",
-                  "value": false
-                }
-              },
-              {
-                "key": "use_limited",
-                "label": "Is our information used only to provide the service to us, and never to train models or for other customers?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "return_destroy",
-                "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "health",
-            "title": "Health information",
-            "questions": [
-              {
-                "key": "phi",
-                "label": "Will you create, receive, keep, or send protected health information on our behalf?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "baa",
-                "label": "Will you sign a business associate agreement with us?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false,
-                "show_when": {
-                  "field": "answers.phi",
-                  "op": "eq",
-                  "value": true
-                }
-              },
-              {
-                "key": "hipaa_assessment",
-                "label": "Have you assessed your compliance with the HIPAA Security Rule in the last year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false,
-                "show_when": {
-                  "field": "answers.phi",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
-          {
-            "key": "development",
-            "title": "Building and changing your service",
-            "questions": [
-              {
-                "key": "sdlc",
-                "label": "Is security reviewed as your service is designed and changed, with code reviewed before release?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "pentest",
-                "label": "Has an independent firm tested your service for weaknesses in the last 12 months, and were the serious findings fixed?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "change",
-                "label": "Are changes to the systems that hold our information approved and recorded?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "operations",
-            "title": "Operations",
-            "questions": [
-              {
-                "key": "patching",
-                "label": "How soon are critical security updates applied to the systems that hold our information?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "week",
-                    "label": "Within a week"
-                  },
-                  {
-                    "key": "month",
-                    "label": "Within a month"
-                  },
-                  {
-                    "key": "longer",
-                    "label": "Longer, or it varies",
-                    "concern": true
-                  }
-                ]
-              },
-              {
-                "key": "vuln_scanning",
-                "label": "Do you scan those systems for weaknesses at least every month?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "malware",
-                "label": "Do your computers and servers have protection against malicious software that is kept current?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "logging",
-                "label": "Are access to our information and changes to your systems logged, and the logs kept at least a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "monitoring",
-                "label": "Are the logs watched for signs of attack at all hours?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              }
-            ]
-          },
-          {
-            "key": "incidents",
-            "title": "Incidents",
-            "questions": [
-              {
-                "key": "ir_plan",
-                "label": "Do you have an incident response plan, tested in the last year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "breach_notice",
-                "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "breach_last",
-                "label": "Have you had a security incident that had to be reported to customers or regulators in the last three years?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": true
-              },
-              {
-                "key": "breach_detail",
-                "label": "What happened, and what changed afterwards?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.breach_last",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
-          {
-            "key": "continuity",
-            "title": "Continuity",
-            "questions": [
-              {
-                "key": "backups",
-                "label": "Is our information backed up to a separate place, and is restoring it tested at least once a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "bc_plan",
-                "label": "Do you have a plan to keep the service running through a disaster, tested in the last year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false
-              },
-              {
-                "key": "recovery",
-                "label": "How soon could the service be running again after losing its main site?",
-                "type": "choice",
-                "required": true,
-                "options": [
-                  {
-                    "key": "day",
-                    "label": "Within a day"
-                  },
-                  {
-                    "key": "week",
-                    "label": "Within a week"
-                  },
-                  {
-                    "key": "longer",
-                    "label": "Longer, or it is not known",
-                    "concern": true
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "others",
-            "title": "Others you use",
-            "questions": [
-              {
-                "key": "subprocessors",
-                "label": "Do others you use (subcontractors or cloud providers) hold or reach our information?",
-                "type": "yes_no",
-                "required": true
-              },
-              {
-                "key": "subprocessor_list",
-                "label": "Who are they, and what does each do?",
-                "type": "long_text",
-                "required": true,
-                "show_when": {
-                  "field": "answers.subprocessors",
-                  "op": "eq",
-                  "value": true
-                }
-              },
-              {
-                "key": "subprocessor_terms",
-                "label": "Do they agree to terms at least as strict as yours with us?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false,
-                "show_when": {
-                  "field": "answers.subprocessors",
-                  "op": "eq",
-                  "value": true
-                }
-              },
-              {
-                "key": "subprocessor_review",
-                "label": "Do you review their security at least once a year?",
-                "type": "yes_no",
-                "required": true,
-                "concern_if": false,
-                "show_when": {
-                  "field": "answers.subprocessors",
-                  "op": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
-          {
-            "key": "more",
-            "title": "Anything else",
-            "questions": [
-              {
-                "key": "notes",
-                "label": "Is there anything else we should know?",
-                "type": "long_text",
-                "required": false
-              }
-            ]
-          }
+       }
+      ]
+     },
+     {
+      "key": "access",
+      "title": "Access",
+      "questions": [
+       {
+        "key": "access",
+        "label": "How will it reach the organization?",
+        "type": "choices",
+        "required": true,
+        "options": [
+         {
+          "key": "privileged",
+          "label": "Administrator or privileged access to the organization's systems"
+         },
+         {
+          "key": "remote",
+          "label": "Remote access to the network or to systems"
+         },
+         {
+          "key": "accounts",
+          "label": "Accounts in the organization's identity system"
+         },
+         {
+          "key": "integration",
+          "label": "A connection that sends or receives the organization's data"
+         },
+         {
+          "key": "on_site",
+          "label": "Work on the premises"
+         },
+         {
+          "key": "physical",
+          "label": "Unescorted access to laboratories, the clinic, or equipment rooms"
+         },
+         {
+          "key": "no_access",
+          "label": "None of these"
+         }
         ]
-      }
-    }
-  ]
+       }
+      ]
+     },
+     {
+      "key": "dependence",
+      "title": "Dependence",
+      "questions": [
+       {
+        "key": "dependency",
+        "label": "If it stopped tomorrow, what would happen to the work that relies on it?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "stops",
+          "label": "Critical research, care, or operations would stop within a day"
+         },
+         {
+          "key": "slows",
+          "label": "Work would slow, and could be kept going another way for weeks"
+         },
+         {
+          "key": "little",
+          "label": "Little: it could be replaced without much trouble"
+         }
+        ]
+       },
+       {
+        "key": "subcontractors",
+        "label": "Does it pass the organization's information or access on to others it uses?",
+        "type": "yes_no"
+       },
+       {
+        "key": "offshore",
+        "label": "Is any of the organization's information held or reached from outside the United States?",
+        "type": "yes_no",
+        "show_when": {
+         "field": "answers.information",
+         "op": "in",
+         "value": [
+          "internal",
+          "confidential",
+          "restricted"
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "due-diligence-short",
+   "title": "Due diligence: short",
+   "summary": "Eight questions for a third party with little at stake: how it protects what it holds, and what it does when something goes wrong.",
+   "purpose": "due_diligence",
+   "document": {
+    "sections": [
+     {
+      "key": "about",
+      "title": "About you",
+      "questions": [
+       {
+        "key": "security_contact",
+        "label": "Who answers for information security, and how can they be reached?",
+        "type": "text",
+        "required": true,
+        "help": "A name or role, and an email address."
+       },
+       {
+        "key": "certifications",
+        "label": "Which independent reports or certifications cover the service you provide to us?",
+        "type": "choices",
+        "required": true,
+        "help": "Choose each that is current. You can be asked for a copy.",
+        "options": [
+         {
+          "key": "soc2_type2",
+          "label": "SOC 2 Type II report"
+         },
+         {
+          "key": "soc2_type1",
+          "label": "SOC 2 Type I report"
+         },
+         {
+          "key": "iso27001",
+          "label": "ISO/IEC 27001 certificate"
+         },
+         {
+          "key": "hitrust",
+          "label": "HITRUST certification"
+         },
+         {
+          "key": "fedramp",
+          "label": "FedRAMP authorization"
+         },
+         {
+          "key": "pci",
+          "label": "PCI DSS attestation of compliance"
+         },
+         {
+          "key": "pentest",
+          "label": "A penetration test by an independent firm in the last 12 months"
+         },
+         {
+          "key": "none",
+          "label": "None of these",
+          "concern": true
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "key": "protection",
+      "title": "Protecting our information",
+      "questions": [
+       {
+        "key": "mfa",
+        "label": "Does everyone who can reach our information or systems sign in with a second factor?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "encryption",
+        "label": "Is our information encrypted when it is stored and when it is sent?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "access_removed",
+        "label": "Is a person's access removed when they leave, or no longer need it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "breach_notice",
+        "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "return_destroy",
+        "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "more",
+      "title": "Anything else",
+      "questions": [
+       {
+        "key": "notes",
+        "label": "Is there anything else we should know?",
+        "type": "long_text",
+        "required": false
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "due-diligence-standard",
+   "title": "Due diligence: standard",
+   "summary": "A security questionnaire for a third party that holds confidential information or reaches systems.",
+   "purpose": "due_diligence",
+   "document": {
+    "sections": [
+     {
+      "key": "about",
+      "title": "About you",
+      "questions": [
+       {
+        "key": "security_contact",
+        "label": "Who answers for information security, and how can they be reached?",
+        "type": "text",
+        "required": true,
+        "help": "A name or role, and an email address."
+       },
+       {
+        "key": "certifications",
+        "label": "Which independent reports or certifications cover the service you provide to us?",
+        "type": "choices",
+        "required": true,
+        "help": "Choose each that is current. You can be asked for a copy.",
+        "options": [
+         {
+          "key": "soc2_type2",
+          "label": "SOC 2 Type II report"
+         },
+         {
+          "key": "soc2_type1",
+          "label": "SOC 2 Type I report"
+         },
+         {
+          "key": "iso27001",
+          "label": "ISO/IEC 27001 certificate"
+         },
+         {
+          "key": "hitrust",
+          "label": "HITRUST certification"
+         },
+         {
+          "key": "fedramp",
+          "label": "FedRAMP authorization"
+         },
+         {
+          "key": "pci",
+          "label": "PCI DSS attestation of compliance"
+         },
+         {
+          "key": "pentest",
+          "label": "A penetration test by an independent firm in the last 12 months"
+         },
+         {
+          "key": "none",
+          "label": "None of these",
+          "concern": true
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "key": "program",
+      "title": "Your security program",
+      "questions": [
+       {
+        "key": "policy",
+        "label": "Do you have written information security policies, approved by your leadership and reviewed each year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "training",
+        "label": "Do your staff complete security awareness training when they join and each year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "background",
+        "label": "Are staff who can reach our information checked before they start, as the law allows?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "access",
+      "title": "Access",
+      "questions": [
+       {
+        "key": "mfa",
+        "label": "Does everyone who can reach our information or systems sign in with a second factor?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "privileged",
+        "label": "Is administrator access limited to named people, and reviewed at least every quarter?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "access_removed",
+        "label": "Is a person's access removed within a day of their leaving, or no longer needing it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "sso",
+        "label": "Can our people sign in to your service with our own identity provider?",
+        "type": "yes_no",
+        "required": true
+       }
+      ]
+     },
+     {
+      "key": "data",
+      "title": "Our information",
+      "questions": [
+       {
+        "key": "encryption_rest",
+        "label": "Is our information encrypted where it is stored?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "encryption_transit",
+        "label": "Is it encrypted whenever it is sent over a network?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "us_only",
+        "label": "Is our information stored and reached only from within the United States?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "locations",
+        "label": "Where is it stored or reached from, outside the United States?",
+        "type": "text",
+        "required": true,
+        "show_when": {
+         "field": "answers.us_only",
+         "op": "eq",
+         "value": false
+        }
+       },
+       {
+        "key": "return_destroy",
+        "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "operations",
+      "title": "Operations",
+      "questions": [
+       {
+        "key": "patching",
+        "label": "How soon are critical security updates applied to the systems that hold our information?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "week",
+          "label": "Within a week"
+         },
+         {
+          "key": "month",
+          "label": "Within a month"
+         },
+         {
+          "key": "longer",
+          "label": "Longer, or it varies",
+          "concern": true
+         }
+        ]
+       },
+       {
+        "key": "logging",
+        "label": "Are access to our information and changes to your systems logged, and the logs kept at least a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "backups",
+        "label": "Is our information backed up, and is restoring it tested at least once a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "incidents",
+      "title": "Incidents",
+      "questions": [
+       {
+        "key": "ir_plan",
+        "label": "Do you have an incident response plan, tested in the last year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "breach_notice",
+        "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "breach_last",
+        "label": "Have you had a security incident that had to be reported to customers or regulators in the last three years?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": true
+       },
+       {
+        "key": "breach_detail",
+        "label": "What happened, and what changed afterwards?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.breach_last",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     },
+     {
+      "key": "others",
+      "title": "Others you use",
+      "questions": [
+       {
+        "key": "subprocessors",
+        "label": "Do others you use (subcontractors or cloud providers) hold or reach our information?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "subprocessor_list",
+        "label": "Who are they, and what does each do?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.subprocessors",
+         "op": "eq",
+         "value": true
+        }
+       },
+       {
+        "key": "subprocessor_terms",
+        "label": "Do they agree to terms at least as strict as yours with us?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false,
+        "show_when": {
+         "field": "answers.subprocessors",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "due-diligence-full",
+   "title": "Due diligence: full",
+   "summary": "The full security questionnaire, for a third party that holds restricted or regulated information or is relied on for critical work.",
+   "purpose": "due_diligence",
+   "document": {
+    "sections": [
+     {
+      "key": "about",
+      "title": "About you",
+      "questions": [
+       {
+        "key": "security_contact",
+        "label": "Who answers for information security, and how can they be reached?",
+        "type": "text",
+        "required": true,
+        "help": "A name or role, and an email address."
+       },
+       {
+        "key": "certifications",
+        "label": "Which independent reports or certifications cover the service you provide to us?",
+        "type": "choices",
+        "required": true,
+        "help": "Choose each that is current. You can be asked for a copy.",
+        "options": [
+         {
+          "key": "soc2_type2",
+          "label": "SOC 2 Type II report"
+         },
+         {
+          "key": "soc2_type1",
+          "label": "SOC 2 Type I report"
+         },
+         {
+          "key": "iso27001",
+          "label": "ISO/IEC 27001 certificate"
+         },
+         {
+          "key": "hitrust",
+          "label": "HITRUST certification"
+         },
+         {
+          "key": "fedramp",
+          "label": "FedRAMP authorization"
+         },
+         {
+          "key": "pci",
+          "label": "PCI DSS attestation of compliance"
+         },
+         {
+          "key": "pentest",
+          "label": "A penetration test by an independent firm in the last 12 months"
+         },
+         {
+          "key": "none",
+          "label": "None of these",
+          "concern": true
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "key": "governance",
+      "title": "Governance",
+      "questions": [
+       {
+        "key": "policy",
+        "label": "Do you have written information security policies, approved by your leadership and reviewed each year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "security_lead",
+        "label": "Is a named person accountable for information security across your organization?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "risk_assessment",
+        "label": "Do you assess the risks to the information you hold at least once a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "training",
+        "label": "Do your staff complete security awareness training when they join and each year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "background",
+        "label": "Are staff who can reach our information checked before they start, as the law allows?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "insurance",
+        "label": "Do you carry cyber liability insurance?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "access",
+      "title": "Access",
+      "questions": [
+       {
+        "key": "mfa",
+        "label": "Does everyone who can reach our information or systems sign in with a second factor?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "mfa_admin",
+        "label": "Do administrators use a second factor that resists phishing, such as a security key?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "privileged",
+        "label": "Is administrator access limited to named people, and reviewed at least every quarter?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "access_review",
+        "label": "Is everyone's access to our information reviewed at least twice a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "access_removed",
+        "label": "Is a person's access removed within a day of their leaving, or no longer needing it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "sso",
+        "label": "Can our people sign in to your service with our own identity provider?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "remote_into_us",
+        "label": "Will your staff reach our network or systems remotely?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "remote_how",
+        "label": "How, and how is that access controlled and recorded?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.remote_into_us",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     },
+     {
+      "key": "data",
+      "title": "Our information",
+      "questions": [
+       {
+        "key": "encryption_rest",
+        "label": "Is our information encrypted where it is stored, with keys you manage separately from the data?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "encryption_transit",
+        "label": "Is it encrypted whenever it is sent over a network?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "segregated",
+        "label": "Is our information kept apart from other customers' so that none of them can reach it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "us_only",
+        "label": "Is our information stored and reached only from within the United States?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "locations",
+        "label": "Where is it stored or reached from, outside the United States?",
+        "type": "text",
+        "required": true,
+        "show_when": {
+         "field": "answers.us_only",
+         "op": "eq",
+         "value": false
+        }
+       },
+       {
+        "key": "use_limited",
+        "label": "Is our information used only to provide the service to us, and never to train models or for other customers?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "return_destroy",
+        "label": "At the end of the work, will you return or destroy our information and confirm it in writing?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "health",
+      "title": "Health information",
+      "questions": [
+       {
+        "key": "phi",
+        "label": "Will you create, receive, keep, or send protected health information on our behalf?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "baa",
+        "label": "Will you sign a business associate agreement with us?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false,
+        "show_when": {
+         "field": "answers.phi",
+         "op": "eq",
+         "value": true
+        }
+       },
+       {
+        "key": "hipaa_assessment",
+        "label": "Have you assessed your compliance with the HIPAA Security Rule in the last year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false,
+        "show_when": {
+         "field": "answers.phi",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     },
+     {
+      "key": "development",
+      "title": "Building and changing your service",
+      "questions": [
+       {
+        "key": "sdlc",
+        "label": "Is security reviewed as your service is designed and changed, with code reviewed before release?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "pentest",
+        "label": "Has an independent firm tested your service for weaknesses in the last 12 months, and were the serious findings fixed?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "change",
+        "label": "Are changes to the systems that hold our information approved and recorded?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "operations",
+      "title": "Operations",
+      "questions": [
+       {
+        "key": "patching",
+        "label": "How soon are critical security updates applied to the systems that hold our information?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "week",
+          "label": "Within a week"
+         },
+         {
+          "key": "month",
+          "label": "Within a month"
+         },
+         {
+          "key": "longer",
+          "label": "Longer, or it varies",
+          "concern": true
+         }
+        ]
+       },
+       {
+        "key": "vuln_scanning",
+        "label": "Do you scan those systems for weaknesses at least every month?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "malware",
+        "label": "Do your computers and servers have protection against malicious software that is kept current?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "logging",
+        "label": "Are access to our information and changes to your systems logged, and the logs kept at least a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "monitoring",
+        "label": "Are the logs watched for signs of attack at all hours?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       }
+      ]
+     },
+     {
+      "key": "incidents",
+      "title": "Incidents",
+      "questions": [
+       {
+        "key": "ir_plan",
+        "label": "Do you have an incident response plan, tested in the last year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "breach_notice",
+        "label": "Will you tell us of an incident that affects our information within 72 hours of finding it?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "breach_last",
+        "label": "Have you had a security incident that had to be reported to customers or regulators in the last three years?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": true
+       },
+       {
+        "key": "breach_detail",
+        "label": "What happened, and what changed afterwards?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.breach_last",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     },
+     {
+      "key": "continuity",
+      "title": "Continuity",
+      "questions": [
+       {
+        "key": "backups",
+        "label": "Is our information backed up to a separate place, and is restoring it tested at least once a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "bc_plan",
+        "label": "Do you have a plan to keep the service running through a disaster, tested in the last year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false
+       },
+       {
+        "key": "recovery",
+        "label": "How soon could the service be running again after losing its main site?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "day",
+          "label": "Within a day"
+         },
+         {
+          "key": "week",
+          "label": "Within a week"
+         },
+         {
+          "key": "longer",
+          "label": "Longer, or it is not known",
+          "concern": true
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "key": "others",
+      "title": "Others you use",
+      "questions": [
+       {
+        "key": "subprocessors",
+        "label": "Do others you use (subcontractors or cloud providers) hold or reach our information?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "subprocessor_list",
+        "label": "Who are they, and what does each do?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.subprocessors",
+         "op": "eq",
+         "value": true
+        }
+       },
+       {
+        "key": "subprocessor_terms",
+        "label": "Do they agree to terms at least as strict as yours with us?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false,
+        "show_when": {
+         "field": "answers.subprocessors",
+         "op": "eq",
+         "value": true
+        }
+       },
+       {
+        "key": "subprocessor_review",
+        "label": "Do you review their security at least once a year?",
+        "type": "yes_no",
+        "required": true,
+        "concern_if": false,
+        "show_when": {
+         "field": "answers.subprocessors",
+         "op": "eq",
+         "value": true
+        }
+       }
+      ]
+     },
+     {
+      "key": "more",
+      "title": "Anything else",
+      "questions": [
+       {
+        "key": "notes",
+        "label": "Is there anything else we should know?",
+        "type": "long_text",
+        "required": false
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "key": "privacy-impact",
+   "title": "Privacy impact assessment",
+   "purpose": "privacy_impact",
+   "summary": "Whoever answers for a process or a system that handles sensitive information says what it handles about people, why, who it is shared with, how long it is kept, and what could go wrong for the people it is about.",
+   "document": {
+    "sections": [
+     {
+      "key": "what",
+      "title": "What it handles about people",
+      "questions": [
+       {
+        "key": "information",
+        "label": "What information about people does it handle?",
+        "type": "choices",
+        "required": true,
+        "options": [
+         {
+          "key": "contact",
+          "label": "Names and contact details"
+         },
+         {
+          "key": "identifiers",
+          "label": "Social Security, license, or account numbers"
+         },
+         {
+          "key": "health",
+          "label": "Health information"
+         },
+         {
+          "key": "genetic",
+          "label": "Genetic or biometric information"
+         },
+         {
+          "key": "financial",
+          "label": "Financial or payment information"
+         },
+         {
+          "key": "research",
+          "label": "Information about research participants"
+         },
+         {
+          "key": "children",
+          "label": "Information about children"
+         },
+         {
+          "key": "location",
+          "label": "Where people are, or have been"
+         }
+        ]
+       },
+       {
+        "key": "whose",
+        "label": "Whose information is it?",
+        "type": "choices",
+        "required": true,
+        "options": [
+         {
+          "key": "patients",
+          "label": "Patients"
+         },
+         {
+          "key": "participants",
+          "label": "Research participants"
+         },
+         {
+          "key": "staff",
+          "label": "Staff"
+         },
+         {
+          "key": "students",
+          "label": "Students and trainees"
+         },
+         {
+          "key": "donors",
+          "label": "Donors"
+         },
+         {
+          "key": "public",
+          "label": "Members of the public"
+         }
+        ]
+       },
+       {
+        "key": "how_many",
+        "label": "About how many people's information does it hold?",
+        "type": "number",
+        "required": true
+       }
+      ]
+     },
+     {
+      "key": "why",
+      "title": "Why it is needed",
+      "questions": [
+       {
+        "key": "purpose",
+        "label": "What is it used for?",
+        "type": "long_text",
+        "required": true
+       },
+       {
+        "key": "basis",
+        "label": "On what basis is it collected and used?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "consent",
+          "label": "The people it is about agreed to it"
+         },
+         {
+          "key": "care",
+          "label": "Treatment, payment, or health care operations"
+         },
+         {
+          "key": "protocol",
+          "label": "A research protocol, with consent or an approved waiver"
+         },
+         {
+          "key": "contract",
+          "label": "A contract or employment"
+         },
+         {
+          "key": "law",
+          "label": "A law or regulation requires it"
+         },
+         {
+          "key": "other",
+          "label": "Something else"
+         }
+        ]
+       },
+       {
+        "key": "basis_other",
+        "label": "What basis?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.basis",
+         "op": "eq",
+         "value": "other"
+        }
+       },
+       {
+        "key": "least",
+        "label": "Does it collect only what the purpose needs?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "least_why",
+        "label": "What more does it collect, and why?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.least",
+         "op": "eq",
+         "value": false
+        }
+       }
+      ]
+     },
+     {
+      "key": "sharing",
+      "title": "Who else sees it",
+      "questions": [
+       {
+        "key": "shared",
+        "label": "Is any of it shared outside the organization?",
+        "type": "yes_no",
+        "required": true
+       },
+       {
+        "key": "shared_with",
+        "label": "With whom, and why?",
+        "type": "long_text",
+        "required": true,
+        "show_when": {
+         "field": "answers.shared",
+         "op": "eq",
+         "value": true
+        }
+       },
+       {
+        "key": "agreement",
+        "label": "What covers the sharing?",
+        "type": "choice",
+        "required": true,
+        "show_when": {
+         "field": "answers.shared",
+         "op": "eq",
+         "value": true
+        },
+        "options": [
+         {
+          "key": "business_associate",
+          "label": "A business associate agreement"
+         },
+         {
+          "key": "data_use",
+          "label": "A data use agreement"
+         },
+         {
+          "key": "contract",
+          "label": "A contract with privacy terms"
+         },
+         {
+          "key": "none",
+          "label": "Nothing yet"
+         }
+        ]
+       },
+       {
+        "key": "access",
+        "label": "Can only those who need it see it?",
+        "type": "yes_no",
+        "required": true
+       }
+      ]
+     },
+     {
+      "key": "keeping",
+      "title": "Keeping it, and letting it go",
+      "questions": [
+       {
+        "key": "retention",
+        "label": "How long is it kept, and what happens to it then?",
+        "type": "long_text",
+        "required": true
+       },
+       {
+        "key": "deidentified",
+        "label": "Is it de-identified where it can be?",
+        "type": "choice",
+        "required": true,
+        "options": [
+         {
+          "key": "yes",
+          "label": "Yes"
+         },
+         {
+          "key": "partly",
+          "label": "Partly"
+         },
+         {
+          "key": "no",
+          "label": "No"
+         },
+         {
+          "key": "cannot",
+          "label": "It cannot be, for this purpose"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "key": "harm",
+      "title": "What could go wrong for the people it is about",
+      "questions": [
+       {
+        "key": "harms",
+        "label": "What could happen to them if it were lost, misused, or wrong?",
+        "type": "long_text",
+        "required": true
+       },
+       {
+        "key": "reduced",
+        "label": "What is done to make that less likely, or less harmful?",
+        "type": "long_text",
+        "required": true
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
 }

@@ -14,6 +14,7 @@ import { toast } from "../components/toast.js";
 import { controlsTab, treatmentTab } from "../components/treatment.js";
 import { alert, card, emptyState } from "../components/ui.js";
 import { amount, readingChart, statePill as indicatorPill, trendWord } from "../components/indicator.js";
+import { incidentsCard } from "../components/incident-links.js";
 import { show } from "./page.js";
 import { facts, ownersCard, prose, recordHeader, tabBar, timeline } from "./record.js";
 
@@ -94,6 +95,7 @@ function overview(risk, ctx) {
         ["Escalated to", escalated ? h("div", {}, escalated.name, h("div", { class: "cell-sub" }, risk.escalation_reason)) : null],
         ["Next review", risk.next_review_on ? h("span", { class: risk.review_overdue ? "overdue" : "" }, date(risk.next_review_on)) : null],
       ])),
+      incidentsCard(risk.incidents),
       ownersCard(risk, ctx)));
 }
 

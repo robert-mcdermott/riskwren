@@ -7,6 +7,12 @@
             "maxLength": 20,
             "title": "Accent",
             "type": "string"
+          },
+          "accent_dark": {
+            "default": "",
+            "maxLength": 20,
+            "title": "Accent Dark",
+            "type": "string"
           }
         },
         "required": [
@@ -481,6 +487,19 @@
         "title": "AnalysisBody",
         "type": "object"
       },
+      "AnonymousSetting": {
+        "properties": {
+          "open": {
+            "title": "Open",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "open"
+        ],
+        "title": "AnonymousSetting",
+        "type": "object"
+      },
       "AskBody": {
         "properties": {
           "assignee": {
@@ -641,6 +660,47 @@
             "title": "Accent",
             "type": "string"
           },
+          "accent_dark": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent Dark"
+          },
+          "email_footer": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Footer"
+          },
+          "footer_links": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Footer Links"
+          },
           "organization_name": {
             "default": "",
             "maxLength": 400,
@@ -658,15 +718,33 @@
             "type": "string"
           },
           "rating_ramp": {
-            "default": "ordinal",
-            "maxLength": 20,
-            "title": "Rating Ramp",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Ramp"
           },
           "show_powered_by": {
             "default": true,
             "title": "Show Powered By",
             "type": "boolean"
+          },
+          "sign_in_message": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sign In Message"
           }
         },
         "required": [
@@ -674,6 +752,102 @@
           "palette"
         ],
         "title": "BrandingBody",
+        "type": "object"
+      },
+      "BreachBody": {
+        "properties": {
+          "conclusion": {
+            "default": "undecided",
+            "description": "undecided, notify, or no_notification",
+            "title": "Conclusion",
+            "type": "string"
+          },
+          "discovered_at": {
+            "description": "When it was discovered: the clock starts then",
+            "title": "Discovered At",
+            "type": "string"
+          },
+          "exception": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "workforce, authorized, or could_not_retain",
+            "title": "Exception"
+          },
+          "factors": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FactorBody"
+            },
+            "title": "Factors",
+            "type": "object"
+          },
+          "information": {
+            "description": "From the protected_information vocabulary",
+            "items": {
+              "type": "string"
+            },
+            "title": "Information",
+            "type": "array"
+          },
+          "most_in_one_state": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The most of them living in any one state or jurisdiction",
+            "title": "Most In One State"
+          },
+          "people": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "About how many people it concerns",
+            "title": "People"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "regimes": {
+            "items": {
+              "$ref": "#/components/schemas/RegimeBody"
+            },
+            "title": "Regimes",
+            "type": "array"
+          },
+          "secured": {
+            "default": false,
+            "description": "Unusable, unreadable, or indecipherable",
+            "title": "Secured",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "discovered_at"
+        ],
+        "title": "BreachBody",
         "type": "object"
       },
       "CallReviewBody": {
@@ -802,6 +976,55 @@
         "title": "CancelBody",
         "type": "object"
       },
+      "CapabilityBody": {
+        "properties": {
+          "basis": {
+            "description": "What that rests on",
+            "maxLength": 8000,
+            "title": "Basis",
+            "type": "string"
+          },
+          "data_loss_hours": {
+            "default": 0,
+            "description": "How much information it can lose; none for a site",
+            "title": "Data Loss Hours",
+            "type": "integer"
+          },
+          "recovery_hours": {
+            "description": "What it can be restored within",
+            "title": "Recovery Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recovery_hours",
+          "basis"
+        ],
+        "title": "CapabilityBody",
+        "type": "object"
+      },
+      "CaseBody": {
+        "properties": {
+          "members": {
+            "description": "Accounts named on it, besides its handlers",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "restricted": {
+            "description": "True: only those named on it know it exists",
+            "title": "Restricted",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "restricted"
+        ],
+        "title": "CaseBody",
+        "type": "object"
+      },
       "CategoryBody": {
         "properties": {
           "appetite": {
@@ -891,6 +1114,42 @@
           "root_cause"
         ],
         "title": "ClosureBody",
+        "type": "object"
+      },
+      "CodeBody": {
+        "properties": {
+          "code": {
+            "description": "The follow-up code the reporter was given",
+            "maxLength": 100,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "CodeBody",
+        "type": "object"
+      },
+      "CodeMessageBody": {
+        "properties": {
+          "body": {
+            "maxLength": 20000,
+            "title": "Body",
+            "type": "string"
+          },
+          "code": {
+            "description": "The follow-up code the reporter was given",
+            "maxLength": 100,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "body"
+        ],
+        "title": "CodeMessageBody",
         "type": "object"
       },
       "ConcludeBody": {
@@ -1190,23 +1449,6 @@
           }
         },
         "title": "ControlBody",
-        "type": "object"
-      },
-      "CoversBody": {
-        "properties": {
-          "covers": {
-            "description": "The references of the systems, information, and scopes",
-            "items": {
-              "type": "string"
-            },
-            "title": "Covers",
-            "type": "array"
-          }
-        },
-        "required": [
-          "covers"
-        ],
-        "title": "CoversBody",
         "type": "object"
       },
       "DemoSignIn": {
@@ -1988,6 +2230,70 @@
         "title": "Excuse",
         "type": "object"
       },
+      "ExerciseBody": {
+        "properties": {
+          "achieved_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How long recovery took",
+            "title": "Achieved Hours"
+          },
+          "held_on": {
+            "description": "The day it was held",
+            "title": "Held On",
+            "type": "string"
+          },
+          "kind": {
+            "description": "tabletop, walkthrough, simulation, or full",
+            "title": "Kind",
+            "type": "string"
+          },
+          "outcome": {
+            "description": "What happened",
+            "maxLength": 20000,
+            "title": "Outcome",
+            "type": "string"
+          },
+          "participants": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participants"
+          },
+          "result": {
+            "description": "met, partly, or not_met: its recovery objectives",
+            "title": "Result",
+            "type": "string"
+          },
+          "scenario": {
+            "description": "What was tried",
+            "maxLength": 20000,
+            "title": "Scenario",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "held_on",
+          "scenario",
+          "outcome",
+          "result"
+        ],
+        "title": "ExerciseBody",
+        "type": "object"
+      },
       "ExternalRefBody": {
         "description": "What a record is called in another system.",
         "properties": {
@@ -2007,6 +2313,36 @@
           "value"
         ],
         "title": "ExternalRefBody",
+        "type": "object"
+      },
+      "FactorBody": {
+        "properties": {
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "low, moderate, or high",
+            "title": "Level"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "FactorBody",
         "type": "object"
       },
       "FrameworkBody": {
@@ -2231,6 +2567,79 @@
         "title": "HeldBody",
         "type": "object"
       },
+      "Impact": {
+        "properties": {
+          "after": {
+            "description": "4h, 1d, 3d, 1w, or 1m",
+            "title": "After",
+            "type": "string"
+          },
+          "level": {
+            "description": "1 negligible to 5 severe",
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "after",
+          "level"
+        ],
+        "title": "Impact",
+        "type": "object"
+      },
+      "ImpactBody": {
+        "properties": {
+          "data_loss_hours": {
+            "description": "How much information it can afford to lose",
+            "title": "Data Loss Hours",
+            "type": "integer"
+          },
+          "impacts": {
+            "description": "How much its loss hurts",
+            "items": {
+              "$ref": "#/components/schemas/Impact"
+            },
+            "title": "Impacts",
+            "type": "array"
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The least it needs",
+            "title": "Minimum"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "recovery_hours": {
+            "description": "How soon it must be back",
+            "title": "Recovery Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recovery_hours",
+          "data_loss_hours"
+        ],
+        "title": "ImpactBody",
+        "type": "object"
+      },
       "ImplementationBody": {
         "properties": {
           "control": {
@@ -2279,6 +2688,156 @@
           "control"
         ],
         "title": "ImplementationBody",
+        "type": "object"
+      },
+      "IncidentBody": {
+        "description": "A correction. Send only what changes, with the ``version`` you had.",
+        "properties": {
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "occurred_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occurred On"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "IncidentBody",
+        "type": "object"
+      },
+      "IncidentIssueBody": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "subjects": {
+            "description": "Controls, scopes, risks",
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "title": "IncidentIssueBody",
         "type": "object"
       },
       "IndicatorBody": {
@@ -2865,6 +3424,28 @@
         "title": "JobSwitch",
         "type": "object"
       },
+      "LeadershipReadersBody": {
+        "properties": {
+          "people": {
+            "description": "Accounts named as readers",
+            "items": {
+              "type": "integer"
+            },
+            "title": "People",
+            "type": "array"
+          },
+          "reach": {
+            "description": "executives, organization, or leaders",
+            "title": "Reach",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reach"
+        ],
+        "title": "LeadershipReadersBody",
+        "type": "object"
+      },
       "LeadershipReportBody": {
         "properties": {
           "from": {
@@ -2921,6 +3502,99 @@
           }
         },
         "title": "LeadershipReportBody",
+        "type": "object"
+      },
+      "LearningBody": {
+        "properties": {
+          "failed": {
+            "description": "Controls that failed",
+            "items": {
+              "type": "string"
+            },
+            "title": "Failed",
+            "type": "array"
+          },
+          "held": {
+            "description": "Controls that held",
+            "items": {
+              "type": "string"
+            },
+            "title": "Held",
+            "type": "array"
+          },
+          "lessons": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What was learned",
+            "title": "Lessons"
+          },
+          "realized": {
+            "description": "Risks it realized",
+            "items": {
+              "type": "string"
+            },
+            "title": "Realized",
+            "type": "array"
+          },
+          "root_cause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the root_causes vocabulary",
+            "title": "Root Cause"
+          }
+        },
+        "title": "LearningBody",
+        "type": "object"
+      },
+      "LossBody": {
+        "properties": {
+          "amount": {
+            "description": "In whole units of the currency; negative to correct",
+            "title": "Amount",
+            "type": "integer"
+          },
+          "currency": {
+            "default": "USD",
+            "maxLength": 3,
+            "title": "Currency",
+            "type": "string"
+          },
+          "kind": {
+            "description": "response, recovery, lost_revenue, notification, legal, fines, or other",
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "kind",
+          "amount"
+        ],
+        "title": "LossBody",
         "type": "object"
       },
       "MappingBody": {
@@ -3040,6 +3714,26 @@
           }
         },
         "title": "MembersBody",
+        "type": "object"
+      },
+      "MessageBody": {
+        "properties": {
+          "body": {
+            "maxLength": 20000,
+            "title": "Body",
+            "type": "string"
+          },
+          "shared": {
+            "default": true,
+            "description": "Shared with the reporter, or a note",
+            "title": "Shared",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "MessageBody",
         "type": "object"
       },
       "NewAccount": {
@@ -3220,12 +3914,40 @@
         "title": "NewUnit",
         "type": "object"
       },
-      "NoteBody": {
+      "NotificationBody": {
         "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "duty": {
+            "description": "Whom the rule says to notify, such as individuals",
+            "title": "Duty",
+            "type": "string"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
           "note": {
             "anyOf": [
               {
-                "maxLength": 4000,
+                "maxLength": 20000,
                 "type": "string"
               },
               {
@@ -3233,9 +3955,42 @@
               }
             ],
             "title": "Note"
+          },
+          "recipient": {
+            "maxLength": 400,
+            "title": "Recipient",
+            "type": "string"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "regime": {
+            "description": "A rule the assessment names, such as hipaa or state:Ohio",
+            "title": "Regime",
+            "type": "string"
+          },
+          "sent_on": {
+            "description": "The day it was sent",
+            "title": "Sent On",
+            "type": "string"
           }
         },
-        "title": "NoteBody",
+        "required": [
+          "regime",
+          "duty",
+          "recipient",
+          "sent_on"
+        ],
+        "title": "NotificationBody",
         "type": "object"
       },
       "ObjectiveBody": {
@@ -3995,103 +4750,55 @@
         "title": "ReadingBody",
         "type": "object"
       },
-      "ReportBody": {
+      "RegimeBody": {
         "properties": {
-          "collected_on": {
+          "days": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "integer"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "When it was received",
-            "title": "Collected On"
+            "description": "For a state or a contract: days allowed",
+            "title": "Days"
           },
-          "covers_from": {
+          "hours": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "integer"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "The period it covers, from",
-            "title": "Covers From"
+            "description": "For a state or a contract: or hours",
+            "title": "Hours"
           },
-          "covers_to": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Covers To"
-          },
-          "data_class": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Data Class"
+          "key": {
+            "description": "hipaa, hipaa_business_associate, ftc_safeguards, dfars, state, or contract",
+            "title": "Key",
+            "type": "string"
           },
           "name": {
             "anyOf": [
               {
-                "maxLength": 400,
+                "maxLength": 60,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
+            "description": "For a state or a contract",
             "title": "Name"
-          },
-          "summary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Summary"
-          },
-          "url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Where it is kept, if not sent as a file",
-            "title": "Url"
-          },
-          "valid_until": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "When it stops counting",
-            "title": "Valid Until"
           }
         },
-        "title": "ReportBody",
+        "required": [
+          "key"
+        ],
+        "title": "RegimeBody",
         "type": "object"
       },
       "RequestAnswerBody": {
@@ -5128,6 +5835,152 @@
         "title": "SignIn",
         "type": "object"
       },
+      "SiteBody": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "criticality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Criticality"
+          },
+          "data_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Class"
+          },
+          "external_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExternalRefBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Refs"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Unit Id"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restricted"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "SiteBody",
+        "type": "object"
+      },
       "StepBody": {
         "properties": {
           "procedure": {
@@ -5612,6 +6465,68 @@
         "title": "TouchesBody",
         "type": "object"
       },
+      "TriageBody": {
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the incident_categories vocabulary",
+            "title": "Category"
+          },
+          "handler_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who handles it",
+            "title": "Handler Id"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Its unit, if it should move",
+            "title": "Org Unit Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "critical, high, moderate, or low",
+            "title": "Severity"
+          },
+          "subjects": {
+            "description": "References of its records",
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          }
+        },
+        "title": "TriageBody",
+        "type": "object"
+      },
       "UnitChanges": {
         "properties": {
           "code": {
@@ -5901,6 +6816,23 @@
         "title": "CloseBody",
         "type": "object"
       },
+      "riskwren__api__routers__agreements__CoversBody": {
+        "properties": {
+          "covers": {
+            "description": "The references of the systems, information, and scopes",
+            "items": {
+              "type": "string"
+            },
+            "title": "Covers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "covers"
+        ],
+        "title": "CoversBody",
+        "type": "object"
+      },
       "riskwren__api__routers__analyses__AnswerBody": {
         "properties": {
           "look_again": {
@@ -5975,6 +6907,24 @@
           }
         },
         "title": "CloseBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__analyses__NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
         "type": "object"
       },
       "riskwren__api__routers__analyses__StartBody": {
@@ -6362,6 +7312,24 @@
         "title": "DecisionBody",
         "type": "object"
       },
+      "riskwren__api__routers__documents__NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
+        "type": "object"
+      },
       "riskwren__api__routers__evidence__SubjectsBody": {
         "properties": {
           "subjects": {
@@ -6417,6 +7385,142 @@
           "up"
         ],
         "title": "MoveBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__governance__NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__incidents__NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How it ended",
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__incidents__ReportBody": {
+        "description": "What happened, when, and where.",
+        "properties": {
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "incident, near_miss, or concern",
+            "title": "Kind"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where it happened",
+            "title": "Location"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What happened, in a line",
+            "title": "Name"
+          },
+          "occurred_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When it happened, if known",
+            "title": "Occurred On"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The unit it happened in",
+            "title": "Org Unit Id"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What happened",
+            "title": "Summary"
+          }
+        },
+        "title": "ReportBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__incidents__ReviewBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "ReviewBody",
         "type": "object"
       },
       "riskwren__api__routers__internal_audit__AnswerBody": {
@@ -6479,6 +7583,24 @@
           "owner_id"
         ],
         "title": "FindingBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__internal_audit__NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
         "type": "object"
       },
       "riskwren__api__routers__internal_audit__PlanBody": {
@@ -6761,6 +7883,79 @@
         "title": "AnswersIn",
         "type": "object"
       },
+      "riskwren__api__routers__resilience__CoversBody": {
+        "properties": {
+          "processes": {
+            "description": "References of processes",
+            "items": {
+              "type": "string"
+            },
+            "title": "Processes",
+            "type": "array"
+          }
+        },
+        "title": "CoversBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__resilience__FindingBody": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "title": "FindingBody",
+        "type": "object"
+      },
       "riskwren__api__routers__risks__AssessmentBody": {
         "properties": {
           "impact_levels": {
@@ -6923,6 +8118,123 @@
           "severity"
         ],
         "title": "FindingBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__third_parties__NoteBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "NoteBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__third_parties__ReportBody": {
+        "properties": {
+          "collected_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When it was received",
+            "title": "Collected On"
+          },
+          "covers_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The period it covers, from",
+            "title": "Covers From"
+          },
+          "covers_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covers To"
+          },
+          "data_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Class"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where it is kept, if not sent as a file",
+            "title": "Url"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When it stops counting",
+            "title": "Valid Until"
+          }
+        },
+        "title": "ReportBody",
         "type": "object"
       },
       "riskwren__api__routers__third_parties__ReviewBody": {
@@ -7926,6 +9238,70 @@
         ]
       }
     },
+    "/api/v1/admin/anonymous-reporting": {
+      "get": {
+        "operationId": "show_anonymous_setting_api_v1_admin_anonymous_reporting_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Anonymous Setting Api V1 Admin Anonymous Reporting Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Whether reporting without a name is open",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "put": {
+        "operationId": "save_anonymous_setting_api_v1_admin_anonymous_reporting_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnonymousSetting"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Anonymous Setting Api V1 Admin Anonymous Reporting Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open or close reporting without a name",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
     "/api/v1/admin/branding": {
       "get": {
         "operationId": "show_api_v1_admin_branding_get",
@@ -8117,6 +9493,70 @@
         "summary": "Upload a logo or tab icon",
         "tags": [
           "branding"
+        ]
+      }
+    },
+    "/api/v1/admin/leadership-readers": {
+      "get": {
+        "operationId": "show_leadership_readers_api_v1_admin_leadership_readers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Leadership Readers Api V1 Admin Leadership Readers Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Who reads the leadership reports",
+        "tags": [
+          "reporting"
+        ]
+      },
+      "put": {
+        "operationId": "save_leadership_readers_api_v1_admin_leadership_readers_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadershipReadersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Leadership Readers Api V1 Admin Leadership Readers Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change who reads the leadership reports",
+        "tags": [
+          "reporting"
         ]
       }
     },
@@ -8653,7 +10093,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CoversBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__agreements__CoversBody"
               }
             }
           },
@@ -8882,6 +10322,157 @@
         "summary": "Open a closed agreement again",
         "tags": [
           "agreements"
+        ]
+      }
+    },
+    "/api/v1/anonymous-reports": {
+      "get": {
+        "operationId": "anonymous_open_api_v1_anonymous_reports_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Anonymous Open Api V1 Anonymous Reports Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Whether a report can be made without a name (public)",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "post": {
+        "description": "Nothing about who sent it is kept. The code in the answer is shown once: it is the\nonly way back to the report.",
+        "operationId": "report_anonymously_api_v1_anonymous_reports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__incidents__ReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Report Anonymously Api V1 Anonymous Reports Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report without a name (public, when open)",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/anonymous-reports/follow-up": {
+      "post": {
+        "operationId": "follow_up_anonymous_api_v1_anonymous_reports_follow_up_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Follow Up Anonymous Api V1 Anonymous Reports Follow Up Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Follow up a report with its code (public)",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/anonymous-reports/messages": {
+      "post": {
+        "operationId": "write_anonymously_api_v1_anonymous_reports_messages_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeMessageBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Write Anonymously Api V1 Anonymous Reports Messages Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add to a report through its code (public)",
+        "tags": [
+          "incidents"
         ]
       }
     },
@@ -9853,7 +11444,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__internal_audit__NoteBody"
               }
             }
           },
@@ -10998,6 +12589,279 @@
         "summary": "Change a contact, or say they have left",
         "tags": [
           "third parties"
+        ]
+      }
+    },
+    "/api/v1/continuity": {
+      "get": {
+        "operationId": "continuity_api_v1_continuity_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Continuity Api V1 Continuity Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Every continuity plan, and the processes none restores",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}": {
+      "get": {
+        "operationId": "continuity_plan_api_v1_continuity__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Continuity Plan Api V1 Continuity  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A continuity plan: what it restores, whom to call",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/covers": {
+      "put": {
+        "operationId": "set_covers_api_v1_continuity__ref__covers_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__resilience__CoversBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Covers Api V1 Continuity  Ref  Covers Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say which processes a plan restores",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/exercises": {
+      "post": {
+        "operationId": "record_exercise_api_v1_continuity__ref__exercises_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Exercise Api V1 Continuity  Ref  Exercises Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record an exercise",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/exercises/{exercise_id}/issues": {
+      "post": {
+        "operationId": "raise_finding_api_v1_continuity__ref__exercises__exercise_id__issues_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "exercise_id",
+            "required": true,
+            "schema": {
+              "title": "Exercise Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__resilience__FindingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Raise Finding Api V1 Continuity  Ref  Exercises  Exercise Id  Issues Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise a finding of an exercise as an issue",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
+    "/api/v1/continuity/{ref}/offline": {
+      "get": {
+        "operationId": "continuity_offline_api_v1_continuity__ref__offline_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The plan in force as one file, for when the systems are down",
+        "tags": [
+          "resilience"
         ]
       }
     },
@@ -13323,7 +15187,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__documents__NoteBody"
               }
             }
           },
@@ -13377,7 +15241,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__documents__NoteBody"
               }
             }
           },
@@ -16930,6 +18794,1080 @@
         ]
       }
     },
+    "/api/v1/incidents": {
+      "get": {
+        "operationId": "list_incidents_api_v1_incidents_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "description": "reported, handling, closed, or live",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "reported, handling, closed, or live",
+              "title": "Status"
+            }
+          },
+          {
+            "description": "incident, near_miss, or concern",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "incident, near_miss, or concern",
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "severity",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          },
+          {
+            "description": "Those that concern this record",
+            "in": "query",
+            "name": "about",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Those that concern this record",
+              "title": "About"
+            }
+          },
+          {
+            "description": "Only those I reported",
+            "in": "query",
+            "name": "reported",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only those I reported",
+              "title": "Reported",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; start with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "-updated_at",
+              "description": "A field name; start with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Incidents Api V1 Incidents Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find incidents, near misses, and concerns",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "post": {
+        "operationId": "report_incident_api_v1_incidents_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__incidents__ReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Report Incident Api V1 Incidents Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report an incident, a near miss, or a concern",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/summary": {
+      "get": {
+        "operationId": "incidents_summary_api_v1_incidents_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Incidents Summary Api V1 Incidents Summary Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The incidents you may see from the last year, counted",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}": {
+      "get": {
+        "operationId": "show_incident_api_v1_incidents__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Incident Api V1 Incidents  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One incident, as much of it as you may see",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "patch": {
+        "operationId": "update_incident_api_v1_incidents__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Incident Api V1 Incidents  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Correct an incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/breach": {
+      "get": {
+        "operationId": "show_breach_api_v1_incidents__ref__breach_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Breach Api V1 Incidents  Ref  Breach Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Whether it must be notified, and by when",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "post": {
+        "operationId": "assess_breach_api_v1_incidents__ref__breach_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BreachBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Assess Breach Api V1 Incidents  Ref  Breach Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assess whether it must be notified",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/case": {
+      "put": {
+        "operationId": "set_incident_case_api_v1_incidents__ref__case_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Incident Case Api V1 Incidents  Ref  Case Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restrict an incident to those named on it",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/close": {
+      "post": {
+        "operationId": "close_incident_api_v1_incidents__ref__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__incidents__NoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Close Incident Api V1 Incidents  Ref  Close Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close an incident, saying how it ended",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/history": {
+      "get": {
+        "description": "For those who see the handling: not for a reporter who sees only their report.",
+        "operationId": "incident_history_api_v1_incidents__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Incident History Api V1 Incidents  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that has happened to an incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/issues": {
+      "post": {
+        "operationId": "raise_issue_api_v1_incidents__ref__issues_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentIssueBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Raise Issue Api V1 Incidents  Ref  Issues Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Raise an issue from it",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/learning": {
+      "put": {
+        "operationId": "set_learning_api_v1_incidents__ref__learning_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Learning Api V1 Incidents  Ref  Learning Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What it realized, what failed, what was learned",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/losses": {
+      "post": {
+        "operationId": "add_loss_api_v1_incidents__ref__losses_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LossBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Loss Api V1 Incidents  Ref  Losses Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record what it cost",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/messages": {
+      "post": {
+        "operationId": "write_about_incident_api_v1_incidents__ref__messages_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Write About Incident Api V1 Incidents  Ref  Messages Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Write about an incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/notifications": {
+      "post": {
+        "operationId": "record_notification_api_v1_incidents__ref__notifications_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Notification Api V1 Incidents  Ref  Notifications Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record a notification",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/owners": {
+      "put": {
+        "operationId": "set_incident_owners_api_v1_incidents__ref__owners_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Incident Owners Api V1 Incidents  Ref  Owners Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set who handles an incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/reopen": {
+      "post": {
+        "operationId": "reopen_incident_api_v1_incidents__ref__reopen_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reopen Incident Api V1 Incidents  Ref  Reopen Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reopen a closed incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/incidents/{ref}/triage": {
+      "post": {
+        "operationId": "triage_incident_api_v1_incidents__ref__triage_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Triage Incident Api V1 Incidents  Ref  Triage Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Triage: category, severity, records, handler",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
     "/api/v1/indicators": {
       "get": {
         "operationId": "list_indicators_api_v1_indicators_get",
@@ -20323,6 +23261,83 @@
         ]
       }
     },
+    "/api/v1/privacy": {
+      "get": {
+        "operationId": "privacy_overview_api_v1_privacy_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Privacy Overview Api V1 Privacy Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The processes and systems that need a privacy impact assessment",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/v1/privacy/reviews/{item_id}": {
+      "post": {
+        "operationId": "review_privacy_api_v1_privacy_reviews__item_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__incidents__ReviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Review Privacy Api V1 Privacy Reviews  Item Id  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say an answered assessment has been reviewed",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
     "/api/v1/processes": {
       "get": {
         "operationId": "list_processes_api_v1_processes_get",
@@ -20710,6 +23725,102 @@
         "summary": "Everything that has happened to a process",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/processes/{ref}/impact": {
+      "get": {
+        "operationId": "show_impact_api_v1_processes__ref__impact_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Impact Api V1 Processes  Ref  Impact Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A process's business impact and its shortfalls",
+        "tags": [
+          "resilience"
+        ]
+      },
+      "post": {
+        "operationId": "record_impact_api_v1_processes__ref__impact_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Impact Api V1 Processes  Ref  Impact Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Analyse a process's business impact",
+        "tags": [
+          "resilience"
         ]
       }
     },
@@ -21286,6 +24397,29 @@
         "summary": "Answer a questionnaire",
         "tags": [
           "questionnaires"
+        ]
+      }
+    },
+    "/api/v1/resilience": {
+      "get": {
+        "operationId": "show_resilience_api_v1_resilience_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Resilience Api V1 Resilience Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Processes with their recovery needs and every shortfall",
+        "tags": [
+          "resilience"
         ]
       }
     },
@@ -21941,7 +25075,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__NoteBody"
               }
             }
           },
@@ -22703,7 +25837,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__analyses__NoteBody"
               }
             }
           },
@@ -27003,6 +30137,102 @@
         ]
       }
     },
+    "/api/v1/services/{ref}/recovery": {
+      "get": {
+        "operationId": "show_service_recovery_api_v1_services__ref__recovery_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Service Recovery Api V1 Services  Ref  Recovery Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What a service can be restored within",
+        "tags": [
+          "resilience"
+        ]
+      },
+      "post": {
+        "operationId": "record_service_recovery_api_v1_services__ref__recovery_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapabilityBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Service Recovery Api V1 Services  Ref  Recovery Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say what a service can deliver",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
     "/api/v1/session": {
       "delete": {
         "operationId": "sign_out_api_v1_session_delete",
@@ -27583,7 +30813,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__governance__NoteBody"
               }
             }
           },
@@ -28147,6 +31377,653 @@
         "summary": "Records that one with this name might already be",
         "tags": [
           "find"
+        ]
+      }
+    },
+    "/api/v1/sites": {
+      "get": {
+        "operationId": "list_sites_api_v1_sites_get",
+        "parameters": [
+          {
+            "description": "Words to look for in the name, reference, or summary",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words to look for in the name, reference, or summary",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "A unit's id; includes every unit beneath it",
+            "in": "query",
+            "name": "unit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A unit's id; includes every unit beneath it",
+              "title": "Unit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "criticality",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Criticality"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Class"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner"
+            }
+          },
+          {
+            "description": "Only records I am named on",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Only records I am named on",
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "A field name; start with - for descending",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "-updated_at",
+              "description": "A field name; start with - for descending",
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Sites Api V1 Sites Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find sites",
+        "tags": [
+          "inventory"
+        ]
+      },
+      "post": {
+        "operationId": "create_site_api_v1_sites_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Site Api V1 Sites Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a site",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/sites/{ref}": {
+      "get": {
+        "operationId": "show_site_api_v1_sites__ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Site Api V1 Sites  Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One site, with its owners and links",
+        "tags": [
+          "inventory"
+        ]
+      },
+      "patch": {
+        "operationId": "update_site_api_v1_sites__ref__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Site Api V1 Sites  Ref  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change a site",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/sites/{ref}/history": {
+      "get": {
+        "operationId": "site_history_api_v1_sites__ref__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Site History Api V1 Sites  Ref  History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Everything that has happened to a site",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/sites/{ref}/links": {
+      "post": {
+        "operationId": "add_site_link_api_v1_sites__ref__links_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__inventory__LinkBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Site Link Api V1 Sites  Ref  Links Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Link a site to a record",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/sites/{ref}/links/{link_id}": {
+      "delete": {
+        "operationId": "remove_site_link_api_v1_sites__ref__links__link_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Remove Site Link Api V1 Sites  Ref  Links  Link Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove a link from a site",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/sites/{ref}/owners": {
+      "put": {
+        "operationId": "set_site_owners_api_v1_sites__ref__owners_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Site Owners Api V1 Sites  Ref  Owners Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a site's owners",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/sites/{ref}/recovery": {
+      "get": {
+        "operationId": "show_site_recovery_api_v1_sites__ref__recovery_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Site Recovery Api V1 Sites  Ref  Recovery Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "How soon work at a site goes on again",
+        "tags": [
+          "resilience"
+        ]
+      },
+      "post": {
+        "operationId": "record_site_recovery_api_v1_sites__ref__recovery_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapabilityBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Site Recovery Api V1 Sites  Ref  Recovery Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say what a site can deliver",
+        "tags": [
+          "resilience"
         ]
       }
     },
@@ -28947,6 +32824,102 @@
         ]
       }
     },
+    "/api/v1/systems/{ref}/recovery": {
+      "get": {
+        "operationId": "show_system_recovery_api_v1_systems__ref__recovery_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show System Recovery Api V1 Systems  Ref  Recovery Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What a system can be restored within",
+        "tags": [
+          "resilience"
+        ]
+      },
+      "post": {
+        "operationId": "record_system_recovery_api_v1_systems__ref__recovery_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapabilityBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record System Recovery Api V1 Systems  Ref  Recovery Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say what a system can deliver",
+        "tags": [
+          "resilience"
+        ]
+      }
+    },
     "/api/v1/tests/{test_id}": {
       "delete": {
         "operationId": "remove_test_api_v1_tests__test_id__delete",
@@ -29539,7 +33512,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReportBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__ReportBody"
               }
             }
           },
@@ -29969,7 +33942,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__NoteBody"
               }
             }
           },
@@ -30032,7 +34005,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__third_parties__NoteBody"
               }
             }
           },
@@ -30119,6 +34092,102 @@
         "summary": "Set a third party's owners",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/third-parties/{ref}/recovery": {
+      "get": {
+        "operationId": "show_third_party_recovery_api_v1_third_parties__ref__recovery_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Third Party Recovery Api V1 Third Parties  Ref  Recovery Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What a third party can be back within",
+        "tags": [
+          "resilience"
+        ]
+      },
+      "post": {
+        "operationId": "record_third_party_recovery_api_v1_third_parties__ref__recovery_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapabilityBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Record Third Party Recovery Api V1 Third Parties  Ref  Recovery Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Say what a third party can deliver",
+        "tags": [
+          "resilience"
         ]
       }
     },

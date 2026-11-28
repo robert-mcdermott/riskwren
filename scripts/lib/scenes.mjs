@@ -12,6 +12,9 @@ const first = (api, pick = "(rows) => rows[0].ref") => async (page) => page.eval
 const daysAgo = (days) => new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
 const click = (text) => `(() => { const el = [...document.querySelectorAll("button, a")].find((each) => each.textContent.trim() === ${JSON.stringify(text)});
   if (el) el.click(); else window.__sceneMissed = ${JSON.stringify(`there is no button called "${text}"`)}; })()`;
+/** A campaign of the demo by its kind, since its reference depends on the order they were made. */
+const campaign = (kind) => first("/api/v1/campaigns", `(data) => data.campaigns.find((row) => row.kind === ${JSON.stringify(kind)}).ref`);
+const campaignPath = (kind, after = "") => async (page) => `/campaigns/${await campaign(kind)(page)}${after}`;
 const risk = (words, tab = "") => async (page) =>
   `/risks/${await first(`/api/v1/risks?q=${encodeURIComponent(words)}`)(page)}${tab ? `?tab=${tab}` : ""}`;
 
@@ -263,6 +266,7 @@ export const SCENES = [
   { name: "leadership-report", as: "president", path: "/leadership-reports/LDR-0002" },
   { name: "leadership-next", as: "cro", path: "/leadership-reports/next" },
   { name: "leadership-first", as: "auditor", path: "/leadership-reports/LDR-0001" },
+  { name: "leadership-security", as: "ciso", path: "/leadership-reports/LDR-0002" },
   { name: "as-of", as: "cro", path: `/as-of?on=${daysAgo(90)}` },
   { name: "as-of-record", as: "cro",
     path: async (page) => `/as-of/${await first("/api/v1/risks?q=ransomware")(page)}?on=${daysAgo(120)}` },
@@ -277,6 +281,20 @@ export const SCENES = [
   { name: "audit-engagement-reported", as: "cro", path: "/audit/engagements/AUD-0001" },
   { name: "audit-committee-report", as: "president", path: "/audit/plans/APL-0001/committee-report" },
   { name: "audit-outside", as: "auditor", path: "/audit/outside" },
+  { name: "resilience", as: "cro", path: "/resilience" },
+  { name: "process-impact", as: "cro", path: async (page) => `/processes/${await first("/api/v1/processes?q=research+data+storage")(page)}?tab=impact` },
+  { name: "system-recovery", as: "cro", path: async (page) => `/systems/${await first("/api/v1/systems?q=backup+service")(page)}?tab=recovery` },
+  { name: "sites", as: "cro", path: "/sites" },
+  { name: "site-recovery", as: "cro", path: async (page) => `/sites/${await first("/api/v1/sites?q=clinic+building")(page)}?tab=recovery` },
+  { name: "site-recovery-form", as: "cro", path: async (page) => `/sites/${await first("/api/v1/sites?q=freezer+rooms")(page)}?tab=recovery`, step: click("Say again") },
+  { name: "third-party-recovery", as: "cro", path: async (page) => `/third-parties/${await first("/api/v1/third-parties?q=lakeshore")(page)}?tab=recovery` },
+  { name: "process-impact-clinic", as: "cro", path: async (page) => `/processes/${await first("/api/v1/processes?q=medication+dispensing")(page)}?tab=impact` },
+  { name: "continuity", as: "cro", path: "/continuity" },
+  { name: "continuity-plan", as: "cro", path: async (page) => `/continuity/${await first("/api/v1/documents?q=research+data+storage+continuity")(page)}` },
+  { name: "continuity-exercise", as: "ciso", path: async (page) => `/continuity/${await first("/api/v1/documents?q=research+data+storage+continuity")(page)}`, step: click("Record an exercise") },
+  { name: "continuity-finding", as: "ciso", path: async (page) => `/continuity/${await first("/api/v1/documents?q=research+data+storage+continuity")(page)}`, step: click("Raise a finding") },
+  { name: "continuity-covers", as: "cro", path: async (page) => `/continuity/${await first("/api/v1/documents?q=dispensing+downtime")(page)}`, step: click("Change") },
+  { name: "continuity-document", as: "cro", path: async (page) => `/documents/${await first("/api/v1/documents?q=dispensing+downtime")(page)}` },
   { name: "outside-page", as: "auditor", path: async (page) => page.evaluate(`(async () => {
       const me = (await (await fetch("/api/v1/session")).json()).data;
       const made = await fetch("/api/v1/audit/outside", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": me.csrf_token },
@@ -284,6 +302,40 @@ export const SCENES = [
       const url = (await made.json()).meta.link.url;
       // A visit that differed only after "#" would not load the page again.
       return "/outside?visit=" + Date.now() + "#" + url.split("#")[1]; })()`) },
+  { name: "incidents", as: "ciso", path: "/incidents" },
+  { name: "incident-new", as: "member", path: "/incidents/new" },
+  { name: "incident", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}` },
+  { name: "incident-triage", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=freezer+alarm")(page)}`, step: click("Triage") },
+  { name: "incident-anonymous", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=infusion+pumps")(page)}` },
+  { name: "incident-history", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=ransomware+stopped")(page)}?tab=history` },
+  { name: "incident-case", as: "cro", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=controlled+substance")(page)}` },
+  { name: "incident-case-form", as: "cro", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=controlled+substance")(page)}`, step: click("Change who is named") },
+  { name: "incident-restrict", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Restrict it") },
+  { name: "incident-breach", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=participant+names")(page)}?tab=breach` },
+  { name: "incident-breach-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=participant+names")(page)}?tab=breach`, step: click("Assess it again") },
+  { name: "incident-notify-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=participant+names")(page)}?tab=breach`, step: click("Record a notification") },
+  { name: "incident-breach-secured", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}?tab=breach` },
+  { name: "incident-breach-none", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=freezer+alarm")(page)}?tab=breach` },
+  { name: "privacy", as: "cro", path: "/privacy" },
+  { name: "system-privacy", as: "ciso", path: async (page) => `/systems/${await first("/api/v1/systems?q=survey+platform")(page)}?tab=privacy` },
+  { name: "system-privacy-reviewed", as: "member", path: async (page) => `/systems/${await first("/api/v1/systems?q=scheduling+system")(page)}?tab=privacy` },
+  { name: "incident-learned", as: "cro", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=ransomware+stopped")(page)}` },
+  { name: "incident-learning-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Say what it taught") },
+  { name: "incident-loss-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Record a cost") },
+  { name: "incident-issue-form", as: "ciso", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=laptop+stolen")(page)}`, step: click("Raise an issue") },
+  { name: "risk-incidents", as: "cro", path: risk("ransomware reaching research") },
+  { name: "control-incidents", as: "ciso", path: async (page) => `/controls/${await first("/api/v1/controls?q=second+factor")(page)}` },
+  { name: "incident-reporter", as: "member", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=mailbox")(page)}` },
+  { name: "program-anonymous", as: "admin", path: "/admin/program?tab=visibility" },
+  // Reporting without a name, and following up a report with the code the demo gave it.
+  { name: "report-page", as: "member", path: "/report" },
+  { name: "report-follow-up", as: "member", path: "/report", step: `(async () => {
+      document.querySelectorAll(".tab")[1].click();
+      await new Promise((done) => setTimeout(done, 50));
+      const input = document.querySelector("input[autocomplete=off]");
+      input.value = "7KQ2M-PX4RT-9WZ3H-C6V8N";
+      [...document.querySelectorAll("button")].find((each) => each.textContent.trim() === "Open my report").click();
+      await new Promise((done) => setTimeout(done, 400)); })()` },
   { name: "audit-finding", as: "cro", path: async (page) => `/issues/${await first("/api/v1/issues?q=full+restore")(page)}` },
   { name: "audit-request", as: "ciso", path: async (page) => `/audit/requests/${await first("/api/v1/home", "(data) => data.items.find((item) => item.kind === 'audit_request').href.split('/').pop()")(page)}` },
   { name: "risk-bow-tie", as: "cro", path: async (page) => `/risks/${await first("/api/v1/risks?q=ransomware+reaching+research")(page)}?tab=bow-tie` },
@@ -359,18 +411,18 @@ export const SCENES = [
   { name: "admin-sso", as: "admin", path: "/admin/sso" },
   { name: "scheduled-work", as: "admin", path: "/admin/scheduled-work" },
   { name: "campaigns", as: "ciso", path: "/campaigns" },
-  { name: "campaign", as: "assess1", path: "/campaigns/CMP-0002" },
-  { name: "campaign-waiting", as: "auditor", path: "/campaigns/CMP-0002?show=pending" },
-  { name: "campaign-closed", as: "cro", path: "/campaigns/CMP-0001" },
-  { name: "campaign-acknowledgment", as: "assess1", path: "/campaigns/CMP-0004" },
+  { name: "campaign", as: "assess1", path: campaignPath("attestation") },
+  { name: "campaign-waiting", as: "auditor", path: campaignPath("attestation", "?show=pending") },
+  { name: "campaign-closed", as: "cro", path: campaignPath("self_assessment") },
+  { name: "campaign-acknowledgment", as: "assess1", path: campaignPath("acknowledgment") },
   { name: "campaign-start", as: "assess1", path: "/campaigns", step: click("Start a campaign") },
   { name: "campaign-item", as: "ciso",
     path: async (page) => first("/api/v1/home", `(data) => data.items.find((item) => item.kind === "campaign" && item.title.startsWith("Attest")).href`)(page),
     step: `(() => { const label = [...document.querySelectorAll(".questionnaire label")].find((l) => l.textContent === "Partly"); if (label) label.click(); else window.__sceneMissed = "the option Partly"; })()` },
   { name: "campaign-item-evidence", as: "assess1",
-    path: async (page) => first("/api/v1/campaigns/CMP-0003", `(data) => "/campaign-items/" + data.items[0].id`)(page) },
+    path: async (page) => first(`/api/v1/campaigns/${await campaign("evidence")(page)}`, `(data) => "/campaign-items/" + data.items[0].id`)(page) },
   { name: "campaign-item-answered", as: "assess1",
-    path: async (page) => first("/api/v1/campaigns/CMP-0002", `(data) => "/campaign-items/" + data.items.find((item) => item.outcome === "partly").id`)(page) },
+    path: async (page) => first(`/api/v1/campaigns/${await campaign("attestation")(page)}`, `(data) => "/campaign-items/" + data.items.find((item) => item.outcome === "partly").id`)(page) },
   { name: "questionnaires", as: "cro", path: "/questionnaires" },
   { name: "questionnaire", as: "bio_mgr", path: "/questionnaires/control-attestation",
     step: `(() => { const pick = (text) => { const label = [...document.querySelectorAll(".questionnaire label")].find((l) => l.textContent === text); if (label) label.click(); else window.__sceneMissed = "the option " + text; }; pick("Partly"); pick("No"); })()` },

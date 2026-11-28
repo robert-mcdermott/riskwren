@@ -399,6 +399,7 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
             "attestation": "Attest", "self_assessment": "Look again at",
             "completeness": "Check the records of", "profile": "Describe the security of",
             "evidence": "Provide evidence for", "acknowledgment": "Read and acknowledge",
+            "privacy_impact": "Assess the privacy impact of",
         }[campaign.kind]  # fmt: skip
         href = (
             f"/library/{item.subject_ref}" if campaign.kind == "acknowledgment"
@@ -543,6 +544,46 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 None,
             )  # fmt: skip
 
+    # Incidents: reports to triage, and incidents the person handles.
+    from riskwren.incidents import reports as incidents
+
+    for incident, state in incidents.waiting_on(session, principal):
+        kind = incidents.KIND_LABELS[incident.kind].lower()
+        if state == "triage":
+            add(
+                "incident_triage", f"Triage: {incident.name}",
+                f"{incident.ref} · a {kind} reported "
+                + ("without a name" if incident.anonymous else "here"),
+                f"/incidents/{incident.ref}", None, ref=incident.ref,
+            )  # fmt: skip
+        else:
+            add(
+                "incident_handle", f"Handle: {incident.name}",
+                f"{incident.ref} · a {kind}, {incident.severity or 'not yet rated'}",
+                f"/incidents/{incident.ref}", None, ref=incident.ref,
+            )  # fmt: skip
+
+    # Continuity plans whose exercise is due.
+    from riskwren.resilience import plans as continuity
+
+    for document, due in continuity.waiting_on(session, principal):
+        add(
+            "plan_exercise", f"Exercise {document.name}",
+            f"{document.ref} · try the plan out, on a table or for real",
+            f"/continuity/{document.ref}", due, ref=document.ref,
+        )  # fmt: skip
+
+    # Notifications an incident's handler still has to make, by the rules that apply.
+    from riskwren.incidents import breach
+
+    for incident, duty in breach.waiting_on(session, principal):
+        add(
+            "incident_notify", f"Notify {duty['to'][0].lower()}{duty['to'][1:]}",
+            f"{incident.ref} · {incident.name} · {duty['regime_label']}"
+            + (", if it is a breach" if duty["if_breach"] else ""),
+            f"/incidents/{incident.ref}?tab=breach", duty["due_at"].date(), ref=incident.ref,
+        )  # fmt: skip
+
     # Third parties due for review: on their tier's cadence, or because something happened.
     from riskwren.thirdparty import lifecycle
 
@@ -627,6 +668,8 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
     kept = principal.units_for(roles.STEWARD, roles.MANAGER)
     if kept is None or kept:
         for record_type in TYPES.values():
+            if record_type.extra.get("no_orphans"):
+                continue  # its own work names who answers for it, as triage does an incident
             for record in _orphans(session, record_type, kept):
                 add(
                     "orphan", f"Name an owner for {record.name}",

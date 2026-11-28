@@ -36,6 +36,11 @@ async function boot() {
     (await import("./pages/respond.js")).respondPage(root, meta);
     return;
   }
+  // Someone reporting a concern without a name, or following one up with its code.
+  if (window.location.pathname === "/report") {
+    (await import("./pages/report.js")).reportPage(root, meta);
+    return;
+  }
   // Someone outside the organization reading what an auditor opened to them: no account.
   if (window.location.pathname === "/outside") {
     (await import("./pages/outside.js")).outsidePage(root, meta);
@@ -75,6 +80,10 @@ async function boot() {
   route("/evidence/:ref", page("evidence", "evidencePage"));
   route("/assessments", page("assessments", "assessmentList"));
   route("/assessments/:ref", page("assessments", "assessmentPage"));
+  route("/privacy", page("privacy", "privacyPage"));
+  route("/incidents", page("incidents", "incidentList"));
+  route("/incidents/new", page("incidents", "incidentNew", meta));
+  route("/incidents/:ref", page("incidents", "incidentPage"));
   route("/issues", page("issues", "issueList"));
   route("/issues/:ref", page("issues", "issuePage"));
   route("/exceptions", page("exceptions", "exceptionList"));
@@ -90,7 +99,7 @@ async function boot() {
   route("/actions", page("actions", "actionList"));
   route("/risks", page("risks", "riskRegister"));
   route("/risks/:ref", page("risk", "riskPage"));
-  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"], ["service", "services"]]) {
+  for (const [type, path] of [["process", "processes"], ["system", "systems"], ["third_party", "third-parties"], ["information", "information"], ["service", "services"], ["site", "sites"]]) {
     route(`/${path}`, page("records", "recordList", type));
     if (type !== "third_party") route(`/${path}/:ref`, page("record", "recordPage", type));
   }
@@ -110,6 +119,9 @@ async function boot() {
   route("/audit/requests/:id", page("audit", "requestPage"));
   route("/audit/outside", page("audit", "outsideAccess"));
   route("/as-of", page("as-of", "asOfRegister"));
+  route("/resilience", page("resilience", "resiliencePage"));
+  route("/continuity", page("continuity", "continuityList"));
+  route("/continuity/:ref", page("continuity", "continuityPlan"));
   route("/as-of/:ref", page("as-of", "asOfRecord"));
   route("/check-dossier", page("check-dossier", "checkDossier"));
   route("/reviews/:ref", page("reviews", "reviewPage"));

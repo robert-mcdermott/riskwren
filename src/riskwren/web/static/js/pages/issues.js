@@ -7,7 +7,7 @@ import { date, plural, relative } from "../core/format.js";
 import { label, options, unitOptions, units, vocabularies } from "../core/lookups.js";
 import { navigate, query, setQuery } from "../core/router.js";
 import { session } from "../core/session.js";
-import { evidenceUnits, freshness } from "../components/evidence.js";
+import { evidenceUnits, freshness } from "../components/evidence-state.js";
 import { banner, checkbox, field, section, select, submit } from "../components/form.js";
 import { ISSUE_STATUS, issueDue, issueStatus, recordPicker, SEVERITY, severityPill } from "../components/issue.js";
 import { openOverlay } from "../components/overlay.js";
@@ -241,6 +241,8 @@ function overview(issue, ctx) {
       card({ title: "What is wrong" }, issue.summary ? prose(issue.summary) : h("p", { class: "muted" }, "No detail was given."),
         issue.source?.engagement ? h("p", { class: "subtle" }, "A finding of internal audit, from ", h("a", { href: `/audit/engagements/${issue.source.engagement.ref}` }, `${issue.source.engagement.ref} ${issue.source.engagement.name}`), ". Internal audit confirms its closure.")
           : issue.source?.review ? h("p", { class: "subtle" }, "From ", h("a", { href: `/reviews/${issue.source.review.ref}` }, `${issue.source.review.ref} ${issue.source.review.name}`), ".")
+          : issue.source?.exercise ? h("p", { class: "subtle" }, "A finding of the exercise held on ", date(issue.source.exercise.held_on), " of ", h("a", { href: `/continuity/${issue.source.exercise.plan.ref}` }, `${issue.source.exercise.plan.ref} ${issue.source.exercise.plan.name}`), ".")
+          : issue.source?.incident ? h("p", { class: "subtle" }, "Raised from the incident ", h("a", { href: `/incidents/${issue.source.incident.ref}` }, `${issue.source.incident.ref} ${issue.source.incident.name}`), ".")
           : issue.source ? h("p", { class: "subtle" }, "From ", h("a", { href: `/assessments/${issue.source.assessment.ref}` }, `${issue.source.assessment.ref} ${issue.source.assessment.name}`),
             `, tested by ${issue.source.tested_by} on ${date(issue.source.tested_at)}.`) : null),
       card({ title: "What it is about" },

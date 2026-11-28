@@ -255,3 +255,213 @@ def test_the_rating_ramp_is_the_organizations_choice(
     refused = admin.put("/api/v1/admin/branding", json={**body, "rating_ramp": "rainbow"})
     assert refused.status_code == 422
     assert [e["location"] for e in refused.json()["errors"]] == [["rating_ramp"]]
+
+
+def test_the_brand_kit(db: Database) -> None:
+    kit = {
+        "accent": "#1f6f5c",
+        "accent_dark": "#7FD1BD",
+        "sign_in_message": "  Questions? Ask the risk office.  ",
+        "footer_links": [
+            {"label": "Risk policy", "url": "https://intranet.example.org/risk"},
+            {"label": "Help", "url": "mailto:risk-office@example.org"},
+            {"label": "", "url": ""},
+        ],
+        "email_footer": "Risk Office, Building 4.",
+    }
+    with db.write(ME.actor) as session:
+        saved = branding.save(session, ME, kit)
+    assert saved.accent_dark == "#7fd1bd"
+    assert saved.sign_in_message == "Questions? Ask the risk office."
+    assert [link["label"] for link in saved.footer_links] == ["Risk policy", "Help"]
+    public = branding.public_view(saved)
+    assert public["footer_links"][1]["url"] == "mailto:risk-office@example.org"
+    assert public["sign_in_message"].startswith("Questions?") and public["sign_in_image"] is None
+    assert "#7fd1bd" in branding.theme_css(saved)
+    assert branding.derive_accent("#1f6f5c", "#7fd1bd").night == "#7fd1bd"
+    assert "sign-in" in branding.IMAGES
+
+
+@pytest.mark.parametrize(
+    ("change", "field"),
+    [
+        ({"accent_dark": "#102030", "accent": "#1f6f5c"}, "accent_dark"),  # too dark to read
+        ({"accent_dark": "#7fd1bd", "accent": ""}, "accent_dark"),  # nothing to pair it with
+        ({"accent_dark": "teal", "accent": "#1f6f5c"}, "accent_dark"),
+        ({"sign_in_message": "x" * 601}, "sign_in_message"),
+        ({"email_footer": "x" * 301}, "email_footer"),
+        ({"footer_links": [{"label": "Bad", "url": "javascript:alert(1)"}]}, "footer_links"),
+        ({"footer_links": [{"label": "", "url": "https://example.org"}]}, "footer_links"),
+        ({"footer_links": [{"label": "n", "url": "https://example.org"}] * 6}, "footer_links"),
+        ({"rating_ramp": "rainbow"}, "rating_ramp"),
+    ],
+)
+def test_a_brand_kit_that_cannot_be_used_is_refused(
+    db: Database, change: dict[str, object], field: str
+) -> None:
+    with db.write(ME.actor) as session, pytest.raises(Invalid) as refused:
+        branding.save(session, ME, change)
+    assert field in refused.value.errors
+
+
+def test_the_brand_kit_through_the_api(as_role: Clients) -> None:
+    admin = as_role("admin")
+    body = {
+        "product_name": "Risk Front Door", "palette": "slate", "accent": "#2a4fc7",
+        "sign_in_message": "Ask the risk office.", "rating_ramp": "signal",
+        "footer_links": [{"label": "Policy", "url": "https://example.org/policy"}],
+    }  # fmt: skip
+    saved = admin.put("/api/v1/admin/branding", json=body)
+    assert saved.status_code == 200, saved.text
+    meta = as_role(None).get("/api/v1/meta").json()["data"]["branding"]
+    assert meta["sign_in_message"] == "Ask the risk office." and meta["rating_ramp"] == "signal"
+    assert meta["footer_links"] == [{"label": "Policy", "url": "https://example.org/policy"}]
+    # Saving the names again leaves the kit as it was.
+    again = admin.put(
+        "/api/v1/admin/branding", json={"product_name": "Risk Front Door", "palette": "slate"}
+    )
+    assert again.json()["data"]["sign_in_message"] == "Ask the risk office."
+    checked = admin.post(
+        "/api/v1/admin/branding/check", json={"accent": "#2a4fc7", "accent_dark": "#9db4ff"}
+    )
+    assert checked.json()["data"]["night"] == "#9db4ff" and checked.json()["data"]["ok"]
+    assert admin.post("/api/v1/admin/branding/images/sign-in", content=PNG).status_code == 200
+    assert as_role(None).get("/api/v1/meta").json()["data"]["branding"]["sign_in_image"]
+
+
+# --- Branding from the configuration file ---------------------------------------------------
+
+DAY = {"bg": "#f6f5f2", "surface": "#ffffff", "text": "#1d2733", "muted": "#57606b",
+       "accent": "#1f5f8b", "stripe": "#b4501a"}  # fmt: skip
+NIGHT = {"bg": "#12171d", "surface": "#1a222b", "text": "#f2f4f6", "muted": "#b9c2cc",
+         "accent": "#6cb6e6", "on_accent": "#0f1a24"}  # fmt: skip
+
+
+def _brand_table(tmp_path: Path) -> dict:  # type: ignore[type-arg]
+    (tmp_path / "brand").mkdir(exist_ok=True)
+    (tmp_path / "brand" / "logo.png").write_bytes(PNG)
+    return {
+        "product_name": "Lantern",
+        "organization_name": "Northmere Institute",
+        "show_powered_by": False,
+        "logo_light": "brand/logo.png",
+        "logo_height": 40,
+        "font": ["Inter", "Arial"],
+        "font_headings": ["Source Serif", "serif"],
+        "footer_links": [{"label": "Privacy", "url": "https://northmere.example/privacy"}],
+        "rating_ramp": "signal",
+        "colors": {"day": dict(DAY), "night": dict(NIGHT)},
+    }
+
+
+def test_a_brand_is_read_from_the_configuration_file(tmp_path: Path) -> None:
+    from riskwren.config import ConfigError, parse_config
+
+    config = parse_config({"branding": _brand_table(tmp_path)}, base_dir=tmp_path)
+    file = config.branding
+    assert file.values["product_name"] == "Lantern" and file.logo_height == 40
+    assert file.files == {"logo-light": (tmp_path / "brand" / "logo.png").resolve()}
+    assert file.fonts == {"body": ["Inter", "Arial"], "headings": ["Source Serif", "serif"]}
+    # What was left out is worked out: text to go on the accent, and the quieter surfaces.
+    day = file.colors["day"]
+    assert day["on_accent"] == "#ffffff" and day["stripe"] == "#b4501a"
+    assert color.is_hex(day["surface_2"]) and day["surface_2"] != day["surface"]
+    assert color.contrast(day["control_border"], day["surface"]) >= 3
+    assert color.contrast(file.colors["night"]["control_border"], NIGHT["surface"]) >= 3
+    assert {"product_name", "colors", "palette", "accent", "image:logo-light", "font:body"} <= set(
+        file.names
+    )
+    assert parse_config({}, base_dir=tmp_path).branding is None
+
+    bad = _brand_table(tmp_path)
+    bad |= {"logo_light": "brand/missing.png", "product_name": "", "colour": "#fff",
+            "font": ["Inter; } body { display: none"], "logo_height": 400}  # fmt: skip
+    bad["colors"]["day"]["text"] = "#cccccc"  # cannot be read on white
+    bad["colors"]["night"].pop("muted")
+    bad["footer_links"] = [{"label": "Privacy", "url": "javascript:alert(1)"}]
+    with pytest.raises(ConfigError) as caught:
+        parse_config({"branding": bad}, base_dir=tmp_path)
+    said = "\n".join(caught.value.problems)
+    for expected in (
+        "logo_light: there is no file", "product_name: Give the product a name",
+        "colour is not a setting", "font: give up to six font names", "logo_height",
+        "text on bg has a contrast of", "[branding.colors.night] also needs: muted",
+        "footer_links:",
+    ):  # fmt: skip
+        assert expected in said, expected
+
+
+def test_the_file_wins_and_the_rest_stays_editable(db: Database, tmp_path: Path) -> None:
+    file, found = branding.from_file(_brand_table(tmp_path), tmp_path)
+    assert found == [] and file is not None
+    try:
+        branding.pin(file)
+        with db.write(ME.actor) as session:
+            saved = branding.save(
+                session,
+                ME,
+                {"product_name": "Something else", "sign_in_message": "Ask the office."},
+            )
+            # The name is the file's; the message, which the file does not set, was saved.
+            assert (saved.product_name, saved.sign_in_message) == ("Lantern", "Ask the office.")
+            assert saved.rating_ramp == "signal"
+            stored = settings.get(session, branding.KEY)
+            assert stored["product_name"] != "Lantern" and "colors" not in stored
+            assert "files" not in stored and "pinned" not in stored
+            with pytest.raises(Invalid) as refused:
+                branding.store_image(session, ME, tmp_path / "kept", "logo-light", PNG)
+            assert "configuration file" in refused.value.errors["file"]
+            branding.store_image(session, ME, tmp_path / "kept", "favicon", PNG)
+            current = branding.load(session)
+            path, media = branding.image_file(current, tmp_path / "kept", "logo-light")  # type: ignore[misc]
+            assert path == tmp_path / "brand" / "logo.png" and media == "image/png"
+            # The dark logo falls back to the file's light one; the favicon is the stored one.
+            assert branding.image_file(current, tmp_path / "kept", "logo-dark") is not None
+            assert (
+                branding.image_file(current, tmp_path / "kept", "favicon")[0].parent.name == "kept"
+            )  # type: ignore[index]
+            shown = branding.public_view(current)
+            assert shown["colors_fixed"] and shown["logo_light"].startswith(
+                "/branding/logo-light?v=f"
+            )
+            css = branding.theme_css(current)
+        assert css.startswith(":root, :root[data-palette] {")
+        assert "--bg: light-dark(#f6f5f2, #12171d);" in css
+        assert "--brand-accent: light-dark(#1f5f8b, #6cb6e6);" in css
+        assert "--signature: light-dark(#b4501a, #6cb6e6);" in css
+        assert '--font: "Inter", "Arial", sans-serif;' in css
+        assert 'h1, h2 {\n  font-family: "Source Serif", serif;' in css
+        assert "--brand-logo-height: 40px;" in css
+        assert set(css) <= set('abcdefghijklmnopqrstuvwxyzAIS0123456789#:;(){}[]-,." \n')
+    finally:
+        branding.pin(None)
+    with db.read() as session:
+        # With the file gone, the app's own name is back: the attempt to change a setting
+        # the file had fixed was not stored.
+        assert branding.load(session).product_name == "RiskWren"
+        assert branding.load(session).sign_in_message == "Ask the office."
+
+
+def test_file_branding_through_the_api(instance: Instance, people: People, tmp_path: Path) -> None:
+    from dataclasses import replace
+
+    from riskwren.api.app import create_app
+    from tests.people import email_of, sign_in
+
+    file, _ = branding.from_file(_brand_table(tmp_path), tmp_path)
+    try:
+        app = create_app(replace(instance.config, branding=file))
+        with TestClient(app, base_url="http://localhost") as client:
+            assert "--bg: light-dark(#f6f5f2, #12171d)" in client.get("/theme.css").text
+            assert client.get("/branding/logo-light").content == PNG
+            meta = client.get("/api/v1/meta").json()["data"]["branding"]
+            assert meta["product_name"] == "Lantern" and meta["colors_fixed"] is True
+            sign_in(client, email_of("admin"))
+            editor = client.get("/api/v1/admin/branding").json()["data"]
+            assert "product_name" in editor["pinned"] and editor["colors"]["day"]["bg"] == "#f6f5f2"
+            assert editor["images"][0] == {
+                "kind": "logo-light", "label": "Logo for light backgrounds", "set": True,
+                "from_file": True,
+            }  # fmt: skip
+    finally:
+        branding.pin(None)

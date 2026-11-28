@@ -22,6 +22,7 @@ from riskwren.inventory import access, history, links, records
 from riskwren.inventory.registry import (
     INFORMATION,
     PROCESS,
+    SITE,
     SYSTEM,
     THIRD_PARTY,
     RecordType,
@@ -69,6 +70,10 @@ class SystemBody(ThingBody):
 class ThirdPartyBody(ThingBody):
     website: str | None = None
     notes: str | None = None
+
+
+class SiteBody(ThingBody):
+    address: str | None = Field(default=None, max_length=300)
 
 
 class InformationBody(ThingBody):
@@ -410,6 +415,63 @@ def remove_system_link(request: Request, ref: str, link_id: int) -> dict[str, An
 @router.get("/systems/{ref}/history", summary="Everything that has happened to a system")
 def system_history(request: Request, ref: str) -> dict[str, Any]:
     return record_history(request, SYSTEM, ref)
+
+
+# --- Sites --------------------------------------------------------------------------------
+
+
+@router.get("/sites", summary="Find sites")
+def list_sites(
+    request: Request,
+    q: str | None = Q,
+    unit: int | None = UNIT,
+    status: str | None = None,
+    kind: str | None = None,
+    criticality: str | None = None,
+    data_class: str | None = None,
+    owner: int | None = None,
+    mine: bool = MINE,
+    sort: str = SORT,
+    limit: int | None = LIMIT,
+    cursor: str | None = None,
+) -> dict[str, Any]:
+    filters = thing_filters(q, unit, status, kind, criticality, data_class, owner, mine)
+    return list_records(request, SITE, filters, sort, limit, cursor)
+
+
+@router.post("/sites", status_code=201, summary="Add a site")
+def create_site(request: Request, body: SiteBody) -> dict[str, Any]:
+    return create_record(request, SITE, body)
+
+
+@router.get("/sites/{ref}", summary="One site, with its owners and links")
+def show_site(request: Request, ref: str) -> dict[str, Any]:
+    return show_record(request, SITE, ref)
+
+
+@router.patch("/sites/{ref}", summary="Change a site")
+def update_site(request: Request, ref: str, body: SiteBody) -> dict[str, Any]:
+    return update_record(request, SITE, ref, body)
+
+
+@router.put("/sites/{ref}/owners", summary="Set a site's owners")
+def set_site_owners(request: Request, ref: str, body: OwnersBody) -> dict[str, Any]:
+    return set_record_owners(request, SITE, ref, body)
+
+
+@router.post("/sites/{ref}/links", status_code=201, summary="Link a site to a record")
+def add_site_link(request: Request, ref: str, body: LinkBody) -> dict[str, Any]:
+    return add_record_link(request, SITE, ref, body)
+
+
+@router.delete("/sites/{ref}/links/{link_id}", summary="Remove a link from a site")
+def remove_site_link(request: Request, ref: str, link_id: int) -> dict[str, Any]:
+    return remove_record_link(request, SITE, ref, link_id)
+
+
+@router.get("/sites/{ref}/history", summary="Everything that has happened to a site")
+def site_history(request: Request, ref: str) -> dict[str, Any]:
+    return record_history(request, SITE, ref)
 
 
 # --- Third parties ------------------------------------------------------------------------

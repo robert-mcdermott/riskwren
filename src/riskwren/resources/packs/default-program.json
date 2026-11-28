@@ -515,6 +515,14 @@
           [
             "process",
             "service"
+          ],
+          [
+            "process",
+            "site"
+          ],
+          [
+            "system",
+            "site"
           ]
         ]
       },
@@ -690,6 +698,11 @@
         "description": "Something that went wrong showed it"
       },
       {
+        "key": "exercise",
+        "label": "Exercise",
+        "description": "An exercise of a continuity plan showed it"
+      },
+      {
         "key": "review",
         "label": "Review",
         "description": "A review of a supplier, a system, or a process"
@@ -698,6 +711,111 @@
         "key": "observation",
         "label": "Observation",
         "description": "Somebody noticed it and said so"
+      }
+    ],
+    "site_kinds": [
+      {
+        "key": "data_center",
+        "label": "Data center",
+        "description": "Where systems run: a room, a building, or a colocation cage"
+      },
+      {
+        "key": "building",
+        "label": "Building",
+        "description": "A building, or a floor of one, where people work"
+      },
+      {
+        "key": "laboratory",
+        "label": "Laboratory",
+        "description": "Where research is done, with its instruments"
+      },
+      {
+        "key": "clinic",
+        "label": "Clinic",
+        "description": "Where patients are seen and treated"
+      },
+      {
+        "key": "storage",
+        "label": "Storage",
+        "description": "Where specimens, records, or supplies are kept"
+      },
+      {
+        "key": "other",
+        "label": "Other"
+      }
+    ],
+    "protected_information": [
+      {
+        "key": "health",
+        "label": "Health information",
+        "description": "Identifiable health information a covered entity or its business associate holds"
+      },
+      {
+        "key": "personal",
+        "label": "Personal information under a state's law",
+        "description": "A name with a Social Security, license, or account number, or another identifier a state's breach law names"
+      },
+      {
+        "key": "financial",
+        "label": "Customer financial information",
+        "description": "Information about customers of a financial product or service"
+      },
+      {
+        "key": "participant",
+        "label": "Research participants' information",
+        "description": "Identifiable information about people in a study"
+      },
+      {
+        "key": "controlled",
+        "label": "Controlled or covered defense information",
+        "description": "Controlled unclassified information, or covered defense information under a contract"
+      },
+      {
+        "key": "credentials",
+        "label": "Sign-in credentials",
+        "description": "Usernames with passwords, or keys that unlock accounts"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these"
+      }
+    ],
+    "incident_categories": [
+      {
+        "key": "security",
+        "label": "Security",
+        "description": "Systems, accounts, or information reached, changed, or put at risk by someone who should not have"
+      },
+      {
+        "key": "privacy",
+        "label": "Privacy",
+        "description": "Personal or health information used, shared, or lost in a way it should not be"
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "description": "Harm, or the chance of harm, to people"
+      },
+      {
+        "key": "conduct",
+        "label": "Conduct",
+        "description": "How someone behaved: misconduct, harassment, or a conflict of interest"
+      },
+      {
+        "key": "compliance",
+        "label": "Compliance",
+        "description": "A law, a regulation, a contract, or the organization's own policy not followed"
+      },
+      {
+        "key": "operations",
+        "label": "Operations",
+        "description": "Something the organization depends on failed or stopped"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these, or not yet known"
       }
     ],
     "root_causes": [
@@ -1203,6 +1321,7 @@
     "exception_max_months": 12,
     "key_control_test_months": 6,
     "document_review_months": 12,
+    "plan_exercise_months": 12,
     "reminders": {
       "soon_days": 14,
       "steward_after_days": 7,
@@ -1491,5 +1610,11 @@
         ]
       }
     ]
+  },
+  "privacy": {
+    "impact_assessment_classes": [
+      "restricted"
+    ],
+    "impact_assessment_months": 36
   }
 }

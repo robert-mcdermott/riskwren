@@ -75,6 +75,7 @@ def cadence_problems(session: Session, doc: Any, ratings: list[str]) -> dict[str
         ("key_control_test_months", "how often a key control is tested"),
         ("exception_max_months", "how long an exception may run"),
         ("document_review_months", "how often a document is reviewed"),
+        ("plan_exercise_months", "how often a continuity plan is exercised"),
     ):
         if not _whole(doc.get(name), *MONTHS):
             found[name] = f"Give {label} as a number of months, from 1 to 120."
@@ -101,7 +102,7 @@ def cadence_problems(session: Session, doc: Any, ratings: list[str]) -> dict[str
     unknown = set(doc) - {
         "risk_review_months", "unrated_risk_review_months", "control_rating_months",
         "key_control_test_months", "exception_max_months", "issue_due_days", "reminders",
-        "document_review_months",
+        "document_review_months", "plan_exercise_months",
     }  # fmt: skip
     if unknown:
         found["cadences"] = f"{sorted(unknown)[0]!r} is not a cadence."

@@ -23,7 +23,7 @@ from riskwren.db.models.inventory import RECORD_STATUSES, RecordMixin, one_of
 from riskwren.db.types import UtcDateTime
 
 # From the broadest to the most particular. A document implements one of an earlier kind.
-DOCUMENT_KINDS = ("policy", "standard", "procedure", "guideline")
+DOCUMENT_KINDS = ("policy", "standard", "procedure", "plan", "guideline")
 # Where a version's words are: written here, a link to where they are kept, or a file.
 VERSION_FORMS = ("text", "link", "file")
 VERSION_STATUSES = ("draft", "in_review", "approved", "published", "superseded", "discarded")

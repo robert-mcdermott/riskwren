@@ -17,7 +17,7 @@
 }
 .brand:hover { text-decoration: none; }
 .brand-mark { width: 28px; height: 28px; color: var(--accent); flex: none; }
-.brand-logo { max-height: 30px; max-width: 170px; width: auto; }
+.brand-logo { max-height: var(--brand-logo-height, 30px); max-width: var(--brand-logo-width, 170px); width: auto; }
 .brand-name { font-weight: 400; }
 .brand-name strong { font-weight: 650; }
 .only-dark { display: none; }

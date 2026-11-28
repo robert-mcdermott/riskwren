@@ -37,6 +37,8 @@ class Principal:
     command: bool = field(default=False)
     # Leads every unit there is, as the head of the organization does: worked out at sign-in.
     leads_all: bool = False
+    # Reads the leadership reports by the program's choice of who does: worked out at sign-in.
+    report_reader: bool = False
 
     @classmethod
     def for_command(cls, label: str = "Command line") -> Principal:
@@ -107,10 +109,16 @@ class Principal:
         return self.manages or self.is_admin or self.has(roles.AUDITOR)
 
     @property
-    def reads_reports(self) -> bool:
-        """May read the leadership reports: they are the organization's, so those who read
-        everything, and those who lead all of it."""
+    def reads_oversight(self) -> bool:
+        """May read internal audit's universe and plans: they are the organization's, so
+        those who read everything, and those who lead all of it."""
         return self.reads_all or self.leads_all or self.everywhere(roles.LEADER)
+
+    @property
+    def reads_leadership(self) -> bool:
+        """May read the leadership reports: those who read everything and those who lead all
+        of it, and whomever else the program has chosen."""
+        return self.reads_oversight or self.report_reader
 
     @property
     def edits_all(self) -> bool:
@@ -152,7 +160,8 @@ class Principal:
             "assess": self.assesses,
             "steward": self.stewards or self.manages_somewhere,
             "lead": self.leads,
-            "reports": self.reads_reports,
+            "oversight": self.reads_oversight,
+            "leadership": self.reads_leadership,
             "audit": self.has(roles.AUDITOR),
         }
 
