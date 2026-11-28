@@ -63,6 +63,12 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("POST", "/api/v1/reported/{report_id}/confirm"): Needs.ASSESS,
     ("POST", "/api/v1/reported/{report_id}/set-aside"): Needs.ASSESS,
     ("GET", "/api/v1/standing/{kind}/{ref}"): Needs.MEMBER,
+    # Drafts: proposed by an assistant or a token, made by a person in the ordinary form
+    ("POST", "/api/v1/drafts"): Needs.MEMBER,
+    ("GET", "/api/v1/drafts"): Needs.MEMBER,
+    ("GET", "/api/v1/drafts/{draft_id}"): Needs.MEMBER,
+    ("POST", "/api/v1/drafts/{draft_id}/use"): Needs.MEMBER,
+    ("POST", "/api/v1/drafts/{draft_id}/set-aside"): Needs.MEMBER,
     ("POST", "/api/v1/jobs/{key}/run"): Needs.ADMIN,
     ("PUT", "/api/v1/jobs/{key}"): Needs.ADMIN,
     ("GET", "/api/v1/mail"): Needs.ADMIN,
@@ -633,6 +639,8 @@ PERSON_ONLY = frozenset({
     ("PUT", "/api/v1/incidents/{ref}/case"),
     ("POST", "/api/v1/reported/{report_id}/confirm"),
     ("POST", "/api/v1/reported/{report_id}/set-aside"),
+    ("POST", "/api/v1/drafts/{draft_id}/use"),
+    ("POST", "/api/v1/drafts/{draft_id}/set-aside"),
     ("POST", "/api/v1/privacy/reviews/{item_id}"),
 })  # fmt: skip
 

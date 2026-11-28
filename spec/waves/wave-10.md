@@ -33,11 +33,13 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `riskwren.integration.standing` answers for what the asker may see, and otherwise 404. A third party is out of standing when it is not active, its review is overdue, or the coverage rules find information shared with it that no required agreement covers; a scope when it is not active, a control it uses failed a test, or a critical or high issue about it is past its date; an exception whenever it is not in force. Each reason has a code and a sentence, and nothing of the record's contents. A webhook has a `format`: the plain message, a ticket (`title`, `description`, `link`), or a chat message (`text`), each still naming only the event and the record. The API guide has recipes for purchasing, data access, deployments, ticketing, and chat. The tests are in `tests/test_results.py` and `tests/test_integration.py`.
 
-### Slice 3: Tool server for assistants ☐
+### Slice 3: Tool server for assistants ☑
 
-- [ ] `riskwren tools`: a Model Context Protocol server over standard input and output, acting with a token (INT-06)
-- [ ] Tools that read: search, a record, a risk with its controls, a scope's readiness, what is overdue
-- [ ] Tools that draft: a risk, an issue, a control; each a draft a person opens, changes, and confirms, or sets aside
+- [x] `riskwren tools`: a Model Context Protocol server over standard input and output, acting with a token (INT-06)
+- [x] Tools that read: search, a record, a risk with its controls, a scope's readiness, what is overdue
+- [x] Tools that draft: a risk, an issue, a control; each a draft a person opens, changes, and confirms, or sets aside
+
+**Done:** `riskwren.integration.tools` is one set of tools, each calling RiskWren's own API through a small interface, so the tool server and the assistant in the app (slice 4) share them and neither can see more than the asker. `riskwren.integration.mcp` speaks JSON-RPC 2.0 one message to a line, with `initialize`, `ping`, `tools/list`, and `tools/call`, by hand rather than with a library; the protocol is small and the server only answers. `riskwren tools --url` takes the token from `RISKWREN_TOKEN` only, wants `https://` away from the same computer, and `--no-drafts` leaves out the drafting tools. Drafts are `draft` rows (migration 0049) listed under **Drafts** for those who may add that kind of record in its unit; **Open** puts a draft in the ordinary form for a risk, an issue, or a control, and saving it marks the draft as used, naming the record, which must be one the same person made after the draft was proposed. The demo's security engineer has a desktop assistant with a reading token that has drafted a risk and an issue. The tests are `tests/test_drafts.py`.
 
 ### Slice 4: Optional assistant ☐
 
@@ -57,6 +59,7 @@ Made on 2026-11-27 without the user, under their go-ahead to build waves 9 and 1
 - **Pushed results are proposals until a person confirms them.** A scanner's failure is shown on the control at once, as reported by its source, but readiness and ratings move only when an assessor confirms it, the same second pair of eyes a person's result needs.
 - **The reference says yes or no, never why in detail.** A purchasing process learns that a supplier is not in good standing and the reason's kind (no review in date, a gap in coverage), not the review's contents.
 - **Drafts are records of their own,** never half-made records: a person confirms a draft through the ordinary form, so every rule applies, and a draft set aside leaves nothing behind.
+- **A token that may only read may still draft.** A draft changes nothing until a person makes a record of it, so the safest token for an assistant, one that may only read, is enough. It is the one change such a token may send.
 - **Providers are named by protocol, called over plain HTTP,** with no vendor library. Keys come from the environment only; a key in the file is refused.
 - **The assistant reads through the API as the asker,** with their cookie or their token, so it can never see more than they may; and it is sent only what the program's data classes allow.
 

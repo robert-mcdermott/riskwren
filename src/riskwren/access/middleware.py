@@ -29,6 +29,9 @@ NO_TOKEN = {
     ("POST", "/api/v1/anonymous-reports/follow-up"),
     ("POST", "/api/v1/anonymous-reports/messages"),
 }
+# What a token that may only read may still send: a draft, which changes nothing until a
+# person makes a record of it.
+DRAFTING = {("POST", "/api/v1/drafts")}
 MAX_BODY = 32 * 1024 * 1024  # a little over the largest file anyone may send
 
 
@@ -89,7 +92,7 @@ def _prepare(request: Request) -> None:
     if _bearer(request) is not None:
         if principal is None:
             raise HTTPException(401, "The token is not one in force.")
-        if unsafe and principal.read_only:
+        if unsafe and principal.read_only and (request.method, request.url.path) not in DRAFTING:
             raise HTTPException(403, "This token may only read.")
         return  # a token is not a cookie: there is no request forgery to guard against
     if unsafe and principal is not None and (request.method, request.url.path) not in NO_TOKEN:

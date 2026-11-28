@@ -42,7 +42,9 @@ export function reducesLabel(key) {
 }
 
 /** Add a control, or edit the one given. A new one can be started from the library of common controls. */
-export function editControl({ record = null, vocab, units, from = null, unitId = null, onDone = null }) {
+export function editControl({ record = null, draft = null, vocab, units, from: library = null, unitId = null, onDone = null }) {
+  const from = library ?? (draft ? { title: draft.values.name, statement: draft.values.statement, kind: draft.values.kind, nature: draft.values.nature, frequency: draft.values.frequency, objective: draft.values.objective } : null);
+  if (draft) unitId = unitId ?? draft.org_unit?.id ?? null;
   openOverlay({
     title: record ? "Edit control" : "Add a control",
     subtitle: record ? record.ref : "Something the organization does to reduce a risk, described once.",
@@ -50,8 +52,8 @@ export function editControl({ record = null, vocab, units, from = null, unitId =
       const name = field("Title", { value: record?.name ?? from?.title ?? "", required: true, hint: "A few words. For example: Backups tested by restoring." });
       const statement = field("Statement", { type: "textarea", value: record?.statement ?? from?.statement ?? "", required: true,
         hint: "One sentence: who does what, and how often." });
-      const objective = field("Objective", { type: "textarea", value: record?.objective ?? "", hint: "Optional. What it is meant to prevent, detect, or put right." });
-      const kind = select("Kind", options(vocab, "control_kinds", { blank: record || from ? null : "Choose…" }), { value: record?.kind ?? from?.kind ?? "", required: true });
+      const objective = field("Objective", { type: "textarea", value: record?.objective ?? from?.objective ?? "", hint: "Optional. What it is meant to prevent, detect, or put right." });
+      const kind = select("Kind", options(vocab, "control_kinds", { blank: record || from?.kind ? null : "Choose…" }), { value: record?.kind ?? from?.kind ?? "", required: true });
       const nature = select("Nature", options(vocab, "control_natures", { blank: "Not said" }), { value: record?.nature ?? from?.nature ?? "" });
       const frequency = select("How often", options(vocab, "control_frequencies", { blank: "Not said" }), { value: record?.frequency ?? from?.frequency ?? "" });
       const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record || unitId ? null : "Choose…" }),
@@ -106,6 +108,7 @@ export function editControl({ record = null, vocab, units, from = null, unitId =
           run: () => (record ? patch(`/api/v1/controls/${record.ref}`, { version: record.version, ...values() }) : post("/api/v1/controls", values())) });
         if (!done) return;
         close();
+        if (draft) await post(`/api/v1/drafts/${draft.id}/use`, { ref: done.data.ref }).catch(() => toast("It was made, but the draft could not be marked as used."));
         if (record || !onDone) toast(record ? "Saved." : `${done.data.ref} was added.`);
         if (onDone) onDone(done.data);
         else if (!record) navigate(`/controls/${done.data.ref}`);

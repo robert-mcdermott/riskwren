@@ -157,13 +157,14 @@ async function boot() {
   route("/campaign-items/:id", page("campaigns", "campaignItem"));
   route("/questionnaires", page("questionnaires", "questionnaireList"));
   route("/questionnaires/:key", page("questionnaires", "questionnairePage"));
+  route("/reported", page("reported", "reportedPage"));
+  route("/drafts", page("drafts", "draftsPage"));
   if (can("admin")) {
     route("/admin/people", page("admin-people", "adminPeople"));
     route("/admin/units", page("admin-units", "adminUnits"));
     route("/admin/appearance", page("admin-appearance", "adminAppearance"));
     route("/admin/sso", page("admin-sso", "adminSso"));
     route("/admin/integrations", page("admin-integrations", "adminIntegrations"));
-    route("/reported", page("reported", "reportedPage"));
     route("/admin/operations", page("admin-operations", "adminOperations"));
     route("/admin/scheduled-work", page("admin-operations", "adminOperations")); // its earlier address
   }

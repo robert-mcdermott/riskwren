@@ -119,6 +119,49 @@ echo "$answer" | jq -e '.data.in_good_standing' > /dev/null || echo "Hold: $(ech
 
 **Ticketing and chat.** Register a webhook with the format **A ticket** at the service desk's incoming address, told of `issue.*`, and each issue raised or changed opens or updates a ticket whose link leads back to the issue. Register one with **A chat message** at a channel's incoming address, told of `incident.report` and `exception.request`, for the few things a team should see as they happen. Neither carries what the record says.
 
+## An assistant: the tool server
+
+`riskwren tools` is a Model Context Protocol server, over standard input and output, for an assistant on someone's own computer. It gives the assistant tools that call RiskWren's API with a token, so the assistant sees only what the token may:
+
+| Tool | What it does |
+|---|---|
+| `search` | Search every kind of record the token may see |
+| `get_record` | One record in full, by its reference |
+| `risk_with_controls` | A risk, with its ratings and the controls that bear on it |
+| `scope_readiness` | A scope: what it is held to, how far it meets it, and its open issues |
+| `whats_overdue` | Risks whose review is overdue, issues past their date, controls whose rating is stale |
+| `draft_risk` · `draft_issue` · `draft_control` | A draft, for a person to open, change, and save |
+
+Make a token for it under **Admin → Other systems**: an auditor's that may only read is enough, because a token that may only read may still draft. Then tell the assistant to start the server, with the token in its environment and never on the command line:
+
+```json
+{
+  "mcpServers": {
+    "riskwren": {
+      "command": "riskwren",
+      "args": ["tools", "--url", "https://grc.example.org"],
+      "env": {"RISKWREN_TOKEN": "rwt_…"}
+    }
+  }
+}
+```
+
+`--no-drafts` offers only the tools that read. The address must be `https://`, except on the same computer. An answer is cut short past 24,000 characters, so one record cannot fill a conversation. What the assistant does with what it reads is between it and whoever provides it, so choose one the organization trusts with what the token may see. The drafts it makes are in the history under the token's name, and when the token was last used is shown beside it.
+
+### Drafts
+
+A draft is a proposal, never a half-made record. It waits under **Drafts** for a person who may add that kind of record in its unit: a unit's steward or a manager for a risk or a control, and an assessor too for an issue. **Open** puts it in the ordinary form, where the person changes what they like and saves it, so every rule that applies to a record they make applies to this one; the draft is then marked as used, naming what was made. **Set aside** keeps it on record with why, and makes nothing.
+
+```bash
+curl -s -X POST -H "Authorization: Bearer rwt_…" -H "Content-Type: application/json" \
+  https://grc.example.org/api/v1/drafts \
+  -d '{"kind": "issue", "values": {"name": "Firewall rules not reviewed in a year",
+       "summary": "The last review is fourteen months old.", "severity": "moderate",
+       "org_unit_id": 4}, "why": "The firewall standard asks for one every six months."}'
+```
+
+A risk draft may say `name`, `summary`, `cause`, `event`, `consequence`, and `category`; an issue draft `name`, `summary`, `severity`, and `source_kind`; a control draft `name`, `statement`, `objective`, `kind`, `nature`, and `frequency`. Each may say `org_unit_id`, and needs a `name`. Anything else is refused.
+
 ## The contract
 
 `docs/api-contract.json` records every route, its parameters, and the fields its body takes, and which are needed. A release may add to it: a route, an optional parameter, an optional field. A change that would break a client (a route, a parameter, or a field taken away, or one that was optional made needed) fails the build unless it is made on purpose, and is then listed under **Breaking** in the [changelog](../CHANGELOG.md).
@@ -284,6 +327,7 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET` · `POST /admin/webhooks` · `PATCH` · `DELETE /admin/webhooks/{hook_id}` · `POST /admin/webhooks/{hook_id}/test` | Webhooks with their latest deliveries; register one (`name`, `url`, `events`, `format`; the secret is in `meta.secret` this once), change, pause or resume (`active`), remove, or send a test (administrators) |
 | `GET` · `POST /controls/{ref}/reported` · `GET /reported` · `POST /reported/{id}/confirm` · `POST /reported/{id}/set-aside` | What other systems report of a control: report one (a token acting as a manager, an assessor, or a steward); see a control's; what waits for you to decide; confirm one (`note`, `severity`) or set it aside (`note`), as a person who assesses the control's unit and does not own the control |
 | `GET /standing/{kind}/{ref}` | Whether a third party, a scope, or an exception is in good standing, with the reasons by code |
+| `GET` · `POST /drafts` · `GET /drafts/{id}` · `POST /drafts/{id}/use` · `POST /drafts/{id}/set-aside` | Drafts: propose one (`kind`, `values`, `why`; a token that may only read may too); those waiting for you; one draft; mark one as used, naming the record you made from it (`ref`); set one aside (`note`) |
 | `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
 | `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 

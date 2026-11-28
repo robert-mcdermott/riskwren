@@ -505,6 +505,16 @@
   },
   "body": {}
  },
+ "GET /api/v1/drafts": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/drafts/{draft_id}": {
+  "parameters": {
+   "path:draft_id": true
+  },
+  "body": {}
+ },
  "GET /api/v1/engagements/{ref}": {
   "parameters": {
    "path:ref": true
@@ -2558,6 +2568,30 @@
  "POST /api/v1/dossiers/check": {
   "parameters": {},
   "body": {}
+ },
+ "POST /api/v1/drafts": {
+  "parameters": {},
+  "body": {
+   "kind": true,
+   "values": true,
+   "why": false
+  }
+ },
+ "POST /api/v1/drafts/{draft_id}/set-aside": {
+  "parameters": {
+   "path:draft_id": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/drafts/{draft_id}/use": {
+  "parameters": {
+   "path:draft_id": true
+  },
+  "body": {
+   "ref": true
+  }
  },
  "POST /api/v1/engagements/{ref}/advance": {
   "parameters": {

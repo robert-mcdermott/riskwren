@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
 from riskwren.api.common import envelope, reading, writing
-from riskwren.integration import results, standing, tokens, webhooks
+from riskwren.integration import drafts, results, standing, tokens, webhooks
 
 router = APIRouter(prefix="/api/v1", tags=["integration"])
 
@@ -199,3 +199,63 @@ def check_standing(request: Request, kind: str, ref: str) -> dict[str, Any]:
     principal = current(request)
     with reading(request) as session:
         return envelope(standing.check(session, principal, kind, ref))
+
+
+# --- Drafts ------------------------------------------------------------------------------------
+
+
+class DraftBody(BaseModel):
+    kind: str = Field(description="risk, issue, or control")
+    values: dict[str, Any] = Field(
+        description="The ordinary form's fields by name, and org_unit_id; at least a name"
+    )
+    why: str | None = Field(default=None, max_length=2000, description="What it rests on")
+
+
+class UseBody(BaseModel):
+    ref: str = Field(max_length=32, description="The record made from it")
+
+
+class AsideBody(BaseModel):
+    note: str | None = Field(default=None, max_length=2000)
+
+
+@router.post("/drafts", status_code=201, summary="Propose a risk, an issue, or a control")
+def propose_draft(request: Request, body: DraftBody) -> dict[str, Any]:
+    """Kept for a person to open in the ordinary form; nothing is made until they save it. A
+    token that may only read may still propose one."""
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        row = drafts.propose(session, principal, body.kind, body.values, body.why)
+        return envelope(drafts.view(session, principal, row))
+
+
+@router.get("/drafts", summary="Drafts waiting for a person who may make them")
+def list_drafts(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(drafts.waiting(session, principal))
+
+
+@router.get("/drafts/{draft_id}", summary="One draft")
+def show_draft(request: Request, draft_id: int) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(drafts.view(session, principal, drafts.load(session, principal, draft_id)))
+
+
+@router.post("/drafts/{draft_id}/use", summary="Mark a draft as used, naming what was made")
+def use_draft(request: Request, draft_id: int, body: UseBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        row = drafts.used(session, principal, drafts.load(session, principal, draft_id), body.ref)
+        return envelope(drafts.view(session, principal, row))
+
+
+@router.post("/drafts/{draft_id}/set-aside", summary="Set a draft aside, saying why")
+def set_draft_aside(request: Request, draft_id: int, body: AsideBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        row = drafts.set_aside(session, principal, drafts.load(session, principal, draft_id),
+                               body.note)  # fmt: skip
+        return envelope(drafts.view(session, principal, row))

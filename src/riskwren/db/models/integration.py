@@ -118,3 +118,29 @@ class ReportedResult(Base):
     evidence_id: Mapped[int | None] = mapped_column(Integer)
 
     __table_args__ = (Index("ix_reported_result_control", "control_id", "status"),)
+
+
+class Draft(Base):
+    """What an assistant or another system proposes: a risk, an issue, or a control, made only
+    when a person opens it in the ordinary form and saves it. Setting one aside leaves no
+    record behind; the draft itself stays, with why."""
+
+    __tablename__ = "draft"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(16))  # risk, issue, or control
+    values: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict)
+    why: Mapped[str | None] = mapped_column(Text)  # what the drafter says it rests on
+    source: Mapped[str] = mapped_column(String(200))  # the token's name, or the assistant's
+    org_unit_id: Mapped[int | None] = mapped_column(ForeignKey("org_unit.id"))
+    made_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))  # the asker, if a person
+    made_by_name: Mapped[str] = mapped_column(String(200))
+    made_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    status: Mapped[str] = mapped_column(String(16))  # waiting, used, or set_aside
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    decided_by_name: Mapped[str | None] = mapped_column(String(200))
+    decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    record_ref: Mapped[str | None] = mapped_column(String(32))  # what was made from it
+
+    __table_args__ = (Index("ix_draft_status", "status", "made_at"),)

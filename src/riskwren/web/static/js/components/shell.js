@@ -23,7 +23,7 @@ function named(item) {
 const NAMED = new Set(["processes", "systems", "third-parties", "services", "information", "sites", "issues", "exceptions", "incidents"]);
 
 export const NAV = [
-  { items: [{ href: "/", label: "Home", iconName: "home", exact: true }] },
+  { items: [{ href: "/", label: "Home", iconName: "home", exact: true }, { href: "/drafts", label: "Drafts", iconName: "edit", when: ["steward", "assess"] }] },
   {
     heading: "Risks",
     items: [

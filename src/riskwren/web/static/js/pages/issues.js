@@ -36,17 +36,22 @@ function footerOf(footer, save, close) {
  * Raise an issue, or change one. `about` is records it starts out being about;
  * `requirement` ({ framework, code, title }) a requirement; `from` what found it.
  */
-export function editIssue({ issue = null, about = [], requirement = null, unitId = null, from = null, name = "", vocab, units: unitIndex, onDone = null }) {
+export function editIssue({ issue = null, draft = null, about = [], requirement = null, unitId = null, from = null, name = "", vocab, units: unitIndex, onDone = null }) {
+  if (draft) {
+    name = draft.values.name ?? name;
+    unitId = unitId ?? draft.org_unit?.id ?? null;
+    from = from ?? draft.values.source_kind ?? null;
+  }
   const chosen = about.map((record) => ({ ...record }));
   openOverlay({
     title: issue ? "Edit the issue" : "Raise an issue",
     subtitle: issue ? `${issue.ref} · ${issue.name}` : "Something that is wrong and must be put right.",
     render: (body, footer, close) => {
       const title = field("What is wrong", { value: issue?.name ?? name, required: true, maxlength: 200, hint: issue ? null : "In a few words, as you would say it to the person who must fix it." });
-      const summary = field("Detail", { type: "textarea", rows: 4, value: issue?.summary ?? "", hint: "What was seen, where, and how it was found." });
+      const summary = field("Detail", { type: "textarea", rows: 4, value: issue?.summary ?? draft?.values.summary ?? "", hint: "What was seen, where, and how it was found." });
       const unit = select("Unit", unitOptions(unitIndex.tree, { only: evidenceUnits(), blank: issue || unitId ? null : "Choose…" }), { value: issue?.org_unit_id ?? unitId ?? "", required: true, hint: "The unit that must put it right." });
       const meaning = h("div", { class: "hint" });
-      const severity = select("Severity", severityOptions(vocab), { value: issue?.severity ?? "moderate" });
+      const severity = select("Severity", severityOptions(vocab), { value: issue?.severity ?? draft?.values.severity ?? "moderate" });
       const explain = () => {
         const item = (vocab.issue_severities ?? []).find((each) => each.key === severity.input.value);
         meaning.replaceChildren(item?.description ?? "", item?.due_days ? `. Due within ${days(item.due_days)} of being raised.` : "");
@@ -70,6 +75,7 @@ export function editIssue({ issue = null, about = [], requirement = null, unitId
               requirements: requirement ? [{ framework: requirement.framework, code: requirement.code }] : [] })) });
         if (!done) return;
         close();
+        if (draft) await post(`/api/v1/drafts/${draft.id}/use`, { ref: done.data.ref }).catch(() => toast("It was made, but the draft could not be marked as used."));
         toast(issue ? "Saved." : `${done.data.ref} was raised. It is due ${date(done.data.due_on)}.`);
         if (onDone) onDone(done.data);
         else navigate(`/issues/${done.data.ref}`);

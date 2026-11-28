@@ -2311,36 +2311,54 @@ class Builder:
                                         "days": 90})  # fmt: skip
             scanner, _ = tokens.issue(session, who, {
                 "name": "Patch scanner", "role": "assessor", "read_only": False, "days": 180})  # fmt: skip
+            helper, _ = tokens.issue(session, who, {
+                "name": "Security engineer's assistant", "role": "auditor", "read_only": True,
+                "days": 30})  # fmt: skip
+            helper_id = helper.id
             hook, _ = webhooks.create(session, who, {
                 "name": "Service desk", "url": "https://servicedesk.northmere.example/hooks/grc",
                 "events": ["issue.*", "incident.*"]})  # fmt: skip
             webhooks.update(session, who, hook.id, {"active": False})
             self.tally("tokens")
             scanner_id = scanner.id
-        # The patch scanner reports what it finds; the security office confirms the failure.
-        from riskwren.db.models import ApiToken, Control
-        from riskwren.integration import results
+        # The patch scanner reports what it finds; the security office confirms the failure; an
+        # engineer's desktop assistant, through the tool server, drafts what it was asked to.
+        from riskwren.db.models import ApiToken, Control, ReportedResult
+        from riskwren.integration import drafts, results
 
-        for days, name, values in c.REPORTED:
-            yield self._on(days, hour=6)
+        steps = sorted([(spec[0], "report", spec) for spec in c.REPORTED]
+                       + [(9, "confirm", None)]
+                       + [(spec[0], "draft", spec) for spec in c.DRAFTS],
+                       key=lambda step: -step[0])  # fmt: skip
+        for days, what, spec in steps:
+            if what == "confirm":
+                yield self._on(days, hour=10)
+                with self.act(self.cast["assess1"]) as (session, who):
+                    first = session.scalars(
+                        select(ReportedResult).where(ReportedResult.outcome == "failed")
+                    ).first()
+                    if first is not None:
+                        results.confirm(
+                            session, who, first, {"note": "Confirmed against the console."}
+                        )
+                continue
+            yield self._on(days, hour=6 if what == "report" else 15)
             with self.db.write(self.principal(self.cast["admin"]).actor) as session:
-                row = session.get(ApiToken, scanner_id)
+                row = session.get(ApiToken, scanner_id if what == "report" else helper_id)
                 assert row is not None
                 bot = tokens.principal_for(session, row)
                 session.info["actor"] = bot.actor
-                control = session.scalars(select(Control).where(Control.name == name)).one()
-                results.report(session, bot, control, {
-                    **values, "observed_at": self._on(days, hour=5).isoformat()})  # fmt: skip
-                self.tally("reports from other systems")
-        yield self._on(9, hour=10)
-        from riskwren.db.models import ReportedResult
-
-        with self.act(self.cast["assess1"]) as (session, who):
-            first = session.scalars(
-                select(ReportedResult).where(ReportedResult.outcome == "failed")
-            ).first()
-            if first is not None:
-                results.confirm(session, who, first, {"note": "Confirmed against the console."})
+                if what == "report":
+                    _, name, values = spec
+                    control = session.scalars(select(Control).where(Control.name == name)).one()
+                    results.report(session, bot, control, {
+                        **values, "observed_at": self._on(days, hour=5).isoformat()})  # fmt: skip
+                    self.tally("reports from other systems")
+                else:
+                    _, kind, unit, values, why = spec
+                    drafts.propose(session, bot, kind, {**values, "org_unit_id": self.units[unit]},
+                                   why)  # fmt: skip
+                    self.tally("drafts")
 
     def _story_resilience(self) -> Script:
         """The risk office facilitates business impact analyses of the critical processes, and
