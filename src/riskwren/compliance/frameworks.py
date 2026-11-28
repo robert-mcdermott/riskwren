@@ -118,8 +118,9 @@ def card(row: Requirement, children: int = 0) -> dict[str, Any]:
     return {
         "id": row.id,
         "code": row.code,
-        "title": row.title,
-        "excerpt": _excerpt(row.text),
+        "title": row.local_title or row.title,
+        "excerpt": _excerpt(row.local_text or row.text),
+        "licensed": bool(row.local_title or row.local_text),
         "kind": row.kind,
         "is_citable": row.is_citable,
         "depth": row.depth,
@@ -136,6 +137,40 @@ def _child_counts(session: Session, ids: list[int]) -> dict[int, int]:
         .group_by(Requirement.parent_id)
     ).all()
     return {int(parent): int(count) for parent, count in rows}
+
+
+def load_local_text(
+    session: Session, principal: Principal, framework: Framework, rows: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """The source's own words for a framework that ships as identifiers, from an organization
+    that holds a license to them. They stay in this installation: no pack carries them. A row
+    with neither a title nor text takes the words away again."""
+    if not principal.configures:
+        raise PermissionDenied("Only those who run the program load a framework's text.")
+    if framework.text_policy != "identifiers":
+        raise Invalid(
+            "Nothing was loaded.", {"framework": f"{framework.title} carries its own text."}
+        )
+    by_code = {
+        row.code: row
+        for row in session.scalars(
+            select(Requirement).where(Requirement.framework_id == framework.id)
+        )
+    }
+    unknown = [str(row.get("code")) for row in rows if row.get("code") not in by_code]
+    if unknown:
+        raise Invalid(
+            "Nothing was loaded.", {"code": f"{framework.title} has no {', '.join(unknown[:5])}."}
+        )
+    with audit.operation(session, "framework.local_text", framework=framework.key):
+        for row in rows:
+            requirement = by_code[row["code"]]
+            requirement.local_title = (str(row.get("title") or "").strip() or None) and str(
+                row["title"]
+            ).strip()[:300]
+            requirement.local_text = str(row.get("text") or "").strip() or None
+    session.flush()
+    return {"loaded": len(rows)}
 
 
 def find(session: Session, framework: Framework, code: str) -> Requirement:
@@ -235,7 +270,7 @@ def detail(session: Session, framework: Framework, code: str) -> dict[str, Any]:
     ).all()
     return {
         **card(row, len(children)),
-        "text": row.text,
+        "text": row.local_text or row.text,
         "guidance": row.guidance,
         "status": row.status,
         "framework": {"key": framework.key, "title": framework.title},

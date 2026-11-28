@@ -1,0 +1,10 @@
+# Only what the image is built from goes into the build context.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!NOTICE
+!src/
+!deploy/container-start.sh
+**/__pycache__

@@ -63,6 +63,9 @@ ignore = [
 # Its content is tables of sentences, kept one entry to a line.
 "scripts/build-default-program.py" = ["E501"]
 "scripts/build-framework-packs.py" = ["E501"]
+"scripts/build-starter-programs.py" = ["E501"]
+# A measurement: its randomness picks pages, and it reads only the server it started.
+"scripts/measure.py" = ["S310", "S311"]
 "tests/test_frameworks.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]
 "tests/test_crosswalk.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]
 "tests/test_scopes.py" = ["E501", "S104", "S105", "S106", "S108", "S311", "S608"]

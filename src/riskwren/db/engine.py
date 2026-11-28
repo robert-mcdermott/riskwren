@@ -92,6 +92,7 @@ class Database:
     @contextmanager
     def read(self) -> Iterator[Session]:
         session = self._read()
+        session.info["reading"] = True  # see riskwren.db.remember
         try:
             yield session
         finally:

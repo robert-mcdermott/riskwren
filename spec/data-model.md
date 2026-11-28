@@ -199,7 +199,7 @@ Free labels, for whatever the vocabularies do not cover, kept as a list on the r
 | 6 | `measure_snapshot` (slice 1; outside the hash chain), `leadership_report` (slice 3; `LDR`; its body is kept out of the history, which records its fingerprint), `scenario`, `estimate` |
 | 7 | `audit_entity` (slice 1; what audit says about a thing in the universe, which is otherwise worked out), `audit_plan` (`APL`), `engagement` (`AUD`), `engagement_member`, `workpaper`, `review_note` (slice 2; their words kept out of the history), `request_item`, `external_access` |
 | 8 | `incident`, `case`, `case_member`, `breach_assessment`, `notification`, `loss_event`, `impact_analysis`, `continuity_plan`, `plan_version`, `exercise`, `site` |
-| 9 | `api_token`, `webhook`, `webhook_delivery`, `custom_field` |
+| 9 | `custom_value` (slice 3; the fields themselves are the `custom_fields` setting; a child of its record in the history), `requirement.local_title` and `local_text` (slice 3; a licence holder's words for a framework that ships as identifiers), `api_token`, `webhook`, `webhook_delivery`, `webhook_cursor` (slice 4; tokens act as a role and are kept as a digest; deliveries and the cursor are bookkeeping, outside the history) |
 
 ## Program settings
 

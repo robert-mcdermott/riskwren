@@ -35,6 +35,43 @@ In `units`, each scoped role lists the units it covers, or `null` for the whole 
 
 `GET /api/v1/session` returns the same for the session you hold, or 401 if you hold none. `DELETE /api/v1/session` signs out.
 
+## Another system: tokens
+
+Another system uses the API with a token, made by an administrator under **Admin → Other systems**, and sent in a header instead of a cookie:
+
+```bash
+curl -s -H "Authorization: Bearer rwt_…" https://grc.example.org/api/v1/risks?limit=50
+```
+
+A token acts as a role, never as a person: an **auditor's** reads everything, a **manager's** runs the program, an **assessor's** tests and reviews, a **steward's** works within one unit, and a **member's** reads what everyone may. A manager's or an assessor's token may be limited to one unit, and a steward's must be. A token is made to read only unless the administrator says otherwise; a change sent with one that may only read is refused with 403. An administrator's token cannot be made.
+
+The token is shown once, when it is made; only its SHA-256 fingerprint is kept. It ends on its date (at most a year and a day away) or when it is withdrawn, after which it is refused with 401. What a token changes is in the history under its name (*API token Ticketing*), and when it was last used is shown beside it. A request with a token needs no CSRF token, because it carries no cookie.
+
+## Being told: webhooks
+
+An administrator registers a webhook under **Admin → Other systems**: a name, an `https://` address, and what it is told of: `*` for everything, a family such as `issue.*`, or an event such as `issue.close` or `risk.assess`. The families are risk, control, issue, exception, incident, document, evidence, assessment, third_party, third_party_review, system, process, scope, and agreement. An event's name is what was done, as the history names it.
+
+Within a minute of something happening, each webhook that wants it is sent a `POST`:
+
+```json
+{
+  "event": "issue.close",
+  "at": "2026-11-28T14:02:11.402Z",
+  "seq": 10422,
+  "record": {"type": "issue", "ref": "ISS-0031", "url": "https://grc.example.org/issues/ISS-0031"}
+}
+```
+
+A message names the event and the record, and never says what the record says: the receiver asks the API, with a token, for what it may see. A restricted record is never named. One operation on one record makes one message. A new webhook is told of what happens after it is registered, not of the past.
+
+Each message carries `X-RiskWren-Event`, `X-RiskWren-Delivery`, and `X-RiskWren-Signature: t=TIME,v1=HEX`, where `HEX` is the HMAC-SHA256, keyed with the webhook's secret, of the time, a dot, and the body exactly as sent. The secret is shown once, when the webhook is registered. To check a message, recompute the signature and compare it in constant time, and refuse one whose time is more than five minutes away from your own.
+
+An answer of 2xx is a delivery. Anything else, or no answer within ten seconds, is tried again after a minute, five minutes, half an hour, two hours, and twelve hours, and then given up. The latest deliveries, with how each went, are shown with the webhook, and kept for thirty days. A webhook can be paused, and sent a test message.
+
+## The contract
+
+`docs/api-contract.json` records every route, its parameters, and the fields its body takes, and which are needed. A release may add to it: a route, an optional parameter, an optional field. A change that would break a client (a route, a parameter, or a field taken away, or one that was optional made needed) fails the build unless it is made on purpose, and is then listed under **Breaking** in the [changelog](../CHANGELOG.md).
+
 ## Changing things
 
 Every request that changes anything (`POST`, `PUT`, `PATCH`, `DELETE`) must carry the session's CSRF token in a header:
@@ -192,6 +229,8 @@ Every route requires a signed-in account except those marked public. What a rout
 | `POST /questionnaires/check` | Check a document without saving it, and see which questions given answers would show |
 | `POST /questionnaires/{key}/responses` · `GET /responses/{id}` | Answer a questionnaire, as a draft or in full; read answers as they were asked |
 | `GET /jobs` · `POST /jobs/{key}/run` · `PUT /jobs/{key}` | Scheduled work: how it is going, run one job now, pause or resume one (administrators) |
+| `GET` · `POST /admin/tokens` · `POST /admin/tokens/{token_id}/revoke` | Tokens for other systems: list them, make one (`name`, `role`, `org_unit_id`, `read_only`, `days`; the token is in `meta.token` this once), withdraw one (administrators) |
+| `GET` · `POST /admin/webhooks` · `PATCH` · `DELETE /admin/webhooks/{hook_id}` · `POST /admin/webhooks/{hook_id}/test` | Webhooks with their latest deliveries; register one (`name`, `url`, `events`; the secret is in `meta.secret` this once), change, pause or resume (`active`), remove, or send a test (administrators) |
 | `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
 | `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 
@@ -324,6 +363,7 @@ A requirement is addressed by a query, since codes such as `164.308(a)(1)(ii)(A)
 | Route | What it does |
 |---|---|
 | `GET /program` | Categories with appetite, the scoring method, cadences, and the acceptance table |
+| `GET /program/fields` · `PUT /program/fields/{type_key}` | The fields of the organization's own on each kind of record; set those of one kind (`fields`, each with `key`, `label`, `kind`, `choices`, `help`, `required`). A record takes their values as `custom` |
 | `PATCH /risk-categories/{key}` | Set a category's appetite (a manager for the whole organization) |
 | `GET /vocabularies` | The lists of values records choose from |
 | `GET` · `PUT /admin/visibility` | How much of the register everyone sees |

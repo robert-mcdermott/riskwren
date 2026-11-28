@@ -24,6 +24,48 @@ class Preferences(BaseModel):
     email_notices: str = Field(max_length=16)
 
 
+def _size(root: Any) -> int:
+    """The bytes the data home holds."""
+    from pathlib import Path
+
+    total = 0
+    for path in Path(root).rglob("*"):
+        try:
+            total += path.stat().st_size if path.is_file() else 0
+        except OSError:
+            continue
+    return total
+
+
+@router.get("/admin/operations", summary="This installation: version, database, backups, health")
+def installation(request: Request) -> dict[str, Any]:
+    """What an administrator needs to know of the installation itself, and what `riskwren
+    doctor --production` would say of it, without reaching anything outside."""
+    import shutil
+
+    from riskwren import __version__, backup
+    from riskwren.cli import doctor
+    from riskwren.db import migrate
+    from riskwren.home import DataHome
+
+    config = request.app.state.config
+    home = DataHome(config.data.home)
+    db = request.app.state.db
+    checks = doctor.going_live(config, home)
+    return envelope({
+        "version": __version__,
+        "database": "SQLite" if config.uses_sqlite else "PostgreSQL",
+        "migration": migrate.current_revision(db.engine),
+        "workers": config.server.workers,
+        "scheduler": config.server.scheduler,
+        "base_url": config.server.base_url,
+        "data_home": {"path": str(home.root), "bytes": _size(home.root),
+                      "free_bytes": shutil.disk_usage(home.root).free},
+        "last_backup": backup.last(home),
+        "checks": [{"name": c.name, "status": c.status, "detail": c.detail} for c in checks],
+    })  # fmt: skip
+
+
 @router.get("/jobs", summary="Scheduled work, and how its recent runs went")
 def jobs_status(request: Request) -> dict[str, Any]:
     jobs.ensure(request.app.state.db)

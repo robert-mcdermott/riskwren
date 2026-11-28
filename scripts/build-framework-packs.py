@@ -742,13 +742,45 @@ def count(items: list[dict[str, Any]]) -> tuple[int, int]:
     return total, citable
 
 
+# --- ISO/IEC 27001, by its codes ------------------------------------------------------------
+
+# The standard is copyrighted and has no open license, so the pack carries its codes and
+# nothing else: no titles, no text. An organization that holds a license loads the text into
+# its own installation (`riskwren frameworks text iso-27001 FILE`), where it stays.
+ISO_CLAUSES = {"4": 4, "5": 3, "6": 3, "7": 5, "8": 3, "9": 3, "10": 2}
+ISO_THEMES = {"5": ("Organizational controls", 37), "6": ("People controls", 8),
+              "7": ("Physical controls", 14), "8": ("Technological controls", 34)}  # fmt: skip
+
+
+def build_iso_27001(_offline: bool) -> dict[str, Any]:
+    clauses = [node(number, title=f"Clause {number}", group=True, children=[
+        node(f"{number}.{n}") for n in range(1, count + 1)]) for number, count in ISO_CLAUSES.items()]  # fmt: skip
+    annex = [node(f"A.{theme}", title=label, group=True, children=[
+        node(f"A.{theme}.{n}", kind="control") for n in range(1, count + 1)])
+        for theme, (label, count) in ISO_THEMES.items()]  # fmt: skip
+    return {
+        "pack": header(
+            "iso-27001", "ISO/IEC 27001:2022, by its codes", "2022",
+            publisher="ISO and IEC", license="The codes only. The standard's titles and text are "
+            "copyrighted and are not carried; an organization that holds a license loads them "
+            "into its own installation.",
+            text_policy="identifiers", source_url="https://www.iso.org/standard/27001",
+            summary="The management system's clauses 4 to 10 and the 93 controls of Annex A, "
+            "by their codes, to map controls to and to scope.",
+        ),
+        "requirements": [node("Clauses", title="The management system", group=True,
+                              children=clauses),
+                         node("Annex A", title="Annex A controls", group=True, children=annex)],
+    }  # fmt: skip
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--offline", action="store_true", help="use only files already fetched")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     builders = (build_csf, build_800_53, build_800_53_r4, build_800_171, build_hipaa,
-                build_hipaa_breach, build_privacy_framework)  # fmt: skip
+                build_hipaa_breach, build_privacy_framework, build_iso_27001)  # fmt: skip
     for build in builders:
         pack = build(args.offline)
         path = OUT / f"{pack['pack']['key']}.json"

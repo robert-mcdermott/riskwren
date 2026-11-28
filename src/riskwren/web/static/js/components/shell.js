@@ -8,11 +8,20 @@ import { can, session } from "../core/session.js";
 import { mode, setMode } from "../core/prefs.js";
 import { openAppearance } from "./appearance.js";
 import { openPalette } from "./cmdk.js";
+import { TYPES, UNIT } from "./record.js";
 
 const quickFind = async (text) => (await import("../pages/find.js")).quickFind(text);
 import { avatar } from "./ui.js";
 
 // Each entry appears only for people who can use it. Sections arrive as the product grows.
+/** A menu item for a kind of record, or for units, says what the organization calls it. */
+function named(item) {
+  if (item.href === "/admin/units") return { ...item, label: UNIT.plural };
+  const type = Object.values(TYPES).find((each) => `/${each.path}` === item.href && NAMED.has(each.path));
+  return type ? { ...item, label: type.plural } : item;
+}
+const NAMED = new Set(["processes", "systems", "third-parties", "services", "information", "sites", "issues", "exceptions", "incidents"]);
+
 export const NAV = [
   { items: [{ href: "/", label: "Home", iconName: "home", exact: true }] },
   {
@@ -115,13 +124,14 @@ export const NAV = [
       { href: "/admin/units", label: "Units", iconName: "units", when: "admin" },
       { href: "/admin/appearance", label: "Appearance", iconName: "appearance", when: "admin" },
       { href: "/admin/sso", label: "Single sign-on", iconName: "key", when: "admin" },
-      { href: "/admin/scheduled-work", label: "Scheduled work", iconName: "history", when: "admin" },
+      { href: "/admin/integrations", label: "Other systems", iconName: "link", when: "admin" },
+      { href: "/admin/operations", label: "Operations", iconName: "history", when: "admin" },
     ],
   },
 ];
 
 export function visibleNav() {
-  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || [item.when].flat().some((need) => can(need))) }))
+  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || [item.when].flat().some((need) => can(need))).map(named) }))
     .filter((group) => group.items.length);
 }
 

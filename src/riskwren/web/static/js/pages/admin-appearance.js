@@ -106,6 +106,14 @@ export function adminAppearance(main) {
         hint: "Up to five, one to a line, as: Label | https://address. Shown at the foot of the sidebar and the sign-in page." });
       const emailFooter = field("Last line of every email", { value: data.email_footer, maxlength: 300,
         hint: "Optional. For example the name of your office and how to reach it." });
+      const terms = (data.term_choices ?? []).map((standard) => ({ key: standard.key, standard,
+        one: h("input", { class: "input", value: data.terms?.[standard.key]?.one ?? "", placeholder: standard.one, maxlength: 30, "aria-label": `Your word for one ${standard.one.toLowerCase()}` }),
+        many: h("input", { class: "input", value: data.terms?.[standard.key]?.many ?? "", placeholder: standard.many, maxlength: 30, "aria-label": `Your word for several ${standard.many.toLowerCase()}` }) }));
+      const termsProblem = h("div", { class: "error", role: "alert", hidden: true });
+      const termsField = { input: terms[0]?.one, setError: (text) => {
+        termsProblem.hidden = !text;
+        termsProblem.textContent = text ?? "";
+      } };
       const checks = h("div", { "aria-live": "polite" });
       const preview = h("div", { class: "preview" });
 
@@ -195,6 +203,7 @@ export function adminAppearance(main) {
       lock("sign_in_message", message);
       lock("footer_links", links);
       lock("email_footer", emailFooter);
+      if (pinned.has("terms")) for (const term of terms) { term.one.disabled = true; term.many.disabled = true; }
       if (pinned.has("accent")) picker.disabled = true;
       if (pinned.has("palette")) for (const radio of cards.querySelectorAll("input")) radio.disabled = true;
       if (pinned.has("rating_ramp")) for (const radio of ramps.querySelectorAll("input")) radio.disabled = true;
@@ -212,7 +221,7 @@ export function adminAppearance(main) {
         event.preventDefault();
         const done = await submit({ button: save, banner: problem,
           fields: { product_name: product, organization_name: organization, accent, accent_dark: accentDark, sign_in_message: message,
-            footer_links: links, email_footer: emailFooter },
+            footer_links: links, email_footer: emailFooter, terms: termsField },
           run: () => put("/api/v1/admin/branding", { product_name: product.input.value,
             organization_name: organization.input.value, palette, accent: accent.input.value.trim(),
             accent_dark: accentDark.input.value.trim(), rating_ramp: ramp, show_powered_by: powered.input.checked,
@@ -220,7 +229,8 @@ export function adminAppearance(main) {
             footer_links: links.input.value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
               const cut = line.indexOf("|");
               return cut < 0 ? { label: line, url: "" } : { label: line.slice(0, cut).trim(), url: line.slice(cut + 1).trim() };
-            }) }) });
+            }),
+            ...(pinned.has("terms") ? {} : { terms: Object.fromEntries(terms.map((term) => [term.key, { one: term.one.value.trim(), many: term.many.value.trim() }])) }) }) });
         if (done) {
           toast("The appearance was saved.");
           window.dispatchEvent(new CustomEvent("riskwren:branding"));
@@ -243,6 +253,12 @@ export function adminAppearance(main) {
         h("p", { class: "hint subtle" }, "How Low to Critical are colored, on badges and the heat map. A rating always carries its bars and its name as well."),
         ramps)),
       card({ title: "Sign-in page, links, and email" }, h("div", { class: "stack" }, message.node, links.node, emailFooter.node)),
+      card({ title: "Your own words" }, h("div", { class: "stack" },
+        h("p", { class: "muted" }, pinned.has("terms") ? "Set in the configuration file." : "If your organization says department where RiskWren says unit, or vendor where it says third party, say so here. Your words are used in the menu, in page titles, and for the kinds of record. Leave a row empty to keep the standard word."),
+        h("div", { class: "table-wrap" }, h("table", { class: "table" },
+          h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Standard word"), h("th", { scope: "col" }, "One"), h("th", { scope: "col" }, "Many"))),
+          h("tbody", {}, terms.map((term) => h("tr", {}, h("th", { scope: "row" }, term.standard.one), h("td", {}, term.one), h("td", {}, term.many)))))),
+        termsProblem)),
       h("div", { class: "form-actions" }, save, h("span", { class: "subtle" }, "Changes apply for everyone as soon as you save.")));
 
       return h("div", { class: "stack-lg" },

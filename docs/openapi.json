@@ -745,6 +745,24 @@
               }
             ],
             "title": "Sign In Message"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The organization's own words: key \u2192 {one, many}",
+            "title": "Terms"
           }
         },
         "required": [
@@ -1273,6 +1291,19 @@
       "ControlBody": {
         "description": "A control. On a change, send only what changes, with the ``version`` you were editing.",
         "properties": {
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
+          },
           "external_refs": {
             "anyOf": [
               {
@@ -2345,6 +2376,24 @@
         "title": "FactorBody",
         "type": "object"
       },
+      "FieldsBody": {
+        "properties": {
+          "fields": {
+            "description": "In order, each with key, label, kind (text, number, date, or choice), choices for a choice, and optionally help and required",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Fields",
+            "type": "array"
+          }
+        },
+        "required": [
+          "fields"
+        ],
+        "title": "FieldsBody",
+        "type": "object"
+      },
       "FrameworkBody": {
         "description": "A framework of the organization's own. On a change, send only what changes.",
         "properties": {
@@ -3026,6 +3075,19 @@
               }
             ],
             "title": "Criticality"
+          },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
           },
           "data_class": {
             "anyOf": [
@@ -4352,6 +4414,19 @@
             ],
             "title": "Criticality"
           },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
+          },
           "data_class": {
             "anyOf": [
               {
@@ -5033,6 +5108,19 @@
             ],
             "title": "Consequence"
           },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
+          },
           "event": {
             "anyOf": [
               {
@@ -5557,6 +5645,19 @@
             ],
             "title": "Criticality"
           },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
+          },
           "data_class": {
             "anyOf": [
               {
@@ -5860,6 +5961,19 @@
             ],
             "title": "Criticality"
           },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
+          },
           "data_class": {
             "anyOf": [
               {
@@ -6057,6 +6171,19 @@
               }
             ],
             "title": "Criticality"
+          },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
           },
           "data_class": {
             "anyOf": [
@@ -6265,6 +6392,19 @@
             ],
             "title": "Criticality"
           },
+          "custom": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Values of the organization's own fields, by key",
+            "title": "Custom"
+          },
           "data_class": {
             "anyOf": [
               {
@@ -6446,6 +6586,51 @@
           "answers"
         ],
         "title": "TieringBody",
+        "type": "object"
+      },
+      "TokenBody": {
+        "properties": {
+          "days": {
+            "description": "How many days it lasts, up to 366",
+            "title": "Days",
+            "type": "integer"
+          },
+          "name": {
+            "description": "What will use it",
+            "maxLength": 200,
+            "title": "Name",
+            "type": "string"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A unit, for a manager's, an assessor's, or a steward's token (a steward's needs one)",
+            "title": "Org Unit Id"
+          },
+          "read_only": {
+            "default": true,
+            "description": "Whether it may only read",
+            "title": "Read Only",
+            "type": "boolean"
+          },
+          "role": {
+            "description": "auditor, manager, assessor, steward, or member",
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "days"
+        ],
+        "title": "TokenBody",
         "type": "object"
       },
       "TouchesBody": {
@@ -6759,6 +6944,91 @@
           "items"
         ],
         "title": "VocabularyBody",
+        "type": "object"
+      },
+      "WebhookBody": {
+        "properties": {
+          "events": {
+            "description": "*, a family such as issue.*, or names such as issue.close",
+            "items": {
+              "type": "string"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 200,
+            "title": "Name",
+            "type": "string"
+          },
+          "url": {
+            "description": "An https:// address",
+            "maxLength": 1000,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url",
+          "events"
+        ],
+        "title": "WebhookBody",
+        "type": "object"
+      },
+      "WebhookChange": {
+        "properties": {
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          },
+          "events": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Events"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "title": "WebhookChange",
         "type": "object"
       },
       "WorkBody": {
@@ -9560,6 +9830,114 @@
         ]
       }
     },
+    "/api/v1/admin/tokens": {
+      "get": {
+        "operationId": "list_tokens_api_v1_admin_tokens_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Tokens Api V1 Admin Tokens Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Tokens for other systems",
+        "tags": [
+          "integration"
+        ]
+      },
+      "post": {
+        "operationId": "issue_token_api_v1_admin_tokens_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Issue Token Api V1 Admin Tokens Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Make a token; it is shown this once",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/admin/tokens/{token_id}/revoke": {
+      "post": {
+        "operationId": "revoke_token_api_v1_admin_tokens__token_id__revoke_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token_id",
+            "required": true,
+            "schema": {
+              "title": "Token Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Revoke Token Api V1 Admin Tokens  Token Id  Revoke Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Withdraw a token",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
     "/api/v1/admin/visibility": {
       "get": {
         "operationId": "show_visibility_api_v1_admin_visibility_get",
@@ -9644,6 +10022,210 @@
         "summary": "Every vocabulary, with what may be changed in it",
         "tags": [
           "inventory"
+        ]
+      }
+    },
+    "/api/v1/admin/webhooks": {
+      "get": {
+        "operationId": "list_webhooks_api_v1_admin_webhooks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Webhooks Api V1 Admin Webhooks Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Webhooks, with their latest deliveries",
+        "tags": [
+          "integration"
+        ]
+      },
+      "post": {
+        "operationId": "create_webhook_api_v1_admin_webhooks_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Webhook Api V1 Admin Webhooks Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Register a webhook",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/admin/webhooks/{hook_id}": {
+      "delete": {
+        "operationId": "remove_webhook_api_v1_admin_webhooks__hook_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hook_id",
+            "required": true,
+            "schema": {
+              "title": "Hook Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Remove Webhook Api V1 Admin Webhooks  Hook Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove a webhook",
+        "tags": [
+          "integration"
+        ]
+      },
+      "patch": {
+        "operationId": "change_webhook_api_v1_admin_webhooks__hook_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hook_id",
+            "required": true,
+            "schema": {
+              "title": "Hook Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Change Webhook Api V1 Admin Webhooks  Hook Id  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change, pause, or resume a webhook",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/admin/webhooks/{hook_id}/test": {
+      "post": {
+        "operationId": "test_webhook_api_v1_admin_webhooks__hook_id__test_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hook_id",
+            "required": true,
+            "schema": {
+              "title": "Hook Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Test Webhook Api V1 Admin Webhooks  Hook Id  Test Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send a test message to a webhook",
+        "tags": [
+          "integration"
         ]
       }
     },
@@ -24003,6 +24585,83 @@
           }
         },
         "summary": "How risks are rated: the method, the categories, and the rules",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
+    "/api/v1/program/fields": {
+      "get": {
+        "operationId": "list_fields_api_v1_program_fields_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Fields Api V1 Program Fields Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "The fields of the organization's own on each kind of record",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
+    "/api/v1/program/fields/{type_key}": {
+      "put": {
+        "operationId": "save_fields_api_v1_program_fields__type_key__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type_key",
+            "required": true,
+            "schema": {
+              "title": "Type Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldsBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Fields Api V1 Program Fields  Type Key  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set the fields a kind of record carries",
         "tags": [
           "risks"
         ]

@@ -1,0 +1,8 @@
+# Caddy in front of RiskWren: it gets and renews the certificate itself.
+grc.example.org {
+	encode zstd gzip
+	request_body {
+		max_size 33MB
+	}
+	reverse_proxy 127.0.0.1:8020
+}

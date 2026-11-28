@@ -38,13 +38,29 @@ DAY_SURFACE = "#ffffff"
 NIGHT_SURFACE = "#1f1e1c"
 IMAGES = {"logo-light": "Logo for light backgrounds", "logo-dark": "Logo for dark backgrounds",
           "favicon": "Browser tab icon", "sign-in": "Picture on the sign-in page"}  # fmt: skip
+# Each palette's accent by day, as a plain color for email, where stylesheets do not reach.
+EMAIL_ACCENTS = {"wren": "#0f5876", "slate": "#2d57b4", "garnet": "#9b2c3c"}
 MAX_LINKS = 5
+# The words an organization may replace with its own, as (one, many): the kinds of record
+# whose names differ most between organizations, and units.
+TERMS = {
+    "unit": ("Unit", "Units"),
+    "process": ("Process", "Processes"),
+    "system": ("System", "Systems"),
+    "third_party": ("Third party", "Third parties"),
+    "service": ("Service", "Services"),
+    "information": ("Information asset", "Information assets"),
+    "site": ("Site", "Sites"),
+    "issue": ("Issue", "Issues"),
+    "exception": ("Exception", "Exceptions"),
+    "incident": ("Incident", "Incidents"),
+}
 _LINK = re.compile(r"^(https://|http://|mailto:)\S+$", re.I)
 MAX_IMAGE_BYTES = 2_000_000
 # What the app stores. The rest of a Branding comes from the configuration file.
 STORED = (
     "product_name", "organization_name", "palette", "accent", "accent_dark", "sign_in_message",
-    "footer_links", "email_footer", "rating_ramp", "show_powered_by", "images",
+    "footer_links", "email_footer", "terms", "rating_ramp", "show_powered_by", "images",
 )  # fmt: skip
 TEXT_MIN = 4.5  # WCAG AA for ordinary text
 
@@ -59,6 +75,7 @@ class Branding:
     sign_in_message: str = ""
     footer_links: list[dict[str, str]] = field(default_factory=list)  # label and url
     email_footer: str = ""
+    terms: dict[str, dict[str, str]] = field(default_factory=dict)  # key → one and many
     rating_ramp: str = "ordinal"
     show_powered_by: bool = True
     images: dict[str, str] = field(default_factory=dict)  # kind → stored file name
@@ -228,7 +245,7 @@ def from_file(table: Any, base_dir: Path) -> tuple[FileBranding | None, list[str
     if not isinstance(table, dict):
         return None, ["[branding] must be a table"]
     known = {
-        *FILE_TEXT, "show_powered_by", "footer_links", "colors", *FILE_IMAGES, *FILE_FONTS,
+        *FILE_TEXT, "show_powered_by", "footer_links", "terms", "colors", *FILE_IMAGES, *FILE_FONTS,
         "logo_height",
     }  # fmt: skip
     for key in table:
@@ -249,7 +266,7 @@ def from_file(table: Any, base_dir: Path) -> tuple[FileBranding | None, list[str
             found.append("[branding] show_powered_by: must be true or false")
         else:
             values["show_powered_by"] = table["show_powered_by"]
-    for key in ("footer_links",):
+    for key in ("footer_links", "terms"):
         if key in table:
             values[key] = table[key]
     shaped = dict(values)
@@ -257,10 +274,19 @@ def from_file(table: Any, base_dir: Path) -> tuple[FileBranding | None, list[str
         isinstance(link, dict) for link in shaped["footer_links"]
     ):
         _tidy_lists(shaped)
-        values.update({k: shaped[k] for k in ("footer_links",) if k in values})
+        values.update({k: shaped[k] for k in ("footer_links", "terms") if k in values})
     elif "footer_links" in shaped:
         found.append("[branding] footer_links: give a list of { label, url } tables")
         shaped.pop("footer_links"), values.pop("footer_links")
+    if "terms" in shaped and not (
+        isinstance(shaped["terms"], dict)
+        and all(isinstance(words, dict) for words in shaped["terms"].values())
+    ):
+        found.append("[branding] terms: give a table for each word, with one and many")
+        shaped.pop("terms"), values.pop("terms")
+    elif "terms" in shaped and "footer_links" not in shaped:
+        _tidy_lists(shaped)
+        values["terms"] = shaped["terms"]
     # Check what was given by the same rules the app applies when someone saves.
     probe = {**Branding().to_json(), **shaped}
     if "accent_dark" in shaped and "accent" not in shaped:
@@ -475,6 +501,16 @@ def problems(values: dict[str, Any]) -> dict[str, str]:
                 errors["footer_links"] = (
                     f"“{label}” needs an address that starts with https://, http://, or mailto:."
                 )
+    terms = values.get("terms") or {}
+    if not isinstance(terms, dict) or set(terms) - set(TERMS):
+        errors["terms"] = f"Words can be set for: {', '.join(TERMS)}."
+    else:
+        for key, words in terms.items():
+            one, many = str(words.get("one", "")).strip(), str(words.get("many", "")).strip()
+            if bool(one) != bool(many):
+                errors["terms"] = f"Give both words for {TERMS[key][0].lower()}, or neither."
+            elif len(one) > 30 or len(many) > 30:
+                errors["terms"] = "Keep each word to 30 characters."
     return errors
 
 
@@ -494,6 +530,16 @@ def _tidy_lists(values: dict[str, Any]) -> None:
             for link in links
             if isinstance(link, dict) and (link.get("label") or link.get("url"))
         ]
+    terms = values.get("terms")
+    if isinstance(terms, dict):
+        values["terms"] = {
+            key: {
+                "one": str(words.get("one", "")).strip(),
+                "many": str(words.get("many", "")).strip(),
+            }
+            for key, words in terms.items()
+            if isinstance(words, dict) and (words.get("one") or words.get("many"))
+        }
 
 
 def save(session: Session, principal: Principal, values: dict[str, Any]) -> Branding:
@@ -741,6 +787,13 @@ def image_file(branding: Branding, brand_dir: Path, kind: str) -> tuple[Path, st
     return path, media
 
 
+def email_accent(branding: Branding) -> str:
+    """The accent email is written in: the configuration file's, the one chosen, or the
+    palette's. Every one of them reads on white, which is where email is shown."""
+    day = branding.colors.get("day", {}) if branding.colors else {}
+    return day.get("accent") or branding.accent or EMAIL_ACCENTS.get(branding.palette, "#0f5876")
+
+
 def public_view(branding: Branding) -> dict[str, Any]:
     """What the web app needs before anyone signs in."""
 
@@ -768,4 +821,9 @@ def public_view(branding: Branding) -> dict[str, Any]:
         "sign_in_image": url("sign-in"),
         "sign_in_message": branding.sign_in_message,
         "footer_links": branding.footer_links,
+        "terms": {
+            key: {"one": words["one"], "many": words["many"]}
+            for key, words in branding.terms.items()
+            if key in TERMS and words.get("one") and words.get("many")
+        },
     }

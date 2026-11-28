@@ -55,6 +55,9 @@ class ThingBody(BaseModel):
     restricted: bool | None = None
     kind: str | None = None
     external_refs: list[ExternalRefBody] | None = None
+    custom: dict[str, Any] | None = Field(
+        default=None, description="Values of the organization's own fields, by key"
+    )
 
 
 class ProcessBody(ThingBody):

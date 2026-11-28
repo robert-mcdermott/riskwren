@@ -294,6 +294,9 @@ def test_the_brand_kit(db: Database) -> None:
         ({"footer_links": [{"label": "", "url": "https://example.org"}]}, "footer_links"),
         ({"footer_links": [{"label": "n", "url": "https://example.org"}] * 6}, "footer_links"),
         ({"rating_ramp": "rainbow"}, "rating_ramp"),
+        ({"terms": {"risk": {"one": "Hazard", "many": "Hazards"}}}, "terms"),  # not offered
+        ({"terms": {"unit": {"one": "Department", "many": ""}}}, "terms"),  # both or neither
+        ({"terms": {"unit": {"one": "D" * 31, "many": "Ds"}}}, "terms"),
     ],
 )
 def test_a_brand_kit_that_cannot_be_used_is_refused(
@@ -465,3 +468,34 @@ def test_file_branding_through_the_api(instance: Instance, people: People, tmp_p
             }  # fmt: skip
     finally:
         branding.pin(None)
+
+
+def test_the_organizations_own_words(db: Database, tmp_path: Path) -> None:
+    """Terms rename the kinds of record and units, from the app or from the file."""
+    words = {"unit": {"one": " Department ", "many": "Departments"},
+             "third_party": {"one": "Vendor", "many": "Vendors"},
+             "issue": {"one": "", "many": ""}}  # fmt: skip
+    with db.write(ME.actor) as session:
+        saved = branding.save(session, ME, {"terms": words})
+    assert saved.terms == {"unit": {"one": "Department", "many": "Departments"},
+                           "third_party": {"one": "Vendor", "many": "Vendors"}}  # fmt: skip
+    assert branding.public_view(saved)["terms"]["third_party"]["many"] == "Vendors"
+
+    pinned, found = branding.from_file(
+        {"terms": {"issue": {"one": "Finding", "many": "Findings"}}}, tmp_path
+    )
+    assert found == [] and pinned is not None and "terms" in pinned.names
+    _, wrong = branding.from_file({"terms": {"issue": "Finding"}}, tmp_path)
+    assert any("terms" in problem for problem in wrong)
+
+
+def test_email_carries_the_organizations_header(db: Database) -> None:
+    from riskwren import mail
+
+    with db.write(ME.actor) as session:
+        saved = branding.save(session, ME, {"accent": "#1f6f5c", "organization_name": "Northmere"})
+    assert branding.email_accent(saved) == "#1f6f5c"
+    how = mail.Look("Harbor Risk", "Northmere", "", accent=branding.email_accent(saved))
+    _, page = mail.compose(how, "Hello", [("Something", None)])
+    assert "border-top:4px solid #1f6f5c" in page and "Harbor Risk" in page and "Northmere" in page
+    assert branding.email_accent(branding.Branding(palette="garnet")) == "#9b2c3c"

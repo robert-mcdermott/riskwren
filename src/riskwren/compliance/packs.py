@@ -32,7 +32,7 @@ from riskwren.events import audit
 BUILTIN = ("nist-csf", "nist-800-53", "nist-800-171", "hipaa-security")
 # Shipped, and loaded when someone asks: an earlier version that some programs still name,
 # and the privacy and breach frameworks a privacy office holds itself to.
-OPTIONAL = ("nist-800-53-r4", "hipaa-breach", "nist-privacy")
+OPTIONAL = ("nist-800-53-r4", "hipaa-breach", "nist-privacy", "iso-27001")
 AVAILABLE = BUILTIN + OPTIONAL
 KEY_CHARACTERS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.")
 # What a pack may declare. ``own`` is for frameworks entered here, never for a pack.
@@ -136,7 +136,12 @@ def problems(pack: Any) -> list[str]:
             found.append(f"{code}: children is a list.")
         if not item.get("group"):
             citable += 1
-            if not (item.get("text") or item.get("title")):
+            # A pack of identifiers may carry the code alone: the words are the licence
+            # holder's to load into their own installation.
+            if (
+                not (item.get("text") or item.get("title"))
+                and head.get("text_policy") != "identifiers"
+            ):
                 found.append(f"{code}: a requirement that can be cited has a title or text.")
     if not citable:
         found.append("A pack has at least one requirement that can be cited.")

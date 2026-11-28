@@ -112,6 +112,7 @@ Use this section when the look has to be exact: every color by day and after dar
 | `sign_in_message` | A message on the sign-in page, up to 600 characters |
 | `email_footer` | The last line of every email |
 | `footer_links` | Up to five links, each `{ label = "…", url = "…" }` |
+| `terms` | The organization's own words for kinds of record and for units, each `{ one = "…", many = "…" }`: see below |
 | `palette` | One of the built-in palettes: `wren`, `slate`, `garnet` |
 | `accent`, `accent_dark` | An accent color over a built-in palette, as hex. Not needed when `[branding.colors]` is set |
 | `rating_ramp` | How ratings are colored: `ordinal`, one hue from pale to deep, or `signal`, green through amber to red |
@@ -119,6 +120,19 @@ Use this section when the look has to be exact: every color by day and after dar
 Image paths are relative to the file's folder. Images are PNG, JPEG, WebP, or SVG, up to 2 MB, and are served as they are: RiskWren scales a logo and changes nothing else about it.
 
 Fonts are named, never shipped. A name works on a computer that has the font installed, and the next name in the list is tried on one that does not, so end the list with fonts every computer has. A font that is licensed, as most brand typefaces are, cannot be put on the server for everyone.
+
+#### Your own words
+
+Where your organization says *department* for what RiskWren calls a unit, or *vendor* for a third party, name the word once and it is used in the menu, in page titles, and for the kinds of record:
+
+```toml
+[branding.terms]
+unit = { one = "Department", many = "Departments" }
+third_party = { one = "Vendor", many = "Vendors" }
+issue = { one = "Finding", many = "Findings" }
+```
+
+Words can be set for `unit`, `process`, `system`, `third_party`, `service`, `information`, `site`, `issue`, `exception`, and `incident`, each up to 30 characters. Give both words or neither. Statuses, roles, and the program's own words (its scales, appetite, and vocabularies) are already yours to change under **Admin → Program**.
 
 #### Exact colors
 
@@ -322,7 +336,7 @@ The server runs them while it is up. Nothing needs to be installed or scheduled.
 
 - **Each job runs once.** Before a process runs a job it claims the job in the database. With several workers, or several servers on one database, whichever claims it has it and the others leave it alone. A process that dies mid-job loses its claim after fifteen minutes.
 - **A restart loses nothing.** What is due is worked out from the database and the clock, so a server that was down catches up when it starts.
-- **Admin → Scheduled work** shows each job, when it last ran and what it did, and can run one now or pause it. A failed run is shown with its reason and tried again when next due.
+- **Admin → Operations** shows each job, when it last ran and what it did, and can run one now or pause it. A failed run is shown with its reason and tried again when next due.
 - `uv run riskwren jobs` lists the same from the command line, and `uv run riskwren jobs run` runs whatever is due.
 
 To run the jobs from the operating system's scheduler instead, set `scheduler = false` under `[server]` and run `uv run riskwren jobs run` every few minutes. `doctor` warns if the scheduler is off and nothing has run for two days.
@@ -334,7 +348,7 @@ To run the jobs from the operating system's scheduler instead, set `scheduler = 
 1. Under `[mail]` in `riskwren.toml`, set `host` and `from_address`. If the mail server needs a sign-in, set `username`, and put the password in the `RISKWREN_MAIL_PASSWORD` environment variable.
 2. Set `base_url` under `[server]`, so that messages can link back.
 3. Restart RiskWren, and run `uv run riskwren doctor`: it connects and signs in to the mail server, and sends nothing.
-4. Send yourself a message from **Admin → Scheduled work**, or with `uv run riskwren mail test you@example.org`.
+4. Send yourself a message from **Admin → Operations**, or with `uv run riskwren mail test you@example.org`.
 
 Then each person chooses, under **Your account**: each notice as it happens, one summary a day, or no email. The choice appears only once email is set up.
 
@@ -370,7 +384,52 @@ SQLite is the default and needs no setup. Use PostgreSQL when many people will u
    uv run riskwren doctor
    ```
 
-Moving an existing installation from SQLite to PostgreSQL is not automated in this release. Start new installations on the database you mean to keep.
+To move an existing installation from SQLite to PostgreSQL, or back, see [Move between SQLite and PostgreSQL](#move-between-sqlite-and-postgresql).
+
+## Back up and restore
+
+```bash
+uv run riskwren backup /backups/riskwren-2026-12-01.zip
+```
+
+`backup` writes the whole installation to one file: every table, every file the data home stores (evidence, attachments, uploaded logos), and a manifest that counts and fingerprints each of them and says which version of RiskWren took it. It reads everything as of one moment, so the server can go on running and people can go on working while it does. The file must not exist already. It holds everything, so keep it as carefully as the database itself: somewhere other than the server, and encrypted where your other backups are.
+
+The data home's exports and logs are not in it: exports can be made again, and logs belong to the machine.
+
+To restore, set up an empty database and data home (a new `riskwren.toml`, and for PostgreSQL an empty database), then:
+
+```bash
+uv run riskwren --config new/riskwren.toml restore /backups/riskwren-2026-12-01.zip
+```
+
+`restore` goes only into an empty database and a data home without files, so that nothing already there is overwritten or mixed in. It needs the same version of RiskWren that took the backup: restore with that version, then upgrade. Once loaded, every table is read back and fingerprinted, every file is checked, and the history is verified, and it says so; anything that does not match is named, and the command exits with 1. `restore --describe FILE` says what a backup holds without restoring it.
+
+Restore a backup now and then, onto a spare machine, to know that it works.
+
+### Move between SQLite and PostgreSQL
+
+A backup is the same whichever database it was taken from, so moving is a backup from one and a restore into the other:
+
+```bash
+uv run riskwren backup move.zip                       # with the old riskwren.toml
+uv sync --extra postgres
+export RISKWREN_DATABASE_URL=postgresql+psycopg://riskwren@db.example.org:5432/riskwren
+uv run riskwren --config new/riskwren.toml restore move.zip
+```
+
+Stop the server before the backup, so that nothing is written after it, and start it on the new configuration once the restore says that everything matches. People stay signed in: their sessions move with everything else.
+
+## Sizing
+
+RiskWren was measured with 10,000 records (systems, processes, risks, and controls), on one laptop with 10 cores (`scripts/measure.py`, which anyone can run). Each simulated person read the pages people read most, one after another, with no pause between them, which is far harder than real use:
+
+| | One person | 25 people at once, 2 workers | 25 people at once, 8 workers |
+|---|---:|---:|---:|
+| A record, a list, the heat map, notices (median) | under 15 ms | 200 to 300 ms | 25 to 80 ms |
+| Home, search, and the dashboards (median) | 40 to 120 ms | 0.7 to 1.1 s | 0.5 to 0.7 s |
+| Requests a second | | 28 | 81 |
+
+Nothing failed. With one person, every page answered in under 120 milliseconds; the dearest pages are home, the risk dashboard, and the compliance dashboard, which count across the whole register for each person, and their cost does not grow with the number of records. With many people at once, RiskWren is limited by the processor: give it a worker for each core it may use (`workers` under `[server]`), and use PostgreSQL once there are several workers. A person reading and writing pauses between clicks, so 80 requests a second serves many hundreds of people at once.
 
 ## Upgrade
 
@@ -381,7 +440,7 @@ uv sync
 uv run riskwren db upgrade
 ```
 
-`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.4.0, that is the questionnaire tiering asks and the three due diligence questionnaires. Coming from 0.3.0, that is also the publishers' mappings carried with the built-in frameworks: where each SP 800-53 Rev. 4 control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement comes from. Coming from 0.2.1, that is the four built-in questionnaires; the [changelog](../CHANGELOG.md) says what behaves differently afterwards. Coming from 0.1.0, that is also the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. Back up first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
+`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.4.0, that is the questionnaire tiering asks and the three due diligence questionnaires. Coming from 0.3.0, that is also the publishers' mappings carried with the built-in frameworks: where each SP 800-53 Rev. 4 control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement comes from. Coming from 0.2.1, that is the four built-in questionnaires; the [changelog](../CHANGELOG.md) says what behaves differently afterwards. Coming from 0.1.0, that is also the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. [Back up](#back-up-and-restore) first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
 
 ## Run behind a reverse proxy
 

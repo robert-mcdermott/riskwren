@@ -1,5 +1,6 @@
 // One control: what is done, what is known of how well, and the risks it bears on.
 
+import { customCard } from "../components/custom-fields.js";
 import { del, get, post } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date, plural } from "../core/format.js";
@@ -56,6 +57,7 @@ function overview(control, ctx) {
       ])),
       directedBy(control), reliedOnBy(control),
       incidentsCard(control.incidents),
+      customCard(control.custom),
       ownersCard(control, ctx)));
 }
 

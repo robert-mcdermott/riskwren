@@ -26,6 +26,7 @@ from riskwren.api.routers import (
     governance,
     incidents,
     indicators,
+    integration,
     internal_audit,
     inventory,
     issues,
@@ -52,10 +53,10 @@ from riskwren.home import DataHome
 from riskwren.program import branding as brand_rules
 
 ROUTERS = (
-    system, session, sso, people, branding, inventory, risks, controls, treatment, frameworks,
-    scopes, evidence, assessments, issues, exchange, reporting, operations, questionnaires,
-    campaigns, indicators, tidy, analyses, documents, agreements, governance, third_parties,
-    internal_audit, resilience, incidents,
+    system, session, sso, people, branding, integration, inventory, risks, controls, treatment,
+    frameworks, scopes, evidence, assessments, issues, exchange, reporting, operations,
+    questionnaires, campaigns, indicators, tidy, analyses, documents, agreements, governance,
+    third_parties, internal_audit, resilience, incidents,
 )  # fmt: skip
 
 

@@ -50,12 +50,25 @@ def check_origin(request: Request) -> None:
         raise HTTPException(403, "Requests from other sites are refused.")
 
 
+def _bearer(request: Request) -> str | None:
+    found = request.headers.get("authorization", "")
+    scheme, _, value = found.partition(" ")
+    return value.strip() if scheme.lower() == "bearer" and value.strip() else None
+
+
 def _authenticate(request: Request) -> Principal | None:
+    database = request.app.state.db
+    raw = _bearer(request)
+    if raw is not None:
+        # Another system, with a token that acts as a role. A cookie alongside it is ignored.
+        from riskwren.integration import tokens
+
+        with database.read() as session:
+            return tokens.authenticate(session, database.engine, raw)
     token = request.cookies.get(sessions.COOKIE)
     if not token:
         return None
     config = request.app.state.config.server
-    database = request.app.state.db
     # A session's sliding expiry is bookkeeping, not history, so no actor is needed.
     with database.bookkeeping() as session:
         found = sessions.load(
@@ -73,6 +86,12 @@ def _prepare(request: Request) -> None:
         check_origin(request)
     principal = _authenticate(request)
     request.state.principal = principal
+    if _bearer(request) is not None:
+        if principal is None:
+            raise HTTPException(401, "The token is not one in force.")
+        if unsafe and principal.read_only:
+            raise HTTPException(403, "This token may only read.")
+        return  # a token is not a cookie: there is no request forgery to guard against
     if unsafe and principal is not None and (request.method, request.url.path) not in NO_TOKEN:
         sent = request.headers.get(sessions.CSRF_HEADER, "")
         if not sent or not hmac.compare_digest(sent, principal.csrf_token):

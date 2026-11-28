@@ -23,7 +23,7 @@ from riskwren.api.routers.inventory import (
 )
 from riskwren.core import scoring
 from riskwren.inventory import records
-from riskwren.program import rules
+from riskwren.program import fields, rules
 from riskwren.risk import categories, library, program, register
 from riskwren.risk import method as methods
 from riskwren.risk.register import RISK
@@ -51,6 +51,9 @@ class RiskBody(BaseModel):
         default=None, description="The library entry it was started from"
     )
     external_refs: list[ExternalRefBody] | None = None
+    custom: dict[str, Any] | None = Field(
+        default=None, description="Values of the organization's own fields, by key"
+    )
 
 
 class AssessmentBody(BaseModel):
@@ -162,6 +165,35 @@ def publish_program(request: Request, body: ProgramChange) -> dict[str, Any]:
     with writing(request, principal.actor) as session:
         found = program.change(session, principal, body.model_dump(exclude_none=True))
         return envelope({**found, "program": program_view(session)}, preview=False)
+
+
+class FieldsBody(BaseModel):
+    fields: list[dict[str, Any]] = Field(
+        description="In order, each with key, label, kind (text, number, date, or choice), "
+        "choices for a choice, and optionally help and required"
+    )
+
+
+@router.get(
+    "/program/fields", summary="The fields of the organization's own on each kind of record"
+)
+def list_fields(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(
+            {
+                "fields": fields.all_(session),
+                "kinds": [{"key": key, "label": label} for key, label in fields.KINDS.items()],
+                "can_change": principal.configures,
+            }
+        )
+
+
+@router.put("/program/fields/{type_key}", summary="Set the fields a kind of record carries")
+def save_fields(request: Request, type_key: str, body: FieldsBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        return envelope(fields.save(session, principal, type_key, body.fields))
 
 
 @router.get("/risk-library", summary="Reusable risk statements to start a risk from")

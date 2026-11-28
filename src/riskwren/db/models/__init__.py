@@ -73,7 +73,9 @@ from riskwren.db.models.incidents import (
 )
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.insight import LeadershipReport, MeasureSnapshot
+from riskwren.db.models.integration import ApiToken, Webhook, WebhookCursor, WebhookDelivery
 from riskwren.db.models.inventory import (
+    CustomValue,
     ExternalRef,
     Information,
     Process,
@@ -139,6 +141,7 @@ __all__ = [
     "Agreement",
     "AgreementCoverage",
     "AgreementParty",
+    "ApiToken",
     "Assessment",
     "AssuranceResponsibility",
     "AssuranceReview",
@@ -163,6 +166,7 @@ __all__ = [
     "ControlTest",
     "Counter",
     "Credential",
+    "CustomValue",
     "DocumentControl",
     "DocumentRequirement",
     "Engagement",
@@ -252,5 +256,8 @@ __all__ = [
     "ThirdPartyReview",
     "TierAssessment",
     "TreatmentPlan",
+    "Webhook",
+    "WebhookCursor",
+    "WebhookDelivery",
     "Workpaper",
 ]

@@ -70,9 +70,15 @@ def test_every_built_in_pack_is_sound_and_says_where_it_comes_from() -> None:
         pack = packs.builtin(key)
         assert packs.problems(pack) == [], key
         head = pack["pack"]
-        assert head["key"] == key and head["text_policy"] == "verbatim"
-        assert "Public domain" in head["license"] and head["publisher"]
-        assert head["source_url"].startswith("https://") and head["built_from"]
+        assert (
+            head["key"] == key and head["publisher"] and head["source_url"].startswith("https://")
+        )
+        if head["text_policy"] == "identifiers":
+            # Codes alone, of a copyrighted standard: no words of its own, and it says so.
+            assert packs.policy_problems(pack) == [] and "copyrighted" in head["license"]
+            continue
+        assert head["text_policy"] == "verbatim"
+        assert "Public domain" in head["license"] and head["built_from"]
         sizes[key] = sum(not item.get("group") for item, _ in packs.walk(pack["requirements"]))
     # The publishers' own counts: 106 outcomes, 97 requirements, and the active controls.
     assert sizes["nist-csf"] == 106 and sizes["nist-800-171"] == 97

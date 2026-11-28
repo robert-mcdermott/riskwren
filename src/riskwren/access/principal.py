@@ -39,6 +39,8 @@ class Principal:
     leads_all: bool = False
     # Reads the leadership reports by the program's choice of who does: worked out at sign-in.
     report_reader: bool = False
+    token_id: int | None = None  # an API token acting as a role, not a person
+    read_only: bool = False  # a token that may only read
 
     @classmethod
     def for_command(cls, label: str = "Command line") -> Principal:
@@ -53,6 +55,8 @@ class Principal:
 
     @property
     def actor(self) -> Actor:
+        if self.token_id is not None:
+            return Actor("token", None, self.name)
         if self.command or self.account_id is None:
             return Actor.command(self.name)
         return Actor.account(self.account_id, self.name)

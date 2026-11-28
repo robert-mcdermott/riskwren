@@ -36,6 +36,9 @@ class BrandingBody(BaseModel):
     sign_in_message: str | None = Field(default=None, max_length=2000)
     footer_links: list[dict[str, str]] | None = None
     email_footer: str | None = Field(default=None, max_length=1000)
+    terms: dict[str, dict[str, str]] | None = Field(
+        default=None, description="The organization's own words: key → {one, many}"
+    )
 
 
 class AccentBody(BaseModel):
@@ -52,6 +55,9 @@ def _editor_view(current_branding: branding.Branding) -> dict[str, Any]:
         "email_footer": current_branding.email_footer,
         "palettes": [{"key": key, "description": text} for key, text in branding.PALETTES.items()],
         "ramps": [{"key": key, "description": text} for key, text in branding.RAMPS.items()],
+        "term_choices": [
+            {"key": key, "one": one, "many": many} for key, (one, many) in branding.TERMS.items()
+        ],
         "images": [
             {
                 "kind": kind,

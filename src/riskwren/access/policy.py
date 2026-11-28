@@ -46,6 +46,16 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("PUT", "/api/v1/sso/mappings"): Needs.ADMIN,
     # Scheduled work and email, for whoever keeps the installation.
     ("GET", "/api/v1/jobs"): Needs.ADMIN,
+    ("GET", "/api/v1/admin/operations"): Needs.ADMIN,
+    # Other systems: tokens and webhooks
+    ("GET", "/api/v1/admin/tokens"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/tokens"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/tokens/{token_id}/revoke"): Needs.ADMIN,
+    ("GET", "/api/v1/admin/webhooks"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/webhooks"): Needs.ADMIN,
+    ("PATCH", "/api/v1/admin/webhooks/{hook_id}"): Needs.ADMIN,
+    ("DELETE", "/api/v1/admin/webhooks/{hook_id}"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/webhooks/{hook_id}/test"): Needs.ADMIN,
     ("POST", "/api/v1/jobs/{key}/run"): Needs.ADMIN,
     ("PUT", "/api/v1/jobs/{key}"): Needs.ADMIN,
     ("GET", "/api/v1/mail"): Needs.ADMIN,
@@ -399,6 +409,8 @@ POLICIES.update(
     {
         ("GET", "/api/v1/program"): Needs.MEMBER,
         ("PATCH", "/api/v1/risk-categories/{key}"): Needs.CONFIGURE,
+        ("GET", "/api/v1/program/fields"): Needs.MEMBER,
+        ("PUT", "/api/v1/program/fields/{type_key}"): Needs.CONFIGURE,
         ("GET", "/api/v1/risk-library"): Needs.MEMBER,
         ("GET", "/api/v1/risks/{ref}/assessments"): Needs.MEMBER,
         ("POST", "/api/v1/risks/{ref}/assessments"): Needs.MEMBER,

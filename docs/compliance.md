@@ -19,6 +19,14 @@ A new installation has four, each built from its publisher's own machine-readabl
 
 Three more ship and are loaded when someone asks, under **Load a framework**: NIST SP 800-53 Rev. 4, for programs and agreements that still name it; the **HIPAA Breach Notification Rule** (45 CFR Part 164 Subpart D: notifying individuals, the media, and the Secretary, and a business associate's duty to the covered entity); and the **NIST Privacy Framework 1.0** (five functions, their categories, and 100 subcategories), for a privacy office that holds itself to it. [Breach assessment](incidents.md#breach-assessment) and [privacy impact assessments](running-the-program.md#privacy-impact-assessments) are their working side.
 
+**ISO/IEC 27001:2022** also ships, as its codes alone: clauses 4 to 10 and the 93 controls of Annex A, without their titles or text, which are copyrighted. Load it with `riskwren frameworks load iso-27001` to map controls and scope to its codes. An organization that holds a license to the standard can load its titles and text from its own copy, as a CSV file with the columns `code`, `title`, and `text`:
+
+```bash
+uv run riskwren frameworks text iso-27001 our-licensed-copy.csv
+```
+
+The words stay in that installation and its backups, and each requirement says that its text is the organization's licensed copy.
+
 Each shows its publisher, version, license, and where it came from. Anyone signed in can browse a framework's tree, search it, narrow it to a baseline, and read any requirement in full.
 
 ![A framework's page: its tree of requirements, a search, and how many of them have a control](img/framework-light.webp)

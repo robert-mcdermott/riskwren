@@ -13,6 +13,7 @@ from riskwren.access.principal import Principal
 from riskwren.core.clock import utc_now
 from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
 from riskwren.db.models import OrgUnit
+from riskwren.db.remember import remembered
 
 DEFAULT_KINDS = ("organization", "division", "department", "center", "core", "lab", "office")
 
@@ -23,7 +24,11 @@ def _require_admin(principal: Principal) -> None:
 
 
 def all_units(session: Session) -> list[OrgUnit]:
-    return list(session.scalars(select(OrgUnit).order_by(OrgUnit.name)))
+    return list(
+        remembered(
+            session, "units", lambda: list(session.scalars(select(OrgUnit).order_by(OrgUnit.name)))
+        )
+    )
 
 
 def get(session: Session, unit_id: int) -> OrgUnit:

@@ -1,5 +1,6 @@
 // Admin → Units: the organization's hierarchy.
 
+import { UNIT } from "../components/record.js";
 import { get, patch, post } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { plural, titleCase } from "../core/format.js";
@@ -68,7 +69,7 @@ function node(unit, context) {
 
 export function adminUnits(main) {
   return show(main, {
-    title: "Units",
+    title: UNIT.plural,
     load: async () => (await get("/api/v1/units", null, { fresh: true })).data,
     view: (data, reload) => {
       const context = { units: data.units, reload };
@@ -79,7 +80,7 @@ export function adminUnits(main) {
         onDone: reload,
       });
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Admin", title: "Units",
+        pageHeader({ eyebrow: "Admin", title: UNIT.plural,
           lede: "Every record belongs to a unit. A steward of a unit also looks after every unit within it.",
           actions: [button("Import", { iconName: "upload", onclick: importer }),
             button("Add a unit", { kind: "btn-primary", iconName: "plus", onclick: () => editUnit(context) })] }),

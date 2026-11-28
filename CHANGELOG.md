@@ -4,6 +4,57 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.9.0 (unreleased)
+
+Wave 9, *Adoption*.
+
+### Added
+
+- **Backup and restore:** `riskwren backup FILE` writes the whole installation (every table,
+  every stored file, and a manifest that fingerprints each) to one file, as of one moment,
+  while the server runs. `riskwren restore FILE` loads it into an empty database and data home
+  and checks every table, every file, and the history against it. The file is the same
+  whichever database it came from, so moving between SQLite and PostgreSQL is a backup from one
+  and a restore into the other.
+- **`scripts/measure.py`** measures the server with many records and many people at once.
+- **Your own words:** under **Admin → Appearance → Your own words**, or `[branding.terms]` in
+  `riskwren.toml`, the organization names units, processes, systems, third parties, services,
+  information assets, sites, issues, exceptions, and incidents in its own words, used in the
+  menu, in page titles, and for the kinds of record.
+- **Email has a header** with the product's name, the organization's, and its accent.
+- **Starter programs:** `riskwren init --program` starts from a program written for an
+  academic medical center, a university, or a general nonprofit, beside the research
+  institute's, which stays the default. `riskwren program import` takes a starter's name.
+- **Fields of your own:** under **Admin → Program → Fields**, up to twelve fields (text, a
+  number, a date, or one of a list) on systems, processes, third parties, services, information
+  assets, sites, risks, and controls, asked for in their forms and kept in their history.
+- **ISO/IEC 27001:2022, by its codes:** clauses 4 to 10 and the Annex A controls, without the
+  standard's words, loaded with `riskwren frameworks load iso-27001`. `riskwren frameworks
+  text` loads a licensed copy's titles and text into the installation, where they stay.
+- `riskwren frameworks load` takes the key of a framework that ships, as well as a file.
+- **Tokens for other systems:** under **Admin → Other systems**, an administrator makes a
+  token that acts as a role (auditor, manager, assessor, steward, or member), optionally for
+  one unit, reading only unless said otherwise, for up to a year and a day. It is shown once,
+  kept as a fingerprint, sent as `Authorization: Bearer`, and named in the history.
+- **Webhooks:** addresses told of named events (`issue.close`, `risk.assess`, or whole
+  families), with the record's reference and never its contents, signed with HMAC-SHA256, and
+  tried again when they do not answer. A new scheduled job, **Webhooks**, sends them.
+- **The API's contract** is recorded in `docs/api-contract.json`, and a change that would break
+  a client fails the build.
+- **Deployment:** a container image (`deploy/Containerfile`) that runs as a user of its own and
+  sets itself up on its first start, a compose file with PostgreSQL, a locked-down systemd unit,
+  proxy examples for Caddy and nginx, and a new guide, **Deployment**.
+- **`riskwren doctor --production`** checks the https address, where the server listens, the
+  database, a backup in the last two days, that it is not a demo, a second administrator, and
+  email. **Admin → Operations** (formerly Scheduled work) shows the same, with the version, the
+  database, the data home, and the last backup.
+
+### Changed
+
+- **The compliance dashboard and home are faster:** the dashboard counts readiness without
+  building every control's full view, and a request that only reads looks up the program's
+  settings, the units, and the risk categories once. See **Sizing** in the configuration guide.
+
 ## 0.8.0 (2026-11-27)
 
 Wave 8, *Incidents and resilience*: when something goes wrong, it is reported, handled, and

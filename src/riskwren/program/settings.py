@@ -10,12 +10,20 @@ from sqlalchemy.orm import Session
 
 from riskwren.core.clock import utc_now
 from riskwren.db.models import Setting
+from riskwren.db.remember import remembered
+
+_MISSING = object()  # a setting never saved, remembered as such
 
 
 def get(session: Session, key: str, default: Any = None) -> Any:
     """A setting's value, or the default. The value is a copy: changing it changes nothing."""
-    row = session.scalars(select(Setting).where(Setting.key == key)).first()
-    return copy.deepcopy(row.value) if row is not None else default
+
+    def load() -> Any:
+        row = session.scalars(select(Setting).where(Setting.key == key)).first()
+        return row.value if row is not None else _MISSING
+
+    value = remembered(session, ("setting", key), load)
+    return copy.deepcopy(value) if value is not _MISSING else default
 
 
 def put(session: Session, key: str, value: Any) -> bool:

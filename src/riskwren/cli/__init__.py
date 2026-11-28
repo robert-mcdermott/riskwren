@@ -97,10 +97,13 @@ def cmd_program_import(args: argparse.Namespace) -> int:
     from riskwren.program import packs
 
     config, _ = _load(args)
-    try:
-        pack = json.loads(Path(args.file).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        raise RiskWrenError(f"{args.file} could not be read as a pack: {exc}") from exc
+    if args.file in packs.STARTERS and not Path(args.file).exists():
+        pack = packs.starter(args.file)
+    else:
+        try:
+            pack = json.loads(Path(args.file).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise RiskWrenError(f"{args.file} could not be read as a pack: {exc}") from exc
     db = _database(config)
     principal = Principal.for_command()
     try:
@@ -118,6 +121,17 @@ def cmd_program_import(args: argparse.Namespace) -> int:
     for line in result["changed"]:
         print(f"  {line}")
     return EXIT_OK
+
+
+def _load_starter(db: Database, key: str) -> None:
+    from riskwren.access.principal import Principal
+    from riskwren.program import packs
+
+    pack = packs.starter(key)
+    principal = Principal.for_command()
+    with db.write(principal.actor) as session:
+        packs.import_(session, principal, pack)
+    print(f"Program: started from the {pack['pack']['title'].lower()} program")
 
 
 def cmd_init(args: argparse.Namespace) -> int:
@@ -149,6 +163,8 @@ def cmd_init(args: argparse.Namespace) -> int:
         loaded = _install_program(db)
         if any(loaded.values()):
             print("Program: loaded the default program and the starter libraries")
+        if args.program and args.program != "research-institute" and any(loaded.values()):
+            _load_starter(db, args.program)
         users.first_admin(db, config, args)
     finally:
         db.dispose()
@@ -257,10 +273,13 @@ def cmd_frameworks_load(args: argparse.Namespace) -> int:
     config, _ = _load(args)
     pack = None
     if args.file:
-        try:
-            pack = json.loads(Path(args.file).read_text(encoding="utf-8"))
-        except (OSError, ValueError) as exc:
-            raise RiskWrenError(f"{args.file} could not be read as a pack: {exc}") from exc
+        if args.file in framework_packs.AVAILABLE and not Path(args.file).exists():
+            pack = framework_packs.builtin(args.file)  # one that ships, by its key
+        else:
+            try:
+                pack = json.loads(Path(args.file).read_text(encoding="utf-8"))
+            except (OSError, ValueError) as exc:
+                raise RiskWrenError(f"{args.file} could not be read as a pack: {exc}") from exc
         found = framework_packs.problems(pack)
         if found:
             print(f"{args.file} cannot be loaded:")
@@ -318,6 +337,38 @@ def cmd_frameworks_show(args: argparse.Namespace) -> int:
                 print(f"  {'Baseline:':<11} {baseline.title}, {baseline.requirement_count}")
     finally:
         db.dispose()
+    return EXIT_OK
+
+
+def cmd_frameworks_text(args: argparse.Namespace) -> int:
+    import csv
+
+    from riskwren.access.principal import Principal
+    from riskwren.compliance import frameworks
+    from riskwren.core.errors import Invalid, NotFound
+
+    config, _ = _load(args)
+    try:
+        with Path(args.file).open(encoding="utf-8-sig", newline="") as handle:
+            rows = [dict(row) for row in csv.DictReader(handle)]
+    except OSError as exc:
+        raise RiskWrenError(f"{args.file} could not be read: {exc}") from exc
+    if rows and "code" not in rows[0]:
+        raise RiskWrenError("The file needs a header row with code, title, and text.")
+    db = _database(config)
+    principal = Principal.for_command()
+    try:
+        with db.write(principal.actor) as session:
+            try:
+                framework = frameworks.by_key(session, args.key)
+                done = frameworks.load_local_text(session, principal, framework, rows)
+            except (NotFound, Invalid) as exc:
+                detail = " ".join(getattr(exc, "errors", {}).values())
+                raise RiskWrenError(f"{exc} {detail}".strip()) from exc
+    finally:
+        db.dispose()
+    print(f"Loaded the words of {done['loaded']} requirements of {framework.title}. They stay in "
+          "this installation.")  # fmt: skip
     return EXIT_OK
 
 
@@ -558,7 +609,7 @@ def cmd_mail(args: argparse.Namespace) -> int:
 def cmd_doctor(args: argparse.Namespace) -> int:
     from riskwren.cli import doctor
 
-    checks = doctor.run(args.config)
+    checks = doctor.run(args.config, production=args.production)
     width = max(len(check.name) for check in checks)
     for check in checks:
         print(f"{doctor.MARKS[check.status]} {check.name.ljust(width)}  {check.detail}")
@@ -571,6 +622,49 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(
         "Everything checks out." if not warned else f"Working, with {warned} thing(s) to look at."
     )
+    return EXIT_OK
+
+
+def cmd_backup(args: argparse.Namespace) -> int:
+    from riskwren import backup
+
+    config, home = _load(args)
+    home.require()
+    db = _database(config)
+    try:
+        done = backup.take(db.engine, home, Path(args.file))
+    finally:
+        db.dispose()
+    print(f"Backed up {done.tables} tables ({done.rows} rows), {done.files} files, and "
+          f"{done.events} events of history to {done.path}.")  # fmt: skip
+    print(f"{PRODUCT_NAME} {done.version}, migration {done.migration}, taken {done.taken_at}.")
+    return EXIT_OK
+
+
+def cmd_restore(args: argparse.Namespace) -> int:
+    from riskwren import backup
+
+    config, home = _load(args)
+    if args.describe:
+        found = backup.describe(Path(args.file))
+        print(f"Taken {found['taken_at']} by {PRODUCT_NAME} {found['version']} from "
+              f"{found['database']}: {found['tables']} tables, {found['rows']} rows, "
+              f"{found['files']} files, {found['history'].get('events', 0)} events.")  # fmt: skip
+        return EXIT_OK
+    backup.read_manifest(Path(args.file))  # before anything is made
+    home.create()  # SQLite keeps its database in the data home
+    db = _database(config, current=False)
+    try:
+        done = backup.restore(db.engine, home, Path(args.file))
+    finally:
+        db.dispose()
+    print(f"Restored {done.tables} tables ({done.rows} rows), {done.files} files, and "
+          f"{done.events} events of history into {done.database}.")  # fmt: skip
+    for problem in done.problems:
+        print(problem, file=sys.stderr)
+    if done.problems:
+        return EXIT_ERROR
+    print("Every table, every file, and the history match the backup.")
     return EXIT_OK
 
 
@@ -637,6 +731,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     init.add_argument("--admin-name", metavar="NAME", help="the first administrator's name")
     init.add_argument("--password-stdin", action="store_true", help=STDIN_HELP)
+    init.add_argument(
+        "--program",
+        metavar="KIND",
+        choices=("research-institute", "academic-medical-center", "university", "nonprofit"),
+        help="the program to start from: research-institute (the default), "
+        "academic-medical-center, university, or nonprofit",
+    )
     init.set_defaults(handler=cmd_init)
 
     serve = commands.add_parser(
@@ -819,7 +920,13 @@ def build_parser() -> argparse.ArgumentParser:
         description="Load a framework from a pack file, or the built-in ones that are "
         "missing. A pack is checked whole first and refused whole if anything is wrong.",
     )
-    held_load.add_argument("file", nargs="?", metavar="FILE", help="the pack to load")
+    held_load.add_argument(
+        "file",
+        nargs="?",
+        metavar="FILE",
+        help="the pack to load, or the key of one that ships to be loaded on request, such as "
+        "hipaa-breach, nist-privacy, nist-800-53-r4, or iso-27001",
+    )
     held_load.add_argument(
         "--builtin",
         action="store_true",
@@ -837,6 +944,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     held_show.add_argument("key", metavar="KEY", help="the framework's key, such as nist-csf")
     held_show.set_defaults(handler=cmd_frameworks_show)
+    held_text = held_commands.add_parser(
+        "text",
+        help="load your licensed copy of a framework's text",
+        description="For a framework that ships as its codes alone, such as iso-27001, load the "
+        "titles and text from a copy your organization holds a license to: a CSV file with the "
+        "columns code, title, and text. The words stay in this installation and in its "
+        "backups; no pack or export carries them. A row with an empty title and text takes "
+        "that requirement's words away.",
+    )
+    held_text.add_argument("key", metavar="KEY", help="the framework's key, such as iso-27001")
+    held_text.add_argument("file", metavar="FILE", help="the CSV file of code, title, and text")
+    held_text.set_defaults(handler=cmd_frameworks_text)
 
     program = commands.add_parser(
         "program",
@@ -863,17 +982,50 @@ def build_parser() -> argparse.ArgumentParser:
         "assessments already made keep the version they were made under, and every open risk "
         "is read again from what was loaded: its ratings, its standing, and its next review.",
     )
-    program_import.add_argument("file", metavar="FILE", help="the pack to load")
+    program_import.add_argument(
+        "file",
+        metavar="FILE",
+        help="the pack to load, or the name of a starter program: research-institute, "
+        "academic-medical-center, university, or nonprofit",
+    )
     program_import.add_argument(
         "--dry-run", action="store_true", help="say what would change, and change nothing"
     )
     program_import.set_defaults(handler=cmd_program_import)
+
+    backed = commands.add_parser(
+        "backup",
+        help="back the whole installation up to one file",
+        description="Write every table, every stored file, and a manifest of their fingerprints "
+        "to one file, as of one moment, while the server goes on running. The file restores "
+        "into SQLite or PostgreSQL. Keep it somewhere safe: it holds everything.",
+    )
+    backed.add_argument("file", metavar="FILE", help="the file to write, which must not exist")
+    backed.set_defaults(handler=cmd_backup)
+
+    restored = commands.add_parser(
+        "restore",
+        help="restore a backup into an empty database",
+        description="Load a backup into an empty database and data home, then check every "
+        "table, every file, and the history against it. To move between SQLite and "
+        "PostgreSQL, back up from one and restore into the other. Use the same version of "
+        "RiskWren that took the backup, then upgrade.",
+    )
+    restored.add_argument("file", metavar="FILE", help="the backup to restore")
+    restored.add_argument("--describe", action="store_true", help="only say what the backup holds")
+    restored.set_defaults(handler=cmd_restore)
 
     doctor = commands.add_parser(
         "doctor",
         help="check that this installation is healthy",
         description="Check the configuration, the data home, the database and its schema, "
         "and the history. Exits with 1 if anything must be fixed.",
+    )
+    doctor.add_argument(
+        "--production",
+        action="store_true",
+        help="also check what matters before real people rely on it: the https address, the "
+        "database, a recent backup, a second administrator, email, and that it is not a demo",
     )
     doctor.set_defaults(handler=cmd_doctor)
 

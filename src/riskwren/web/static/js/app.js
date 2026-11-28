@@ -7,6 +7,7 @@ import { fallback, route, start } from "./core/router.js";
 import { can, setSession } from "./core/session.js";
 import { openPalette } from "./components/cmdk.js";
 import { commands, mountShell } from "./components/shell.js";
+import { applyTerms } from "./components/record.js";
 import { emptyState } from "./components/ui.js";
 import { setProduct, setTitle } from "./pages/page.js";
 
@@ -14,6 +15,7 @@ apply(); // paint with the remembered mode and palette before anything else
 const root = document.getElementById("app");
 
 function applyBranding(meta) {
+  applyTerms(meta.branding.terms);
   setProduct(meta.branding.product_name);
   setOrganizationPalette(meta.branding.palette);
   setOrganizationRamp(meta.branding.rating_ramp);
@@ -158,7 +160,9 @@ async function boot() {
     route("/admin/units", page("admin-units", "adminUnits"));
     route("/admin/appearance", page("admin-appearance", "adminAppearance"));
     route("/admin/sso", page("admin-sso", "adminSso"));
-    route("/admin/scheduled-work", page("admin-operations", "adminOperations"));
+    route("/admin/integrations", page("admin-integrations", "adminIntegrations"));
+    route("/admin/operations", page("admin-operations", "adminOperations"));
+    route("/admin/scheduled-work", page("admin-operations", "adminOperations")); // its earlier address
   }
   fallback(page("not-found", "notFound"));
 
