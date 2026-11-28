@@ -72,6 +72,11 @@ def test_a_failed_check_counts_once_a_person_confirms_it(as_role: Clients, peopl
     assert {owner["account_id"] for owner in raised["owners"]} == {people.accounts["manager"]}
     again = as_role("assessor").post(f"/api/v1/reported/{report['id']}/confirm", json={})
     assert again.status_code == 409
+    # The scanner reports the same failure the next night: confirmed, it joins the issue
+    # already open on the control instead of raising another.
+    repeat = scanner.post(f"/api/v1/controls/{ref}/reported", json=failed).json()["data"]
+    joined = as_role("assessor").post(f"/api/v1/reported/{repeat['id']}/confirm", json={})
+    assert joined.status_code == 200 and joined.json()["data"]["issue"]["ref"] == issue["ref"]
 
 
 def test_evidence_is_filed_and_a_report_can_be_set_aside(as_role: Clients, people: People) -> None:

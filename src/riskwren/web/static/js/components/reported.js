@@ -37,12 +37,12 @@ function decide(row, mode, onDone) {
             { note: note.input.value || null, ...(severity ? { severity: severity.input.value } : {}) }) });
         if (!done) return;
         closeOverlay();
-        toast(done.data.issue ? `${done.data.issue.ref} was raised.` : done.data.evidence ? `${done.data.evidence.ref} was filed.` : "Done.");
+        toast(done.data.issue ? `Confirmed, on ${done.data.issue.ref}.` : done.data.evidence ? `${done.data.evidence.ref} was filed.` : "Done.");
         onDone();
       });
       body.append(h("div", { class: "stack" }, problem,
         h("p", { class: "muted" }, mode === "confirm"
-          ? (failure ? "Confirming it raises an issue on the control for the control's owners, as a failed test does." : row.kind === "evidence" ? "Confirming it files the evidence with the control, counting for a year from when it was observed." : "Confirming it keeps it on record as checked. Nothing else changes.")
+          ? (failure ? "Confirming it raises an issue on the control for the control's owners, as a failed test does, or joins the issue already open on it." : row.kind === "evidence" ? "Confirming it files the evidence with the control, counting for a year from when it was observed." : "Confirming it keeps it on record as checked. Nothing else changes.")
           : "Setting it aside keeps it on record, with why, and changes nothing else."),
         severity?.node ?? null, note.node));
       footer.hidden = false;

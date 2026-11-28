@@ -149,7 +149,7 @@ Three things to know when you assess:
 
 - **Nothing reaches Home or the bell.** Look at **Compliance → From other systems** as a routine, weekly at least.
 - **That page lists only what waits.** A report once decided stays on the control's **Reported by other systems** card (the last 50), which has **Confirm** and **Set aside** too.
-- **Each confirmed repeat raises another issue.** A failed test does not open a second issue while one is open for the control; a report does, every time. When a scanner reports the same failure night after night, confirm the first and set the repeats aside, saying the issue is already open.
+- **A repeated failure joins the open issue.** As with failed tests, while an issue is open because the control was found wanting, by a test or an earlier report, confirming another failure joins it rather than raising a second.
 
 [Results reported by other systems](other-systems.md#results-reported-by-other-systems) is the administrator's and user's side, and [the API guide](api.md#reporting-onto-a-control) says what a system sends.
 

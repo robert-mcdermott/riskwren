@@ -99,7 +99,7 @@ Three things to know:
 
 - **Reports do not appear on Home or under the bell.** Assessors should look at **From other systems** as a routine, weekly at least.
 - **The page lists only what is waiting.** A report once decided stays on the control's card, with who decided it and how.
-- **A scanner that reports the same failure every night** raises a new issue each time one is confirmed. Confirm the first and set the repeats aside, saying that the issue is already open.
+- **A scanner that reports the same failure every night** raises one issue. While an issue is open because the control was found wanting, by a test or an earlier report, confirming another failure joins it rather than raising a second.
 
 ## Is it in good standing?
 
