@@ -25,7 +25,7 @@ export function editRisk({ record = null, draft = null, program, units, onDone }
         hint: "A few words that name it. For example: Loss of irreplaceable specimens." });
       const category = select("Category", categoryOptions(program, { blank: record ? null : "Choose…" }),
         { value: record?.category ?? from.category ?? "", required: true, hint: "Its category sets the appetite it is held to." });
-      const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record ? null : "Choose…" }),
+      const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record ? null : "Choose…", keep: record?.org_unit_id ?? null }),
         { value: record?.org_unit_id ?? draft?.org_unit?.id ?? "", required: true, hint: "The unit that owns the risk." });
       const cause = field("Cause", { type: "textarea", value: record?.cause ?? from.cause ?? "", hint: "What makes it possible." });
       const event = field("Event", { type: "textarea", value: record?.event ?? from.event ?? "", hint: "What would happen." });

@@ -117,7 +117,7 @@ export function editRecord(type, { record = null, vocab, units, onDone, preset =
     render: (body, footer, close) => {
       const name = field("Name", { value: record?.name ?? "", required: true, hint: NAME_HINTS[type] });
       const kind = select("Kind", options(vocab, meta.kinds, { blank: record ? null : "Choose…" }), { value: record?.kind ?? "", required: true });
-      const unit = select(UNIT.label, unitOptions(units.tree, { only: preset.org_unit_id ? null : ownUnits(), blank: record ? null : "Choose…" }),
+      const unit = select(UNIT.label, unitOptions(units.tree, { only: preset.org_unit_id ? null : ownUnits(), blank: record ? null : "Choose…", keep: record?.org_unit_id ?? null }),
         { value: record?.org_unit_id ?? preset.org_unit_id ?? "", required: true, hint: "The unit that answers for it." });
       const summary = field("Summary", { type: "textarea", value: record?.summary ?? "" });
       const critical = select("Criticality", options(vocab, "criticalities"), { value: record?.criticality ?? "moderate",

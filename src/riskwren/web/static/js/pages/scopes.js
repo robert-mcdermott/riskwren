@@ -45,7 +45,7 @@ function editScope({ scope = null, unitIndex, onDone }) {
     subtitle: scope ? `${scope.ref} · ${scope.name}` : "A boundary that must meet one or more frameworks.",
     render: (body, footer, close) => {
       const name = field("Name", { value: scope?.name ?? "", required: true, maxlength: 200, hint: scope ? null : "For example: Clinical systems, or The data enclave." });
-      const unit = select("Unit", unitOptions(unitIndex.tree, { only: ownUnits(), blank: scope ? null : "Choose…" }), { value: scope?.org_unit_id ?? "", required: true, hint: "The unit that answers for it." });
+      const unit = select("Unit", unitOptions(unitIndex.tree, { only: ownUnits(), blank: scope ? null : "Choose…", keep: scope?.org_unit_id ?? null }), { value: scope?.org_unit_id ?? "", required: true, hint: "The unit that answers for it." });
       const summary = field("What it is for", { type: "textarea", rows: 2, value: scope?.summary ?? "" });
       const boundary = field("Boundary", { type: "textarea", rows: 3, value: scope?.boundary ?? "", hint: "Where it begins and ends, in words. What is inside it is listed once it is saved." });
       const offers = checkbox("Offers its controls to other scopes", { checked: scope?.offers_controls ?? false,

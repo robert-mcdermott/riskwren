@@ -378,6 +378,7 @@ def update(
     if not access.can_edit(session, principal, record_type, record):
         raise PermissionDenied(f"You cannot edit this {record_type.label}.")
     require_version(record_type, record, version)
+    was_in = record.org_unit_id
     with audit.operation(session, f"{record_type.key}.edit"):
         with session.no_autoflush:
             errors = _apply(session, record_type, record, values, creating=False)
@@ -385,7 +386,9 @@ def update(
             session.expire(record)  # put back what was there
             raise Invalid(f"The {record_type.label} was not saved.", errors)
         may_add = record_type.extra.get("can_add") or access.can_add
-        if "org_unit_id" in values and not may_add(principal, record.org_unit_id):
+        # Moving a record is for those who look after the unit it goes to. Its owner saving
+        # it where it already is moves nothing.
+        if record.org_unit_id != was_in and not may_add(principal, record.org_unit_id):
             session.expire(record)
             raise PermissionDenied("You can move a record only to a unit you look after.")
         if getattr(record, "_external_refs", None) is not None:

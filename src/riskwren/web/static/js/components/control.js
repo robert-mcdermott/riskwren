@@ -56,7 +56,7 @@ export function editControl({ record = null, draft = null, vocab, units, from: l
       const kind = select("Kind", options(vocab, "control_kinds", { blank: record || from?.kind ? null : "Choose…" }), { value: record?.kind ?? from?.kind ?? "", required: true });
       const nature = select("Nature", options(vocab, "control_natures", { blank: "Not said" }), { value: record?.nature ?? from?.nature ?? "" });
       const frequency = select("How often", options(vocab, "control_frequencies", { blank: "Not said" }), { value: record?.frequency ?? from?.frequency ?? "" });
-      const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record || unitId ? null : "Choose…" }),
+      const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record || unitId ? null : "Choose…", keep: record?.org_unit_id ?? null }),
         { value: record?.org_unit_id ?? unitId ?? "", required: true, hint: "The unit that operates it." });
       const key = checkbox("Key control", { checked: record?.is_key ?? false, hint: "One that a serious risk depends on above all others." });
       const restricted = checkbox("Restricted", { checked: record?.restricted ?? false });
