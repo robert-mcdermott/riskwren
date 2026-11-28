@@ -1,13 +1,13 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.7.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.8.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
 | | Guide | For | Covers |
 |---|---|---|---|
 | 1 | [Getting started](getting-started.md) | Whoever installs RiskWren | Installing, `init`, `doctor`, `serve`, first sign-in, the demo organization, units and people |
-| 2 | [The register](the-register.md) | Everyone who owns, assesses, or reads a risk | The inventory, risks and their three ratings, controls, what the controls suggest, plans, actions, and acceptance; the objectives a risk threatens; risk analyses, search, saved views, what a record is missing, and indicators |
+| 2 | [The register](the-register.md) | Everyone who owns, assesses, or reads a risk | The inventory, risks and their three ratings, controls, what the controls suggest, plans, actions, and acceptance; the objectives a risk threatens; risk analyses, search, saved views, what a record is missing, and indicators; sites; business impact and recovery; continuity plans and exercises |
 | 3 | [Compliance](compliance.md) | Security and compliance leads, and the stewards of what must comply | Frameworks, new versions and moving a scope to one, mapping controls to requirements and the crosswalks a publisher suggests, scopes, inherited controls, agreements and the terms they impose, readiness, the compliance dashboard, connections |
 | 4 | [Evidence and testing](evidence-and-testing.md) | Control owners and assessors | Evidence and its dates, files, assessments, tests, independence, and what a result changes |
 | 5 | [Issues and exceptions](issues-and-exceptions.md) | Whoever fixes, checks, or decides | The issue register, severity and dates, actions, closure confirmed by someone else, exceptions, the plan of action, notices |
@@ -15,8 +15,8 @@ These guides describe RiskWren 0.7.0. Read them in this order if you are new, or
 | 7 | [Third parties](third-parties.md) | Whoever looks after the organization's suppliers and partners, most often the security office | Third parties and their services; what each reaches and handles; tiering by the program's rules; contacts; due diligence questionnaires sent through a link that needs no account; reviewing the answers and their concerns; reports and certificates, and what each covers and leaves to the organization; who agreements are with, and the stop where shared information has no covering agreement; findings followed up with the third party; review again; offboarding; subcontractors |
 | 8 | [Internal audit](internal-audit.md) | Internal audit, the third line | The audit universe ranked from the register, what audit says about a thing, the plan for a period, its approval, and tracking it |
 | 9 | [Incidents](incidents.md) | Everyone who reports something, and the security team and others who triage and handle it | Reporting an incident, a near miss, or a concern; who sees a report; triage; handling it, and what is said to the reporter; restricted cases, known only to those named on them; what it taught: the risks it realized, the controls that failed or held, lessons, costs, and the issues raised from it; breach assessment, deadlines, and notifications; reporting without a name, and following it up with a code |
-| 10 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, committee sessions, when someone leaves, reminders, the dashboards, the history, appearance |
-| 11 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard |
+| 10 | [Running the program](running-the-program.md) | The risk, compliance, and security assurance team, and administrators | Roles and scope, who sees what, the program and its editors, questionnaires, campaigns, committee sessions, when someone leaves, reminders, the dashboards, the history, privacy impact assessments, appearance |
+| 11 | [Configuration](configuration.md) | Whoever runs the server | `riskwren.toml`, environment overrides, the data home, optional single sign-on and email, scheduled work, PostgreSQL, upgrading, reverse proxies, the demo guard, the look fixed in the file |
 | 12 | [API](api.md) | Anyone connecting another system | Sign-in, the CSRF token, responses, errors, lists, and a table of routes |
 
 ## Reference
@@ -92,6 +92,7 @@ These two are written from the code, so they always match the version they ship 
 | Which controls stand between the causes of this risk and what follows it? | [The bow-tie](the-register.md#the-bow-tie) |
 | What does a dashboard figure count? | [Read the dashboards](running-the-program.md#read-the-dashboards) |
 | How do I move to PostgreSQL? | [Use PostgreSQL](configuration.md#use-postgresql) |
+| Our brand has exact colors, logo files, and typefaces. Can RiskWren use them? | [`[branding]`](configuration.md#branding) |
 | How do I put it behind a proxy? | [Run behind a reverse proxy](configuration.md#run-behind-a-reverse-proxy) |
 | How do I send notices and reminders by email? | [Email](configuration.md#email) |
 | How do I ask every control owner to attest, and see who has? | [Campaigns](running-the-program.md#campaigns) |
@@ -108,7 +109,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.7.0 is the register, compliance, the means of keeping both current, the organization's own word, its third parties, insight (measures, portfolio views, leadership reports, the record as it stood on a date, and dossiers that prove they are unchanged), and internal audit's own workspace. It does not yet handle incidents or plan for continuity; those follow in the next release. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action; the action's owner here records it. An outside auditor's link lists the evidence on file but does not yet download its files. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.8.0 is the register, compliance, the means of keeping both current, the organization's own word, its third parties, insight (measures, portfolio views, leadership reports, the record as it stood on a date, and dossiers that prove they are unchanged), internal audit's own workspace, and incidents and resilience. It is not yet ready to be adopted without help: there is no container image or deployment guide, no program pack for kinds of organization other than a research institute, no tokens for other systems, and no handbook for a team starting out; those follow in the next release. The organization's own words for things (its terms) cannot yet replace the product's. An incident's breach assessment works out what each rule requires, but its notification letters are written elsewhere. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action; the action's owner here records it. An outside auditor's link lists the evidence on file but does not yet download its files. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

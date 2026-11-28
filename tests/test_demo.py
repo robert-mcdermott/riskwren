@@ -499,6 +499,48 @@ def test_the_storylines_came_out_as_written(demo_db: Database, built: demo.Summa
         assert asked == ["accepted", "answered", "open"]
         grants = session.scalars(select(OutsideAccess).order_by(OutsideAccess.id)).all()
         assert [row.views for row in grants] == [0, 2]
+        # Incidents: reported, triaged, handled, and closed; two without a name, one a
+        # restricted case; two breach assessments, one still open; costs and an issue.
+        from riskwren.db.models import (
+            BreachAssessment,
+            BreachNotification,
+            ContinuityCover,
+            ContinuityExercise,
+            ImpactAnalysis,
+            Incident,
+            IncidentLoss,
+            RecoveryCapability,
+            Site,
+        )
+
+        incidents = session.scalars(select(Incident)).all()
+        assert (
+            sorted(row.status for row in incidents)
+            == ["closed"] * 2 + ["handling"] * 4 + ["reported"] * 2
+        )
+        assert sum(row.anonymous for row in incidents) == 2
+        assert sum(row.restricted for row in incidents) == 1
+        breaches = session.scalars(
+            select(BreachAssessment).where(BreachAssessment.superseded_by.is_(None))
+        ).all()
+        assert sorted(row.conclusion for row in breaches) == ["no_notification", "undecided"]
+        assert len(session.scalars(select(BreachNotification)).all()) == 1
+        assert len(session.scalars(select(IncidentLoss)).all()) == 3
+        learned = session.scalars(
+            select(Issue).where(Issue.source_kind.in_(["incident", "exercise"]))
+        )
+        assert sorted(row.source_kind for row in learned) == ["exercise", "incident"]
+        # Resilience: four critical processes analysed, four sites, and two plans exercised.
+        current = ImpactAnalysis.superseded_by.is_(None)
+        assert len(session.scalars(select(ImpactAnalysis).where(current)).all()) == 4
+        capable = session.scalars(
+            select(RecoveryCapability).where(RecoveryCapability.superseded_by.is_(None))
+        ).all()
+        assert {row.subject_type for row in capable} == {"system", "site", "third_party"}
+        assert len(session.scalars(select(Site)).all()) == 4
+        assert len(session.scalars(select(ContinuityCover)).all()) == 2
+        exercised = sorted(row.result for row in session.scalars(select(ContinuityExercise)))
+        assert exercised == ["met", "partly"]
     assert built.counts["acceptances refused"] == 1
 
 

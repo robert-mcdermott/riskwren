@@ -155,7 +155,7 @@ Detail: [waves/wave-6.md](waves/wave-6.md)
 
 Detail: [waves/wave-7.md](waves/wave-7.md)
 
-## Wave 8: Incidents and resilience (v0.8.0) ☐
+## Wave 8: Incidents and resilience (v0.8.0) ☑
 
 **Goal:** when something goes wrong, it is reported, handled, and learned from; and the organization knows what it cannot afford to lose.
 
@@ -167,7 +167,7 @@ Detail: [waves/wave-7.md](waves/wave-7.md)
 | 4 | Learning and losses | Incidents joined to risks and controls; corrective actions; loss events and near misses | ☑ |
 | 5 | Business impact | Sites; impact analysis per process; recovery needs checked against what dependencies can deliver | ☑ |
 | 6 | Plans and exercises | Versioned plans that print for use offline; exercises with findings | ☑ |
-| 7 | Release prep | Guides, changelog, release | ☐ |
+| 7 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-8.md](waves/wave-8.md)
 
@@ -178,7 +178,7 @@ Detail: [waves/wave-8.md](waves/wave-8.md)
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
 | 1 | Production | Measured performance at 10,000 records and many people at once; several workers; backup, restore, and moving between SQLite and PostgreSQL | ☐ |
-| 2 | Brand kit | A custom palette, sign-in page message and image, email header, footer links, the organization's own terms, contrast checks | ☐ |
+| 2 | Brand kit | The organization's own terms, an email header; exact colors, the sign-in message and picture, footer links, and contrast checks arrived in 0.8.0 | ☐ |
 | 3 | Starter programs | Program packs for a research institute, an academic medical center, a university, and a general nonprofit; custom fields; identifier-only framework packs | ☐ |
 | 4 | API for others | Scoped tokens, signed webhooks, a recorded API contract | ☐ |
 | 5 | Deployment | A container image, a compose file, a hardened systemd unit, proxy examples, the operations view, `doctor --production` | ☐ |

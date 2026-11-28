@@ -2,7 +2,7 @@
 
 **Goal:** when something goes wrong, it is reported, handled, and learned from; and the organization knows what it cannot afford to lose. Waves 1 to 7 made a record of what could go wrong, what is done about it, what is promised, who is depended on, and how all of it is checked. Wave 8 adds what actually happens: incidents, near misses, and concerns reported by anyone, triaged and handled, kept to those who need to know when they are sensitive, assessed for whether they must be notified, and joined back to the risks they realized and the controls that failed; and, for resilience, what each process needs to recover and whether what it relies on can deliver it.
 
-**Branch:** `wave-8` · **Target version:** `0.8.0` · **Status:** ☐ in progress
+**Branch:** `wave-8` · **Target version:** `0.8.0` · **Status:** ☑ released
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security team, this wave is incident handling on the same record as the risks and controls: a report that takes a minute from anyone, triage that names the systems, information, and third parties involved, a breach assessment with its clock, and the risks an incident realized and the controls that failed, so that the register learns from what happened.
 
@@ -75,9 +75,11 @@ The wave is done when, on a fresh checkout:
 
 **Done:** a continuity plan is a document of the new kind `plan`, so its versions, approval, owners, and review are a document's (migration 0044 widens the kind, and adds `continuity_cover` and `continuity_exercise`). `riskwren.resilience.plans` says what a plan restores, gathers whom to call from the owners of the plan, its processes, and what they rely on, writes the version in force as one self-contained HTML file, records exercises against the version in force, raises findings as issues with the exercise as their source, and puts an exercise due within a month on its owner's home page, on a new `plan_exercise_months` cadence. A process's business impact names the plans that restore it. The demo has two plans; the research storage plan's tabletop exercise found the five-day restore. The acceptance tests are `tests/test_continuity.py`.
 
-### Slice 7: Release prep ☐
+### Slice 7: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.7.0 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.7.0 on both databases, audits, release, and the site republished
+
+**Done:** a new guide, Incidents, written slice by slice, in the guides' index and the site's menu; the register guide covers sites, business impact, and continuity plans, and the configuration guide the look fixed in the file. Before the release, at the user's request, the look can be fixed in `riskwren.toml` (`[branding]`: exact colors by day and after dark, checked for readability at start, logo files, a sign-in picture, typefaces), and the app gained an accent of its own after dark, a sign-in message and picture, footer links, and an email footer; what the file sets is locked under Admin → Appearance. The README, the guides' index, and the site's home page describe 0.8.0, with new sections on incidents, breach assessment, and resilience, and the changelog has its upgrade notes. The upgrade from 0.7.0 was run from that release's own code with its demo organization on both databases: migrations 0039 to 0045 applied, every row of every table kept (the history and the questionnaires only grew, by the privacy impact questionnaire the upgrade loads, and the counters gained `INC` and `SIT`), the history still verifies, and over the old data an incident was reported, triaged, learned from, costed, and closed, a process analysed, a site added and relied on, and its recovery checked; `riskwren verify` passing and a second upgrade changing nothing. The demo's storyline test checks the wave's stories.
 
 ## Decisions
 

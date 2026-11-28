@@ -12,6 +12,9 @@ const first = (api, pick = "(rows) => rows[0].ref") => async (page) => page.eval
 const daysAgo = (days) => new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
 const click = (text) => `(() => { const el = [...document.querySelectorAll("button, a")].find((each) => each.textContent.trim() === ${JSON.stringify(text)});
   if (el) el.click(); else window.__sceneMissed = ${JSON.stringify(`there is no button called "${text}"`)}; })()`;
+/** A campaign of the demo by its kind, since its reference depends on the order they were made. */
+const campaign = (kind) => first("/api/v1/campaigns", `(data) => data.campaigns.find((row) => row.kind === ${JSON.stringify(kind)}).ref`);
+const campaignPath = (kind, after = "") => async (page) => `/campaigns/${await campaign(kind)(page)}${after}`;
 const risk = (words, tab = "") => async (page) =>
   `/risks/${await first(`/api/v1/risks?q=${encodeURIComponent(words)}`)(page)}${tab ? `?tab=${tab}` : ""}`;
 
@@ -408,18 +411,18 @@ export const SCENES = [
   { name: "admin-sso", as: "admin", path: "/admin/sso" },
   { name: "scheduled-work", as: "admin", path: "/admin/scheduled-work" },
   { name: "campaigns", as: "ciso", path: "/campaigns" },
-  { name: "campaign", as: "assess1", path: "/campaigns/CMP-0002" },
-  { name: "campaign-waiting", as: "auditor", path: "/campaigns/CMP-0002?show=pending" },
-  { name: "campaign-closed", as: "cro", path: "/campaigns/CMP-0001" },
-  { name: "campaign-acknowledgment", as: "assess1", path: "/campaigns/CMP-0004" },
+  { name: "campaign", as: "assess1", path: campaignPath("attestation") },
+  { name: "campaign-waiting", as: "auditor", path: campaignPath("attestation", "?show=pending") },
+  { name: "campaign-closed", as: "cro", path: campaignPath("self_assessment") },
+  { name: "campaign-acknowledgment", as: "assess1", path: campaignPath("acknowledgment") },
   { name: "campaign-start", as: "assess1", path: "/campaigns", step: click("Start a campaign") },
   { name: "campaign-item", as: "ciso",
     path: async (page) => first("/api/v1/home", `(data) => data.items.find((item) => item.kind === "campaign" && item.title.startsWith("Attest")).href`)(page),
     step: `(() => { const label = [...document.querySelectorAll(".questionnaire label")].find((l) => l.textContent === "Partly"); if (label) label.click(); else window.__sceneMissed = "the option Partly"; })()` },
   { name: "campaign-item-evidence", as: "assess1",
-    path: async (page) => first("/api/v1/campaigns/CMP-0003", `(data) => "/campaign-items/" + data.items[0].id`)(page) },
+    path: async (page) => first(`/api/v1/campaigns/${await campaign("evidence")(page)}`, `(data) => "/campaign-items/" + data.items[0].id`)(page) },
   { name: "campaign-item-answered", as: "assess1",
-    path: async (page) => first("/api/v1/campaigns/CMP-0002", `(data) => "/campaign-items/" + data.items.find((item) => item.outcome === "partly").id`)(page) },
+    path: async (page) => first(`/api/v1/campaigns/${await campaign("attestation")(page)}`, `(data) => "/campaign-items/" + data.items.find((item) => item.outcome === "partly").id`)(page) },
   { name: "questionnaires", as: "cro", path: "/questionnaires" },
   { name: "questionnaire", as: "bio_mgr", path: "/questionnaires/control-attestation",
     step: `(() => { const pick = (text) => { const label = [...document.querySelectorAll(".questionnaire label")].find((l) => l.textContent === text); if (label) label.click(); else window.__sceneMissed = "the option " + text; }; pick("Partly"); pick("No"); })()` },

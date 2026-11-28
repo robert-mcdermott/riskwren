@@ -4,9 +4,41 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## 0.8.0 (unreleased)
+## 0.8.0 (2026-11-27)
 
-Wave 8, *Incidents and resilience*.
+Wave 8, *Incidents and resilience*: when something goes wrong, it is reported, handled, and
+learned from, and the organization knows what it cannot afford to lose. Anyone signed in
+reports an incident, a near miss, or a concern in one short form and, where the organization
+opens it, anyone can without giving a name. Each report is triaged and handled on the same
+record as the risks and controls, a sensitive case is kept to those named on it, and an
+incident involving protected information is assessed for whether it must be notified, to
+whom, and by when. What an incident realized, which controls failed or held, and what it cost
+are kept, so the register learns from what happened. For resilience, a process says what it
+needs to recover, and everything it relies on (systems, services, sites, and the third
+parties that perform it) is checked against that; continuity plans print for when the systems
+are down, and are exercised.
+
+### Upgrading from 0.7.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0039 to 0045). Every row is
+kept, and the history still verifies. A few things look different afterwards:
+
+- **The menu has a new group, Incidents,** for everyone signed in. **Inventory** has **Sites**,
+  **Reports** has **Resilience** and **Continuity plans**, and **Compliance** has **Privacy
+  impact**.
+- **A security leader who assesses everywhere now reads the leadership reports,** as does
+  anyone else whose role covers the whole organization. To keep the reports to those who lead
+  the whole organization, as before, choose **Nobody else** under **Admin → Program → Who sees
+  what**.
+- **Reporting without a name is closed** until an administrator opens it there.
+- **The new vocabularies start with their usual values:** incident categories, protected
+  information, and site kinds. A program whose kinds of link were edited gains the links a
+  site may have, and keeps its own names for the rest.
+- **Nothing is analysed yet:** Reports → Resilience lists a process once someone records its
+  business impact, and a system, service, site, or third party says what it can deliver once
+  someone records that.
+- **The look can be fixed in `riskwren.toml`.** Nothing changes unless a `[branding]` section is
+  added; see [Configuration](docs/configuration.md#branding).
 
 ### Added
 
@@ -30,19 +62,30 @@ Wave 8, *Incidents and resilience*.
   from it (the HIPAA Breach Notification Rule, as a covered entity or a business associate,
   the FTC Safeguards Rule, DFARS 252.204-7012, and any state's law or contract named), each
   notification is recorded, and what is still to send waits on the handler's home page.
+- **Reporting without a name,** closed until an administrator opens it under **Admin →
+  Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
+  name, or address, with a follow-up code shown once.
 - **Privacy impact assessments:** a built-in questionnaire, asked by a new kind of campaign of
   every process and system whose data class the program's new `privacy` rule names, with the
   answers' concerns flagged, a review, and **Compliance → Privacy impact**.
 - **Two frameworks, loaded on request:** the HIPAA Breach Notification Rule (45 CFR Part 164
   Subpart D) and the NIST Privacy Framework 1.0.
-- **Reporting without a name,** closed until an administrator opens it under **Admin →
-  Program → Who sees what**: a page at `/report` that needs no sign-in and keeps no account,
-  name, or address, with a follow-up code shown once.
+- **Business impact and recovery:** a process's business impact analysis (how its loss hurts
+  over time, how soon it must be back, how much information it can lose, and the least it
+  needs), what each system and service can deliver and what that rests on, and every shortfall
+  between them. A process's **Business impact** tab, a system's or service's **Recovery** tab,
+  and **Reports → Resilience**. **Sites** are a new kind of inventory record (`SIT`): the
+  places work depends on, relied on by processes and systems, with a **Recovery** tab of their
+  own; third parties that perform a process have one too, and both are checked with the rest.
 - **Continuity plans and exercises:** a plan is a document of the new kind **Continuity
   plan**, versioned, approved, and reviewed like any document. **Reports → Continuity plans**
   shows what each restores and what that relies on, whom to call, a copy that prints or
   downloads as one file for when the systems are down, and its exercises, whose findings are
   issues. A plan is exercised on a new `plan_exercise_months` cadence.
+- **Who reads the leadership reports is the program's choice,** under **Admin → Program → Who
+  sees what**: only those who lead the whole organization, anyone whose role covers the whole
+  organization (the default), or every leader and manager, with named readers on top. A reader
+  who may not see a record a report names sees where it stands but not what it is.
 - **Branding fixed in the configuration file:** a `[branding]` section in `riskwren.toml`
   sets the look exactly: every color by day and after dark (checked for readability when the
   server starts), logo files for light and dark backgrounds, the tab icon, a sign-in picture,
@@ -51,17 +94,6 @@ Wave 8, *Incidents and resilience*.
 - **More of the look in the app:** an accent of its own after dark, a picture and a message
   on the sign-in page, up to five links of the organization's own, and the last line of every
   email.
-- **Business impact and recovery:** a process's business impact analysis (how its loss hurts
-  over time, how soon it must be back, how much information it can lose, and the least it
-  needs), what each system and service can deliver and what that rests on, and every shortfall
-  between them. A process's **Business impact** tab, a system's or service's **Recovery** tab,
-  and **Reports → Resilience**. **Sites** are a new kind of inventory record (`SIT`): the
-  places work depends on, relied on by processes and systems, with a **Recovery** tab of their
-  own; third parties that perform a process have one too, and both are checked with the rest.
-- **Who reads the leadership reports is the program's choice,** under **Admin → Program → Who
-  sees what**: only those who lead the whole organization, anyone whose role covers the whole
-  organization (the default), or every leader and manager, with named readers on top. A reader
-  who may not see a record a report names sees where it stands but not what it is.
 
 ### Changed
 
