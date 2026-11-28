@@ -90,6 +90,24 @@ Email is optional and off until both `host` and `from_address` are set. See [Ema
 | `from_name` | `""` | The name beside it. Empty means the product's name |
 | `digest_hour` | `7` | The hour of the day, in UTC, after which daily summaries are sent |
 
+### `[assistant]`
+
+An assistant that summarizes records and drafts risks. Optional and off; see [The assistant](#the-assistant).
+
+| Key | Default | Meaning |
+|---|---|---|
+| `enabled` | `false` | Whether it is on. While it is off, none of it is installed |
+| `provider` | `"openai"` | The protocol the provider speaks: `"openai"` (the Chat Completions API, which servers on your own machines speak too), `"anthropic"` (the Messages API), or `"bedrock"` (Amazon Bedrock's Converse API) |
+| `url` | `""` | The API's root. Empty means the provider's own service. It must be `https://` unless it is on this computer |
+| `model` | `""` | The model to use. Needed when it is on |
+| `key_env` | `""` | The name of the environment variable that holds the key. The key itself is refused in the file |
+| `region` | `"us-east-1"` | For Bedrock |
+| `send` | `"public, internal"` | The data classes whose records may be sent, besides records with none. Restricted records never are |
+| `daily_limit` | `40` | Exchanges for one person, or one token, in a day |
+| `time_limit_seconds` | `90` | For one exchange, every call to the provider and the tools together |
+| `max_tokens` | `1500` | The longest answer, in the provider's tokens |
+| `temperature` | `0.2` | How much the answers vary |
+
 ### `[branding]`
 
 Optional. Leave it out and the look is set in the app, under **Admin → Appearance**, as before.
@@ -356,6 +374,34 @@ Then each person chooses, under **Your account**: each notice as it happens, one
 - **Turning email on does not send people their history.** Only notices written after it is set up are sent.
 - **A daily summary** gathers what a person has not yet read in the app, once a day after `digest_hour`.
 - Messages say what happened and link to it. They carry no record's contents beyond its name.
+
+## The assistant
+
+**You do not need this to use RiskWren, and it is off.** Turned on, it does two things for anyone signed in: **Summarize** on a record's page writes a short summary of it, and **Draft with the assistant** on the register turns someone's own description of what could go wrong into a draft risk, which opens in the ordinary form for them to check, change, and save. Administrators see how it is set up, check that the provider answers, and read every exchange under **Admin → Assistant**.
+
+1. Choose a provider the organization trusts with what people may see: its own model server (Ollama, vLLM, or anything that speaks the Chat Completions API), or a service it has an agreement with.
+2. Under `[assistant]`, set `enabled = true`, the `provider`, the `model`, and, for a server of your own, its `url`. Put the key, if one is needed, in an environment variable and name it in `key_env`.
+3. Decide what may be sent: `send` lists the data classes whose records may go to the provider.
+4. Restart RiskWren, and use **Check the connection** under **Admin → Assistant**.
+
+For a model on the same computer, with nothing leaving it:
+
+```toml
+[assistant]
+enabled = true
+provider = "openai"
+url = "http://127.0.0.1:11434/v1"
+model = "granite4:3b"
+```
+
+What it is careful about:
+
+- **It reads as the person asking.** Its tools are the ones `riskwren tools` offers, and each calls RiskWren's API with the asker's own session or token, so it can see nothing they may not.
+- **It is sent no more than it should be.** Whatever the tools read passes through a filter first: a restricted record, and a record whose data class is not in `send`, reach the provider only as a reference and the reason it was withheld. What a person types to it is sent as they wrote it.
+- **It makes nothing.** A summary is shown, not saved. A draft waits under **Drafts** until a person who may add a risk opens it and saves it through the ordinary form.
+- **Everything is recorded.** Each exchange is written before the provider is asked, and again when it ends, with who asked, what for, the tools it used, what it answered, and the tokens it took, in the history, where it cannot be changed unnoticed.
+- **It is held to limits.** Each person, and each token, may ask `daily_limit` times a day, counted from the record so that two requests at once cannot both take the last one; each exchange stops after `time_limit_seconds`, and after six rounds of tools.
+- **Text in a record is data to it.** It is told so, and the most a record's text could make it do is read what the asker may read and propose a draft, which a person must still save.
 
 ## Use PostgreSQL
 

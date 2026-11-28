@@ -104,3 +104,38 @@ from_name = ""
 
 # The hour of the day, in UTC, after which daily summaries are sent.
 digest_hour = 7
+
+[assistant]
+# An assistant that summarizes records and drafts risks. Optional, and off: while it is off,
+# nothing of it is installed and nothing is sent anywhere.
+#
+# It reads only what the person asking may see, through RiskWren's own API, and makes nothing
+# by itself: a person opens each draft in the ordinary form and saves it. Every exchange is
+# recorded in the history and shown under Admin → Assistant.
+enabled = false
+
+# The protocol the provider speaks: "openai" (the Chat Completions API, which servers on your
+# own machines such as Ollama or vLLM speak too), "anthropic" (the Messages API), or "bedrock"
+# (Amazon Bedrock's Converse API).
+provider = "openai"
+
+# The API's root. Leave it empty for the provider's own service, or name a server of your own,
+# such as "http://127.0.0.1:11434/v1". It must be https unless it is on this computer.
+url = ""
+model = ""
+
+# The key is never written in this file. Name the environment variable that holds it, such as
+# "OPENAI_API_KEY" or "ANTHROPIC_API_KEY". A server on this computer may need none. For
+# Bedrock, the key is AWS_BEARER_TOKEN_BEDROCK, or AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
+key_env = ""
+region = "us-east-1"
+
+# Records of these data classes may be sent, besides records with none; restricted records
+# never are. Leave out a class to keep its records back.
+send = "public, internal"
+
+# Each person may ask this many times a day, and each exchange stops after this many seconds.
+daily_limit = 40
+time_limit_seconds = 90
+max_tokens = 1500
+temperature = 0.2

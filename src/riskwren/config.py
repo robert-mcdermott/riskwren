@@ -92,6 +92,38 @@ class MailConfig:
 
 
 @dataclass(frozen=True)
+class AssistantConfig:
+    """An assistant that drafts and summarizes, with a provider the organization chooses,
+    named by the protocol it speaks. Off until enabled; while off, nothing of it is installed."""
+
+    enabled: bool = False
+    provider: str = "openai"  # openai (which local servers speak too), anthropic, or bedrock
+    url: str = ""  # the API's root; each provider has a default
+    model: str = ""
+    key_env: str = ""  # the environment variable that holds its key, if it needs one
+    region: str = "us-east-1"  # for bedrock
+    max_tokens: int = 1500
+    temperature: float = 0.2
+    time_limit_seconds: int = 90  # for one exchange: every call to the provider and the tools
+    daily_limit: int = 40  # exchanges for one person in a day
+    send: str = "public, internal"  # the data classes whose records may be sent to it
+
+    @property
+    def base_url(self) -> str:
+        if self.url:
+            return self.url.rstrip("/")
+        return {
+            "openai": "https://api.openai.com/v1",
+            "anthropic": "https://api.anthropic.com",
+            "bedrock": f"https://bedrock-runtime.{self.region}.amazonaws.com",
+        }.get(self.provider, "")
+
+    @property
+    def classes(self) -> frozenset[str]:
+        return frozenset(word.strip() for word in self.send.split(",") if word.strip())
+
+
+@dataclass(frozen=True)
 class Config:
     path: Path | None = None
     server: ServerConfig = field(default_factory=ServerConfig)
@@ -99,6 +131,7 @@ class Config:
     data: DataConfig = field(default_factory=DataConfig)
     sso: SsoConfig = field(default_factory=SsoConfig)
     mail: MailConfig = field(default_factory=MailConfig)
+    assistant: AssistantConfig = field(default_factory=AssistantConfig)
     # The [branding] section, checked: a ``riskwren.program.branding.FileBranding``, or None.
     branding: Any = None
 
@@ -120,6 +153,7 @@ _SECTIONS: dict[str, type] = {
     "data": DataConfig,
     "sso": SsoConfig,
     "mail": MailConfig,
+    "assistant": AssistantConfig,
 }
 
 
@@ -359,6 +393,46 @@ def _validate(config: Config, raw: Mapping[str, Any]) -> list[str]:
                 "[mail] password_env names the environment variable that holds the password, "
                 "such as RISKWREN_MAIL_PASSWORD"
             )
+    problems.extend(_check_assistant(config.assistant))
+    return problems
+
+
+ASSISTANT_PROVIDERS = ("openai", "anthropic", "bedrock")
+
+
+def _check_assistant(assistant: AssistantConfig) -> list[str]:
+    problems: list[str] = []
+    if assistant.provider not in ASSISTANT_PROVIDERS:
+        problems.append('[assistant] provider must be "openai", "anthropic", or "bedrock"')
+    if not assistant.enabled:
+        return problems
+    if not assistant.model:
+        problems.append("[assistant] model must name the model to use")
+    local = re.fullmatch(
+        r"http://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(/\S*)?", assistant.base_url
+    )
+    if not (re.fullmatch(r"https://[^\s?#]+", assistant.base_url) or local):
+        problems.append(
+            "[assistant] url must be an https address, or an http one on this computer, such "
+            'as "http://127.0.0.1:11434/v1"'
+        )
+    if assistant.key_env and not re.fullmatch(r"[A-Z][A-Z0-9_]*", assistant.key_env):
+        problems.append(
+            "[assistant] key_env names the environment variable that holds the key, such as "
+            "ANTHROPIC_API_KEY"
+        )
+    if not re.fullmatch(r"[a-z]{2}(-[a-z]+)+-\d", assistant.region):
+        problems.append('[assistant] region must be a region such as "us-east-1"')
+    if not 100 <= assistant.max_tokens <= 32000:
+        problems.append("[assistant] max_tokens must be between 100 and 32000")
+    if not 0 <= assistant.temperature <= 2:
+        problems.append("[assistant] temperature must be between 0 and 2")
+    if not 10 <= assistant.time_limit_seconds <= 600:
+        problems.append("[assistant] time_limit_seconds must be between 10 and 600")
+    if not 1 <= assistant.daily_limit <= 10000:
+        problems.append("[assistant] daily_limit must be between 1 and 10000")
+    if not all(re.fullmatch(r"[a-z][a-z0-9_]*", word) for word in assistant.classes):
+        problems.append('[assistant] send lists data classes by key, such as "public, internal"')
     return problems
 
 

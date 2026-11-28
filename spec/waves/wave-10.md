@@ -41,12 +41,14 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `riskwren.integration.tools` is one set of tools, each calling RiskWren's own API through a small interface, so the tool server and the assistant in the app (slice 4) share them and neither can see more than the asker. `riskwren.integration.mcp` speaks JSON-RPC 2.0 one message to a line, with `initialize`, `ping`, `tools/list`, and `tools/call`, by hand rather than with a library; the protocol is small and the server only answers. `riskwren tools --url` takes the token from `RISKWREN_TOKEN` only, wants `https://` away from the same computer, and `--no-drafts` leaves out the drafting tools. Drafts are `draft` rows (migration 0049) listed under **Drafts** for those who may add that kind of record in its unit; **Open** puts a draft in the ordinary form for a risk, an issue, or a control, and saving it marks the draft as used, naming the record, which must be one the same person made after the draft was proposed. The demo's security engineer has a desktop assistant with a reading token that has drafted a risk and an issue. The tests are `tests/test_drafts.py`.
 
-### Slice 4: Optional assistant ☐
+### Slice 4: Optional assistant ☑
 
-- [ ] `[assistant]` in the configuration: off by default; when off, nothing of it is installed (INT-07)
-- [ ] Providers by protocol: the OpenAI-compatible API (which local servers speak), Anthropic's Messages API, and Amazon Bedrock's Converse API; keys only from the environment
-- [ ] Draft a risk statement from a description; summarize a record; both from what the asker may see, and only from data classes the program allows
-- [ ] Every exchange recorded in the history; a daily limit per person; Admin → Assistant to check the connection and read the log
+- [x] `[assistant]` in the configuration: off by default; when off, nothing of it is installed (INT-07)
+- [x] Providers by protocol: the OpenAI-compatible API (which local servers speak), Anthropic's Messages API, and Amazon Bedrock's Converse API; keys only from the environment
+- [x] Draft a risk statement from a description; summarize a record; both from what the asker may see, and only from data classes the program allows
+- [x] Every exchange recorded in the history; a daily limit per person; Admin → Assistant to check the connection and read the log
+
+**Done:** `riskwren.assistant` holds the providers (each a plain HTTP call, no vendor library; Bedrock signed with Signature Version 4 from the standard library, or a Bedrock API key), and the service. While `enabled` is false its routes are not mounted, the session says so, and the app neither shows nor loads anything of it. When on, **Summarize** sits beside **Connections** on every record's page, and **Draft with the assistant** on the register: a description becomes a draft that opens in the ordinary **Raise a risk** form. Both use the tools of slice 3 through RiskWren's own API in the same process, with the asker's cookie and CSRF token or their token, so a token reaches the assistant as itself. Everything a tool reads passes `withhold`, which turns a restricted record, and a record whose data class is not in `send`, into its reference and why. Each exchange is an `assistant_exchange` row (migration 0050), written before the provider is asked with the asker's account or token row locked while the day's exchanges are counted, so the limit holds under concurrency, and written again when it ends, both as events in the hash-chained history. One overall time limit covers every call; six rounds of tools at most. **Admin → Assistant** shows the setup, checks the connection, and lists the log. The API's own documents and the role-by-route matrix are made with the assistant on. Tried end to end against a small model running on the same computer: the connection check, a summary through three tools, and a drafted risk opening in the form. The tests are `tests/test_assistant.py`, with a scripted provider: nothing is sent anywhere.
 
 ### Slice 5: Release prep ☐
 
@@ -62,6 +64,10 @@ Made on 2026-11-27 without the user, under their go-ahead to build waves 9 and 1
 - **A token that may only read may still draft.** A draft changes nothing until a person makes a record of it, so the safest token for an assistant, one that may only read, is enough. It is the one change such a token may send.
 - **Providers are named by protocol, called over plain HTTP,** with no vendor library. Keys come from the environment only; a key in the file is refused.
 - **The assistant reads through the API as the asker,** with their cookie or their token, so it can never see more than they may; and it is sent only what the program's data classes allow.
+
+- **A token that may only read may also ask the assistant.** It only reads and drafts, and the exchange is recorded under the token's name.
+- **The assistant's answers are shown, not kept on the record.** A summary is a reading aid; the record says what the organization decided. Only a draft can become a record, through a person.
+- **No streaming.** Each provider is asked for a whole answer: simpler, the same for all three protocols, and the answers are short.
 
 ## Notes
 

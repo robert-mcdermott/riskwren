@@ -328,6 +328,8 @@ Every route requires a signed-in account except those marked public. What a rout
 | `GET` · `POST /controls/{ref}/reported` · `GET /reported` · `POST /reported/{id}/confirm` · `POST /reported/{id}/set-aside` | What other systems report of a control: report one (a token acting as a manager, an assessor, or a steward); see a control's; what waits for you to decide; confirm one (`note`, `severity`) or set it aside (`note`), as a person who assesses the control's unit and does not own the control |
 | `GET /standing/{kind}/{ref}` | Whether a third party, a scope, or an exception is in good standing, with the reasons by code |
 | `GET` · `POST /drafts` · `GET /drafts/{id}` · `POST /drafts/{id}/use` · `POST /drafts/{id}/set-aside` | Drafts: propose one (`kind`, `values`, `why`; a token that may only read may too); those waiting for you; one draft; mark one as used, naming the record you made from it (`ref`); set one aside (`note`) |
+| `POST /assistant/summary` · `POST /assistant/draft-risk` | Only when the assistant is turned on: a summary of a record (`ref`), or a risk drafted from a description (`description`, `org_unit_id`), as whoever asks; `429` past the day's limit, `502` when the provider fails or runs out of time |
+| `GET /admin/assistant` · `POST /admin/assistant/check` | Only when the assistant is turned on: how it is set up, with its log; check that the provider answers (administrators) |
 | `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
 | `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 

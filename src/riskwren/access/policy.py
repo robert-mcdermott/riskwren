@@ -63,6 +63,11 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("POST", "/api/v1/reported/{report_id}/confirm"): Needs.ASSESS,
     ("POST", "/api/v1/reported/{report_id}/set-aside"): Needs.ASSESS,
     ("GET", "/api/v1/standing/{kind}/{ref}"): Needs.MEMBER,
+    # The assistant, when it is turned on: asked by a person or a token, set up by the file
+    ("POST", "/api/v1/assistant/summary"): Needs.MEMBER,
+    ("POST", "/api/v1/assistant/draft-risk"): Needs.MEMBER,
+    ("GET", "/api/v1/admin/assistant"): Needs.ADMIN,
+    ("POST", "/api/v1/admin/assistant/check"): Needs.ADMIN,
     # Drafts: proposed by an assistant or a token, made by a person in the ordinary form
     ("POST", "/api/v1/drafts"): Needs.MEMBER,
     ("GET", "/api/v1/drafts"): Needs.MEMBER,

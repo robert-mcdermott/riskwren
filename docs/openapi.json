@@ -1722,6 +1722,33 @@
         "title": "DocumentIn",
         "type": "object"
       },
+      "DraftRiskBody": {
+        "properties": {
+          "description": {
+            "description": "What could go wrong, in your words",
+            "maxLength": 4000,
+            "title": "Description",
+            "type": "string"
+          },
+          "org_unit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The unit it belongs to",
+            "title": "Org Unit Id"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "DraftRiskBody",
+        "type": "object"
+      },
       "DueBody": {
         "properties": {
           "due_on": {
@@ -6110,6 +6137,21 @@
         "title": "SuggestionBody",
         "type": "object"
       },
+      "SummaryBody": {
+        "properties": {
+          "ref": {
+            "description": "The record to summarize",
+            "maxLength": 32,
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "SummaryBody",
+        "type": "object"
+      },
       "SystemBody": {
         "properties": {
           "criticality": {
@@ -9792,6 +9834,48 @@
         ]
       }
     },
+    "/api/v1/admin/assistant": {
+      "get": {
+        "operationId": "assistant_settings_api_v1_admin_assistant_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Assistant Settings Api V1 Admin Assistant Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "How the assistant is set up, and its log",
+        "tags": [
+          "assistant"
+        ]
+      }
+    },
+    "/api/v1/admin/assistant/check": {
+      "post": {
+        "operationId": "check_assistant_api_v1_admin_assistant_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Check Assistant Api V1 Admin Assistant Check Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check that the provider answers",
+        "tags": [
+          "assistant"
+        ]
+      }
+    },
     "/api/v1/admin/branding": {
       "get": {
         "operationId": "show_api_v1_admin_branding_get",
@@ -12012,6 +12096,90 @@
         "summary": "Add a control to an assessment",
         "tags": [
           "assessments"
+        ]
+      }
+    },
+    "/api/v1/assistant/draft-risk": {
+      "post": {
+        "description": "The assistant searches for a risk that already says the same, and otherwise keeps a\ndraft for you to open in the ordinary form. Nothing is made until a person saves it.",
+        "operationId": "draft_risk_api_v1_assistant_draft_risk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftRiskBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Draft Risk Api V1 Assistant Draft Risk Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A risk drafted by the assistant from your words",
+        "tags": [
+          "assistant"
+        ]
+      }
+    },
+    "/api/v1/assistant/summary": {
+      "post": {
+        "description": "Written from what you may see, through the same tools the tool server offers, and from\nno data class the configuration keeps back. It is not saved on the record.",
+        "operationId": "summarize_api_v1_assistant_summary_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SummaryBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Summarize Api V1 Assistant Summary Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A summary of a record, by the assistant",
+        "tags": [
+          "assistant"
         ]
       }
     },

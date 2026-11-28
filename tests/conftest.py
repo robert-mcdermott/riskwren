@@ -133,6 +133,19 @@ def client(instance: Instance) -> Iterator[TestClient]:
 
 
 @pytest.fixture
+def full_client(instance: Instance) -> Iterator[TestClient]:
+    """A client of an app with every optional part turned on, for the API's own documents."""
+    from dataclasses import replace
+
+    from riskwren.config import AssistantConfig
+
+    on = AssistantConfig(enabled=True, model="m", url="http://127.0.0.1:9/v1")
+    app = create_app(replace(instance.config, assistant=on))
+    with TestClient(app, base_url="http://localhost") as test_client:
+        yield test_client
+
+
+@pytest.fixture
 def people(instance: Instance):  # type: ignore[no-untyped-def]
     """A small organization with one person in each role (see ``tests/people.py``), and the
     default program."""

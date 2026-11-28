@@ -7,6 +7,7 @@ import { button, h, icon } from "../core/dom.js";
 import { date, dateTime, relative } from "../core/format.js";
 import { label, program as loadProgram, units, vocabularies } from "../core/lookups.js";
 import { query, setQuery } from "../core/router.js";
+import { session } from "../core/session.js";
 import { banner, field, select, submit } from "../components/form.js";
 import { confirmAction, openOverlay } from "../components/overlay.js";
 import { peoplePicker } from "../components/people-picker.js";
@@ -361,7 +362,11 @@ export function recordHeader(record, { badges = [], actions = null } = {}) {
           // A reporter who sees only their report is not offered the views of the whole record.
           record.everything === false ? null : h("a", { class: "connections-link", href: `/graph/${record.ref}` }, icon("link", "icon icon-sm"), "Connections"),
           record.everything === false ? null : h("a", { class: "connections-link", href: `/as-of/${record.ref}` }, icon("history", "icon icon-sm"), "As of a date"),
-          DOSSIERS.has(record.type) ? h("a", { class: "connections-link", href: `/api/v1/dossiers/${record.ref}`, download: "" }, icon("download", "icon icon-sm"), "Dossier") : null)),
+          DOSSIERS.has(record.type) ? h("a", { class: "connections-link", href: `/api/v1/dossiers/${record.ref}`, download: "" }, icon("download", "icon icon-sm"), "Dossier") : null,
+          // The assistant, only when it is turned on: its code is loaded when it is used.
+          session()?.assistant && record.everything !== false && !record.restricted
+            ? h("button", { type: "button", class: "link-button connections-link", onclick: async () => (await import("../components/assistant.js")).summarize(record) }, icon("document", "icon icon-sm"), "Summarize")
+            : null)),
       actions),
     missingNote(record),
   ];

@@ -75,6 +75,7 @@ from riskwren.db.models.indicators import Indicator, IndicatorReading, Indicator
 from riskwren.db.models.insight import LeadershipReport, MeasureSnapshot
 from riskwren.db.models.integration import (
     ApiToken,
+    AssistantExchange,
     Draft,
     ReportedResult,
     Webhook,
@@ -150,6 +151,7 @@ __all__ = [
     "AgreementParty",
     "ApiToken",
     "Assessment",
+    "AssistantExchange",
     "AssuranceResponsibility",
     "AssuranceReview",
     "AuditEntity",

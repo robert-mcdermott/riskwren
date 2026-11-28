@@ -66,8 +66,8 @@ def breaks(recorded: dict[str, Any], now: dict[str, Any]) -> list[str]:
     return found
 
 
-def test_no_change_breaks_a_client(client: TestClient) -> None:
-    now = contract(client.get("/api/openapi.json").json())
+def test_no_change_breaks_a_client(full_client: TestClient) -> None:
+    now = contract(full_client.get("/api/openapi.json").json())
     recorded = json.loads(CONTRACT.read_text(encoding="utf-8")) if CONTRACT.exists() else {}
     problems = breaks(recorded, now)
     assert problems == [], (

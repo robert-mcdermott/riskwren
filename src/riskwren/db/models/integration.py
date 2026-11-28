@@ -144,3 +144,36 @@ class Draft(Base):
     record_ref: Mapped[str | None] = mapped_column(String(32))  # what was made from it
 
     __table_args__ = (Index("ix_draft_status", "status", "made_at"),)
+
+
+class AssistantExchange(Base):
+    """One exchange with the assistant: who asked, what for, which tools it used, what it
+    answered, and what it cost. Kept in the history, so the record of it cannot be changed
+    unnoticed. The row is made before the provider is asked, so the daily limit is counted
+    from rows that exist."""
+
+    __tablename__ = "assistant_exchange"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asked_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))  # a person
+    token_id: Mapped[int | None] = mapped_column(Integer)  # or a token
+    asked_by_name: Mapped[str] = mapped_column(String(200))
+    task: Mapped[str] = mapped_column(String(32))  # summarize, draft_risk, or check
+    ref: Mapped[str | None] = mapped_column(String(32))  # the record it was about
+    asked: Mapped[str | None] = mapped_column(Text)  # what the person wrote, if anything
+    answer: Mapped[str | None] = mapped_column(Text)
+    tools_used: Mapped[list[dict[str, Any]]] = mapped_column(JsonType, default=list)
+    provider: Mapped[str] = mapped_column(String(16))
+    model: Mapped[str] = mapped_column(String(200))
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(16))  # asking, answered, failed, or refused
+    error: Mapped[str | None] = mapped_column(Text)
+    draft_id: Mapped[int | None] = mapped_column(Integer)
+    asked_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    took_ms: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (
+        Index("ix_assistant_exchange_person", "asked_by", "asked_at"),
+        Index("ix_assistant_exchange_token", "token_id", "asked_at"),
+    )

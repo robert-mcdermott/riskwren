@@ -30,8 +30,12 @@ NO_TOKEN = {
     ("POST", "/api/v1/anonymous-reports/messages"),
 }
 # What a token that may only read may still send: a draft, which changes nothing until a
-# person makes a record of it.
-DRAFTING = {("POST", "/api/v1/drafts")}
+# person makes a record of it, and a question to the assistant, which only reads or drafts.
+DRAFTING = {
+    ("POST", "/api/v1/drafts"),
+    ("POST", "/api/v1/assistant/summary"),
+    ("POST", "/api/v1/assistant/draft-risk"),
+}
 MAX_BODY = 32 * 1024 * 1024  # a little over the largest file anyone may send
 
 

@@ -126,13 +126,14 @@ export const NAV = [
       { href: "/admin/appearance", label: "Appearance", iconName: "appearance", when: "admin" },
       { href: "/admin/sso", label: "Single sign-on", iconName: "key", when: "admin" },
       { href: "/admin/integrations", label: "Other systems", iconName: "link", when: "admin" },
+      { href: "/admin/assistant", label: "Assistant", iconName: "document", when: "admin", only: () => session()?.assistant },
       { href: "/admin/operations", label: "Operations", iconName: "history", when: "admin" },
     ],
   },
 ];
 
 export function visibleNav() {
-  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || [item.when].flat().some((need) => can(need))).map(named) }))
+  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => (!item.when || [item.when].flat().some((need) => can(need))) && (!item.only || item.only())).map(named) }))
     .filter((group) => group.items.length);
 }
 
