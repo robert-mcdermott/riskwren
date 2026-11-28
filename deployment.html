@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-palette="wren">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deployment · RiskWren</title>
+<meta name="description" content="How to run RiskWren for real: in a container, with PostgreSQL, behind a proxy, backed up, and checked before anyone relies on it. Getting started covers trying it on one machine; Configuration covers ">
+<meta property="og:title" content="Deployment">
+<meta property="og:description" content="How to run RiskWren for real: in a container, with PostgreSQL, behind a proxy, backed up, and checked before anyone relies on it. Getting started covers trying it on one machine; Configuration covers ">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body class="page-deployment">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.9.0</span></a>
+  <div class="search" role="search">
+    <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light">☀</button><button type="button" data-theme-choice="system" aria-label="Follow the system theme" title="System">◐</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark">☾</button>
+  </div>
+  <a class="github" href="https://github.com/robert-mcdermott/riskwren" rel="noopener">GitHub</a>
+</header>
+<div class="layout">
+  <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html">Getting started</a></li><li><a href="adopting.html">Adopting RiskWren</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="handbook.html">The program handbook</a></li><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html">Evidence and testing</a></li><li><a href="issues-and-exceptions.html">Issues and exceptions</a></li><li><a href="policies.html">Policies</a></li><li><a href="third-parties.html">Third parties</a></li><li><a href="internal-audit.html">Internal audit</a></li><li><a href="incidents.html">Incidents</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li><li><a href="deployment.html" aria-current="page">Deployment</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html">API reference</a></li><li><a href="cli.html">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
+  <main id="content" class="content">
+<h1 id="deployment">Deployment</h1>
+<p>How to run RiskWren for real: in a container, with PostgreSQL, behind a proxy, backed up, and checked before anyone relies on it. <a href="getting-started.html">Getting started</a> covers trying it on one machine; <a href="configuration.html">Configuration</a> covers every setting.</p>
+<p>The files this guide uses are in the repository's <code>deploy/</code> folder.</p>
+<h2 id="choose-how-to-run-it">Choose how to run it<a class="anchor" href="#choose-how-to-run-it" aria-label="Link to this section">#</a></h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><td></td><th scope="col">For</th><th scope="col">What it takes</th></tr></thead><tbody><tr><td><strong>A container with PostgreSQL</strong> (<code>deploy/compose.yaml</code>)</td><td>Most installations</td><td>A host with Podman or Docker; the proxy in front</td></tr><tr><td><strong>A service on the host</strong> (<code>deploy/riskwren.service</code>)</td><td>Hosts where containers are not used</td><td>Python 3.12 or later, <code>uv</code>, PostgreSQL, systemd</td></tr><tr><td><strong>One process with SQLite</strong></td><td>A small team, or trying it out</td><td>Nothing more; see <a href="getting-started.html">Getting started</a></td></tr></tbody></table></div>
+<p>Whichever you choose: put a reverse proxy in front to end TLS, set <code>base_url</code> to the address people use, back up every day, and run <code>riskwren doctor --production</code> before you tell people it is there.</p>
+<h2 id="in-a-container">In a container<a class="anchor" href="#in-a-container" aria-label="Link to this section">#</a></h2>
+<p><code>deploy/Containerfile</code> builds an image that holds RiskWren and nothing else. It runs as a user of its own, keeps its configuration and data home on the volume at <code>/data</code>, and sets the installation up the first time it starts.</p>
+<div class="code"><pre><code class="language-bash">cp deploy/.env.example deploy/.env      # fill it in; keep it out of version control
+podman compose -f deploy/compose.yaml --env-file deploy/.env up -d --build</code></pre></div>
+<p>(<code>docker compose</code> works the same way.) The compose file runs PostgreSQL 16 beside RiskWren, waits for it to be ready, and publishes RiskWren on <code>127.0.0.1:8020</code> only, for the proxy. In <code>deploy/.env</code>:</p>
+<ul><li><code>RISKWREN_BASE_URL</code>: the <code>https://</code> address people use.</li><li><code>RISKWREN_DB_PASSWORD</code>: the database's password, made up for this installation.</li><li><code>RISKWREN_WORKERS</code>: server processes; one for each core RiskWren may use. See <a href="configuration.html#sizing">Sizing</a>.</li><li><code>RISKWREN_ADMIN_EMAIL</code>, <code>RISKWREN_ADMIN_NAME</code>, <code>RISKWREN_ADMIN_PASSWORD</code>: the first administrator, made on the first start only. Take the password out of the file once they have signed in, and recreate the container (<code>up -d --force-recreate</code>): a container keeps the environment it was started with.</li><li><code>RISKWREN_PROGRAM</code>: the <a href="getting-started.html#set-up-the-installation">program to start from</a>: <code>research-institute</code>, <code>academic-medical-center</code>, <code>university</code>, or <code>nonprofit</code>.</li></ul>
+<p>Every later start brings the database up to date (<code>riskwren db upgrade</code>) before the server starts, so an upgrade is a new image and a restart. Any setting in <a href="configuration.html">Configuration</a> can be given to the container as an environment variable, <code>RISKWREN_&lt;SECTION&gt;_&lt;KEY&gt;</code>. Commands run inside it:</p>
+<div class="code"><pre><code class="language-bash">podman compose -f deploy/compose.yaml exec riskwren riskwren users add you@example.org --role admin
+podman compose -f deploy/compose.yaml exec riskwren riskwren doctor --production</code></pre></div>
+<h2 id="as-a-service-on-the-host">As a service on the host<a class="anchor" href="#as-a-service-on-the-host" aria-label="Link to this section">#</a></h2>
+<p>Install RiskWren into its own environment, and run it under systemd with <code>deploy/riskwren.service</code>:</p>
+<div class="code"><pre><code class="language-bash">sudo useradd --system --home-dir /var/lib/riskwren --shell /usr/sbin/nologin riskwren
+sudo install -d -o riskwren -g riskwren -m 0750 /var/lib/riskwren /etc/riskwren
+sudo UV_PROJECT_ENVIRONMENT=/opt/riskwren uv sync --frozen --no-dev --extra postgres --no-editable
+sudo -u riskwren /opt/riskwren/bin/riskwren --config /etc/riskwren/riskwren.toml init
+sudo cp deploy/riskwren.service /etc/systemd/system/
+sudo systemctl enable --now riskwren</code></pre></div>
+<p>In <code>/etc/riskwren/riskwren.toml</code>, set the data home to <code>/var/lib/riskwren/var</code>, the database's address, and <code>base_url</code>. Secrets go in <code>/etc/riskwren/env</code>, readable only by root (mode 0600), which the unit reads: <code>RISKWREN_DATABASE_URL</code> with its password, the single sign-on client secret, the mail password.</p>
+<p>The unit runs RiskWren as its own user with what it needs and nothing more: only the data home is writable, the rest of the system is read-only or hidden, it cannot gain privileges, load kernel modules, or change the clock, and it may make only the system calls an ordinary service makes. It brings the database up to date before each start.</p>
+<h2 id="behind-a-proxy">Behind a proxy<a class="anchor" href="#behind-a-proxy" aria-label="Link to this section">#</a></h2>
+<p>RiskWren speaks plain HTTP on <code>127.0.0.1</code> and expects a proxy to end TLS. <code>deploy/Caddyfile</code> does that with a certificate Caddy obtains itself; <code>deploy/nginx.conf</code> does it with yours. Either sends the <code>Host</code> header unchanged and <code>X-Forwarded-Proto: https</code>, so that RiskWren marks its session cookie <code>Secure</code> and checks where each change comes from. The nginx example keeps no access log for reports made without a name. See <a href="configuration.html#run-behind-a-reverse-proxy">Run behind a reverse proxy</a>.</p>
+<h2 id="back-it-up">Back it up<a class="anchor" href="#back-it-up" aria-label="Link to this section">#</a></h2>
+<p>Take a backup every day, from a scheduled task, and keep the files somewhere other than the server:</p>
+<div class="code"><pre><code class="language-bash">riskwren backup /backups/riskwren-$(date +%F).zip</code></pre></div>
+<p>A backup is taken while the server runs, and restores into SQLite or PostgreSQL alike. Restore one now and then, onto a spare machine, to know that it works. See <a href="configuration.html#back-up-and-restore">Back up and restore</a>.</p>
+<h2 id="check-before-going-live">Check before going live<a class="anchor" href="#check-before-going-live" aria-label="Link to this section">#</a></h2>
+<div class="code"><pre><code class="language-bash">riskwren doctor --production</code></pre></div>
+<p>Besides the usual checks (the configuration, the data home, the database and its schema, the history), it checks what matters before real people rely on it, and exits with 1 if anything must be fixed:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Check</th><th scope="col">Ready when</th></tr></thead><tbody><tr><td>Address</td><td><code>base_url</code> is the <code>https://</code> address people use</td></tr><tr><td>Listening</td><td>The server listens on this machine only, behind the proxy</td></tr><tr><td>Database for production</td><td>PostgreSQL, or SQLite with one worker for a small team</td></tr><tr><td>Backups</td><td>A backup was taken in the last two days</td></tr><tr><td>Demo</td><td>This is not a demo organization</td></tr><tr><td>Administrators</td><td>There are two, so that the installation is never left without one</td></tr><tr><td>Email for production</td><td>Email is set up, so that reminders reach people</td></tr></tbody></table></div>
+<p><strong>Admin → Operations</strong> shows the same, with the version, the database and its migration, the data home's size and free space, and the last backup, beside the scheduled work.</p>
+<h2 id="upgrade">Upgrade<a class="anchor" href="#upgrade" aria-label="Link to this section">#</a></h2>
+<p>Back up, then: in a container, build or pull the new image and restart; on the host, update the environment (<code>uv sync</code>) and restart the service. Both bring the database up to date as they start. The <a href="changelog.html">changelog</a> says what each release changes, and what looks different afterwards.</p>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="configuration.html"><span>Previous</span>Configuration</a><a class="next" href="api.html"><span>Next</span>The API</a></nav>
+    <footer class="foot">Describes RiskWren 0.9.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+  </main>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#choose-how-to-run-it">Choose how to run it</a></li><li class="l2"><a href="#in-a-container">In a container</a></li><li class="l2"><a href="#as-a-service-on-the-host">As a service on the host</a></li><li class="l2"><a href="#behind-a-proxy">Behind a proxy</a></li><li class="l2"><a href="#back-it-up">Back it up</a></li><li class="l2"><a href="#check-before-going-live">Check before going live</a></li><li class="l2"><a href="#upgrade">Upgrade</a></li></ul></aside>
+</div>
+</body>
+</html>

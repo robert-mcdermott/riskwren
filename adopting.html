@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-palette="wren">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adopting RiskWren · RiskWren</title>
+<meta name="description" content="For an organization deciding whether to use RiskWren, and then putting it into use: what to look at, how to pilot it, what to decide, and how to go live. The program handbook takes over once it is run">
+<meta property="og:title" content="Adopting RiskWren">
+<meta property="og:description" content="For an organization deciding whether to use RiskWren, and then putting it into use: what to look at, how to pilot it, what to decide, and how to go live. The program handbook takes over once it is run">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://robert-mcdermott.github.io/riskwren/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/wren-mark.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body class="page-adopting">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
+  <a class="brand" href="index.html"><img src="assets/wren-mark.svg" alt="" width="26" height="26"><span>RiskWren</span><span class="version">v0.9.0</span></a>
+  <div class="search" role="search">
+    <input id="search" type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="results">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox" aria-label="Search results" hidden></div>
+  </div>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light">☀</button><button type="button" data-theme-choice="system" aria-label="Follow the system theme" title="System">◐</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark">☾</button>
+  </div>
+  <a class="github" href="https://github.com/robert-mcdermott/riskwren" rel="noopener">GitHub</a>
+</header>
+<div class="layout">
+  <nav class="menu" id="menu" aria-label="Documentation"><div class="menu-group"><div class="menu-title">Start</div><ul><li><a href="index.html">Overview</a></li><li><a href="getting-started.html">Getting started</a></li><li><a href="adopting.html" aria-current="page">Adopting RiskWren</a></li></ul></div><div class="menu-group"><div class="menu-title">Use</div><ul><li><a href="handbook.html">The program handbook</a></li><li><a href="the-register.html">The register</a></li><li><a href="compliance.html">Compliance</a></li><li><a href="evidence-and-testing.html">Evidence and testing</a></li><li><a href="issues-and-exceptions.html">Issues and exceptions</a></li><li><a href="policies.html">Policies</a></li><li><a href="third-parties.html">Third parties</a></li><li><a href="internal-audit.html">Internal audit</a></li><li><a href="incidents.html">Incidents</a></li><li><a href="running-the-program.html">Running the program</a></li></ul></div><div class="menu-group"><div class="menu-title">Run</div><ul><li><a href="configuration.html">Configuration</a></li><li><a href="deployment.html">Deployment</a></li></ul></div><div class="menu-group"><div class="menu-title">Reference</div><ul><li><a href="api.html">The API</a></li><li><a href="api-reference.html">API reference</a></li><li><a href="cli.html">Command reference</a></li><li><a href="changelog.html">Changelog</a></li></ul></div></nav>
+  <main id="content" class="content">
+<h1 id="adopting-riskwren">Adopting RiskWren</h1>
+<p>For an organization deciding whether to use RiskWren, and then putting it into use: what to look at, how to pilot it, what to decide, and how to go live. <a href="handbook.html">The program handbook</a> takes over once it is running.</p>
+<h2 id="look-at-it">Look at it<a class="anchor" href="#look-at-it" aria-label="Link to this section">#</a></h2>
+<p>Build the demo organization on a laptop and sign in as each of its sample people (<a href="getting-started.html#explore-the-demo-organization">Explore the demo organization</a>). It is a fictional research institute with two years of history, and every screen has something on it. Look at it as the people who would use it:</p>
+<ul><li><strong>The security leader</strong> and <strong>the risk manager</strong>: the dashboards, the register, the program, and the reports to leadership.</li><li><strong>A steward</strong> and <strong>a staff member</strong>: what a person who answers for a few things sees, and how little they are asked.</li><li><strong>The auditor</strong>: whether the record can be shown to be what it says it was, on any date.</li></ul>
+<p>Then read the <a href="changelog.html">changelog</a>, which lists what each release does, and the end of the guides' index in the repository (<code>docs/README.md</code>), which says what this release does not do yet: together they say where it stops.</p>
+<h2 id="pilot-it">Pilot it<a class="anchor" href="#pilot-it" aria-label="Link to this section">#</a></h2>
+<p>A pilot of six to twelve weeks answers the questions that matter: will the people who must keep it current do so, and does what it shows hold up?</p>
+<ol><li><strong>Install it as you would for production</strong> (<a href="deployment.html">Deployment</a>), with PostgreSQL, behind your proxy, with backups, but with a starter program and nothing imported yet.</li><li><strong>Choose a slice</strong> of the organization: one division, or the systems in one compliance scope. Large enough to have real risks and real owners; small enough to finish.</li><li><strong>Do the first month and the first quarter of the <a href="handbook.html#the-first-month-the-record">handbook</a></strong> for that slice, with its real stewards and owners.</li><li><strong>Judge it</strong> by what the pilot's people did, not by what they said: did owners answer their reminders, did a test result move readiness, did the leadership report survive a question?</li></ol>
+<p>Keep the pilot's installation: it becomes production, and nothing needs moving. If it was on SQLite, move it to PostgreSQL with a backup and a restore (<a href="configuration.html#move-between-sqlite-and-postgresql">Move between SQLite and PostgreSQL</a>).</p>
+<h2 id="decide">Decide<a class="anchor" href="#decide" aria-label="Link to this section">#</a></h2>
+<p>Before going wider, settle the decisions in <a href="handbook.html#decide-first">Decide first</a>, and these about the installation:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th scope="col">Decision</th><th scope="col">Where</th></tr></thead><tbody><tr><td>Who runs the installation, and who is the second administrator</td><td>Roles; <a href="deployment.html#check-before-going-live">Deployment</a></td></tr><tr><td>How people sign in: local accounts, single sign-on, or both</td><td><a href="configuration.html#single-sign-on">Single sign-on</a></td></tr><tr><td>Whether to send email, and from what address</td><td><a href="configuration.html#email">Email</a></td></tr><tr><td>How backups are taken, kept, and tested</td><td><a href="configuration.html#back-up-and-restore">Back up and restore</a></td></tr><tr><td>The look: your names, logos, colors, and words, in the app or fixed in the file</td><td><a href="running-the-program.html#appearance">Appearance</a>, <a href="configuration.html#branding"><code>[branding]</code></a></td></tr><tr><td>Which other systems read from it, and with what token; which are told of events</td><td><a href="api.html#another-system-tokens">Tokens</a>, <a href="api.html#being-told-webhooks">webhooks</a></td></tr><tr><td>Whether reports may be made without a name</td><td><a href="incidents.html#reporting-without-a-name">Reporting without a name</a></td></tr></tbody></table></div>
+<h2 id="go-live">Go live<a class="anchor" href="#go-live" aria-label="Link to this section">#</a></h2>
+<ol><li>Run <code>riskwren doctor --production</code> until it has nothing to fix (<a href="deployment.html#check-before-going-live">Check before going live</a>).</li><li>Bring in what you have: units and people, then the inventory, risks, and controls from spreadsheets, each with a dry run that reports every problem by row before anything is loaded (<a href="the-register.html#import-and-export">Import and export</a>).</li><li>Widen one division or scope at a time, each with its stewards shown what is theirs. Campaigns do the asking (<a href="running-the-program.html#campaigns">Campaigns</a>).</li><li>Turn on what reaches people last: email, then reminders' escalation to stewards and leaders, once records have owners who know they are owners.</li></ol>
+<h2 id="keep-it-current">Keep it current<a class="anchor" href="#keep-it-current" aria-label="Link to this section">#</a></h2>
+<ul><li><strong>Upgrades</strong> come as releases, each with a changelog that says what looks different afterwards. Back up, then upgrade (<a href="deployment.html#upgrade">Upgrade</a>). Within 0.x, a release may change the API; the changes are listed under <strong>Breaking</strong>, and the <a href="api.html#the-contract">contract</a> catches them before they ship.</li><li><strong>Security problems</strong> are reported as <a href="https://github.com/robert-mcdermott/riskwren/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a> says. The application was reviewed against the OWASP Application Security Verification Standard at level 2; the review and what was done about each finding are in the repository's <code>spec/security-review.md</code>.</li><li><strong>Your program</strong> is yours: export it as one file (<code>riskwren program export</code>) to keep it under version control or carry it to another installation.</li></ul>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="getting-started.html"><span>Previous</span>Getting started</a><a class="next" href="handbook.html"><span>Next</span>The program handbook</a></nav>
+    <footer class="foot">Describes RiskWren 0.9.0. Apache License 2.0. Screenshots show an invented organization; every person and record in them is fictional.</footer>
+  </main>
+  <aside class="toc" aria-label="On this page"><div class="menu-title">On this page</div><ul><li class="l2"><a href="#look-at-it">Look at it</a></li><li class="l2"><a href="#pilot-it">Pilot it</a></li><li class="l2"><a href="#decide">Decide</a></li><li class="l2"><a href="#go-live">Go live</a></li><li class="l2"><a href="#keep-it-current">Keep it current</a></li></ul></aside>
+</div>
+</body>
+</html>
