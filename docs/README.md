@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.8.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.9.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
@@ -116,7 +116,7 @@ These two are written from the code, so they always match the version they ship 
 
 ## What this release does not do yet
 
-Version 0.8.0 is the register, compliance, the means of keeping both current, the organization's own word, its third parties, insight (measures, portfolio views, leadership reports, the record as it stood on a date, and dossiers that prove they are unchanged), internal audit's own workspace, and incidents and resilience. It is not yet ready to be adopted without help: there is no container image or deployment guide, no program pack for kinds of organization other than a research institute, no tokens for other systems, and no handbook for a team starting out; those follow in the next release. The organization's own words for things (its terms) cannot yet replace the product's. An incident's breach assessment works out what each rule requires, but its notification letters are written elsewhere. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action; the action's owner here records it. An outside auditor's link lists the evidence on file but does not yet download its files. Two records that are the same thing cannot yet be merged, only found. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.9.0 is the register, compliance, the means of keeping both current, the organization's own word, its third parties, insight (measures, portfolio views, leadership reports, the record as it stood on a date, and dossiers that prove they are unchanged), internal audit's own workspace, incidents and resilience, and what an organization needs to adopt it: backups, deployment, starter programs, tokens and webhooks, and a security review. Other systems cannot yet post a test result onto a control, ask whether a supplier is in good standing, or draft through an assistant; those follow in the next release. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action. An outside auditor's link lists the evidence on file but does not yet download its files. Two records that are the same thing cannot yet be merged, only found. People cannot yet see or end their own other sessions, and passwords are not yet checked against a list of breached ones; see the [security review](../spec/security-review.md) for what else is planned. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

@@ -18,7 +18,7 @@ SCRYPT_R = 8
 SCRYPT_P = 1
 KEY_LENGTH = 32
 MIN_LENGTH = 12
-MAX_LENGTH = 1024
+MAX_LENGTH = 128  # ASVS 2.1.2: at least 64 allowed, more than 128 refused
 
 
 def _b64(raw: bytes) -> str:

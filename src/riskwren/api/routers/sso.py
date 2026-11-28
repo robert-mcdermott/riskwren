@@ -164,7 +164,7 @@ def callback(
     response.set_cookie(
         sessions.COOKIE, token, httponly=True, samesite="strict",
         secure=_base(request).startswith("https://"), path="/",
-        max_age=config.server.session_max_days * 86400,
+        max_age=int(config.server.session_max_days * 86400),
     )  # fmt: skip
     response.delete_cookie(BOUND, path="/api/v1/sso")
     return response

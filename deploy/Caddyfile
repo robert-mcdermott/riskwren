@@ -4,5 +4,15 @@ grc.example.org {
 	request_body {
 		max_size 33MB
 	}
+	header Strict-Transport-Security "max-age=31536000"
+	# Reports made without a name keep no address: neither the proxy's log nor RiskWren's
+	# own is told where they came from.
+	@anonymous path /report /report/* /api/v1/anonymous-reports /api/v1/anonymous-reports/*
+	handle @anonymous {
+		log_skip
+		reverse_proxy 127.0.0.1:8020 {
+			header_up -X-Forwarded-For
+		}
+	}
 	reverse_proxy 127.0.0.1:8020
 }

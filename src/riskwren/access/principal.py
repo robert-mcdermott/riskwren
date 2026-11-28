@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
 
 from riskwren.access import roles
@@ -39,6 +40,7 @@ class Principal:
     leads_all: bool = False
     # Reads the leadership reports by the program's choice of who does: worked out at sign-in.
     report_reader: bool = False
+    signed_in_at: datetime | None = None  # when this session began
     token_id: int | None = None  # an API token acting as a role, not a person
     read_only: bool = False  # a token that may only read
 
@@ -52,6 +54,11 @@ class Principal:
             coverage={roles.MANAGER: EVERYWHERE},
             command=True,
         )
+
+    @property
+    def person(self) -> int | None:
+        """The account of the person acting, or None for a command or a token."""
+        return self.account_id if self.account_id is not None and self.account_id > 0 else None
 
     @property
     def actor(self) -> Actor:

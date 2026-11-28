@@ -601,6 +601,33 @@ def allowed(principal: Principal | None, needs: Needs) -> bool:
     }[needs]
 
 
+# Judgments a named person makes, with their name on them: rating, accepting, deciding,
+# confirming, approving, signing off, publishing. A token acts as a role, never as a person,
+# so it may not make them; and a person's second pair of eyes cannot be a token.
+PERSON_ONLY = frozenset({
+    ("POST", "/api/v1/risks/{ref}/assessments"),
+    ("POST", "/api/v1/risks/{ref}/acceptances"),
+    ("POST", "/api/v1/acceptances/{acceptance_id}/withdrawal"),
+    ("POST", "/api/v1/controls/{ref}/ratings"),
+    ("POST", "/api/v1/tests/{test_id}/results"),
+    ("POST", "/api/v1/results/{result_id}/review"),
+    ("POST", "/api/v1/issues/{ref}/validation"),
+    ("POST", "/api/v1/exceptions/{ref}/decision"),
+    ("POST", "/api/v1/documents/{ref}/draft/decision"),
+    ("POST", "/api/v1/documents/{ref}/draft/publish"),
+    ("POST", "/api/v1/sessions/{ref}/items/{item_id}/decision"),
+    ("POST", "/api/v1/program/publish"),
+    ("POST", "/api/v1/audit/plans/{ref}/approve"),
+    ("POST", "/api/v1/audit/requests/{request_id}/accept"),
+    ("POST", "/api/v1/workpapers/{paper_id}/sign-off"),
+    ("POST", "/api/v1/review-notes/{note_id}/clear"),
+    ("POST", "/api/v1/reviews/{ref}/conclude"),
+    ("POST", "/api/v1/incidents/{ref}/triage"),
+    ("PUT", "/api/v1/incidents/{ref}/case"),
+    ("POST", "/api/v1/privacy/reviews/{item_id}"),
+})  # fmt: skip
+
+
 def authorize(request: Request) -> None:
     """The app-wide dependency: look the matched route up in the table and check it."""
     route = request.scope.get("route")
@@ -611,6 +638,12 @@ def authorize(request: Request) -> None:
     if needs is None:
         raise HTTPException(403, "This route has no access policy.")
     principal: Principal | None = getattr(request.state, "principal", None)
+    if (
+        principal is not None
+        and principal.token_id is not None
+        and ((request.method, path) in PERSON_ONLY)
+    ):
+        raise HTTPException(403, "This is a judgment a named person makes, not a token.")
     if allowed(principal, needs):
         return
     if principal is None:

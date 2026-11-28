@@ -185,7 +185,7 @@ def test_sessions_expire_when_idle_and_at_their_limit(as_role: Clients, instance
     fresh = as_role("auditor")
     limit = instance.config.server.session_max_days
     moment = utc_now()
-    for _ in range(limit * 24 // (idle - 1)):  # used constantly, it still ends at the limit
+    for _ in range(int(limit * 24 // (idle - 1))):  # used constantly, it still ends at the limit
         moment += timedelta(hours=idle - 1)
         with frozen_at(moment):
             fresh.get("/api/v1/session")

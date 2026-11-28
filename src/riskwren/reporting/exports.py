@@ -275,7 +275,7 @@ def _cell(value: Any) -> str:
     if isinstance(value, bool):
         return "yes" if value else "no"
     if isinstance(value, (list, tuple)):
-        return "; ".join(_text(item) for item in value)
+        return _guard("; ".join(_text(item) for item in value))
     return _guard(_text(value))
 
 

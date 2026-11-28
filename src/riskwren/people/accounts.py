@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable, Sequence
 from dataclasses import replace
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, select
@@ -109,6 +110,7 @@ def principal_for(
         csrf_token=token.csrf_token if token else "",
         has_password=has_password(session, account.id),
         session_id=token.id if token else None,
+        signed_in_at=token.created_at if token else None,
         leads_all=leads_all,
     )
     return replace(principal, report_reader=readers.reaches(principal, readers.current(session)))
@@ -224,9 +226,12 @@ def set_password(
     new_password: str,
     *,
     current_password: str | None = None,
+    fresh_since: datetime | None = None,
 ) -> None:
-    """Set a password. A person changing their own must give the current one; an
-    administrator resetting someone else's need not. Other sessions of the account end."""
+    """Set a password. A person changing their own must give the current one; one who has
+    none yet (who signs in through the identity provider) must have signed in within the last
+    ten minutes. An administrator resetting someone else's need not. Other sessions of the
+    account end, and the person is told."""
     own = principal.account_id == account.id
     credential = session.get(Credential, account.id)
     if own and not principal.command:
@@ -237,6 +242,14 @@ def set_password(
                 "The password was not changed.",
                 {"current_password": "That is not your current password."},
             )
+        if credential is None and (
+            fresh_since is None or utc_now() - fresh_since > timedelta(minutes=10)
+        ):
+            raise Invalid(
+                "The password was not changed.",
+                {"current_password": "Sign out and in again, then set a password within ten "
+                                     "minutes."},
+            )  # fmt: skip
     else:
         _require_admin(principal)
     passwords.check_rules(new_password, email=account.email)
@@ -250,6 +263,12 @@ def set_password(
         account.status = "active"
     session.flush()
     _end_sessions(session, account.id, keep=principal.session_id if own else None)
+    from riskwren.people import notices  # it builds on accounts
+
+    said = ("Your password was changed. If it was not you, tell an administrator at once."
+            if own else f"{principal.name} set a new password for you. Change it to one of your "
+            "own under Your account.")  # fmt: skip
+    notices.tell(session, account.id, "account", said, "/account")
 
 
 def check_grant(session: Session, grant: Grant) -> None:

@@ -123,7 +123,9 @@ def principal_for(session: Session, row: ApiToken) -> Principal:
             else units.with_descendants(session, [row.org_unit_id])
         )  # fmt: skip
     return Principal(
-        account_id=None,
+        # Never a person's: a number no account has, so that nothing is ever "theirs" by
+        # creator, owner, or author. It is never stored (riskwren.db.guard).
+        account_id=-row.id,
         name=f"API token {row.name}",
         grants=(grant,) if row.role != roles.MEMBER else (),
         coverage=coverage,

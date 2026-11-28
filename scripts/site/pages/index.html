@@ -315,6 +315,17 @@
   {{shot:third-party-stop|A pharmacy supplier that handles patient records with no business associate agreement, and the stop at the top of its page}}
 </section>
 
+<section class="feature">
+  <div class="feature-text">
+    <p class="eyebrow">Production</p>
+    <h2 id="from-a-laptop-to-production">From a laptop to production, and told what stands in the way</h2>
+    <p>It runs as a container with PostgreSQL or as a locked-down service, backs up to one file that restores into either database, and starts from a program written for a research institute, an academic medical center, a university, or a nonprofit. <code>riskwren doctor --production</code> and the operations page say what is not yet ready.</p>
+    <p>Other systems come in with tokens that act as a role, never as a person, and hear what happens through signed webhooks that carry references, never contents. It was reviewed against the OWASP Application Security Verification Standard at level 2.</p>
+    <p><a class="more" href="deployment.html">Deployment</a></p>
+  </div>
+  {{shot:scheduled-work|The operations page: the installation's version, database, data home, and last backup, and what stands between it and production}}
+</section>
+
 <section class="section">
   <h2 id="also-in-it">Also in it</h2>
   <div class="rest">
@@ -396,5 +407,5 @@ uv run riskwren --config demo/riskwren.toml serve</code></pre></div>
 
 <section class="section">
   <h2 id="where-it-stands">Where it stands</h2>
-  <p>These pages describe version {{version}}: the register, compliance, the means of keeping both current, the organization's policies and agreements, its third parties, the record read back as measures, reports, and packages that prove themselves, internal audit's own work on it, and incidents and resilience: what happened, and what the organization cannot afford to lose. It signs in with local accounts or, if you set it up, single sign-on, and sends email only if you ask it to. Adoption comes next: what an organization needs to run it in production and make it its own. The <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a> says what comes in what order, and the <a href="changelog.html">changelog</a> lists what is in each release.</p>
+  <p>These pages describe version {{version}}: the register, compliance, the means of keeping both current, the organization's policies and agreements, its third parties, the record read back as measures, reports, and packages that prove themselves, internal audit's own work on it, incidents and resilience, and what an organization needs to adopt it: deployment, backups, starter programs, tokens and webhooks, and a security review. It signs in with local accounts or, if you set it up, single sign-on, and sends email only if you ask it to. Connections to the systems around it come next: results pushed in, a reference others can check, and an optional assistant. The <a href="https://github.com/robert-mcdermott/riskwren/blob/main/spec/roadmap.md" rel="noopener">roadmap</a> says what comes in what order, and the <a href="changelog.html">changelog</a> lists what is in each release.</p>
 </section>

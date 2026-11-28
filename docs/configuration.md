@@ -41,8 +41,8 @@ The file has five sections. Only the first three matter for a new installation; 
 | `port` | `8000` | The port |
 | `workers` | `1` | How many server processes to run. One is enough for SQLite and small teams |
 | `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Used for the single sign-on redirect address, and for links in messages RiskWren sends. Set it when you use single sign-on |
-| `session_idle_hours` | `12` | A sign-in ends after this long without activity |
-| `session_max_days` | `7` | A sign-in ends after this long in any case |
+| `session_idle_hours` | `12` | A sign-in ends after this long without activity. Fractions are allowed: `0.5` is half an hour, as OWASP's verification standard asks at its level 2 |
+| `session_max_days` | `7` | A sign-in ends after this long in any case. `0.5` is twelve hours, the same standard's level 2 |
 | `scheduler` | `true` | Run scheduled work inside this server. See [Scheduled work](#scheduled-work) |
 
 `host`, `port`, and `workers` can also be given to `uv run riskwren serve` as `--host`, `--port`, and `--workers`, which take precedence for that run.

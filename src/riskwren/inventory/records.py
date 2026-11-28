@@ -341,12 +341,12 @@ def create(
         session.flush()
         _save_external_refs(session, record_type, record)
         _save_custom(session, record_type, record)
-        if principal.account_id is not None:
+        if principal.person is not None:
             session.add(
                 RecordOwner(
                     record_type=record_type.key,
                     record_id=record.id,
-                    account_id=principal.account_id,
+                    account_id=principal.person,
                     kind=OWNER,
                 )
             )

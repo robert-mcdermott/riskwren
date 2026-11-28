@@ -240,7 +240,8 @@ def test_the_api_shows_how_email_is_doing_and_sends_a_test(
         admin = sign_in(client, email_of("admin"))
         assert admin.post("/api/v1/mail/test").status_code == 502
     app = create_app(config)
-    with TestClient(app, base_url="http://localhost") as client:
+    # The address people use is https here, so the session cookie is sent only over https.
+    with TestClient(app, base_url="https://localhost") as client:
         assert client.get("/api/v1/meta").json()["data"]["mail"] is True
         member = sign_in(client, email_of("member"))
         assert member.get("/api/v1/mail").status_code == 403
@@ -251,7 +252,7 @@ def test_the_api_shows_how_email_is_doing_and_sends_a_test(
         assert saved.json()["data"]["email_notices"] == "digest"
         refused = member.put("/api/v1/session/preferences", json={"email_notices": "weekly"})
         assert refused.status_code == 422
-    with TestClient(app, base_url="http://localhost") as client:
+    with TestClient(app, base_url="https://localhost") as client:
         admin = sign_in(client, email_of("admin"))
         seen = admin.get("/api/v1/mail").json()["data"]
         assert (

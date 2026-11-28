@@ -275,7 +275,7 @@ def record_history(request: Request, record_type: RecordType, ref: str) -> dict[
     principal = current(request)
     with reading(request) as session:
         record = records.load(session, principal, record_type, ref)
-        return envelope(history.for_record(session, record_type, record))
+        return envelope(history.for_record(session, record_type, record, principal=principal))
 
 
 def thing_filters(

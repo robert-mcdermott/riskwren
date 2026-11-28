@@ -10,7 +10,7 @@ Build the demo organization on a laptop and sign in as each of its sample people
 - **A steward** and **a staff member**: what a person who answers for a few things sees, and how little they are asked.
 - **The auditor**: whether the record can be shown to be what it says it was, on any date.
 
-Then read [What is in this release](../README.md#what-is-in-this-release) in the README and [What this release does not do yet](README.md#what-this-release-does-not-do-yet) in the guides: together they say where it stops.
+Then read the [changelog](../CHANGELOG.md), which lists what each release does, and the end of the guides' index in the repository (`docs/README.md`), which says what this release does not do yet: together they say where it stops.
 
 ## Pilot it
 

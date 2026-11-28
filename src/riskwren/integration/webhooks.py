@@ -152,12 +152,13 @@ def wants(events: list[str], name: str) -> bool:
 
 
 def _restricted(session: Session, event: Event) -> bool:
-    """Whether the record is one that only those named on it may know of."""
+    """Whether the record is one that only those named on it may know of. A kind of record
+    that is not known here is treated as one: nothing is named that cannot be checked."""
     from riskwren.inventory.registry import TYPES
 
     record_type = TYPES.get(event.subject_type)
     if record_type is None:
-        return False
+        return True
     row = session.get(record_type.model, event.subject_id)
     return bool(row is None or getattr(row, "restricted", False))
 
@@ -172,6 +173,8 @@ def _path(subject_type: str) -> str:
 def queue(session: Session, *, base_url: str = "") -> int:
     """Turn what has happened since the last time into messages for the webhooks that want
     them. The first time, start from now: a new webhook is not told of the past."""
+    import riskwren.api.app  # noqa: F401  (every kind of record registers itself on import)
+
     kept = session.get(WebhookCursor, 1)
     newest = session.scalar(select(Event.id).order_by(Event.id.desc()).limit(1)) or 0
     if kept is None:

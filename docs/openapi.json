@@ -9830,6 +9830,30 @@
         ]
       }
     },
+    "/api/v1/admin/operations": {
+      "get": {
+        "description": "What an administrator needs to know of the installation itself, and what `riskwren\ndoctor --production` would say of it, without reaching anything outside.",
+        "operationId": "installation_api_v1_admin_operations_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Installation Api V1 Admin Operations Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "This installation: version, database, backups, health",
+        "tags": [
+          "operations"
+        ]
+      }
+    },
     "/api/v1/admin/tokens": {
       "get": {
         "operationId": "list_tokens_api_v1_admin_tokens_get",

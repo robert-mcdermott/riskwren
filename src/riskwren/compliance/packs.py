@@ -102,6 +102,19 @@ def problems(pack: Any) -> list[str]:
     key = head.get("key")
     if isinstance(key, str) and not all(c.isalnum() or c in "-_." for c in key):
         found.append("pack.key uses letters, digits, hyphens, underscores, and dots.")
+    # What the header says of where the pack comes from is shown on the framework's page.
+    for name, limit in (("version", 120), ("publisher", 200), ("license", 1000), ("summary", 2000),
+                        ("built_from", 1000), ("pack_version", 40)):  # fmt: skip
+        value = head.get(name)
+        if value is not None and (not isinstance(value, str) or len(value) > limit):
+            found.append(f"pack.{name} is text of up to {limit} characters.")
+    source = head.get("source_url")
+    if source is not None and (
+        not isinstance(source, str) or len(source) > 500
+        or not source.lower().startswith(("https://", "http://"))
+        or any(ch.isspace() for ch in source)
+    ):  # fmt: skip
+        found.append("pack.source_url is an http:// or https:// address.")
     if head.get("framework_kind", "standard") not in FRAMEWORK_KINDS:
         found.append(f"pack.framework_kind is one of: {', '.join(FRAMEWORK_KINDS)}.")
     if head.get("text_policy") not in PACK_POLICIES:

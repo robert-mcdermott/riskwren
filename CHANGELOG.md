@@ -4,9 +4,34 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
-## 0.9.0 (unreleased)
+## 0.9.0 (2026-11-27)
 
-Wave 9, *Adoption*.
+Wave 9, *Adoption*: what an organization that has never seen RiskWren needs to install it, make
+it its own, and run it in production. An installation backs up to one file that restores into
+SQLite or PostgreSQL, and has been measured with many records and many people at once. It
+deploys as a container with PostgreSQL or as a locked-down service, and says what stands between
+it and production. It starts from a program written for a research institute, an academic
+medical center, a university, or a nonprofit, takes fields and words of the organization's own,
+and lets other systems in with tokens that act as a role and tell them what happens with signed
+webhooks. It was reviewed against the OWASP Application Security Verification Standard at level
+2, and two new guides take an organization from evaluation to the yearly rhythm.
+
+### Upgrading from 0.8.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0046 and 0047). Every row is kept,
+and the history still verifies. A few things look different afterwards:
+
+- **Admin → Scheduled work is now Admin → Operations,** with the installation's version,
+  database, data home, last backup, and what `doctor --production` would say, above the
+  scheduled work. The old address still opens it.
+- **A new scheduled job, Webhooks,** runs every minute and does nothing until a webhook is
+  registered.
+- **The menu's Admin group has Other systems,** for tokens and webhooks.
+- **Sign-in is limited a little more:** 25 failures to one account in fifteen minutes, from
+  anywhere, and the same from one address. A new password is at most 128 characters; a longer
+  one already set still works.
+- **Take a backup with the new command** (`riskwren backup`), and schedule it: `doctor
+  --production` and Admin → Operations now say when the last one was taken.
 
 ### Added
 
@@ -48,6 +73,29 @@ Wave 9, *Adoption*.
   database, a backup in the last two days, that it is not a demo, a second administrator, and
   email. **Admin → Operations** (formerly Scheduled work) shows the same, with the version, the
   database, the data home, and the last backup.
+
+### Security
+
+The application was reviewed against the OWASP Application Security Verification Standard 4.0.3,
+level 2; `spec/security-review.md` lists every finding and what was done.
+
+- A token never counts as the creator, owner, or author of anything, and may not rate, accept,
+  decide, confirm, approve, sign off, publish, or triage: those are a named person's.
+- A record's history names only the records its reader may see.
+- Webhooks never name a restricted record, whichever process sends them.
+- Checking a dossier reads within fixed bounds; a request body is held to its limit however it is
+  sent; a failed statement's values never reach the log; reports made without a name are left
+  out of the server's access log; `Strict-Transport-Security` is sent over https.
+- Spreadsheet formulas are guarded in list cells too; a Markdown link cannot leave the site by
+  way of a backslash; a framework pack's header is checked.
+- Sign-in: the limit on failures to one account is 100 an hour, and signing in to one's own
+  account no longer resets the limit on one address; the current password is guessed no faster
+  when changing it than at sign-in; a person with no password must have signed in in the last
+  ten minutes to set one; a person is told when their password changes; passwords are at most
+  128 characters; the session cookie is always `Secure` when `base_url` is https.
+- `session_idle_hours` and `session_max_days` take fractions.
+- `scripts/screen-reader-check.mjs` reads the main journeys' accessibility trees, and status
+  messages are announced from the first.
 
 ### Changed
 

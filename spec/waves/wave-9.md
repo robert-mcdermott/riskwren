@@ -68,15 +68,19 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `deploy/Containerfile` builds in two stages with `uv` from the lock file, runs as user 10001 with `/data` as its volume, and on its first start runs `riskwren init` (taking the first administrator and a starter program from the environment), on every later one `riskwren db upgrade`. `.containerignore` keeps the build context to what the image needs. `deploy/compose.yaml` runs it with PostgreSQL 16, healthy before RiskWren starts, published on `127.0.0.1` only; `deploy/riskwren.service` is a systemd unit with only the data home writable and the usual hardening; `deploy/Caddyfile` and `deploy/nginx.conf` end TLS in front, the latter keeping no log for reports made without a name. The image was built with Podman and run: it set itself up from the university program, ran as its own user, and answered its health check and its pages. `riskwren backup` leaves a note of the last backup in the data home; `riskwren doctor --production` (`doctor.going_live`, which reaches nothing outside) checks the address, where it listens, the database, a backup in the last two days, the demo marker, two administrators, and email, and **Admin → Operations** (the scheduled work page, renamed, at `/admin/operations`) shows the same beside the installation's version, database and migration, workers, data home, and last backup. A new guide, Deployment. The acceptance test is `tests/test_backup.py::test_doctor_says_what_stands_between_it_and_production`.
 
-### Slice 6: Security and accessibility review ☐
+### Slice 6: Security and accessibility review ☑
 
-- [ ] A review against the OWASP Application Security Verification Standard, level 2, with each finding and its resolution recorded (PLT-19)
-- [ ] The full accessibility audit, and a screen-reader check of the main journeys
+- [x] A review against the OWASP Application Security Verification Standard, level 2, with each finding and its resolution recorded (PLT-19)
+- [x] The full accessibility audit, and a screen-reader check of the main journeys
 
-### Slice 7: The program handbook ☐
+**Done:** the review, in `spec/security-review.md`, read chapters V2, V3, V4, V5, V7, V8.3, V12, V13, and V14 against the code; each finding was traced before it was fixed or accepted. The serious ones were in this wave's own tokens: a token's principal had no account, so "created by me" matched every record nobody made, and a member's token listed reports made without a name; it now acts with an account number no account has, which `riskwren.db.guard` keeps out of every column that names a person, and judgments a named person makes refuse tokens (`PERSON_ONLY`). Webhooks fail closed on a kind of record they do not know. Histories name only what their reader may see. The dossier check, chunked bodies, logging of statement values and of reports made without a name, HSTS, formulas in list cells, Markdown links, framework pack headers, and several sign-in and session details were fixed; what is accepted or planned is said, with why. `scripts/screen-reader-check.mjs` reads eleven journeys' accessibility trees as the browser computes them (landmarks, a skip link, heading levels, names on every control and dialog, a live region), and found that the region announcing messages was made only with the first message; it is now made when the app starts. The acceptance tests are `tests/test_security_review.py`.
 
-- [ ] One guide for a risk and compliance team, from first decisions to the yearly rhythm (DOC-03)
-- [ ] The adopter's guide: from evaluation to production
+### Slice 7: The program handbook ☑
+
+- [x] One guide for a risk and compliance team, from first decisions to the yearly rhythm (DOC-03)
+- [x] The adopter's guide: from evaluation to production
+
+**Done:** two new guides. **The program handbook** (`docs/handbook.md`): the decisions to make first and where each is set, the first month (the record) and the first quarter (the evidence), the yearly rhythm as a table from every week to every year, who does what, and what to watch. **Adopting RiskWren** (`docs/adopting.md`): looking at the demo as the people who would use it, a pilot of six to twelve weeks and how to judge it, the decisions about the installation, going live, and keeping it current. Both are in the guides' index and the site's menu, and link only to what the other guides say.
 
 ### Slice 8: Release prep ☐
 

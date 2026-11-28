@@ -12,6 +12,7 @@ from riskwren.access.policy import current
 from riskwren.api.common import database, envelope, reading, writing
 from riskwren.api.problems import problem
 from riskwren.auth import sessions
+from riskwren.core.errors import Invalid
 from riskwren.demo.build import marker as demo_marker
 from riskwren.events.actor import Actor
 from riskwren.people import accounts
@@ -38,6 +39,10 @@ class PasswordChange(BaseModel):
 
 
 def _secure(request: Request) -> bool:
+    """Whether the session cookie is sent only over https: when the request came that way, or
+    when the address people use is https, whatever a proxy says."""
+    if request.app.state.config.server.base_url.startswith("https://"):
+        return True
     forwarded = request.headers.get("x-forwarded-proto", "").split(",")[0].strip().lower()
     return request.url.scheme == "https" or forwarded == "https"
 
@@ -105,7 +110,9 @@ def sign_in(request: Request, body: SignIn, response: Response) -> Any:
             401, "That email address and password do not match.", instance=request.url.path
         )
 
-    return _start(request, response, account, "password", cleared=keys)
+    # The address's own count stays: signing in to one's own account must not reset the
+    # limit on trying many others.
+    return _start(request, response, account, "password", cleared=[*pair, f"account:{email}"])
 
 
 def _start(
@@ -126,7 +133,7 @@ def _start(
         principal = accounts.principal_for(session, account, row)
     response.set_cookie(
         sessions.COOKIE, token, httponly=True, samesite="strict", secure=_secure(request), path="/",
-        max_age=config.session_max_days * 86400,
+        max_age=int(config.session_max_days * 86400),
     )  # fmt: skip
     return envelope(principal.to_json())
 
@@ -159,9 +166,26 @@ def sign_out(request: Request, response: Response) -> Any:
 @router.post("/session/password", summary="Change your own password")
 def change_password(request: Request, body: PasswordChange) -> Any:
     principal = current(request)
-    with writing(request, principal.actor) as session:
-        account = accounts.get(session, principal.account_id or 0)
-        accounts.set_password(
-            session, principal, account, body.new_password, current_password=body.current_password
-        )
+    if principal.token_id is not None:
+        return problem(403, "A token has no password.", instance=request.url.path)
+    # The current password is guessed no faster here than at sign-in.
+    key = f"password:{principal.account_id}"
+    with reading(request) as session:
+        if sessions.throttled(session, key):
+            return problem(
+                429, "Too many wrong passwords. Wait a few minutes and try again.",
+                instance=request.url.path,
+            )  # fmt: skip
+    try:
+        with writing(request, principal.actor) as session:
+            account = accounts.get(session, principal.account_id or 0)
+            accounts.set_password(
+                session, principal, account, body.new_password,
+                current_password=body.current_password, fresh_since=principal.signed_in_at,
+            )  # fmt: skip
+    except Invalid as exc:
+        if "current_password" in exc.errors:
+            with database(request).bookkeeping() as session:
+                sessions.note_failure(session, key)
+        raise
     return envelope({"changed": True})

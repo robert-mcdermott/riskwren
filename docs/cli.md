@@ -220,6 +220,10 @@ Load a backup into an empty database and data home, then check every table, ever
 
 Check the configuration, the data home, the database and its schema, and the history. Exits with 1 if anything must be fixed.
 
+| Option | Meaning |
+|---|---|
+| `--production` | also check what matters before real people rely on it: the https address, the database, a recent backup, a second administrator, email, and that it is not a demo |
+
 ## `riskwren jobs`
 
 Scheduled work brings risks up to date with the calendar, sends reminders, and sends email where that is set up. The server does this by itself while it runs. These commands are for seeing how it is going, and for running it from a scheduled task where the server's own scheduler is turned off.

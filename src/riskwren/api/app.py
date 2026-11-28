@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI
 
 from riskwren import PRODUCT_NAME, __version__, jobs
-from riskwren.access.middleware import install_access
+from riskwren.access.middleware import MAX_BODY, install_access
 from riskwren.access.policy import authorize
 from riskwren.api.problems import install_problem_handlers
 from riskwren.api.routers import (
@@ -48,6 +48,7 @@ from riskwren.api.routers.branding import install_branding
 from riskwren.api.security import install_security_headers
 from riskwren.api.static import install_static
 from riskwren.config import ENV_CONFIG, Config, load_config
+from riskwren.core import log as logs
 from riskwren.db.engine import Database
 from riskwren.home import DataHome
 from riskwren.program import branding as brand_rules
@@ -86,10 +87,14 @@ def create_app(config: Config) -> FastAPI:
         redoc_url=None,
         openapi_url="/api/openapi.json",
         dependencies=[Depends(authorize)],  # every API route is checked against the policy table
+        # Counted as it arrives, so a body sent in chunks, with no length declared, is held to
+        # the same limit as one that says how long it is.
+        max_body_size=MAX_BODY,
     )
     app.state.config = config
     app.state.home = home
 
+    logs.quiet_unnamed_reports()
     install_access(app)  # runs inside the header middleware, so refusals carry the headers
     install_security_headers(app)
     install_problem_handlers(app)

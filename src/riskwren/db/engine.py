@@ -12,8 +12,11 @@ from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 from riskwren.core.errors import StoreError
+from riskwren.db import guard
 from riskwren.events.actor import Actor
 from riskwren.events.audit import AuditedSession
+
+guard.install()  # a token's stand-in account number is never stored
 
 
 def _sqlite_pragmas(dbapi_connection: Any, _record: Any) -> None:
@@ -55,13 +58,14 @@ def make_engine(url: str, *, echo: bool = False) -> Engine:
                 raise StoreError(
                     f"The database directory {parent} does not exist. Run `riskwren init`."
                 )
-        engine = create_engine(url, echo=echo)
+        # A failed statement's values (a report's words, an answer) never reach the log.
+        engine = create_engine(url, echo=echo, hide_parameters=True)
         event.listen(engine, "connect", _sqlite_pragmas)
         event.listen(engine, "begin", _sqlite_begin)
         return engine
     if backend == "postgresql":
         try:
-            return create_engine(url, echo=echo, pool_pre_ping=True)
+            return create_engine(url, echo=echo, pool_pre_ping=True, hide_parameters=True)
         except ModuleNotFoundError as exc:
             raise StoreError(
                 "PostgreSQL needs the optional driver: run `uv sync --extra postgres`."

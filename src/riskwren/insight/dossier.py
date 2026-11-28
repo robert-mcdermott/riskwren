@@ -52,6 +52,7 @@ MANIFEST = "manifest.json"
 KINDS = ("scope", "risk", "third_party")
 MAX_FILES_BYTES = 200 * 1024 * 1024  # files beyond this are listed as left out
 MAX_READ = 400 * 1024 * 1024  # a dossier larger than this, unpacked, is not checked
+MAX_MANIFEST = 4 * 1024 * 1024  # a manifest larger than this is not a dossier's
 
 
 # --- Writing it down ----------------------------------------------------------------------
@@ -504,7 +505,7 @@ def build(
             {"ref": "Name a scope, a risk, or a third party."},
         )
     detail = records.detail(session, principal, record_type, record)  # NotFound if not seen
-    story = history.for_record(session, record_type, record, limit=100_000)
+    story = history.for_record(session, record_type, record, limit=100_000, principal=principal)
     package = Package()
     package.json("record.json", detail, f"The {record_type.label.lower()} as it stands")
     package.json("history.json", story, "Every change to it, newest first")
@@ -579,10 +580,13 @@ def verify(data: bytes, session: Session | None = None) -> dict[str, Any]:
             problems.append("It holds a file whose name points outside the package.")
         if MANIFEST not in names:
             return {"verified": False, "problems": ["It has no manifest.json."], "manifest": None}
+        if archive.getinfo(MANIFEST).file_size > MAX_MANIFEST:
+            return {"verified": False, "problems": ["Its manifest is too large to be a dossier's."],
+                    "manifest": None}  # fmt: skip
         try:
             manifest = json.loads(archive.read(MANIFEST))
             listed = {item["path"]: item for item in manifest["files"]}
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError, TypeError, zipfile.BadZipFile, EOFError, OSError):
             return {
                 "verified": False,
                 "problems": ["Its manifest cannot be read."],
@@ -596,8 +600,16 @@ def verify(data: bytes, session: Session | None = None) -> dict[str, Any]:
             if path not in names:
                 problems.append(f"{path} is missing.")
                 continue
-            content = archive.read(path)
-            if len(content) != item.get("size") or sha256(content) != item.get("sha256"):
+            digest, size = hashlib.sha256(), 0
+            try:
+                with archive.open(path) as handle:  # in pieces: never the whole file at once
+                    for block in iter(lambda handle=handle: handle.read(1 << 20), b""):
+                        digest.update(block)
+                        size += len(block)
+            except (zipfile.BadZipFile, EOFError, OSError):
+                problems.append(f"{path} cannot be read.")
+                continue
+            if size != item.get("size") or digest.hexdigest() != item.get("sha256"):
                 problems.append(f"{path} has been changed.")
         for extra in sorted(names - set(listed) - {MANIFEST}):
             problems.append(f"{extra} is not in the manifest.")

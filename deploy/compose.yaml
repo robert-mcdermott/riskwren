@@ -39,6 +39,10 @@ services:
       RISKWREN_DATABASE_URL: postgresql+psycopg://riskwren:${RISKWREN_DB_PASSWORD}@database:5432/riskwren
       RISKWREN_SERVER_BASE_URL: ${RISKWREN_BASE_URL:?set RISKWREN_BASE_URL in the .env file}
       RISKWREN_SERVER_WORKERS: ${RISKWREN_WORKERS:-4}
+      # Requests reach the container from the proxy on the host, through the container
+      # network's gateway. Trust the address it forwards, so that each person is told apart
+      # (sign-in limits count by address); only the proxy can reach the published port.
+      FORWARDED_ALLOW_IPS: "*"
       RISKWREN_ADMIN_EMAIL: ${RISKWREN_ADMIN_EMAIL:-}
       RISKWREN_ADMIN_NAME: ${RISKWREN_ADMIN_NAME:-}
       RISKWREN_ADMIN_PASSWORD: ${RISKWREN_ADMIN_PASSWORD:-}

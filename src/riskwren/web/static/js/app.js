@@ -8,6 +8,7 @@ import { can, setSession } from "./core/session.js";
 import { openPalette } from "./components/cmdk.js";
 import { commands, mountShell } from "./components/shell.js";
 import { applyTerms } from "./components/record.js";
+import { readyToAnnounce } from "./components/toast.js";
 import { emptyState } from "./components/ui.js";
 import { setProduct, setTitle } from "./pages/page.js";
 
@@ -15,6 +16,7 @@ apply(); // paint with the remembered mode and palette before anything else
 const root = document.getElementById("app");
 
 function applyBranding(meta) {
+  readyToAnnounce();
   applyTerms(meta.branding.terms);
   setProduct(meta.branding.product_name);
   setOrganizationPalette(meta.branding.palette);

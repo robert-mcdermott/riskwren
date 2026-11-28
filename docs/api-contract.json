@@ -184,6 +184,10 @@
   "parameters": {},
   "body": {}
  },
+ "GET /api/v1/admin/operations": {
+  "parameters": {},
+  "body": {}
+ },
  "GET /api/v1/admin/tokens": {
   "parameters": {},
   "body": {}

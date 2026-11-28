@@ -28,7 +28,7 @@ podman compose -f deploy/compose.yaml --env-file deploy/.env up -d --build
 - `RISKWREN_BASE_URL`: the `https://` address people use.
 - `RISKWREN_DB_PASSWORD`: the database's password, made up for this installation.
 - `RISKWREN_WORKERS`: server processes; one for each core RiskWren may use. See [Sizing](configuration.md#sizing).
-- `RISKWREN_ADMIN_EMAIL`, `RISKWREN_ADMIN_NAME`, `RISKWREN_ADMIN_PASSWORD`: the first administrator, made on the first start only. Take the password out once they have signed in.
+- `RISKWREN_ADMIN_EMAIL`, `RISKWREN_ADMIN_NAME`, `RISKWREN_ADMIN_PASSWORD`: the first administrator, made on the first start only. Take the password out of the file once they have signed in, and recreate the container (`up -d --force-recreate`): a container keeps the environment it was started with.
 - `RISKWREN_PROGRAM`: the [program to start from](getting-started.md#set-up-the-installation): `research-institute`, `academic-medical-center`, `university`, or `nonprofit`.
 
 Every later start brings the database up to date (`riskwren db upgrade`) before the server starts, so an upgrade is a new image and a restart. Any setting in [Configuration](configuration.md) can be given to the container as an environment variable, `RISKWREN_<SECTION>_<KEY>`. Commands run inside it:

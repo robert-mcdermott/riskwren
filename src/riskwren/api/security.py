@@ -42,6 +42,10 @@ def install_security_headers(app: FastAPI) -> None:
         response = await call_next(request)
         for name, value in SECURITY_HEADERS.items():
             response.headers.setdefault(name, value)
+        # Once it is reached over https, a browser is told to use nothing else.
+        forwarded = request.headers.get("x-forwarded-proto", "").split(",")[0].strip().lower()
+        if request.url.scheme == "https" or forwarded == "https":
+            response.headers.setdefault("Strict-Transport-Security", "max-age=31536000")
         if request.url.path.startswith("/api/"):
             response.headers.setdefault("Cache-Control", "no-store")
         return response
