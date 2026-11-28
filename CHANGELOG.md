@@ -4,6 +4,67 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.10.1 (2026-11-28)
+
+The guides, reviewed against the product line by line and completed, and the defects that
+review found, fixed. Four new guides explain how RiskWren works, what each role does and which
+role to give whom, connecting other systems and assistants, and what to do when something goes
+wrong; every other guide was corrected where it had drifted from the product and given worked
+examples that can be followed in the demo organization.
+
+### Upgrading from 0.10.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (there are no new migrations). A few things
+behave differently afterwards:
+
+- **Good standing for a third party is stricter.** A process that asks
+  `GET /standing/third-party/{ref}` now hears no for a supplier that has not been tiered
+  (`not_tiered`), has never had the review its tier calls for (`never_reviewed`), was not
+  approved at its last review (`not_approved`), or is being offboarded (`offboarding`); and a
+  gap in coverage counts whatever the asking token may see. Expect more answers of no at first.
+- **A unit's kind must be one the program names.** An import of units with a kind the program
+  does not know is refused by row; add the kind under **Admin → Program → Vocabularies** first.
+- **A test is assigned only to someone who could record its result,** and **an issue's owner
+  cannot withdraw it.**
+- **`riskwren init --program`, run again, no longer loads the starter** over a program in use;
+  `riskwren program import NAME` does that on purpose.
+
+### Added
+
+- **Guides:** *How RiskWren works*, *Your part in it*, *Other systems and assistants*, and *When
+  something goes wrong*, and worked examples throughout. The guides' index is on the site as
+  *All the guides*, with the questions each answers.
+- **Home** says when reports from other systems or drafts are waiting, for those who may act on
+  them.
+- **Start a review** asks which questionnaire to send, so a third party in a tier with none, or
+  with no tier, can be reviewed from the page.
+- **Add a requirement** brings one outside a scope's baseline into its statement of
+  applicability.
+- Evidence is retired from its own form; a questionnaire is retired from its page; an
+  administrator can change the email address an account signs in with.
+
+### Fixed
+
+- An outside auditor's link to an engagement carried requests to the audited and the team's
+  review notes, which its page never showed.
+- An owner without a steward's or manager's role could not save their own record, and saving a
+  record could move it to another unit.
+- A confirmed failure reported by another system stayed with the assessor who confirmed it; it
+  goes to the control's owners, as a failed test's does. A repeated failure joins the issue
+  already open rather than raising another.
+- A later change to a risk's controls lifted a doubt raised by a completed plan, an indicator,
+  or an analysis; only assessing the risk again does.
+- A result the assessment's lead recorded waited with nobody asked to review it.
+- A first breach assessment ticked no rules, whatever information was involved.
+- Withdraw on an acceptance was offered to people the server then refused.
+- A closed incident still took changes to what it taught; an engagement could be dropped part
+  way through only by API, and was restored to the start; the person internal audit asked was
+  not told.
+- The webhook hints named an event, `issue.close`, that never fires: a confirmed closure is
+  `issue.validate`.
+- Smaller: `riskwren backup` into a missing folder, the policy file chooser, the units import
+  sample, the tiering questionnaire's purpose, and the incident card's label.
+
 ## 0.10.0 (2026-11-27)
 
 Wave 10, *Connected*: RiskWren fits into the systems around it and still never goes looking.

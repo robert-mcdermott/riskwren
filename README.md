@@ -60,7 +60,7 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.10.0 is *Connected*: RiskWren fits into the systems around it and still never goes looking. Others tell it, or ask it; an assistant reads what it may and drafts what a person then makes. It follows 0.9.0, which made it ready for another organization to adopt, and 0.8.0, which added incidents and resilience.
+Version 0.10.0 is *Connected*: RiskWren fits into the systems around it and still never goes looking. Others tell it, or ask it; an assistant reads what it may and drafts what a person then makes. 0.10.1 completes the guides and fixes what their review found. It follows 0.9.0, which made it ready for another organization to adopt, and 0.8.0, which added incidents and resilience.
 
 **Connected, new in 0.10.0**
 
