@@ -63,6 +63,9 @@ def test_an_outsider_reads_one_reported_engagement_and_every_look_is_recorded(
     data = seen.json()["data"]
     assert data["engagement"]["ref"] == ref and data["engagement"]["workpapers"]
     assert data["about"]["organization"] == "Halvard & Co." and "can" not in data["engagement"]
+    # What the page shows and no more: no requests to the audited, no review notes.
+    assert "requests" not in data["engagement"]
+    assert all("notes" not in paper for paper in data["engagement"]["workpapers"])
     # Nothing else is reachable with it.
     assert nobody.get("/api/v1/risks", headers={HEADER: token}).status_code == 401
     with db.read() as session:
