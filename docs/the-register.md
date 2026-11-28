@@ -323,7 +323,7 @@ A risk's residual rating is put **in doubt** when something it rested on changes
 | An indicator | An indicator that warns of the risk passes its limit ([Indicators](#indicators)) |
 | A risk analysis | An analysis names the risk as covering a thing and ticks **its rating needs another look** ([Risk analyses](#risk-analyses)) |
 
-A new residual assessment lifts the doubt. So does any later change to the risk's controls (a rating, a link, or an unlink) that does not itself put the rating in doubt, whatever the doubt came from: a completed plan's or an indicator's doubt can be lifted that way without anyone assessing the risk again. When a plan completes or an indicator passes its limit, assess the risk again anyway.
+A new residual assessment lifts the doubt. A doubt the controls raised also lifts when they no longer suggest a worse rating, as when a control is put right. A doubt from a plan, an indicator, or an analysis stays until someone assesses the risk again: no change to its controls lifts it.
 
 ## Treatment
 

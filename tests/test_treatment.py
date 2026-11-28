@@ -258,6 +258,15 @@ def test_a_control_that_gets_worse_puts_the_rating_in_doubt(db: Database, people
         # Unlinking a control the rating leaned on raises the doubt again.
         controls.unlink(session, steward, risk, made["Split"])
         assert risk.residual_in_doubt and "Split is no longer linked" in risk.residual_doubt_reason
+        # A doubt raised for another reason is not the controls' to lift: only assessing
+        # the risk again does.
+        judge(session, steward, risk, "residual", 4, mission=4)
+        risk.residual_in_doubt = True
+        risk.residual_doubt_reason = "Looked at in RA-0001 against Freezers: alarms untested."
+        controls.link(session, steward, risk, made["Split"], reduces="impact", reliance="primary")
+        assert risk.residual_in_doubt and risk.residual_doubt_reason.startswith("Looked at")
+        judge(session, steward, risk, "residual", 4, mission=4)
+        assert not risk.residual_in_doubt
 
 
 # --- Treatment ----------------------------------------------------------------------------
