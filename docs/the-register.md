@@ -359,7 +359,7 @@ An acceptance can carry **Conditions**, the things that must stay true while it 
 
 An acceptance covers the rating that was accepted. If the residual rating later rises above it, or the acceptance expires or is withdrawn, the risk needs a decision again. **Acceptances** in the sidebar lists them, soonest to expire first, and can show only those expiring within 30 or 90 days.
 
-**Withdraw**, with a reason, is for whoever gave the acceptance, or a manager for the risk's unit. The page offers **Withdraw** to anyone who may edit the risk, but refuses anyone else when they try.
+**Withdraw**, with a reason, is for whoever gave the acceptance, or a manager for the risk's unit, and is offered only to them.
 
 Choosing **Accept** as the response is not an acceptance. It records what is intended and why, and changes nothing about standing: the risk still needs a decision until a leader with the authority records an acceptance.
 

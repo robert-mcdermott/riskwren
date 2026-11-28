@@ -78,7 +78,7 @@ A **contact** is a person at the third party who can be asked: a name, an email 
 
 ### Start a review
 
-**Start a review** on the third party's **Due diligence** tab starts one at once, with the questionnaire its tier names, and opens it. Nothing is asked of anyone until it is sent. As shipped:
+**Start a review** on the third party's **Due diligence** tab asks which **Questionnaire** to send: the one its tier names, which is the usual choice, or another. **Start it** makes the review and opens it. Nothing is asked of anyone until it is sent. As shipped:
 
 | Tier | Questionnaire |
 |---|---|
@@ -87,7 +87,7 @@ A **contact** is a person at the third party who can be asked: a name, an email 
 | Tier 3 | **Due diligence: short**, eight questions |
 | Tier 4, or not tiered | None |
 
-The page offers no choice of questionnaire. For a third party in Tier 4, or one not tiered, **Start a review** stops with "Choose the questionnaire to ask. A tier 4 third party has none of its own." To ask one of them, or to ask a Tier 1 supplier the short questionnaire, choose it through the [API](api.md): give `questionnaire` (such as `due-diligence-short`) when starting it, with `POST /api/v1/third-parties/{ref}/reviews`, or change it while the review is still a draft, with `PATCH /api/v1/reviews/{ref}`.
+A third party in Tier 4, or one not tiered, has no questionnaire of its own: choose one to review it. Choosing another for a tiered supplier, the short questionnaire for a Tier 1 supplier say, is for a reason worth recording in the review. Through the [API](api.md), give `questionnaire` (such as `due-diligence-short`) with `POST /api/v1/third-parties/{ref}/reviews`, or change it while the review is a draft with `PATCH /api/v1/reviews/{ref}`.
 
 The questionnaires are written for organizations in the United States: they ask about a business associate agreement where health information is involved, about notice of an incident within 72 hours, and where the information is held. They can be edited, or others added, under **Admin → Questionnaires**. A review records the tier when it was started, and asks the version of the questionnaire in use when it was first sent.
 
