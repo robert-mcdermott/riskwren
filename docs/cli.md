@@ -70,7 +70,7 @@ Look after the database schema.
 
 ### `riskwren db upgrade`
 
-Apply any migrations the database has not had. Export first: an upgrade cannot be undone except by restoring.
+Apply any migrations the database has not had, and add what is new in the default program and the starter libraries without changing what is there. Back up first, with `riskwren backup`: an upgrade cannot be undone except by restoring.
 
 ### `riskwren db current`
 
@@ -228,7 +228,7 @@ A Model Context Protocol server for an assistant on this computer. Each tool cal
 
 ## `riskwren doctor`
 
-Check the configuration, the data home, the database and its schema, and the history. Exits with 1 if anything must be fixed.
+Check the configuration, the data home, the database and its schema, the history, single sign-on and email where they are set up, and scheduled work. Exits with 1 if anything must be fixed.
 
 | Option | Meaning |
 |---|---|
@@ -236,15 +236,15 @@ Check the configuration, the data home, the database and its schema, and the his
 
 ## `riskwren jobs`
 
-Scheduled work brings risks up to date with the calendar, sends reminders, and sends email where that is set up. The server does this by itself while it runs. These commands are for seeing how it is going, and for running it from a scheduled task where the server's own scheduler is turned off.
+Scheduled work brings risks up to date with the calendar, sends reminders, sends email where that is set up, tells webhooks what has happened, takes the daily snapshot of the measures, and tidies RiskWren's own bookkeeping. The server does this by itself while it runs. These commands are for seeing how it is going, and for running it from a scheduled task where the server's own scheduler is turned off.
 
 ### `riskwren jobs run`
 
-Run every job that is due. With a job's name, run that one now whether or not it is due. A job another process is running is left to it.
+Run every job that is due and not paused. With a job's key (calendar, reminders, mail, webhooks, measures, or tidy), run that one now whether or not it is due or paused. A job another process is running is left to it.
 
 | Option | Meaning |
 |---|---|
-| `JOB` | one job to run now |
+| `JOB` | one job to run now: calendar, reminders, mail, webhooks, measures, or tidy |
 
 ## `riskwren mail`
 
