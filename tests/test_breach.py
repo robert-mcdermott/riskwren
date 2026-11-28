@@ -110,7 +110,10 @@ def test_what_an_assessment_must_say(as_role: Clients, people: People) -> None:
                             "rationale", "regimes"}  # fmt: skip
     # Secured information is not a breach of unsecured information: nothing is due.
     secured = steward.post(f"/api/v1/incidents/{ref}/breach", json={
-        "discovered_at": utc_now().date().isoformat(), "information": ["health"], "people": 3000,
+        # Yesterday: a bare date is midnight where the organization is, which can still be
+        # ahead of the time in UTC.
+        "discovered_at": (utc_now() - timedelta(days=1)).date().isoformat(),
+        "information": ["health"], "people": 3000,
         "secured": True, "conclusion": "no_notification",
         "rationale": "The laptop's disk was encrypted, and the key was not with it.",
         "regimes": [{"key": "hipaa"}]})  # fmt: skip
