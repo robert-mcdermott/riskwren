@@ -50,6 +50,8 @@ def test_a_backup_restores_into_an_empty_database_whole(
     assert taken.tables > 100 and taken.rows > 0 and taken.files == 1 and taken.events > 0
     with pytest.raises(backup.BackupError, match="already exists"):
         backup.take(instance.db.engine, instance.home, path)
+    with pytest.raises(backup.BackupError, match="There is no folder"):
+        backup.take(instance.db.engine, instance.home, tmp_path / "missing" / "backup.zip")
 
     db, home = _empty(tmp_path, "restored")
     try:

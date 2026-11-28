@@ -6,6 +6,7 @@
 # RiskWren listens on 127.0.0.1:8020; put the reverse proxy in front of it (deploy/Caddyfile or
 # deploy/nginx.conf). Back it up with:
 #
+#   podman compose -f deploy/compose.yaml exec riskwren mkdir -p /data/backups
 #   podman compose -f deploy/compose.yaml exec riskwren riskwren backup /data/backups/now.zip
 
 services:

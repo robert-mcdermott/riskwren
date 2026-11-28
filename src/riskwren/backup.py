@@ -153,6 +153,8 @@ def take(engine: Engine, home: DataHome, path: Path) -> Summary:
     path = Path(path)
     if path.exists():
         raise BackupError(f"{path} already exists. Name a new file.")
+    if not path.parent.is_dir():
+        raise BackupError(f"There is no folder {path.parent}. Make it, or name a file in one.")
     taken = utc_now().isoformat()
     summary = Summary(path, __version__, migration, engine.dialect.name, taken)
     manifest: dict[str, Any] = {
