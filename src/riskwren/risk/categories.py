@@ -13,14 +13,17 @@ from riskwren.access.principal import Principal
 from riskwren.core import scoring
 from riskwren.core.errors import Invalid, NotFound, PermissionDenied
 from riskwren.db.models import RiskCategory
+from riskwren.db.remember import remembered
 from riskwren.events import audit
 from riskwren.risk import method as methods
 
 
 def all_(session: Session) -> list[RiskCategory]:
-    return list(
-        session.scalars(select(RiskCategory).order_by(RiskCategory.position, RiskCategory.id))
-    )
+    def load() -> list[RiskCategory]:
+        ordered = select(RiskCategory).order_by(RiskCategory.position, RiskCategory.id)
+        return list(session.scalars(ordered))
+
+    return list(remembered(session, "risk_categories", load))
 
 
 def by_key(session: Session, key: str) -> RiskCategory:

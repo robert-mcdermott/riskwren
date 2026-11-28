@@ -1,5 +1,6 @@
-// Admin → Scheduled work: what RiskWren does by itself, when each job last ran, what it did,
-// when reminders go, and whether email is set up. Email is optional.
+// Admin → Operations: this installation (its version, database, data home, last backup, and
+// what stands between it and production), then what RiskWren does by itself, when each job
+// last ran, what it did, when reminders go, and whether email is set up. Email is optional.
 
 import { get, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
@@ -104,17 +105,41 @@ function email(data) {
     result));
 }
 
+const CHECK_TONES = { ok: "ok", warn: "warn", fail: "danger" };
+const CHECK_WORDS = { ok: "Ready", warn: "Look at this", fail: "Not ready" };
+const megabytes = (bytes) => (bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${(bytes / 1e6).toFixed(bytes < 1e7 ? 1 : 0)} MB`);
+
+function installation(data) {
+  const backup = data.last_backup;
+  return card({ title: "This installation" }, h("div", { class: "stack" },
+    facts([
+      ["Version", `RiskWren ${data.version}`],
+      ["Database", `${data.database}, at migration ${data.migration}`],
+      ["Server", `${plural(data.workers, "worker")}${data.scheduler ? ", running scheduled work" : ""}`],
+      ["Address", data.base_url || h("span", { class: "subtle" }, "Not set")],
+      ["Data home", `${data.data_home.path}: ${megabytes(data.data_home.bytes)}, ${megabytes(data.data_home.free_bytes)} free`],
+      ["Last backup", backup ? `${dateTime(backup.taken_at)}, ${megabytes(backup.bytes)}, to ${backup.path}` : h("span", { class: "subtle" }, "None yet")],
+    ]),
+    h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      h("caption", {}, "Before real people rely on it: what ", h("code", {}, "riskwren doctor --production"), " checks"),
+      h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Check"), h("th", { scope: "col" }, "State"), h("th", { scope: "col" }, "What it found"))),
+      h("tbody", {}, data.checks.map((check) => h("tr", {}, h("th", { scope: "row" }, check.name),
+        h("td", {}, pill(CHECK_WORDS[check.status], CHECK_TONES[check.status])), h("td", {}, check.detail))))))));
+}
+
 export function adminOperations(main) {
   return show(main, {
-    title: "Scheduled work",
+    title: "Operations",
     load: async () => {
-      const [work, mail] = await Promise.all([get("/api/v1/jobs", null, { fresh: true }), get("/api/v1/mail", null, { fresh: true })]);
-      return { ...work.data, mail: mail.data };
+      const [work, mail, here] = await Promise.all([get("/api/v1/jobs", null, { fresh: true }), get("/api/v1/mail", null, { fresh: true }),
+        get("/api/v1/admin/operations", null, { fresh: true })]);
+      return { ...work.data, mail: mail.data, installation: here.data };
     },
     view: (data, reload) => {
       const failed = data.jobs.filter((job) => job.enabled && job.last_status === "failed");
       return h("div", { class: "stack-lg" },
-        pageHeader({ eyebrow: "Admin", title: "Scheduled work", lede: "What RiskWren does by itself, so that nobody has to remember to." }),
+        pageHeader({ eyebrow: "Admin", title: "Operations", lede: "This installation, and what RiskWren does by itself, so that nobody has to remember to." }),
+        installation(data.installation),
         data.scheduler ? null : alert("info", icon("info"), h("div", {}, h("strong", {}, "This server's scheduler is turned off. "),
           "Jobs run when ", h("code", {}, "riskwren jobs run"), " is run, from a scheduled task or by hand, or from here.")),
         failed.length ? alert("danger", icon("alert"), h("div", {}, h("strong", {}, `${failed.map((job) => job.label).join(", ")} failed last time. `),

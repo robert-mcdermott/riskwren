@@ -55,6 +55,9 @@ class ThingBody(BaseModel):
     restricted: bool | None = None
     kind: str | None = None
     external_refs: list[ExternalRefBody] | None = None
+    custom: dict[str, Any] | None = Field(
+        default=None, description="Values of the organization's own fields, by key"
+    )
 
 
 class ProcessBody(ThingBody):
@@ -272,7 +275,7 @@ def record_history(request: Request, record_type: RecordType, ref: str) -> dict[
     principal = current(request)
     with reading(request) as session:
         record = records.load(session, principal, record_type, ref)
-        return envelope(history.for_record(session, record_type, record))
+        return envelope(history.for_record(session, record_type, record, principal=principal))
 
 
 def thing_filters(

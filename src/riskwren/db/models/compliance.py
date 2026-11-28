@@ -107,6 +107,10 @@ class Requirement(Base):
     title: Mapped[str | None] = mapped_column(String(300))
     text: Mapped[str | None] = mapped_column(Text)
     guidance: Mapped[str | None] = mapped_column(Text)
+    # The source's own words, imported by an organization that holds a license to them, for a
+    # framework that ships as identifiers. Kept only in this installation.
+    local_title: Mapped[str | None] = mapped_column(String(300))
+    local_text: Mapped[str | None] = mapped_column(Text)
     kind: Mapped[str | None] = mapped_column(String(40))
     position: Mapped[int] = mapped_column(Integer, default=0)
     depth: Mapped[int] = mapped_column(Integer, default=0)

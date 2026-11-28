@@ -12,6 +12,12 @@ function container() {
   return region;
 }
 
+/** Make the region where messages are announced. A screen reader announces changes to a
+ * region it already knows of, so it is made when the app starts, before the first message. */
+export function readyToAnnounce() {
+  container();
+}
+
 export function toast(message, { action = null, duration = action ? 8000 : 4500 } = {}) {
   const node = h("div", { class: "toast" }, h("span", { class: "grow" }, message));
   let timer = null;

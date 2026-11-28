@@ -45,7 +45,7 @@ def _readiness(session: Session, principal: Principal, unit: int | None) -> list
     for scope in rows:
         open_issues = count(session, principal, ISSUE, {"status": "live", "about": scope.ref})
         for held in scopes.held_to(session, scope):
-            found = scopes.statement(session, principal, scope, held["key"])
+            found = scopes.statement(session, principal, scope, held["key"], brief=True)
             counts = found["counts"]
             applicable = found["applicable"]
             ready = sum(counts[state] for state in READY)

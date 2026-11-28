@@ -18,7 +18,7 @@ import { show } from "./page.js";
 import { tabBar } from "./record.js";
 
 const TABS = [["categories", "Categories and appetite"], ["method", "Scales and matrix"], ["cadences", "Cadences"],
-  ["vocabularies", "Vocabularies"], ["visibility", "Who sees what"]];
+  ["vocabularies", "Vocabularies"], ["fields", "Fields"], ["visibility", "Who sees what"]];
 const said = (error) => Object.values(error.fields ?? {}).join(" ") || error.detail || "That could not be saved.";
 const copy = (value) => JSON.parse(JSON.stringify(value));
 const same = (one, other) => JSON.stringify(one) === JSON.stringify(other);
@@ -300,6 +300,82 @@ function cadencesTab(program, ctx, vocab) {
       number("Tell the leader when late by", () => draft.reminders.leader_after_days, (value) => { draft.reminders.leader_after_days = value; }, "days"))));
 }
 
+// --- Fields of the organization's own ------------------------------------------------------------------
+
+const FIELD_TYPES = [["system", "Systems"], ["process", "Processes"], ["third_party", "Third parties"], ["service", "Services"],
+  ["information", "Information assets"], ["site", "Sites"], ["risk", "Risks"], ["control", "Controls"]];
+
+function fieldsTab(data, reload) {
+  const holder = h("div", { class: "stack-lg" });
+  let kind = FIELD_TYPES.some(([key]) => key === query().get("kind")) ? query().get("kind") : "system";
+  const draw = () => {
+    let items = copy(data.fields[kind] ?? []);
+    const pick = h("select", { class: "select", id: "field-kind" }, FIELD_TYPES.map(([key, label]) => h("option", { value: key, selected: key === kind }, label)));
+    pick.addEventListener("change", () => {
+      kind = pick.value;
+      draw();
+    });
+    const body = h("tbody", {});
+    const problem = banner();
+    const rows = () => body.replaceChildren(...(items.length ? items.map((item, at) => h("tr", {},
+      h("td", {}, textCell(item.label, `Label of ${item.key}`, (value) => { item.label = value; })),
+      h("td", { class: "ref" }, item.key),
+      h("td", {}, item.kind === "choice"
+        ? textCell((item.choices ?? []).join(", "), `Choices for ${item.label}, separated by commas`, (value) => {
+          item.choices = value.split(",").map((each) => each.trim()).filter(Boolean);
+        })
+        : h("span", { class: "subtle" }, data.kinds.find((each) => each.key === item.kind)?.label ?? item.kind)),
+      h("td", {}, textCell(item.help ?? "", `Help for ${item.label}`, (value) => { item.help = value; })),
+      h("td", {}, h("label", { class: "check" }, h("input", { type: "checkbox", checked: Boolean(item.required), disabled: !data.can_change,
+        onchange: (event) => { item.required = event.target.checked; } }), h("span", {}, "Needed"))),
+      h("td", { class: "nowrap" },
+        iconButton("chevron-up", `Move ${item.label} up`, { disabled: at === 0 || !data.can_change, onclick: () => {
+          [items[at - 1], items[at]] = [items[at], items[at - 1]];
+          rows();
+        } }),
+        iconButton("chevron-down", `Move ${item.label} down`, { disabled: at === items.length - 1 || !data.can_change, onclick: () => {
+          [items[at + 1], items[at]] = [items[at], items[at + 1]];
+          rows();
+        } }),
+        iconButton("trash", `Take away ${item.label}`, { disabled: !data.can_change, onclick: () => {
+          items = items.filter((_, index) => index !== at);
+          rows();
+        } }))))
+      : [h("tr", {}, h("td", { colspan: 6, class: "subtle" }, "None yet."))]));
+    rows();
+    const label = field("A new field", { hint: "Its key is made from its label and never changes after.", maxlength: 60 });
+    const newKind = select("Kind", data.kinds.map((each) => [each.key, each.label]), { value: "text" });
+    const add = button("Add", { onclick: () => {
+      const named = label.input.value.trim();
+      const key = named.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40);
+      if (!key || !/^[a-z]/.test(key)) return label.setError("Give it a label that starts with a letter.");
+      if (items.some((item) => item.key === key)) return label.setError("There is already a field with that key.");
+      label.setError(null);
+      items.push({ key, label: named, kind: newKind.input.value, ...(newKind.input.value === "choice" ? { choices: ["Yes", "No"] } : {}) });
+      label.input.value = "";
+      return rows();
+    } });
+    const save = button("Save these fields", { kind: "btn-primary" });
+    save.addEventListener("click", async () => {
+      const done = await submit({ button: save, banner: problem, run: () => put(`/api/v1/program/fields/${kind}`, { fields: items }) });
+      if (!done) return;
+      toast("Saved.");
+      reload();
+    });
+    holder.replaceChildren(
+      h("p", { class: "muted" }, "What your organization also records about a kind of record, such as a cost center on a system or a contract owner on a third party. Each field is a line of text, a number, a date, or one of a list, and is shown and asked for with the record. A field taken away keeps its values, unshown, until it is brought back."),
+      h("div", { class: "field" }, h("label", { class: "label", for: "field-kind" }, "Kind of record"), pick),
+      card({ title: FIELD_TYPES.find(([key]) => key === kind)[1], flush: true },
+        h("div", { class: "table-wrap" }, h("table", { class: "table" },
+          h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Label"), h("th", { scope: "col" }, "Key"), h("th", { scope: "col" }, "Kind or choices"),
+            h("th", { scope: "col" }, "Help"), h("th", { scope: "col" }, "Needed"), h("th", { scope: "col" }, h("span", { class: "sr-only" }, "Order")))),
+          body)),
+        data.can_change ? h("div", { class: "card-pad stack" }, problem, h("div", { class: "row wrap" }, label.node, newKind.node, add), h("div", { class: "form-actions" }, save)) : null));
+  };
+  draw();
+  return holder;
+}
+
 // --- Vocabularies ----------------------------------------------------------------------------------------
 
 function vocabulariesTab(lists, reload) {
@@ -467,6 +543,7 @@ export function adminProgram(main) {
     load: async () => {
       const [program, unitIndex, extra] = await Promise.all([loadProgram({ fresh: true }), units(),
         tab === "vocabularies" ? get("/api/v1/admin/vocabularies", undefined, { fresh: true })
+          : tab === "fields" ? get("/api/v1/program/fields", undefined, { fresh: true })
           : tab === "visibility" ? Promise.all(["visibility", "leadership-readers", "anonymous-reporting"].map((name) => get(`/api/v1/admin/${name}`, undefined, { fresh: true })))
             .then(([seen, readers, anonymous]) => ({ data: { seen: seen.data, readers: readers.data, anonymous: anonymous.data } }))
             : tab === "cadences" ? get("/api/v1/vocabularies", undefined, { fresh: true }) : null]);
@@ -478,6 +555,7 @@ export function adminProgram(main) {
       const body = tab === "method" ? methodTab(data.program, ctx)
         : tab === "cadences" ? cadencesTab(data.program, ctx, data.extra)
           : tab === "vocabularies" ? vocabulariesTab(data.extra, reload)
+            : tab === "fields" ? fieldsTab(data.extra, reload)
             : tab === "visibility" ? [visibilityTab(data.extra.seen), readersTab(data.extra.readers), anonymousTab(data.extra.anonymous, reload)]
               : [categoriesTab(data.program, ctx), rules(data.program)];
       return h("div", { class: "stack-lg" },

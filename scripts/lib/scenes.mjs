@@ -327,6 +327,9 @@ export const SCENES = [
   { name: "control-incidents", as: "ciso", path: async (page) => `/controls/${await first("/api/v1/controls?q=second+factor")(page)}` },
   { name: "incident-reporter", as: "member", path: async (page) => `/incidents/${await first("/api/v1/incidents?q=mailbox")(page)}` },
   { name: "program-anonymous", as: "admin", path: "/admin/program?tab=visibility" },
+  { name: "program-fields", as: "cro", path: "/admin/program?tab=fields" },
+  { name: "system-fields", as: "cro", path: async (page) => `/systems/${await first("/api/v1/systems?q=research+storage")(page)}` },
+  { name: "system-fields-form", as: "cro", path: async (page) => `/systems/${await first("/api/v1/systems?q=research+storage")(page)}`, step: click("Edit") },
   // Reporting without a name, and following up a report with the code the demo gave it.
   { name: "report-page", as: "member", path: "/report" },
   { name: "report-follow-up", as: "member", path: "/report", step: `(async () => {
@@ -408,8 +411,9 @@ export const SCENES = [
   { name: "people", as: "admin", path: "/admin/people" },
   { name: "units", as: "admin", path: "/admin/units" },
   { name: "appearance", as: "admin", path: "/admin/appearance" },
+  { name: "integrations", as: "admin", path: "/admin/integrations" },
   { name: "admin-sso", as: "admin", path: "/admin/sso" },
-  { name: "scheduled-work", as: "admin", path: "/admin/scheduled-work" },
+  { name: "scheduled-work", as: "admin", path: "/admin/operations" },
   { name: "campaigns", as: "ciso", path: "/campaigns" },
   { name: "campaign", as: "assess1", path: campaignPath("attestation") },
   { name: "campaign-waiting", as: "auditor", path: campaignPath("attestation", "?show=pending") },

@@ -1,5 +1,6 @@
 // One inventory record: what it is, who answers for it, what it is connected to, and its history.
 
+import { customCard } from "../components/custom-fields.js";
 import { missingNote } from "../components/tidy.js";
 import { del, get, patch, post, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
@@ -322,7 +323,7 @@ function overview(record, ctx) {
   if (record.tags?.length) glance.push(["Tags", record.tags.join(", ")]);
   return h("div", { class: "split" },
     h("div", { class: "stack-lg" }, about, risksCard(ctx), linksCard(record, ctx)),
-    h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), ownersCard(record, ctx)));
+    h("div", { class: "stack-lg" }, card({ title: "At a glance" }, facts(glance)), customCard(record.custom), ownersCard(record, ctx)));
 }
 
 export function timeline(entries) {

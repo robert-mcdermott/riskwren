@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import (
     Boolean,
@@ -203,6 +204,25 @@ class ExternalRef(Base):
         UniqueConstraint("record_type", "record_id", "system", "value"),
         Index("ix_external_ref_record", "record_type", "record_id"),
         Index("ix_external_ref_value", "value"),
+    )
+
+
+class CustomValue(Base):
+    """The value of a field of the organization's own on one record. The fields themselves are
+    part of the program (``riskwren.program.fields``); a value is kept as JSON, as its kind says."""
+
+    __tablename__ = "custom_value"
+    __audit_parent__ = ("@record_type", "record_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    record_type: Mapped[str] = mapped_column(String(24))
+    record_id: Mapped[int] = mapped_column(Integer)
+    field: Mapped[str] = mapped_column(String(40))
+    value: Mapped[Any] = mapped_column(JsonType)
+
+    __table_args__ = (
+        UniqueConstraint("record_type", "record_id", "field"),
+        Index("ix_custom_value_record", "record_type", "record_id"),
     )
 
 

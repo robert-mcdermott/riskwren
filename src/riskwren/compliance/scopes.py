@@ -779,9 +779,11 @@ def statement(
     *,
     state: str | None = None,
     query: str | None = None,
+    brief: bool = False,
 ) -> dict[str, Any]:
     """For a scope and a framework: every requirement that applies, with the controls that
-    answer it here and where they stand; and every one left out, with the reason.
+    answer it here and where they stand; and every one left out, with the reason. ``brief``
+    leaves out what each control is beyond where it stands, for those who want the counts.
 
     Each requirement is in one state, worked out and never typed in. It is a *gap* when no
     control mapped to it is used in this scope; *planned* when one that is used is not yet
@@ -824,9 +826,20 @@ def statement(
         )
     ):
         mapped.setdefault(requirement_id, []).append(control_id)
-    views = {
-        control_id: implementation_view(session, principal, row) for control_id, row in used.items()
-    }
+    if brief:
+        # Where each stands is all that is wanted: read the providers once, not one by one.
+        given = [row.inherits_from_id for row in used.values() if row.inherits_from_id]
+        provided = session.scalars(select(Implementation).where(Implementation.id.in_(given))).all()
+        if provided:
+            session.scalars(select(Scope).where(Scope.id.in_({p.scope_id for p in provided}))).all()
+        views: dict[int, dict[str, Any]] = {
+            control_id: {"standing": standing(session, row)} for control_id, row in used.items()
+        }
+    else:
+        views = {
+            control_id: implementation_view(session, principal, row)
+            for control_id, row in used.items()
+        }
     assured = readiness.assurance(session, list(used))
     waived = exceptions.in_force_for(session, scope)
     for control_id, view in views.items():
@@ -873,7 +886,7 @@ def statement(
             {
                 "code": requirement.code,
                 "title": requirement.title,
-                "excerpt": frameworks.card(requirement)["excerpt"],
+                "excerpt": frameworks.card(requirement)["excerpt"] if not brief else None,
                 "applicable": applies,
                 "state": found,
                 # What it would be without the exception, and will be again when that ends.
@@ -891,7 +904,7 @@ def statement(
                      "provider": v["provider"]["scope"] if v["provider"] else None,
                      "open": v["control"]["open"]}
                     for v in answering
-                ],
+                ] if not brief else [],
             }
         )  # fmt: skip
     baseline = session.get(Baseline, held.baseline_id) if held.baseline_id else None

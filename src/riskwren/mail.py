@@ -91,6 +91,7 @@ class Look:
     organization: str
     base_url: str
     footer: str = ""
+    accent: str = "#0f5876"
 
     def link(self, href: str | None) -> str | None:
         return f"{self.base_url}{href}" if self.base_url and href else None
@@ -103,6 +104,7 @@ def look(session: Session, config: Config) -> Look:
         brand.organization_name,
         config.server.base_url,
         brand.email_footer,
+        branding.email_accent(brand),
     )
 
 
@@ -136,7 +138,7 @@ def compose(
         '<li style="margin:0 0 12px 0">'
         + (
             f'<a href="{escape(how.link(href) or "", quote=True)}" '
-            f'style="color:#0f5876;font-weight:600">{escape(title)}</a>'
+            f'style="color:{escape(how.accent, quote=True)};font-weight:600">{escape(title)}</a>'
             if how.link(href)
             else f"<strong>{escape(title)}</strong>"
         )
@@ -146,6 +148,15 @@ def compose(
     page = (
         '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:15px;'
         'line-height:1.5;color:#1c1b19;max-width:36em">'
+        f'<div style="border-top:4px solid {escape(how.accent, quote=True)};padding:12px 0 4px">'
+        f'<strong style="color:{escape(how.accent, quote=True)};font-size:17px">'
+        f"{escape(how.product)}</strong>"
+        + (
+            f'<span style="color:#6b6862"> · {escape(how.organization)}</span>'
+            if how.organization
+            else ""
+        )
+        + "</div>"
         f"<p>{escape(greeting)},</p><p>{escape(intro)}</p>"
         f'<ul style="padding-left:20px">{rows}</ul>'
         f'<p style="color:#6b6862;font-size:13px;border-top:1px solid #e3e0da;padding-top:12px">'

@@ -1,0 +1,549 @@
+{
+ "pack": {
+  "key": "iso-27001",
+  "kind": "framework",
+  "framework_kind": "standard",
+  "title": "ISO/IEC 27001:2022, by its codes",
+  "version": "2022",
+  "pack_version": "1.0.0",
+  "publisher": "ISO and IEC",
+  "license": "The codes only. The standard's titles and text are copyrighted and are not carried; an organization that holds a license loads them into its own installation.",
+  "text_policy": "identifiers",
+  "source_url": "https://www.iso.org/standard/27001",
+  "summary": "The management system's clauses 4 to 10 and the 93 controls of Annex A, by their codes, to map controls to and to scope."
+ },
+ "requirements": [
+  {
+   "code": "Clauses",
+   "title": "The management system",
+   "group": true,
+   "children": [
+    {
+     "code": "4",
+     "title": "Clause 4",
+     "group": true,
+     "children": [
+      {
+       "code": "4.1"
+      },
+      {
+       "code": "4.2"
+      },
+      {
+       "code": "4.3"
+      },
+      {
+       "code": "4.4"
+      }
+     ]
+    },
+    {
+     "code": "5",
+     "title": "Clause 5",
+     "group": true,
+     "children": [
+      {
+       "code": "5.1"
+      },
+      {
+       "code": "5.2"
+      },
+      {
+       "code": "5.3"
+      }
+     ]
+    },
+    {
+     "code": "6",
+     "title": "Clause 6",
+     "group": true,
+     "children": [
+      {
+       "code": "6.1"
+      },
+      {
+       "code": "6.2"
+      },
+      {
+       "code": "6.3"
+      }
+     ]
+    },
+    {
+     "code": "7",
+     "title": "Clause 7",
+     "group": true,
+     "children": [
+      {
+       "code": "7.1"
+      },
+      {
+       "code": "7.2"
+      },
+      {
+       "code": "7.3"
+      },
+      {
+       "code": "7.4"
+      },
+      {
+       "code": "7.5"
+      }
+     ]
+    },
+    {
+     "code": "8",
+     "title": "Clause 8",
+     "group": true,
+     "children": [
+      {
+       "code": "8.1"
+      },
+      {
+       "code": "8.2"
+      },
+      {
+       "code": "8.3"
+      }
+     ]
+    },
+    {
+     "code": "9",
+     "title": "Clause 9",
+     "group": true,
+     "children": [
+      {
+       "code": "9.1"
+      },
+      {
+       "code": "9.2"
+      },
+      {
+       "code": "9.3"
+      }
+     ]
+    },
+    {
+     "code": "10",
+     "title": "Clause 10",
+     "group": true,
+     "children": [
+      {
+       "code": "10.1"
+      },
+      {
+       "code": "10.2"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "Annex A",
+   "title": "Annex A controls",
+   "group": true,
+   "children": [
+    {
+     "code": "A.5",
+     "title": "Organizational controls",
+     "group": true,
+     "children": [
+      {
+       "code": "A.5.1",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.2",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.3",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.4",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.5",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.6",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.7",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.8",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.9",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.10",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.11",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.12",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.13",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.14",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.15",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.16",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.17",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.18",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.19",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.20",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.21",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.22",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.23",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.24",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.25",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.26",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.27",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.28",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.29",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.30",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.31",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.32",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.33",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.34",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.35",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.36",
+       "kind": "control"
+      },
+      {
+       "code": "A.5.37",
+       "kind": "control"
+      }
+     ]
+    },
+    {
+     "code": "A.6",
+     "title": "People controls",
+     "group": true,
+     "children": [
+      {
+       "code": "A.6.1",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.2",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.3",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.4",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.5",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.6",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.7",
+       "kind": "control"
+      },
+      {
+       "code": "A.6.8",
+       "kind": "control"
+      }
+     ]
+    },
+    {
+     "code": "A.7",
+     "title": "Physical controls",
+     "group": true,
+     "children": [
+      {
+       "code": "A.7.1",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.2",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.3",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.4",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.5",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.6",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.7",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.8",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.9",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.10",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.11",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.12",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.13",
+       "kind": "control"
+      },
+      {
+       "code": "A.7.14",
+       "kind": "control"
+      }
+     ]
+    },
+    {
+     "code": "A.8",
+     "title": "Technological controls",
+     "group": true,
+     "children": [
+      {
+       "code": "A.8.1",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.2",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.3",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.4",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.5",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.6",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.7",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.8",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.9",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.10",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.11",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.12",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.13",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.14",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.15",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.16",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.17",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.18",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.19",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.20",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.21",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.22",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.23",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.24",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.25",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.26",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.27",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.28",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.29",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.30",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.31",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.32",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.33",
+       "kind": "control"
+      },
+      {
+       "code": "A.8.34",
+       "kind": "control"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

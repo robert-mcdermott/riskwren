@@ -133,6 +133,35 @@ def external_refs(session: Session, given: Any, errors: Errors) -> list[tuple[st
     return found
 
 
+def _stage_custom(
+    session: Session,
+    record_type: RecordType,
+    record: Any,
+    values: Mapping[str, Any],
+    errors: Errors,
+    *,
+    creating: bool,
+) -> None:
+    """The organization's own fields, checked now and kept once the record has its id."""
+    from riskwren.program import fields  # the program builds on the inventory
+
+    record.__dict__.pop("_custom", None)
+    given = values.get("custom")
+    if given is None and not creating:
+        return
+    cleaned = fields.clean(session, record_type.key, given or {}, errors, creating=creating)
+    if cleaned:
+        record._custom = cleaned
+
+
+def _save_custom(session: Session, record_type: RecordType, record: Any) -> None:
+    from riskwren.program import fields
+
+    wanted = record.__dict__.pop("_custom", None)
+    if wanted:
+        fields.store(session, record_type.key, record.id, wanted)
+
+
 def _save_external_refs(session: Session, record_type: RecordType, record: Any) -> None:
     wanted = record.__dict__.pop("_external_refs", None)
     if wanted is None:
@@ -247,6 +276,7 @@ def _apply(
             else:
                 record.status = values["status"]
     apply_fields(session, record_type, record, values, errors, creating=creating)
+    _stage_custom(session, record_type, record, values, errors, creating=creating)
     hook = record_type.extra.get("apply")
     if hook is not None:
         hook(session, record, values, errors, creating)
@@ -310,12 +340,13 @@ def create(
         session.add(record)
         session.flush()
         _save_external_refs(session, record_type, record)
-        if principal.account_id is not None:
+        _save_custom(session, record_type, record)
+        if principal.person is not None:
             session.add(
                 RecordOwner(
                     record_type=record_type.key,
                     record_id=record.id,
-                    account_id=principal.account_id,
+                    account_id=principal.person,
                     kind=OWNER,
                 )
             )
@@ -359,6 +390,9 @@ def update(
             raise PermissionDenied("You can move a record only to a unit you look after.")
         if getattr(record, "_external_refs", None) is not None:
             _save_external_refs(session, record_type, record)
+            record.updated_at = utc_now()
+        if getattr(record, "_custom", None) is not None:
+            _save_custom(session, record_type, record)
             record.updated_at = utc_now()
         touch(session, record)
     updated = record_type.extra.get("updated")
@@ -639,6 +673,7 @@ def detail(
         version=record.version,
         created_at=record.created_at,
         external_refs=external_refs_of(session, record_type, [record.id]).get(record.id, []),
+        custom=_custom_view(session, record_type, record),
         can={
             "edit": editable,
             "assess": access.can_assess(session, principal, record_type, record),
@@ -649,6 +684,12 @@ def detail(
         out.update(more(session, principal, record))
     out["decisions"] = _decisions(session, principal, record_type, record)
     return out
+
+
+def _custom_view(session: Session, record_type: RecordType, record: Any) -> list[dict[str, Any]]:
+    from riskwren.program import fields
+
+    return fields.view(session, record_type.key, record.id)
 
 
 def _decisions(

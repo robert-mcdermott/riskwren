@@ -7,7 +7,7 @@ import { plural, relative } from "../core/format.js";
 import { label, options, unitOptions, units, vocabularies } from "../core/lookups.js";
 import { query, setQuery } from "../core/router.js";
 import { can } from "../core/session.js";
-import { criticality, hrefOf, statusOptions, statusPill, TYPES } from "../components/record.js";
+import { TYPES, UNIT, criticality, hrefOf, statusOptions, statusPill } from "../components/record.js";
 import { exportButton } from "../components/exchange.js";
 import { card, emptyState, pageHeader } from "../components/ui.js";
 import { show } from "./page.js";
@@ -103,14 +103,14 @@ export function recordList(main, type) {
       const bar = h("div", { class: "filters" }, h("div", { class: "filter-search" }, search), listTools(),
         filterSelect("kind", options(vocab, meta.kinds, { blank: "Any kind" }), "Kind"),
         filterSelect("criticality", options(vocab, "criticalities", { blank: "Any criticality" }), "Criticality"),
-        filterSelect("unit", unitOptions(data.units.tree, { blank: "Any unit" }), "Unit"),
+        filterSelect("unit", unitOptions(data.units.tree, { blank: `Any ${UNIT.noun}` }), UNIT.label),
         filterSelect("status", statusOptions(["active", "retired"], "Any status"), "Status"),
         tiered ? filterSelect("tier", [["", "Any tier"], ...data.tiers.map((tier) => [tier.key, tier.label]), ["none", "Not tiered"]], "Tier") : null,
         tiered ? filterSelect("review", [["", "Any review date"], ["due", "Review overdue"], ["soon", "Review due within a month"]], "Review") : null,
         mineToggle());
       const body = rows.length
         ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
-          h("thead", {}, h("tr", {}, sortHeader(meta.label, "name"), h("th", { scope: "col" }, "Unit"), h("th", { scope: "col" }, "Owner"),
+          h("thead", {}, h("tr", {}, sortHeader(meta.label, "name"), h("th", { scope: "col" }, UNIT.label), h("th", { scope: "col" }, "Owner"),
             tiered ? sortHeader("Tier", "tier") : null,
             sortHeader("Criticality", "criticality"), h("th", { scope: "col" }, "Data"), sortHeader("Status", "status"),
             sortHeader("Updated", "updated_at"))),

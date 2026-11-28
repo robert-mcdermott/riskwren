@@ -75,6 +75,15 @@ def _measures(db: Database, _config: Config) -> dict[str, int]:
         return {"measures_taken": measures.snapshot(session)}
 
 
+def _webhooks(db: Database, config: Config) -> dict[str, int]:
+    """Queue messages for what has happened, then send what is due. Bookkeeping, not history."""
+    from riskwren.integration import webhooks
+
+    with db.bookkeeping() as session:
+        queued = webhooks.queue(session, base_url=config.server.base_url)
+    return {"webhooks_queued": queued, **webhooks.send_due(db)}
+
+
 def _tidy(db: Database, _config: Config) -> dict[str, int]:
     now = utc_now()
     with db.bookkeeping() as session:
@@ -102,6 +111,10 @@ JOBS: dict[str, JobSpec] = {
                 "Queues notices and daily summaries and sends what is waiting, where email is "
                 "set up",
                 timedelta(minutes=1), _mail),
+        JobSpec("webhooks", "Webhooks",
+                "Tells the addresses an administrator registered of what has happened, and "
+                "tries again those that did not answer",
+                timedelta(minutes=1), _webhooks),
         JobSpec("measures", "Measures",
                 "Takes the day's snapshot of every measure, for its trend; a later one the same "
                 "day replaces it",

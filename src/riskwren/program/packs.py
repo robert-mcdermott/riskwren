@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from riskwren.access.principal import Principal
 from riskwren.controls import service as controls
 from riskwren.core import scoring
-from riskwren.core.errors import Invalid, PermissionDenied
+from riskwren.core.errors import Invalid, NotFound, PermissionDenied
 from riskwren.db.models import RiskCategory, ScoringMethod
 from riskwren.events import audit
 from riskwren.program import rules, vocab
@@ -32,6 +32,19 @@ CONTROL_PACKS = ("starter-controls.json",)
 def builtin(name: str) -> dict[str, Any]:
     text = resources.files("riskwren.resources").joinpath("packs", name).read_text("utf-8")
     return json.loads(text)
+
+
+# The programs a new installation may start from, written by scripts/build-starter-programs.py.
+STARTERS = ("research-institute", "academic-medical-center", "university", "nonprofit")
+
+
+def starter(key: str) -> dict[str, Any]:
+    """A starter program by its key."""
+    if key not in STARTERS:
+        raise NotFound(
+            f"There is no starter program {key!r}. Choose one of: {', '.join(STARTERS)}."
+        )
+    return builtin(f"programs/{key}.json")
 
 
 def _add_categories(session: Session, items: list[dict[str, Any]]) -> int:

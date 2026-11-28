@@ -1,5 +1,6 @@
 // One risk: how much is at stake, whether it is in order, the reasoning, and its history.
 
+import { customCard } from "../components/custom-fields.js";
 import { get, patch, put } from "../core/api.js";
 import { button, h, icon } from "../core/dom.js";
 import { date } from "../core/format.js";
@@ -96,6 +97,7 @@ function overview(risk, ctx) {
         ["Next review", risk.next_review_on ? h("span", { class: risk.review_overdue ? "overdue" : "" }, date(risk.next_review_on)) : null],
       ])),
       incidentsCard(risk.incidents),
+      customCard(risk.custom),
       ownersCard(risk, ctx)));
 }
 

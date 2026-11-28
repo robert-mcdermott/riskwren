@@ -2277,6 +2277,44 @@ class Builder:
                     outside.package(session, found)
                     outside.record_view(session, found)
 
+    def _story_fields(self) -> Script:
+        """The risk office asks for a cost center and a support tier on every system, and those
+        who keep the central ones fill them in."""
+        from riskwren.db.models import System
+        from riskwren.program import fields
+
+        yield self._on(40, hour=9)
+        with self.act(self.cast["cro"]) as (session, who):
+            fields.save(session, who, "system", c.SYSTEM_FIELDS)
+        names = {row[0]: row[1] for row in c.SYSTEMS}
+        for key, cost, tier in c.SYSTEM_FIELD_VALUES:
+            yield self._on(39, hour=11)
+            with self.act(self.cast["cro"]) as (session, who):
+                system = session.scalars(select(System).where(System.name == names[key])).first()
+                if system is not None:
+                    records.update(session, who, SYSTEM, system,
+                                   {"custom": {"cost_center": cost, "support_tier": tier}},
+                                   version=system.version)  # fmt: skip
+                    self.tally("systems with fields of their own")
+
+    def _story_other_systems(self) -> Script:
+        """The administrator gives the vulnerability scanner a token that reads, and registers
+        the service desk's webhook, paused until the desk is ready. The demo sends nothing."""
+        from riskwren.integration import tokens, webhooks
+
+        yield self._on(20, hour=14)
+        with self.act(self.cast["admin"]) as (session, who):
+            tokens.issue(session, who, {"name": "Vulnerability scanner", "role": "auditor",
+                                        "read_only": True, "days": 180})  # fmt: skip
+            tokens.issue(session, who, {"name": "Asset inventory sync", "role": "steward",
+                                        "org_unit_id": self.units["IT"], "read_only": False,
+                                        "days": 90})  # fmt: skip
+            hook, _ = webhooks.create(session, who, {
+                "name": "Service desk", "url": "https://servicedesk.northmere.example/hooks/grc",
+                "events": ["issue.*", "incident.*"]})  # fmt: skip
+            webhooks.update(session, who, hook.id, {"active": False})
+            self.tally("tokens")
+
     def _story_resilience(self) -> Script:
         """The risk office facilitates business impact analyses of the critical processes, and
         those who keep the systems say what each can deliver."""
@@ -3855,7 +3893,7 @@ class Builder:
             self._story_measures, self._story_leadership, self._story_scenarios,
             self._story_internal_audit, self._story_engagements, self._story_outside,
             self._story_resilience, self._story_incidents, self._story_privacy,
-            self._story_continuity,
+            self._story_continuity, self._story_fields, self._story_other_systems,
         ):  # fmt: skip
             self.schedule(story())
         self.run()

@@ -1,0 +1,55 @@
+# RiskWren with PostgreSQL, for one host. Copy this file and deploy/.env.example, fill in the
+# .env, and start it:
+#
+#   podman compose -f deploy/compose.yaml --env-file deploy/.env up -d     (or docker compose)
+#
+# RiskWren listens on 127.0.0.1:8020; put the reverse proxy in front of it (deploy/Caddyfile or
+# deploy/nginx.conf). Back it up with:
+#
+#   podman compose -f deploy/compose.yaml exec riskwren riskwren backup /data/backups/now.zip
+
+services:
+  database:
+    image: docker.io/library/postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: riskwren
+      POSTGRES_DB: riskwren
+      POSTGRES_PASSWORD: ${RISKWREN_DB_PASSWORD:?set RISKWREN_DB_PASSWORD in the .env file}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U riskwren -d riskwren"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  riskwren:
+    image: ${RISKWREN_IMAGE:-riskwren:latest}
+    build:
+      context: ..
+      dockerfile: deploy/Containerfile
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8020:8020"
+    environment:
+      RISKWREN_DATABASE_URL: postgresql+psycopg://riskwren:${RISKWREN_DB_PASSWORD}@database:5432/riskwren
+      RISKWREN_SERVER_BASE_URL: ${RISKWREN_BASE_URL:?set RISKWREN_BASE_URL in the .env file}
+      RISKWREN_SERVER_WORKERS: ${RISKWREN_WORKERS:-4}
+      # Requests reach the container from the proxy on the host, through the container
+      # network's gateway. Trust the address it forwards, so that each person is told apart
+      # (sign-in limits count by address); only the proxy can reach the published port.
+      FORWARDED_ALLOW_IPS: "*"
+      RISKWREN_ADMIN_EMAIL: ${RISKWREN_ADMIN_EMAIL:-}
+      RISKWREN_ADMIN_NAME: ${RISKWREN_ADMIN_NAME:-}
+      RISKWREN_ADMIN_PASSWORD: ${RISKWREN_ADMIN_PASSWORD:-}
+      RISKWREN_PROGRAM: ${RISKWREN_PROGRAM:-}
+    volumes:
+      - data:/data
+
+volumes:
+  database:
+  data:

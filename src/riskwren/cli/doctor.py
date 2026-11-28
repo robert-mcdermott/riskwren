@@ -35,7 +35,7 @@ class Check:
     detail: str
 
 
-def run(config_path: str | None = None) -> list[Check]:
+def run(config_path: str | None = None, *, production: bool = False) -> list[Check]:
     checks = [_python()]
     try:
         config = load_config(config_path)
@@ -57,7 +57,75 @@ def run(config_path: str | None = None) -> list[Check]:
     # Email is optional as well. Without it, notices and reminders are read in the app.
     checks.append(_mail(config) if config.mail.enabled else Check("Email", OK, "not set up"))
     checks.append(_jobs(config))
+    if production:
+        checks += going_live(config, home)
     return checks
+
+
+def going_live(config: Config, home: DataHome) -> list[Check]:
+    """What matters before real people rely on it: none of it needs the network."""
+    from datetime import datetime, timedelta
+    from urllib.parse import urlsplit
+
+    from sqlalchemy import func, select
+
+    from riskwren import backup
+    from riskwren.core.clock import utc_now
+    from riskwren.db.models import Account, RoleGrant
+
+    found: list[Check] = []
+    base = urlsplit(config.server.base_url)
+    if base.scheme == "https" and base.hostname:
+        found.append(Check("Address", OK, config.server.base_url))
+    else:
+        found.append(Check("Address", FAIL, "set [server] base_url to the https:// address "
+                           "people use, with TLS ended at a proxy in front"))  # fmt: skip
+    if config.server.host in ("127.0.0.1", "localhost", "::1"):
+        found.append(Check("Listening", OK, f"{config.server.host}, behind a proxy"))
+    else:
+        found.append(Check("Listening", WARN, f"on {config.server.host}: make sure only the "
+                           "proxy can reach it"))  # fmt: skip
+    workers = config.server.workers
+    if not config.uses_sqlite:
+        found.append(Check("Database for production", OK, f"PostgreSQL, {workers} worker(s)"))
+    elif workers > 1:
+        found.append(Check("Database for production", FAIL, "several workers need PostgreSQL"))
+    else:
+        found.append(Check("Database for production", WARN, "SQLite serves a small team; "
+                           "use PostgreSQL for more, and for several workers"))  # fmt: skip
+    note = backup.last(home)
+    if note is None:
+        found.append(Check("Backups", FAIL, "no backup has been taken: schedule `riskwren "
+                           "backup` and keep the files elsewhere"))  # fmt: skip
+    else:
+        age = utc_now() - datetime.fromisoformat(note["taken_at"])
+        status = OK if age < timedelta(days=2) else WARN
+        found.append(Check("Backups", status, f"the last was {age.days} day(s) ago, "
+                           f"{note['bytes'] / 1e6:.1f} MB, to {note['path']}"))  # fmt: skip
+    if (home.root.parent / ".riskwren-demo").exists() or (home.root / ".riskwren-demo").exists():
+        found.append(Check("Demo", FAIL, "this is a demo organization, not for real records"))
+    db = Database(config.database_url)
+    try:
+        with db.read() as session:
+            admins = (
+                session.scalar(
+                    select(func.count(func.distinct(RoleGrant.account_id)))
+                    .join(Account, Account.id == RoleGrant.account_id)
+                    .where(RoleGrant.role == "admin", Account.status == "active")
+                )
+                or 0
+            )
+    finally:
+        db.dispose()
+    if admins >= 2:
+        found.append(Check("Administrators", OK, f"{admins} active"))
+    else:
+        found.append(Check("Administrators", WARN, "only one: keep a second, so that the "
+                           "installation is never left without one"))  # fmt: skip
+    if not config.mail.enabled:
+        found.append(Check("Email for production", WARN, "not set up: reminders are read only "
+                           "in the app"))  # fmt: skip
+    return found
 
 
 def _mail(config: Config) -> Check:

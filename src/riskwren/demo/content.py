@@ -2618,3 +2618,19 @@ EVIDENCE_ROWS = [
     "{d4},4,no,owner",
     "{d5},5,yes,owner",
 ]
+
+
+# Fields of the organization's own: finance's cost center and the support tier on systems.
+SYSTEM_FIELDS = [
+    {"key": "cost_center", "label": "Cost center", "kind": "text",
+     "help": "The cost center that pays for it, as finance knows it."},
+    {"key": "support_tier", "label": "Support tier", "kind": "choice",
+     "choices": ["Around the clock", "Business hours", "Best effort"]},
+]  # fmt: skip
+# system key, cost center, support tier
+SYSTEM_FIELD_VALUES = [
+    ("storage", "CC-4120", "Around the clock"), ("cluster", "CC-4120", "Business hours"),
+    ("identity", "CC-3100", "Around the clock"), ("email", "CC-3100", "Business hours"),
+    ("backup", "CC-3100", "Business hours"), ("record", "CC-7200", "Around the clock"),
+    ("cabinets", "CC-7350", "Around the clock"), ("survey", "CC-5300", "Best effort"),
+]  # fmt: skip

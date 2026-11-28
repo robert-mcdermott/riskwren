@@ -185,7 +185,7 @@ def test_sessions_expire_when_idle_and_at_their_limit(as_role: Clients, instance
     fresh = as_role("auditor")
     limit = instance.config.server.session_max_days
     moment = utc_now()
-    for _ in range(limit * 24 // (idle - 1)):  # used constantly, it still ends at the limit
+    for _ in range(int(limit * 24 // (idle - 1))):  # used constantly, it still ends at the limit
         moment += timedelta(hours=idle - 1)
         with frozen_at(moment):
             fresh.get("/api/v1/session")
@@ -249,6 +249,15 @@ REACH: dict[tuple[str, str], set[str]] = {
     ("POST", "/api/v1/sso/check"): {"admin"},
     ("PUT", "/api/v1/sso/mappings"): {"admin"},
     ("GET", "/api/v1/jobs"): {"admin"},
+    ("GET", "/api/v1/admin/operations"): {"admin"},
+    ("GET", "/api/v1/admin/tokens"): {"admin"},
+    ("POST", "/api/v1/admin/tokens"): {"admin"},
+    ("POST", "/api/v1/admin/tokens/{token_id}/revoke"): {"admin"},
+    ("GET", "/api/v1/admin/webhooks"): {"admin"},
+    ("POST", "/api/v1/admin/webhooks"): {"admin"},
+    ("PATCH", "/api/v1/admin/webhooks/{hook_id}"): {"admin"},
+    ("DELETE", "/api/v1/admin/webhooks/{hook_id}"): {"admin"},
+    ("POST", "/api/v1/admin/webhooks/{hook_id}/test"): {"admin"},
     ("POST", "/api/v1/jobs/{key}/run"): {"admin"},
     ("PUT", "/api/v1/jobs/{key}"): {"admin"},
     ("GET", "/api/v1/mail"): {"admin"},
@@ -464,6 +473,8 @@ for _route in (
 ):  # fmt: skip
     REACH[_route] = {"admin", "manager"}
 REACH[("GET", "/api/v1/program")] = EVERYONE
+REACH[("GET", "/api/v1/program/fields")] = EVERYONE
+REACH[("PUT", "/api/v1/program/fields/{type_key}")] = {"admin", "manager"}
 for _report in ("home", "heat-map", "dashboard", "compliance", "graph/{ref}"):
     REACH[("GET", f"/api/v1/{_report}")] = EVERYONE
 REACH[("GET", "/api/v1/history")] = {"admin", "manager", "auditor"}

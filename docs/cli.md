@@ -22,6 +22,8 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 | [`riskwren check-dossier`](#riskwren-check-dossier) | Check that a dossier is whole and unchanged |
 | [`riskwren frameworks`](#riskwren-frameworks) | See and load what the organization is held to |
 | [`riskwren program`](#riskwren-program) | Move the program between installations |
+| [`riskwren backup`](#riskwren-backup) | Back the whole installation up to one file |
+| [`riskwren restore`](#riskwren-restore) | Restore a backup into an empty database |
 | [`riskwren doctor`](#riskwren-doctor) | Check that this installation is healthy |
 | [`riskwren jobs`](#riskwren-jobs) | See scheduled work, or run it now |
 | [`riskwren mail`](#riskwren-mail) | Send waiting email, or test the mail settings |
@@ -36,6 +38,7 @@ Write a configuration file if there is none, create the data home, create or upg
 | `--admin-email` `EMAIL` | create the first administrator with this address |
 | `--admin-name` `NAME` | the first administrator's name |
 | `--password-stdin` | read the password from standard input instead of asking |
+| `--program` `KIND` | the program to start from: research-institute (the default), academic-medical-center, university, or nonprofit |
 
 ## `riskwren serve`
 
@@ -154,7 +157,7 @@ Load a framework from a pack file, or the built-in ones that are missing. A pack
 
 | Option | Meaning |
 |---|---|
-| `FILE` | the pack to load |
+| `FILE` | the pack to load, or the key of one that ships to be loaded on request, such as hipaa-breach, nist-privacy, nist-800-53-r4, or iso-27001 |
 | `--builtin` | load the built-in frameworks not yet here, and the publishers' mappings for those that are |
 | `--dry-run` | check the pack, and load nothing |
 
@@ -165,6 +168,15 @@ Show a framework's publisher, version, license, and source.
 | Option | Meaning |
 |---|---|
 | `KEY` | the framework's key, such as nist-csf |
+
+### `riskwren frameworks text`
+
+For a framework that ships as its codes alone, such as iso-27001, load the titles and text from a copy your organization holds a license to: a CSV file with the columns code, title, and text. The words stay in this installation and in its backups; no pack or export carries them. A row with an empty title and text takes that requirement's words away.
+
+| Option | Meaning |
+|---|---|
+| `KEY` | the framework's key, such as iso-27001 |
+| `FILE` | the CSV file of code, title, and text |
 
 ## `riskwren program`
 
@@ -184,12 +196,33 @@ Load a program pack. The whole pack is checked first, and nothing is loaded unle
 
 | Option | Meaning |
 |---|---|
-| `FILE` | the pack to load |
+| `FILE` | the pack to load, or the name of a starter program: research-institute, academic-medical-center, university, or nonprofit |
 | `--dry-run` | say what would change, and change nothing |
+
+## `riskwren backup`
+
+Write every table, every stored file, and a manifest of their fingerprints to one file, as of one moment, while the server goes on running. The file restores into SQLite or PostgreSQL. Keep it somewhere safe: it holds everything.
+
+| Option | Meaning |
+|---|---|
+| `FILE` | the file to write, which must not exist |
+
+## `riskwren restore`
+
+Load a backup into an empty database and data home, then check every table, every file, and the history against it. To move between SQLite and PostgreSQL, back up from one and restore into the other. Use the same version of RiskWren that took the backup, then upgrade.
+
+| Option | Meaning |
+|---|---|
+| `FILE` | the backup to restore |
+| `--describe` | only say what the backup holds |
 
 ## `riskwren doctor`
 
 Check the configuration, the data home, the database and its schema, and the history. Exits with 1 if anything must be fixed.
+
+| Option | Meaning |
+|---|---|
+| `--production` | also check what matters before real people rely on it: the https address, the database, a recent backup, a second administrator, email, and that it is not a demo |
 
 ## `riskwren jobs`
 

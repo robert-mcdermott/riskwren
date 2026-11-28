@@ -60,9 +60,19 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.8.0 is *Incidents and resilience*: when something goes wrong, it is reported, handled, and learned from, and the organization knows what it cannot afford to lose. It follows 0.7.0, which gave internal audit its own workspace on the same record, and 0.6.0, which read the record back as measures, reports, and packages that prove themselves.
+Version 0.9.0 is *Adoption*: what an organization that has never seen RiskWren needs to install it, make it its own, and run it in production. It follows 0.8.0, which added incidents and resilience, and 0.7.0, which gave internal audit its own workspace on the same record.
 
-**Incidents and resilience, new in 0.8.0**
+**Adoption, new in 0.9.0**
+
+- **Backup and restore** to one portable file, checked against itself; moving between SQLite and PostgreSQL is a backup and a restore. Measured at 10,000 records and many people at once, with the results in the configuration guide.
+- **Deployment:** a container image, a compose file with PostgreSQL, a locked-down systemd unit, proxy examples, `riskwren doctor --production`, and **Admin → Operations**.
+- **Starter programs** for an academic medical center, a university, and a general nonprofit, beside the research institute's; **fields of your own** on eight kinds of record; and **your own words** for kinds of record and units.
+- **Tokens for other systems**, acting as a role and kept as a fingerprint; **signed webhooks** that carry references and never contents; and the API's **contract**, recorded and checked.
+- **ISO/IEC 27001:2022 by its codes,** with a licence holder's own copy of the words loaded into their installation.
+- **A security review** against the OWASP Application Security Verification Standard at level 2, with every finding and what was done (`spec/security-review.md`), and a screen-reader check of the main journeys.
+- **Two new guides:** [Adopting RiskWren](docs/adopting.md) and [the program handbook](docs/handbook.md).
+
+**Incidents and resilience, from 0.8.0**
 
 - **Report something in a minute:** an incident, a near miss, or a concern, from anyone signed in, and, where the organization opens it, from anyone without giving a name, followed up with a code.
 - **Triage and handling:** a category, a severity, the systems, information, and third parties involved, and who handles it. The reporter sees where it stands and what is said to them, not the handling.
@@ -149,7 +159,7 @@ Version 0.8.0 is *Incidents and resilience*: when something goes wrong, it is re
 - **An append-only history** chained by hash, checked with `riskwren verify`.
 - **Branding and themes,** a JSON API under `/api/v1`, a command line for setup and recovery, and the program as a file.
 
-Adoption comes next: what an organization needs to run RiskWren in production and make it its own, then connections to the systems around it. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
+Connections to the systems around it come next: results pushed in, a reference others can check, and an optional assistant, all off until they are wanted. The [roadmap](spec/roadmap.md) says what is next, and the [changelog](CHANGELOG.md) lists everything in each release.
 
 ## Documentation
 
@@ -158,6 +168,8 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | Guide | For |
 |---|---|
 | [Getting started](docs/getting-started.md) | Whoever installs RiskWren and sets it up |
+| [Adopting RiskWren](docs/adopting.md) | Whoever decides whether to use it, and puts it into use |
+| [The program handbook](docs/handbook.md) | The risk and compliance team, from first decisions to the yearly rhythm |
 | [The register](docs/the-register.md) | Everyone who owns, assesses, or reads a risk |
 | [Compliance](docs/compliance.md) | Security and compliance leads, and the stewards of what must comply |
 | [Evidence and testing](docs/evidence-and-testing.md) | Control owners and assessors |
@@ -168,6 +180,7 @@ Start with the [guide index](docs/README.md), or go straight to the guide for yo
 | [Incidents](docs/incidents.md) | Everyone who reports something, and those who triage and handle it |
 | [Running the program](docs/running-the-program.md) | The risk, compliance, and security assurance team, and administrators |
 | [Configuration](docs/configuration.md) | Whoever runs the server |
+| [Deployment](docs/deployment.md) | Whoever puts it into production |
 | [API](docs/api.md) | Anyone connecting another system |
 | [Command reference](docs/cli.md) | Every `riskwren` command and option |
 
@@ -182,6 +195,8 @@ uv run pytest                     # the tests, on SQLite
 scripts/test-both.sh              # the tests on SQLite and on a disposable PostgreSQL
 uv run ruff check && uv run ruff format --check
 node scripts/a11y-audit.mjs       # the accessibility audit, over a fresh demo
+node scripts/screen-reader-check.mjs  # the main journeys as a screen reader is given them
+uv run python scripts/measure.py  # how it performs with many records and people at once
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how the work is organized, and [SECURITY.md](SECURITY.md) to report a vulnerability.

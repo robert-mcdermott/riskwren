@@ -191,7 +191,7 @@ def incident_history(request: Request, ref: str) -> dict[str, Any]:
     with reading(request) as session:
         incident = records.load(session, principal, INCIDENT, ref)
         records.require_whole(session, principal, INCIDENT, incident)
-        return envelope(history.for_record(session, INCIDENT, incident))
+        return envelope(history.for_record(session, INCIDENT, incident, principal=principal))
 
 
 # --- Learning and losses -----------------------------------------------------------------

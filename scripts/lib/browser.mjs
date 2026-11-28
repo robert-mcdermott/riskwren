@@ -81,6 +81,8 @@ export async function openBrowser() {
   };
   return {
     evaluate,
+    /** A Chrome DevTools Protocol call on the page, such as Accessibility.getFullAXTree. */
+    cdp: page,
     waitFor,
     /** The window's size, drawn at twice its pixels unless ``scale`` says otherwise. */
     async size(width, height, scale = 2) {

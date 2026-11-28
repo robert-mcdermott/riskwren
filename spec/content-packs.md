@@ -67,7 +67,7 @@ RiskWren is Apache 2.0 licensed, and nothing in the repository may compromise th
 |---|---|---|
 | `verbatim` | Public-domain works and works dedicated to the public domain: United States government publications, the text of laws and regulations | Codes, titles, and the source text itself |
 | `attributed` | Works under attribution licenses that permit adaptation | Codes, titles, and text, with the required attribution shown wherever the content appears in the app and in every export |
-| `identifiers` | Copyrighted standards and guidance with no open license | Only the codes, and RiskWren's own short, plain-language label for what each requirement is about. Never the source's titles or wording |
+| `identifiers` | Copyrighted standards and guidance with no open license | Only the codes, and at most RiskWren's own short, plain-language label for what each requirement is about. Never the source's titles or wording |
 | `summary` | Public-domain works where RiskWren carries its own short summary because it is easier to act on | Codes, titles, and a one-sentence summary written for RiskWren |
 
 Works whose licenses forbid adaptation, forbid use inside a product, or require a paid license for tool providers are **not shipped at all**, even as identifiers, unless their publisher's terms clearly allow it. RiskWren instead provides the means to load them: an organization that holds a license creates or imports the framework itself.
@@ -122,9 +122,9 @@ SP 800-53 is large. It loads as a catalog; a scope adopts a **baseline** from it
 | `common-rule` | later | verbatim | 45 CFR Part 46, protection of human research subjects |
 | `part-11` | later | verbatim | 21 CFR Part 11, electronic records and signatures |
 | `uniform-guidance` | later | summary | 2 CFR Part 200, selected subparts on internal control, procurement, and subrecipient monitoring |
-| `nist-ai-rmf` | 9 | verbatim | NIST AI Risk Management Framework 1.0, for organizations that track AI risk here |
-| `iso-27001` | 9 | identifiers | Codes of the clauses and Annex A controls with RiskWren's own labels; the official text is imported locally by licence holders |
-| `pci-dss`, `soc-2` | 9 | identifiers | The same approach, if the publishers' terms allow identifiers; otherwise load-your-own |
+| `nist-ai-rmf` | later | verbatim | NIST AI Risk Management Framework 1.0, for organizations that track AI risk here |
+| `iso-27001` | 9 (shipped) | identifiers | The codes of clauses 4 to 10 and the 93 Annex A controls, without labels; a licence holder loads the titles and text into their own installation with `riskwren frameworks text` |
+| `pci-dss`, `soc-2` | later | identifiers | The same approach, if the publishers' terms allow identifiers; otherwise load-your-own |
 | Due diligence questionnaires | 5 | — | Written for RiskWren. Published questionnaires that require a license for tool providers are not shipped; an organization that holds one imports it |
 
 ### Never shipped

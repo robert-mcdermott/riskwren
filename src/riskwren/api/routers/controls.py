@@ -52,6 +52,9 @@ class ControlBody(BaseModel):
     restricted: bool | None = None
     library_key: str | None = None
     external_refs: list[ExternalRefBody] | None = None
+    custom: dict[str, Any] | None = Field(
+        default=None, description="Values of the organization's own fields, by key"
+    )
 
 
 class RatingBody(BaseModel):

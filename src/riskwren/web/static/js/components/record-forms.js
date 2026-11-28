@@ -1,5 +1,6 @@
 // The forms that add and edit inventory records. One form, shaped by what each kind of record has.
 
+import { customFields } from "./custom-fields.js";
 import { similarHint } from "./tidy.js";
 import { patch, post } from "../core/api.js";
 import { button, h, uid } from "../core/dom.js";
@@ -8,7 +9,7 @@ import { navigate } from "../core/router.js";
 import { can, ownUnits } from "../core/session.js";
 import { banner, checkbox, field, section, select, submit } from "./form.js";
 import { openOverlay } from "./overlay.js";
-import { statusLabel, TYPES } from "./record.js";
+import { TYPES, UNIT, statusLabel } from "./record.js";
 import { toast } from "./toast.js";
 
 /**
@@ -116,7 +117,7 @@ export function editRecord(type, { record = null, vocab, units, onDone, preset =
     render: (body, footer, close) => {
       const name = field("Name", { value: record?.name ?? "", required: true, hint: NAME_HINTS[type] });
       const kind = select("Kind", options(vocab, meta.kinds, { blank: record ? null : "Choose…" }), { value: record?.kind ?? "", required: true });
-      const unit = select("Unit", unitOptions(units.tree, { only: preset.org_unit_id ? null : ownUnits(), blank: record ? null : "Choose…" }),
+      const unit = select(UNIT.label, unitOptions(units.tree, { only: preset.org_unit_id ? null : ownUnits(), blank: record ? null : "Choose…" }),
         { value: record?.org_unit_id ?? preset.org_unit_id ?? "", required: true, hint: "The unit that answers for it." });
       const summary = field("Summary", { type: "textarea", value: record?.summary ?? "" });
       const critical = select("Criticality", options(vocab, "criticalities"), { value: record?.criticality ?? "moderate",
@@ -126,14 +127,15 @@ export function editRecord(type, { record = null, vocab, units, onDone, preset =
         hint: "Known only to its owners, its unit's stewards and leaders, managers, and auditors." });
       const status = record ? select("Status", [["active", statusLabel("active")], ["retired", statusLabel("retired")]], { value: record.status }) : null;
       const extra = EXTRA[type](record, vocab, preset);
+      const own = customFields(type, record?.custom ?? null);
 
       const problem = banner();
       const saveButton = button(record ? "Save" : "Add", { kind: "btn-primary" });
-      const fields = { name, kind, org_unit_id: unit, summary, criticality: critical, ...extra.fields, ...(status ? { status } : {}) };
+      const fields = { name, kind, org_unit_id: unit, summary, criticality: critical, ...extra.fields, ...own.fields, ...(status ? { status } : {}) };
       const values = () => ({
         name: name.input.value, kind: kind.input.value, org_unit_id: unit.input.value ? Number(unit.input.value) : null,
         summary: summary.input.value, criticality: critical.input.value, data_class: data.value(),
-        restricted: restricted.input.checked, ...extra.values(), ...(status ? { status: status.input.value } : {}),
+        restricted: restricted.input.checked, ...extra.values(), ...own.values(), ...(status ? { status: status.input.value } : {}),
       });
       const path = `/api/v1/${meta.path}`;
       const save = async () => {
@@ -153,7 +155,7 @@ export function editRecord(type, { record = null, vocab, units, onDone, preset =
         event.preventDefault();
         save();
       } }, problem,
-      section("What it is", name.node, similarHint(type, name.input, { unit: () => unit.input.value, apartFrom: record?.ref }), h("div", { class: "grid-2" }, kind.node, unit.node), summary.node, extra.nodes),
+      section("What it is", name.node, similarHint(type, name.input, { unit: () => unit.input.value, apartFrom: record?.ref }), h("div", { class: "grid-2" }, kind.node, unit.node), summary.node, extra.nodes, own.node),
       section("What is at stake", critical.node, data.node),
       section("Who may see it", restricted.node, status?.node ?? null));
       saveButton.addEventListener("click", save);

@@ -81,6 +81,24 @@ export const TYPES = {
 const BY_PREFIX = Object.fromEntries(Object.entries(TYPES).map(([key, type]) => [type.prefix, key]));
 
 /** Another module adds its own kinds of record (risks, controls) to the ones every page knows. */
+/** What the organization calls a unit, when it has its own word. */
+export const UNIT = { label: "Unit", plural: "Units", noun: "unit", nouns: "units" };
+
+const lower = (word) => (/^[A-Z][a-z]/.test(word) ? word[0].toLowerCase() + word.slice(1) : word);
+
+/** Use the organization's own words for the kinds of record and for units. */
+export function applyTerms(terms = {}) {
+  for (const [key, words] of Object.entries(terms || {})) {
+    if (!words?.one || !words?.many) continue;
+    const named = { label: words.one, plural: words.many, noun: lower(words.one), nouns: lower(words.many) };
+    if (key === "unit") Object.assign(UNIT, named);
+    else if (TYPES[key]) {
+      const article = /^[aeiou]/i.test(words.one) ? "an" : "a";
+      Object.assign(TYPES[key], named, { article: `${article} ${lower(words.one)}` });
+    }
+  }
+}
+
 export function registerType(key, type) {
   TYPES[key] = type;
   BY_PREFIX[type.prefix] = key;

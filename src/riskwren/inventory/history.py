@@ -44,8 +44,11 @@ def words(text: str) -> str:
 class Lookups:
     """Names for the keys and ids that events hold, loaded when first needed."""
 
-    def __init__(self, session: Session, record_type: RecordType) -> None:
+    def __init__(self, session: Session, record_type: RecordType, principal: Any = None) -> None:
         self.session = session
+        # Whose history this is: a record they may not see is not named to them.
+        self.principal = principal
+        self._seen: dict[tuple[str, int], bool] = {}
         self.labels = {**LABELS, **{field.name: field.label for field in record_type.fields}}
         self.vocabularies = {
             **VOCABULARIES,
@@ -73,7 +76,21 @@ class Lookups:
                 rows = self.session.execute(select(model.id, model.ref, model.name)).all()
                 rows = [(row[0], f"{row[1]} {row[2]}") for row in rows]  # type: ignore[misc]
             self._names[kind] = {row[0]: row[1] for row in rows}
+        if kind not in ("unit", "account") and not self._may_see(kind, identifier):
+            return "a record you cannot see"
         return self._names[kind].get(identifier, f"{words(kind).lower()} {identifier}")
+
+    def _may_see(self, kind: str, identifier: Any) -> bool:
+        if self.principal is None or not isinstance(identifier, int):
+            return True
+        if (kind, identifier) not in self._seen:
+            from riskwren.inventory import access  # it builds on the registry, as this does
+
+            row = self.session.get(TYPES[kind].model, identifier)
+            self._seen[(kind, identifier)] = row is not None and access.can_see(
+                self.session, self.principal, TYPES[kind], row
+            )
+        return self._seen[(kind, identifier)]
 
     def value(self, field: str, value: Any) -> Any:
         if value is None or value == "" or value == []:
@@ -178,9 +195,15 @@ def entry(event: Event, record_type: RecordType, lookups: Lookups) -> dict[str, 
 
 
 def for_record(
-    session: Session, record_type: RecordType, record: Any, *, limit: int = 300
+    session: Session,
+    record_type: RecordType,
+    record: Any,
+    *,
+    limit: int = 300,
+    principal: Any = None,
 ) -> list[dict[str, Any]]:
-    """The record's history, newest first. Permission to see it is the caller's to check."""
+    """The record's history, newest first. Permission to see it is the caller's to check;
+    with ``principal``, the records it names that they may not see are not named."""
     events = session.scalars(
         select(Event)
         .where(
@@ -192,7 +215,7 @@ def for_record(
         .order_by(Event.id.desc())
         .limit(limit)
     ).all()
-    lookups = Lookups(session, record_type)
+    lookups = Lookups(session, record_type, principal)
     hidden = record_type.extra.get("history_hidden", ())
     story = [
         entry(event, record_type, lookups) for event in events if event.subject_type not in hidden
@@ -360,7 +383,7 @@ def everywhere(
                 record = None
             else:
                 if key not in lookups:
-                    lookups[key] = Lookups(session, TYPES[key])
+                    lookups[key] = Lookups(session, TYPES[key], principal)
                 item = entry(event, TYPES[key], lookups[key])
                 keeps = bool(TYPES[key].extra.get("history_keeps_titled"))
                 told = item.pop("told", False)

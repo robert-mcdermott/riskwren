@@ -15,6 +15,8 @@ Before version 1.0, only the latest release receives fixes.
 
 ## How RiskWren is kept secure
 
+RiskWren 0.9.0 was reviewed against the OWASP Application Security Verification Standard 4.0.3 at level 2. The review, each finding, and what was done about it are in [`spec/security-review.md`](spec/security-review.md).
+
 The threat model, the controls for each threat, and the table of who may see and do what are
 in [`spec/security.md`](spec/security.md). `riskwren doctor` checks an installation, and
 `riskwren verify` confirms that the history has not been altered.

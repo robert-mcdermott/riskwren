@@ -52,13 +52,14 @@ def test_jobs_run_when_due_and_not_before(instance: Instance, people: People) ->
     db, config = instance.db, instance.config
     with frozen_at(START):
         ran = {result["key"] for result in jobs.run_due(db, config)}
-        assert ran == set(jobs.JOBS) == {"calendar", "reminders", "mail", "measures", "tidy"}
+        assert ran == set(jobs.JOBS) == {
+            "calendar", "reminders", "mail", "webhooks", "measures", "tidy"}  # fmt: skip
         assert jobs.run_due(db, config) == []  # nothing is due again yet
     with frozen_at(START + timedelta(minutes=2)):
-        assert [result["key"] for result in jobs.run_due(db, config)] == ["mail"]
+        assert [result["key"] for result in jobs.run_due(db, config)] == ["mail", "webhooks"]
     with frozen_at(START + timedelta(hours=1, minutes=1)):
         ran = {result["key"] for result in jobs.run_due(db, config)}
-        assert ran == {"calendar", "reminders", "mail"}  # not the daily one
+        assert ran == {"calendar", "reminders", "mail", "webhooks"}  # not the daily one
 
 
 def test_two_processes_run_a_job_once_between_them(instance: Instance, people: People) -> None:

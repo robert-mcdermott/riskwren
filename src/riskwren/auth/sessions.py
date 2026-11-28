@@ -21,7 +21,7 @@ COOKIE = "riskwren_session"
 CSRF_HEADER = "X-CSRF-Token"
 TOUCH_EVERY = timedelta(minutes=1)  # write the sliding expiry at most this often
 THROTTLE_LIMIT = 5  # for one account from one address
-THROTTLE_WIDE = 30  # for one account from anywhere, or for one address at any account
+THROTTLE_WIDE = 25  # for one account from anywhere, or one address at any account: 100 an hour
 THROTTLE_WINDOW = timedelta(minutes=15)
 
 
@@ -30,7 +30,7 @@ def token_hash(token: str) -> str:
 
 
 def create(
-    session: Session, account_id: int, *, idle_hours: int, max_days: int, user_agent: str | None
+    session: Session, account_id: int, *, idle_hours: float, max_days: float, user_agent: str | None
 ) -> tuple[str, SessionToken]:
     """Start a session for an account that has just proved who it is. Returns the token,
     which is given to the browser and never stored, and the session's row."""
@@ -51,7 +51,7 @@ def create(
 
 
 def load(
-    session: Session, token: str | None, *, idle_hours: int, max_days: int
+    session: Session, token: str | None, *, idle_hours: float, max_days: float
 ) -> tuple[SessionToken, Account] | None:
     """The live session for a token and its account, sliding the expiry; None if there is none."""
     if not token or len(token) > 200:

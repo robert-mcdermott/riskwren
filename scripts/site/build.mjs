@@ -24,11 +24,11 @@ const IMAGES = "img"; // the directory of screenshots, inside docs/ and on the s
 
 // Reading order, in groups. Each guide becomes a page of the same name.
 export const MENU = [
-  ["Start", [["index", "Overview"], ["getting-started", "Getting started"]]],
-  ["Use", [["the-register", "The register"], ["compliance", "Compliance"], ["evidence-and-testing", "Evidence and testing"],
+  ["Start", [["index", "Overview"], ["getting-started", "Getting started"], ["adopting", "Adopting RiskWren"]]],
+  ["Use", [["handbook", "The program handbook"], ["the-register", "The register"], ["compliance", "Compliance"], ["evidence-and-testing", "Evidence and testing"],
     ["issues-and-exceptions", "Issues and exceptions"], ["policies", "Policies"], ["third-parties", "Third parties"], ["internal-audit", "Internal audit"],
     ["incidents", "Incidents"], ["running-the-program", "Running the program"]]],
-  ["Run", [["configuration", "Configuration"]]],
+  ["Run", [["configuration", "Configuration"], ["deployment", "Deployment"]]],
   ["Reference", [["api", "The API"], ["api-reference", "API reference"], ["cli", "Command reference"], ["changelog", "Changelog"]]],
 ];
 

@@ -4,6 +4,105 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.9.0 (2026-11-27)
+
+Wave 9, *Adoption*: what an organization that has never seen RiskWren needs to install it, make
+it its own, and run it in production. An installation backs up to one file that restores into
+SQLite or PostgreSQL, and has been measured with many records and many people at once. It
+deploys as a container with PostgreSQL or as a locked-down service, and says what stands between
+it and production. It starts from a program written for a research institute, an academic
+medical center, a university, or a nonprofit, takes fields and words of the organization's own,
+and lets other systems in with tokens that act as a role and tell them what happens with signed
+webhooks. It was reviewed against the OWASP Application Security Verification Standard at level
+2, and two new guides take an organization from evaluation to the yearly rhythm.
+
+### Upgrading from 0.8.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0046 and 0047). Every row is kept,
+and the history still verifies. A few things look different afterwards:
+
+- **Admin → Scheduled work is now Admin → Operations,** with the installation's version,
+  database, data home, last backup, and what `doctor --production` would say, above the
+  scheduled work. The old address still opens it.
+- **A new scheduled job, Webhooks,** runs every minute and does nothing until a webhook is
+  registered.
+- **The menu's Admin group has Other systems,** for tokens and webhooks.
+- **Sign-in is limited a little more:** 25 failures to one account in fifteen minutes, from
+  anywhere, and the same from one address. A new password is at most 128 characters; a longer
+  one already set still works.
+- **Take a backup with the new command** (`riskwren backup`), and schedule it: `doctor
+  --production` and Admin → Operations now say when the last one was taken.
+
+### Added
+
+- **Backup and restore:** `riskwren backup FILE` writes the whole installation (every table,
+  every stored file, and a manifest that fingerprints each) to one file, as of one moment,
+  while the server runs. `riskwren restore FILE` loads it into an empty database and data home
+  and checks every table, every file, and the history against it. The file is the same
+  whichever database it came from, so moving between SQLite and PostgreSQL is a backup from one
+  and a restore into the other.
+- **`scripts/measure.py`** measures the server with many records and many people at once.
+- **Your own words:** under **Admin → Appearance → Your own words**, or `[branding.terms]` in
+  `riskwren.toml`, the organization names units, processes, systems, third parties, services,
+  information assets, sites, issues, exceptions, and incidents in its own words, used in the
+  menu, in page titles, and for the kinds of record.
+- **Email has a header** with the product's name, the organization's, and its accent.
+- **Starter programs:** `riskwren init --program` starts from a program written for an
+  academic medical center, a university, or a general nonprofit, beside the research
+  institute's, which stays the default. `riskwren program import` takes a starter's name.
+- **Fields of your own:** under **Admin → Program → Fields**, up to twelve fields (text, a
+  number, a date, or one of a list) on systems, processes, third parties, services, information
+  assets, sites, risks, and controls, asked for in their forms and kept in their history.
+- **ISO/IEC 27001:2022, by its codes:** clauses 4 to 10 and the Annex A controls, without the
+  standard's words, loaded with `riskwren frameworks load iso-27001`. `riskwren frameworks
+  text` loads a licensed copy's titles and text into the installation, where they stay.
+- `riskwren frameworks load` takes the key of a framework that ships, as well as a file.
+- **Tokens for other systems:** under **Admin → Other systems**, an administrator makes a
+  token that acts as a role (auditor, manager, assessor, steward, or member), optionally for
+  one unit, reading only unless said otherwise, for up to a year and a day. It is shown once,
+  kept as a fingerprint, sent as `Authorization: Bearer`, and named in the history.
+- **Webhooks:** addresses told of named events (`issue.close`, `risk.assess`, or whole
+  families), with the record's reference and never its contents, signed with HMAC-SHA256, and
+  tried again when they do not answer. A new scheduled job, **Webhooks**, sends them.
+- **The API's contract** is recorded in `docs/api-contract.json`, and a change that would break
+  a client fails the build.
+- **Deployment:** a container image (`deploy/Containerfile`) that runs as a user of its own and
+  sets itself up on its first start, a compose file with PostgreSQL, a locked-down systemd unit,
+  proxy examples for Caddy and nginx, and a new guide, **Deployment**.
+- **`riskwren doctor --production`** checks the https address, where the server listens, the
+  database, a backup in the last two days, that it is not a demo, a second administrator, and
+  email. **Admin → Operations** (formerly Scheduled work) shows the same, with the version, the
+  database, the data home, and the last backup.
+
+### Security
+
+The application was reviewed against the OWASP Application Security Verification Standard 4.0.3,
+level 2; `spec/security-review.md` lists every finding and what was done.
+
+- A token never counts as the creator, owner, or author of anything, and may not rate, accept,
+  decide, confirm, approve, sign off, publish, or triage: those are a named person's.
+- A record's history names only the records its reader may see.
+- Webhooks never name a restricted record, whichever process sends them.
+- Checking a dossier reads within fixed bounds; a request body is held to its limit however it is
+  sent; a failed statement's values never reach the log; reports made without a name are left
+  out of the server's access log; `Strict-Transport-Security` is sent over https.
+- Spreadsheet formulas are guarded in list cells too; a Markdown link cannot leave the site by
+  way of a backslash; a framework pack's header is checked.
+- Sign-in: the limit on failures to one account is 100 an hour, and signing in to one's own
+  account no longer resets the limit on one address; the current password is guessed no faster
+  when changing it than at sign-in; a person with no password must have signed in in the last
+  ten minutes to set one; a person is told when their password changes; passwords are at most
+  128 characters; the session cookie is always `Secure` when `base_url` is https.
+- `session_idle_hours` and `session_max_days` take fractions.
+- `scripts/screen-reader-check.mjs` reads the main journeys' accessibility trees, and status
+  messages are announced from the first.
+
+### Changed
+
+- **The compliance dashboard and home are faster:** the dashboard counts readiness without
+  building every control's full view, and a request that only reads looks up the program's
+  settings, the units, and the risk categories once. See **Sizing** in the configuration guide.
+
 ## 0.8.0 (2026-11-27)
 
 Wave 8, *Incidents and resilience*: when something goes wrong, it is reported, handled, and

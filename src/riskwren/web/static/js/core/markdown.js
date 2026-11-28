@@ -16,7 +16,10 @@ const DIVIDER = /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$/;
 const INLINE = /`([^`]+)`|\*\*(.+?)\*\*|__(.+?)__|\*(?!\s)(.+?)\*|(?<![\w])_(?!\s)(.+?)_(?![\w])|\[([^\]]+)\]\(([^()\s]+)\)/;
 
 export function safeHref(href) {
-  return /^(https?:|mailto:)/i.test(href) || /^\/(?!\/)/.test(href) ? href : null;
+  if (/^(https?:|mailto:)/i.test(href)) return href;
+  // A path inside this site, and nothing a browser could read as another one: "//host" or
+  // "/\\host", or a control character in the way.
+  return /^\/(?![/\\])/.test(href) && !/[\\\u0000-\u001f\u007f]/.test(href) ? href : null;
 }
 
 /** Inline text into nodes: text, strong, em, code, and link. */

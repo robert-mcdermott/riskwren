@@ -544,10 +544,10 @@ def request(session: Session, principal: Principal, values: Mapping[str, Any]) -
         item.ref = next_ref(session, EXCEPTION.prefix)
         session.add(item)
         session.flush()
-        if principal.account_id is not None:
+        if principal.person is not None:
             session.add(
                 RecordOwner(
-                    record_type=KEY, record_id=item.id, account_id=principal.account_id,
+                    record_type=KEY, record_id=item.id, account_id=principal.person,
                     kind="owner",
                 )
             )  # fmt: skip

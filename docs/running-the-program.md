@@ -133,6 +133,14 @@ Every word in the method can be changed: the name and meaning of each level of l
 
 A higher rating is never reviewed less often, and a more severe issue is never given longer. Changing how often risks are reviewed moves their review dates, so it is previewed. An issue already raised keeps the date it was given.
 
+### Fields of your own
+
+**Admin → Program → Fields** adds to a kind of record what your organization also records about it: a cost center on a system, a contract owner on a third party, whether a risk goes to the board. Systems, processes, third parties, services, information assets, sites, risks, and controls can each carry up to twelve.
+
+- **A field is a line of text, a number, a date, or one of a list,** with a label, a line of help, and whether it is needed. Its key is made from its label and never changes.
+- **It is asked for in the record's form and shown on its page,** under **More about it**, and every change to a value is in the record's history. Through the API, a record takes them as `custom`, by key.
+- **A field taken away keeps its values, unshown,** and bringing it back brings them back.
+
 ### Vocabularies
 
 Choose a list, then rename its values, say what each means, put them in order, add one, or retire one.
@@ -309,7 +317,7 @@ Everything with a date reminds whoever it is waiting on: actions, risk reviews, 
 - Something found already long overdue, as on the first day after an upgrade, is told once to whoever it has reached, and not to everyone below as well.
 - A reminder is a notice. It is read under the bell, and sent by email where [email is set up](configuration.md#email).
 
-The three periods are part of the program's cadences, with the others. **Admin → Scheduled work** shows them as they are set.
+The three periods are part of the program's cadences, with the others. **Admin → Operations** shows them as they are set.
 
 ### Key controls and the next test
 
@@ -451,7 +459,8 @@ A dossier holds only what the person taking it may see. A file they may not open
 - a logo for light and for dark mode, a tab icon, and a picture for the sign-in page;
 - the default palette (Wren, Slate, or Garnet) and an accent color, which is adjusted for dark mode (or given its own shade after dark) and refused if text on it could not be read;
 - how ratings are colored: an **ordinal** ramp from light to dark in one hue, which keeps rating apart from the colors of standing, or a **signal** ramp from green to red;
-- a message on the sign-in page, up to five links of your own at the foot of the sidebar and the sign-in page, and the last line of every email.
+- a message on the sign-in page, up to five links of your own at the foot of the sidebar and the sign-in page, and the last line of every email, whose header carries your product's name, your organization's, and your accent;
+- your own words for kinds of record and for units, such as *department* for unit or *vendor* for third party, used in the menu, in page titles, and for the kinds of record.
 
 An organization that needs its brand exact (every color by day and after dark, its logo files, its typefaces) sets it in the configuration file's [`[branding]`](configuration.md#branding) section instead. What the file sets is shown here, locked; the rest stays editable here.
 

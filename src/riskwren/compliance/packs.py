@@ -32,7 +32,7 @@ from riskwren.events import audit
 BUILTIN = ("nist-csf", "nist-800-53", "nist-800-171", "hipaa-security")
 # Shipped, and loaded when someone asks: an earlier version that some programs still name,
 # and the privacy and breach frameworks a privacy office holds itself to.
-OPTIONAL = ("nist-800-53-r4", "hipaa-breach", "nist-privacy")
+OPTIONAL = ("nist-800-53-r4", "hipaa-breach", "nist-privacy", "iso-27001")
 AVAILABLE = BUILTIN + OPTIONAL
 KEY_CHARACTERS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.")
 # What a pack may declare. ``own`` is for frameworks entered here, never for a pack.
@@ -102,6 +102,19 @@ def problems(pack: Any) -> list[str]:
     key = head.get("key")
     if isinstance(key, str) and not all(c.isalnum() or c in "-_." for c in key):
         found.append("pack.key uses letters, digits, hyphens, underscores, and dots.")
+    # What the header says of where the pack comes from is shown on the framework's page.
+    for name, limit in (("version", 120), ("publisher", 200), ("license", 1000), ("summary", 2000),
+                        ("built_from", 1000), ("pack_version", 40)):  # fmt: skip
+        value = head.get(name)
+        if value is not None and (not isinstance(value, str) or len(value) > limit):
+            found.append(f"pack.{name} is text of up to {limit} characters.")
+    source = head.get("source_url")
+    if source is not None and (
+        not isinstance(source, str) or len(source) > 500
+        or not source.lower().startswith(("https://", "http://"))
+        or any(ch.isspace() for ch in source)
+    ):  # fmt: skip
+        found.append("pack.source_url is an http:// or https:// address.")
     if head.get("framework_kind", "standard") not in FRAMEWORK_KINDS:
         found.append(f"pack.framework_kind is one of: {', '.join(FRAMEWORK_KINDS)}.")
     if head.get("text_policy") not in PACK_POLICIES:
@@ -136,7 +149,12 @@ def problems(pack: Any) -> list[str]:
             found.append(f"{code}: children is a list.")
         if not item.get("group"):
             citable += 1
-            if not (item.get("text") or item.get("title")):
+            # A pack of identifiers may carry the code alone: the words are the licence
+            # holder's to load into their own installation.
+            if (
+                not (item.get("text") or item.get("title"))
+                and head.get("text_policy") != "identifiers"
+            ):
                 found.append(f"{code}: a requirement that can be cited has a title or text.")
     if not citable:
         found.append("A pack has at least one requirement that can be cited.")

@@ -275,7 +275,7 @@ def raise_finding(
                 "org_unit_id": document.org_unit_id,
                 "source_kind": kind,
                 "subjects": list(values.get("subjects") or []),
-                "owner_id": values.get("owner_id") or principal.account_id,
+                "owner_id": values.get("owner_id") or principal.person,
             },
         )
         issue.source_type, issue.source_id = "exercise", exercise.id

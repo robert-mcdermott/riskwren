@@ -1,0 +1,1621 @@
+{
+  "pack": {
+    "key": "research-institute",
+    "kind": "program",
+    "title": "Research institute",
+    "version": "1",
+    "pack_version": "0.1.0",
+    "publisher": "The RiskWren Authors",
+    "license": "Apache-2.0",
+    "text_policy": "verbatim",
+    "description": "Research with a clinic: the default program."
+  },
+  "vocabularies": {
+    "criticalities": [
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "Could be done without for weeks with little effect"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "Its loss would be felt within days and worked around"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "Its loss would stop important work within a day or two"
+      },
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Research, care, or safety depends on it hour by hour"
+      }
+    ],
+    "data_classes": [
+      {
+        "key": "public",
+        "label": "Public",
+        "description": "Poses little or no risk if disclosed, and may be shared with anyone.",
+        "examples": {
+          "Research": [
+            "Published papers and results",
+            "Data already in a public repository"
+          ],
+          "Health": [
+            "Published population statistics"
+          ],
+          "People": [
+            "Public staff directory entries"
+          ],
+          "Business": [
+            "Press releases",
+            "Figures in a published annual report"
+          ]
+        }
+      },
+      {
+        "key": "internal",
+        "label": "Internal",
+        "description": "Meant for the organization's own people and work. Not to be shared outside without a reason.",
+        "examples": {
+          "Research": [
+            "Drafts and plans for future work",
+            "Laboratory procedures"
+          ],
+          "Health": [
+            "Aggregate counts in which nobody can be identified"
+          ],
+          "People": [
+            "Work contact details",
+            "Organization charts"
+          ],
+          "Business": [
+            "Internal policies and procedures",
+            "Most correspondence and minutes"
+          ]
+        }
+      },
+      {
+        "key": "confidential",
+        "label": "Confidential",
+        "description": "Could harm people or the organization if seen by the wrong person, inside or out. Access is limited to those who need it.",
+        "examples": {
+          "Research": [
+            "Unpublished data, results, and manuscripts",
+            "De-identified participant data",
+            "Data held under a data use agreement"
+          ],
+          "Health": [
+            "Staff immunization and fitness-for-work records"
+          ],
+          "People": [
+            "Personnel records",
+            "Student and trainee records"
+          ],
+          "Business": [
+            "Budgets and financial records",
+            "Contracts",
+            "Security plans"
+          ]
+        }
+      },
+      {
+        "key": "restricted",
+        "label": "Restricted",
+        "description": "Governed by specific legal, regulatory, or contractual obligations. Loss or disclosure may require notifying people, partners, or authorities.",
+        "examples": {
+          "Research": [
+            "Identifiable participant data",
+            "Controlled-access genomic data",
+            "Export-controlled information"
+          ],
+          "Health": [
+            "Identifiable health information",
+            "Health insurance numbers"
+          ],
+          "People": [
+            "A name with a government identifier or full date of birth",
+            "Payroll and bank details"
+          ],
+          "Business": [
+            "Payment card numbers",
+            "Passwords, keys, and access codes"
+          ]
+        }
+      }
+    ],
+    "unit_kinds": [
+      {
+        "key": "organization",
+        "label": "Organization"
+      },
+      {
+        "key": "division",
+        "label": "Division"
+      },
+      {
+        "key": "department",
+        "label": "Department"
+      },
+      {
+        "key": "center",
+        "label": "Center"
+      },
+      {
+        "key": "core",
+        "label": "Core facility"
+      },
+      {
+        "key": "lab",
+        "label": "Lab"
+      },
+      {
+        "key": "clinic",
+        "label": "Clinic"
+      },
+      {
+        "key": "office",
+        "label": "Office"
+      }
+    ],
+    "owner_kinds": [
+      {
+        "key": "owner",
+        "label": "Owner",
+        "description": "Accountable for the record and for keeping it current"
+      },
+      {
+        "key": "delegate",
+        "label": "Delegate",
+        "description": "Acts for the owner day to day"
+      },
+      {
+        "key": "contact",
+        "label": "Contact",
+        "description": "Knows the detail and can be asked"
+      }
+    ],
+    "process_kinds": [
+      {
+        "key": "research",
+        "label": "Research",
+        "description": "Carrying out research"
+      },
+      {
+        "key": "research_support",
+        "label": "Research support",
+        "description": "Cores, shared services, and facilities"
+      },
+      {
+        "key": "clinical",
+        "label": "Clinical",
+        "description": "Care of patients and participants"
+      },
+      {
+        "key": "education",
+        "label": "Education and training"
+      },
+      {
+        "key": "administrative",
+        "label": "Administrative",
+        "description": "Finance, people, legal, and the like"
+      },
+      {
+        "key": "technology",
+        "label": "Technology",
+        "description": "Running information systems and services"
+      },
+      {
+        "key": "facilities",
+        "label": "Facilities and safety"
+      }
+    ],
+    "system_kinds": [
+      {
+        "key": "application",
+        "label": "Application",
+        "description": "Software people use to do their work"
+      },
+      {
+        "key": "platform",
+        "label": "Platform",
+        "description": "Something other systems are built or run on"
+      },
+      {
+        "key": "infrastructure",
+        "label": "Infrastructure",
+        "description": "Networks, storage, compute, and identity"
+      },
+      {
+        "key": "instrument",
+        "label": "Instrument",
+        "description": "Laboratory or imaging equipment and its computer"
+      },
+      {
+        "key": "device",
+        "label": "Device",
+        "description": "A medical, building, or other connected device"
+      },
+      {
+        "key": "data_store",
+        "label": "Data store",
+        "description": "A database, repository, or archive"
+      }
+    ],
+    "hosting": [
+      {
+        "key": "on_premises",
+        "label": "On premises",
+        "description": "Run in the organization's own facilities"
+      },
+      {
+        "key": "cloud",
+        "label": "Cloud, run by us",
+        "description": "In a cloud account the organization administers"
+      },
+      {
+        "key": "hosted",
+        "label": "Hosted by a supplier",
+        "description": "Run entirely by a third party"
+      },
+      {
+        "key": "hybrid",
+        "label": "Hybrid"
+      },
+      {
+        "key": "standalone",
+        "label": "Standalone",
+        "description": "A single machine, often not on the network"
+      }
+    ],
+    "lifecycles": [
+      {
+        "key": "planned",
+        "label": "Planned"
+      },
+      {
+        "key": "in_service",
+        "label": "In service"
+      },
+      {
+        "key": "sunsetting",
+        "label": "Being retired",
+        "description": "Still in use, with an end date"
+      },
+      {
+        "key": "unsupported",
+        "label": "Unsupported",
+        "description": "In use, and no longer maintained by its maker"
+      }
+    ],
+    "control_kinds": [
+      {
+        "key": "preventive",
+        "label": "Preventive",
+        "description": "Stops the event from happening"
+      },
+      {
+        "key": "detective",
+        "label": "Detective",
+        "description": "Notices that it is happening, or has"
+      },
+      {
+        "key": "corrective",
+        "label": "Corrective",
+        "description": "Limits the damage and puts things right"
+      },
+      {
+        "key": "directive",
+        "label": "Directive",
+        "description": "Tells people what to do: a policy, a standard, training"
+      }
+    ],
+    "control_natures": [
+      {
+        "key": "manual",
+        "label": "Manual",
+        "description": "Done by a person"
+      },
+      {
+        "key": "automated",
+        "label": "Automated",
+        "description": "Done by a system without anyone acting"
+      },
+      {
+        "key": "both",
+        "label": "Both",
+        "description": "A system and a person together"
+      }
+    ],
+    "control_frequencies": [
+      {
+        "key": "continuous",
+        "label": "Continuous"
+      },
+      {
+        "key": "daily",
+        "label": "Daily"
+      },
+      {
+        "key": "weekly",
+        "label": "Weekly"
+      },
+      {
+        "key": "monthly",
+        "label": "Monthly"
+      },
+      {
+        "key": "quarterly",
+        "label": "Quarterly"
+      },
+      {
+        "key": "twice_a_year",
+        "label": "Twice a year"
+      },
+      {
+        "key": "annually",
+        "label": "Annually"
+      },
+      {
+        "key": "as_needed",
+        "label": "When the occasion arises"
+      }
+    ],
+    "third_party_kinds": [
+      {
+        "key": "supplier",
+        "label": "Supplier",
+        "description": "Sells goods the organization depends on"
+      },
+      {
+        "key": "service_provider",
+        "label": "Service provider",
+        "description": "Runs a service or a system for it"
+      },
+      {
+        "key": "contractor",
+        "label": "Contractor",
+        "description": "Does work on its behalf"
+      },
+      {
+        "key": "collaborator",
+        "label": "Collaborator",
+        "description": "A research or clinical partner"
+      },
+      {
+        "key": "sponsor",
+        "label": "Sponsor or funder"
+      },
+      {
+        "key": "subrecipient",
+        "label": "Subrecipient",
+        "description": "Receives funds the organization passes through"
+      }
+    ],
+    "service_kinds": [
+      {
+        "key": "software_service",
+        "label": "Software as a service",
+        "description": "An application it runs and the organization uses"
+      },
+      {
+        "key": "hosting",
+        "label": "Hosting or infrastructure",
+        "description": "Computing, storage, or networks it runs for the organization"
+      },
+      {
+        "key": "data_service",
+        "label": "Data processing or analysis",
+        "description": "Work it does on the organization's data"
+      },
+      {
+        "key": "laboratory",
+        "label": "Laboratory or testing",
+        "description": "Tests, sequencing, or analysis of specimens"
+      },
+      {
+        "key": "clinical",
+        "label": "Clinical service",
+        "description": "Care, or a service to patients, given on the organization's behalf"
+      },
+      {
+        "key": "maintenance",
+        "label": "Maintenance and support",
+        "description": "Keeping equipment or systems working"
+      },
+      {
+        "key": "professional",
+        "label": "Professional services",
+        "description": "Advice, audit, legal, or consulting work"
+      },
+      {
+        "key": "staffing",
+        "label": "Staffing",
+        "description": "People who work alongside the organization's own"
+      },
+      {
+        "key": "supply",
+        "label": "Goods and supplies",
+        "description": "Things delivered, with no access to systems or information"
+      },
+      {
+        "key": "logistics",
+        "label": "Logistics",
+        "description": "Moving or storing specimens, equipment, or records"
+      },
+      {
+        "key": "collaboration",
+        "label": "Research collaboration",
+        "description": "Shared work under a protocol or an award"
+      },
+      {
+        "key": "funding",
+        "label": "Funding",
+        "description": "Money the organization receives, with its terms"
+      }
+    ],
+    "information_kinds": [
+      {
+        "key": "research_data",
+        "label": "Research data",
+        "description": "Data produced or collected by research"
+      },
+      {
+        "key": "participant_data",
+        "label": "Participant data",
+        "description": "About people who take part in research"
+      },
+      {
+        "key": "patient_records",
+        "label": "Patient records",
+        "description": "Records of care"
+      },
+      {
+        "key": "specimen_records",
+        "label": "Specimen records",
+        "description": "What is known about stored specimens"
+      },
+      {
+        "key": "controlled_data",
+        "label": "Controlled-access data",
+        "description": "Held under another party's terms"
+      },
+      {
+        "key": "personnel_records",
+        "label": "Personnel records",
+        "description": "About staff, students, and applicants"
+      },
+      {
+        "key": "financial_records",
+        "label": "Financial records",
+        "description": "Accounts, awards, payments, and donors"
+      },
+      {
+        "key": "intellectual_property",
+        "label": "Intellectual property",
+        "description": "Unpublished results and inventions"
+      },
+      {
+        "key": "operational",
+        "label": "Operational",
+        "description": "What the organization needs to run"
+      }
+    ],
+    "link_kinds": [
+      {
+        "key": "relies_on",
+        "label": "Relies on",
+        "reverse": "Supports",
+        "between": [
+          [
+            "process",
+            "system"
+          ],
+          [
+            "process",
+            "service"
+          ],
+          [
+            "process",
+            "site"
+          ],
+          [
+            "system",
+            "site"
+          ]
+        ]
+      },
+      {
+        "key": "performed_by",
+        "label": "Performed by",
+        "reverse": "Performs",
+        "between": [
+          [
+            "process",
+            "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "supplied_by",
+        "label": "Supplied by",
+        "reverse": "Supplies",
+        "between": [
+          [
+            "system",
+            "third_party"
+          ],
+          [
+            "system",
+            "service"
+          ]
+        ]
+      },
+      {
+        "key": "holds",
+        "label": "Holds",
+        "reverse": "Is held in",
+        "between": [
+          [
+            "system",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "uses",
+        "label": "Uses",
+        "reverse": "Is used by",
+        "between": [
+          [
+            "process",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "shared_with",
+        "label": "Is shared with",
+        "reverse": "Receives",
+        "between": [
+          [
+            "information",
+            "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "reaches",
+        "label": "Reaches",
+        "reverse": "Is reached by",
+        "between": [
+          [
+            "service",
+            "system"
+          ]
+        ]
+      },
+      {
+        "key": "handles",
+        "label": "Handles",
+        "reverse": "Is handled by",
+        "between": [
+          [
+            "service",
+            "information"
+          ]
+        ]
+      },
+      {
+        "key": "subcontracts",
+        "label": "Subcontracts to",
+        "reverse": "Is a subcontractor of",
+        "between": [
+          [
+            "third_party",
+            "third_party"
+          ]
+        ]
+      },
+      {
+        "key": "depends_on",
+        "label": "Depends on",
+        "reverse": "Is depended on by",
+        "between": [
+          [
+            "process",
+            "process"
+          ],
+          [
+            "system",
+            "system"
+          ]
+        ]
+      },
+      {
+        "key": "part_of",
+        "label": "Is part of",
+        "reverse": "Includes",
+        "between": [
+          [
+            "process",
+            "process"
+          ],
+          [
+            "system",
+            "system"
+          ]
+        ]
+      }
+    ],
+    "issue_severities": [
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Leaves people, patients, or regulated data exposed now, or breaks a legal obligation"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "A control the organization relies on does not work, with nothing making up for it"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "A control works in part, or something else partly makes up for it"
+      },
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "A weakness in how something is done or recorded that does not yet leave anything exposed"
+      }
+    ],
+    "issue_sources": [
+      {
+        "key": "test",
+        "label": "Test",
+        "description": "A test in an assessment found a control wanting"
+      },
+      {
+        "key": "gap",
+        "label": "Gap",
+        "description": "A requirement that nothing answers, or a control with no evidence"
+      },
+      {
+        "key": "security_test",
+        "label": "Security testing",
+        "description": "A penetration test, a scan, or an exercise found it"
+      },
+      {
+        "key": "audit",
+        "label": "Audit",
+        "description": "A finding from an internal or external audit"
+      },
+      {
+        "key": "incident",
+        "label": "Incident",
+        "description": "Something that went wrong showed it"
+      },
+      {
+        "key": "exercise",
+        "label": "Exercise",
+        "description": "An exercise of a continuity plan showed it"
+      },
+      {
+        "key": "review",
+        "label": "Review",
+        "description": "A review of a supplier, a system, or a process"
+      },
+      {
+        "key": "observation",
+        "label": "Observation",
+        "description": "Somebody noticed it and said so"
+      }
+    ],
+    "site_kinds": [
+      {
+        "key": "data_center",
+        "label": "Data center",
+        "description": "Where systems run: a room, a building, or a colocation cage"
+      },
+      {
+        "key": "building",
+        "label": "Building",
+        "description": "A building, or a floor of one, where people work"
+      },
+      {
+        "key": "laboratory",
+        "label": "Laboratory",
+        "description": "Where research is done, with its instruments"
+      },
+      {
+        "key": "clinic",
+        "label": "Clinic",
+        "description": "Where patients are seen and treated"
+      },
+      {
+        "key": "storage",
+        "label": "Storage",
+        "description": "Where specimens, records, or supplies are kept"
+      },
+      {
+        "key": "other",
+        "label": "Other"
+      }
+    ],
+    "protected_information": [
+      {
+        "key": "health",
+        "label": "Health information",
+        "description": "Identifiable health information a covered entity or its business associate holds"
+      },
+      {
+        "key": "personal",
+        "label": "Personal information under a state's law",
+        "description": "A name with a Social Security, license, or account number, or another identifier a state's breach law names"
+      },
+      {
+        "key": "financial",
+        "label": "Customer financial information",
+        "description": "Information about customers of a financial product or service"
+      },
+      {
+        "key": "participant",
+        "label": "Research participants' information",
+        "description": "Identifiable information about people in a study"
+      },
+      {
+        "key": "controlled",
+        "label": "Controlled or covered defense information",
+        "description": "Controlled unclassified information, or covered defense information under a contract"
+      },
+      {
+        "key": "credentials",
+        "label": "Sign-in credentials",
+        "description": "Usernames with passwords, or keys that unlock accounts"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these"
+      }
+    ],
+    "incident_categories": [
+      {
+        "key": "security",
+        "label": "Security",
+        "description": "Systems, accounts, or information reached, changed, or put at risk by someone who should not have"
+      },
+      {
+        "key": "privacy",
+        "label": "Privacy",
+        "description": "Personal or health information used, shared, or lost in a way it should not be"
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "description": "Harm, or the chance of harm, to people"
+      },
+      {
+        "key": "conduct",
+        "label": "Conduct",
+        "description": "How someone behaved: misconduct, harassment, or a conflict of interest"
+      },
+      {
+        "key": "compliance",
+        "label": "Compliance",
+        "description": "A law, a regulation, a contract, or the organization's own policy not followed"
+      },
+      {
+        "key": "operations",
+        "label": "Operations",
+        "description": "Something the organization depends on failed or stopped"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these, or not yet known"
+      }
+    ],
+    "root_causes": [
+      {
+        "key": "procedure",
+        "label": "Procedure",
+        "description": "There was no procedure, or it was unclear or out of date"
+      },
+      {
+        "key": "people",
+        "label": "People and time",
+        "description": "Not enough people, time, or training to do it"
+      },
+      {
+        "key": "ownership",
+        "label": "Ownership",
+        "description": "Nobody was clearly responsible, or it changed hands and was dropped"
+      },
+      {
+        "key": "technology",
+        "label": "Technology",
+        "description": "A system could not do what was needed, or failed"
+      },
+      {
+        "key": "design",
+        "label": "Design",
+        "description": "The control was done as described and still did not meet the need"
+      },
+      {
+        "key": "change",
+        "label": "Change",
+        "description": "A change elsewhere was not followed through here"
+      },
+      {
+        "key": "third_party",
+        "label": "Third party",
+        "description": "A supplier or partner did not do its part"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "None of these, or not known"
+      }
+    ],
+    "external_systems": [
+      {
+        "key": "asset_tag",
+        "label": "Asset tag",
+        "description": "The number on the label, or in the asset register"
+      },
+      {
+        "key": "contract",
+        "label": "Contract number",
+        "description": "As the contracts or purchasing system knows it"
+      },
+      {
+        "key": "ticket",
+        "label": "Ticket",
+        "description": "A request or change in the service desk"
+      },
+      {
+        "key": "configuration_item",
+        "label": "Configuration item",
+        "description": "Its entry in a configuration database"
+      },
+      {
+        "key": "award",
+        "label": "Award number",
+        "description": "A grant or sponsored agreement"
+      },
+      {
+        "key": "other",
+        "label": "Other",
+        "description": "An identifier in any other system"
+      }
+    ]
+  },
+  "categories": [
+    {
+      "key": "strategic",
+      "name": "Strategic",
+      "appetite": "high",
+      "description": "The organization's direction, standing, and sources of support.",
+      "children": [
+        {
+          "key": "funding_environment",
+          "name": "Funding environment"
+        },
+        {
+          "key": "scientific_direction",
+          "name": "Scientific direction"
+        },
+        {
+          "key": "partnerships",
+          "name": "Partnerships and affiliations"
+        },
+        {
+          "key": "reputation",
+          "name": "Reputation and standing"
+        }
+      ]
+    },
+    {
+      "key": "research",
+      "name": "Research and scientific integrity",
+      "appetite": "moderate",
+      "description": "The conduct of research and the soundness of what it produces.",
+      "children": [
+        {
+          "key": "integrity",
+          "name": "Research integrity"
+        },
+        {
+          "key": "human_subjects",
+          "name": "Human participants"
+        },
+        {
+          "key": "animals",
+          "name": "Animal research"
+        },
+        {
+          "key": "data_quality",
+          "name": "Data and specimen integrity"
+        },
+        {
+          "key": "research_security",
+          "name": "Research security"
+        }
+      ]
+    },
+    {
+      "key": "clinical",
+      "name": "Clinical and participant safety",
+      "appetite": "low",
+      "description": "The safety of patients and of participants in clinical research.",
+      "children": [
+        {
+          "key": "patient_safety",
+          "name": "Patient safety"
+        },
+        {
+          "key": "medication",
+          "name": "Medication"
+        },
+        {
+          "key": "infection",
+          "name": "Infection prevention"
+        },
+        {
+          "key": "clinical_trial_conduct",
+          "name": "Conduct of clinical trials"
+        }
+      ]
+    },
+    {
+      "key": "regulatory",
+      "name": "Regulatory and legal",
+      "appetite": "low",
+      "description": "What the law, regulators, sponsors, and agreements require.",
+      "children": [
+        {
+          "key": "privacy",
+          "name": "Privacy"
+        },
+        {
+          "key": "grants",
+          "name": "Award and agreement terms"
+        },
+        {
+          "key": "licensing",
+          "name": "Licensing and accreditation"
+        },
+        {
+          "key": "employment",
+          "name": "Employment and conduct"
+        }
+      ]
+    },
+    {
+      "key": "technology",
+      "name": "Information and technology",
+      "appetite": "moderate",
+      "description": "The confidentiality, integrity, and availability of information and systems.",
+      "children": [
+        {
+          "key": "confidentiality",
+          "name": "Confidentiality of information"
+        },
+        {
+          "key": "availability",
+          "name": "Availability of systems"
+        },
+        {
+          "key": "integrity_change",
+          "name": "Integrity and change"
+        },
+        {
+          "key": "ai",
+          "name": "Use of AI and automation"
+        }
+      ]
+    },
+    {
+      "key": "operations",
+      "name": "Operations and facilities",
+      "appetite": "moderate",
+      "description": "The buildings, equipment, and services that work depends on.",
+      "children": [
+        {
+          "key": "facilities",
+          "name": "Facilities and utilities"
+        },
+        {
+          "key": "equipment",
+          "name": "Equipment and instruments"
+        },
+        {
+          "key": "biosafety",
+          "name": "Biological, chemical, and radiation safety"
+        },
+        {
+          "key": "continuity",
+          "name": "Continuity of operations"
+        }
+      ]
+    },
+    {
+      "key": "people",
+      "name": "People and culture",
+      "appetite": "moderate",
+      "description": "The people who do the work, and how they are treated.",
+      "children": [
+        {
+          "key": "workforce",
+          "name": "Workforce and succession"
+        },
+        {
+          "key": "wellbeing",
+          "name": "Safety and wellbeing of staff"
+        },
+        {
+          "key": "conduct",
+          "name": "Conduct and training"
+        }
+      ]
+    },
+    {
+      "key": "financial",
+      "name": "Financial and stewardship",
+      "appetite": "low",
+      "description": "The organization's money, and the money entrusted to it.",
+      "children": [
+        {
+          "key": "stewardship",
+          "name": "Stewardship of sponsored funds"
+        },
+        {
+          "key": "fraud",
+          "name": "Fraud and misuse"
+        },
+        {
+          "key": "liquidity",
+          "name": "Liquidity and reserves"
+        },
+        {
+          "key": "philanthropy",
+          "name": "Philanthropy"
+        }
+      ]
+    },
+    {
+      "key": "third_party",
+      "name": "Third party",
+      "appetite": "moderate",
+      "description": "What the organization depends on others for.",
+      "children": [
+        {
+          "key": "supplier_dependence",
+          "name": "Dependence on a supplier"
+        },
+        {
+          "key": "supplier_security",
+          "name": "A supplier's handling of information"
+        },
+        {
+          "key": "subrecipients",
+          "name": "Subrecipients and collaborators"
+        }
+      ]
+    }
+  ],
+  "scoring_method": {
+    "title": "Five by five, by the highest impact",
+    "likelihood": [
+      {
+        "level": 1,
+        "key": "rare",
+        "label": "Rare",
+        "definition": "Not expected within ten years"
+      },
+      {
+        "level": 2,
+        "key": "unlikely",
+        "label": "Unlikely",
+        "definition": "Could happen once in five to ten years"
+      },
+      {
+        "level": 3,
+        "key": "possible",
+        "label": "Possible",
+        "definition": "Could happen once in two to five years"
+      },
+      {
+        "level": 4,
+        "key": "likely",
+        "label": "Likely",
+        "definition": "Expected about once a year"
+      },
+      {
+        "level": 5,
+        "key": "almost_certain",
+        "label": "Almost certain",
+        "definition": "Expected several times a year"
+      }
+    ],
+    "impact_levels": [
+      {
+        "level": 1,
+        "key": "negligible",
+        "label": "Negligible"
+      },
+      {
+        "level": 2,
+        "key": "minor",
+        "label": "Minor"
+      },
+      {
+        "level": 3,
+        "key": "moderate",
+        "label": "Moderate"
+      },
+      {
+        "level": 4,
+        "key": "major",
+        "label": "Major"
+      },
+      {
+        "level": 5,
+        "key": "severe",
+        "label": "Severe"
+      }
+    ],
+    "dimensions": [
+      {
+        "key": "mission",
+        "label": "Mission",
+        "question": "How far would research, care, or teaching be set back, and could the loss be recovered?",
+        "levels": {
+          "1": "No noticeable effect on research, care, or teaching.",
+          "2": "A delay of days to one group's work, fully recovered.",
+          "3": "Weeks of delay to several groups, or a study's timeline at risk; recoverable with effort.",
+          "4": "Months of work lost, a major program or service halted, or a study compromised.",
+          "5": "Irreplaceable material, data, or years of work lost, or the organization unable to carry out its mission."
+        }
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "question": "Could patients, participants, staff, or the public be harmed?",
+        "levels": {
+          "1": "No harm to anyone.",
+          "2": "Minor injury or distress needing no more than first aid or reassurance.",
+          "3": "Harm needing medical treatment, or a patient or participant exposed to avoidable risk.",
+          "4": "Serious harm to one person, or lesser harm to many.",
+          "5": "Death, permanent harm, or serious harm to many."
+        }
+      },
+      {
+        "key": "financial",
+        "label": "Financial",
+        "question": "What would it cost, as a share of the annual operating budget?",
+        "levels": {
+          "1": "Under one hundredth of one percent of the annual operating budget.",
+          "2": "Up to one tenth of one percent.",
+          "3": "Up to one percent.",
+          "4": "Up to five percent.",
+          "5": "More than five percent, or the organization's solvency in question."
+        }
+      },
+      {
+        "key": "legal",
+        "label": "Legal and regulatory",
+        "question": "Would an obligation be breached, and what would follow?",
+        "levels": {
+          "1": "No obligation breached.",
+          "2": "A minor lapse, corrected internally, with nothing to report.",
+          "3": "A reportable breach, or a finding that needs a corrective action plan.",
+          "4": "Sanctions, repayment of funds, or an award or approval suspended.",
+          "5": "Loss of eligibility for funding, loss of a license or accreditation, or prosecution."
+        }
+      },
+      {
+        "key": "trust",
+        "label": "Trust",
+        "question": "How would it affect the confidence of participants, patients, funders, partners, and the public?",
+        "levels": {
+          "1": "Not noticed outside the team.",
+          "2": "Noticed inside the organization, with no lasting effect.",
+          "3": "Complaints or local coverage; some participants, donors, or partners ask questions.",
+          "4": "Sustained coverage; participants withdraw, or a partner or funder steps back.",
+          "5": "Lasting loss of public confidence; recruitment, giving, or partnerships damaged for years."
+        }
+      }
+    ],
+    "ratings": [
+      {
+        "key": "low",
+        "label": "Low",
+        "description": "Managed as part of ordinary work"
+      },
+      {
+        "key": "moderate",
+        "label": "Moderate",
+        "description": "Watched, with an owner and a review each year"
+      },
+      {
+        "key": "high",
+        "label": "High",
+        "description": "Needs a plan or a formal acceptance, and leadership's attention"
+      },
+      {
+        "key": "critical",
+        "label": "Critical",
+        "description": "Needs action now, and the attention of the most senior leaders"
+      }
+    ],
+    "matrix": [
+      [
+        "low",
+        "low",
+        "low",
+        "low",
+        "moderate"
+      ],
+      [
+        "low",
+        "low",
+        "moderate",
+        "moderate",
+        "moderate"
+      ],
+      [
+        "low",
+        "moderate",
+        "moderate",
+        "high",
+        "high"
+      ],
+      [
+        "moderate",
+        "moderate",
+        "high",
+        "high",
+        "critical"
+      ],
+      [
+        "high",
+        "high",
+        "high",
+        "critical",
+        "critical"
+      ]
+    ],
+    "control_effect": {
+      "reliance": {
+        "primary": 1.0,
+        "supporting": 0.5
+      },
+      "strength": {
+        "effective": 1.0,
+        "partly": 0.5,
+        "ineffective": 0.0,
+        "not_assessed": 0.0
+      },
+      "limit": 2
+    }
+  },
+  "cadences": {
+    "risk_review_months": {
+      "critical": 3,
+      "high": 6,
+      "moderate": 12,
+      "low": 24
+    },
+    "unrated_risk_review_months": 3,
+    "control_rating_months": 12,
+    "issue_due_days": {
+      "critical": 30,
+      "high": 90,
+      "moderate": 180,
+      "low": 365
+    },
+    "exception_max_months": 12,
+    "key_control_test_months": 6,
+    "document_review_months": 12,
+    "plan_exercise_months": 12,
+    "reminders": {
+      "soon_days": 14,
+      "steward_after_days": 7,
+      "leader_after_days": 21
+    }
+  },
+  "authority": {
+    "acceptance": {
+      "moderate": {
+        "max_months": 24,
+        "needs_limit": false
+      },
+      "high": {
+        "max_months": 12,
+        "needs_limit": true
+      },
+      "critical": {
+        "max_months": 6,
+        "needs_limit": true
+      }
+    }
+  },
+  "tiering": {
+    "questionnaire": "third-party-tiering",
+    "tiers": [
+      {
+        "key": "tier_1",
+        "label": "Tier 1",
+        "description": "Holds or can see restricted or regulated information, has privileged access to systems, or is relied on for critical work and reaches information or systems.",
+        "review_months": 12,
+        "rules": [
+          {
+            "reason": "It holds, receives, or can see restricted information.",
+            "when": {
+              "field": "answers.information",
+              "op": "eq",
+              "value": "restricted"
+            }
+          },
+          {
+            "reason": "Some of the information is regulated, such as identifiable health information or controlled-access data.",
+            "when": {
+              "field": "answers.regulated",
+              "op": "contains_any",
+              "value": [
+                "health",
+                "participant",
+                "controlled",
+                "cards",
+                "identifiers",
+                "students",
+                "export"
+              ]
+            }
+          },
+          {
+            "reason": "It has administrator or privileged access to the organization's systems.",
+            "when": {
+              "field": "answers.access",
+              "op": "contains",
+              "value": "privileged"
+            }
+          },
+          {
+            "reason": "Critical work stops without it, and it reaches the organization's information or systems.",
+            "when": {
+              "all": [
+                {
+                  "field": "answers.dependency",
+                  "op": "eq",
+                  "value": "stops"
+                },
+                {
+                  "any": [
+                    {
+                      "field": "answers.information",
+                      "op": "in",
+                      "value": [
+                        "confidential",
+                        "restricted"
+                      ]
+                    },
+                    {
+                      "field": "answers.access",
+                      "op": "contains_any",
+                      "value": [
+                        "remote",
+                        "accounts",
+                        "integration"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "key": "tier_2",
+        "label": "Tier 2",
+        "description": "Holds confidential information, reaches systems, holds records about many people, or is relied on for critical work.",
+        "review_months": 24,
+        "rules": [
+          {
+            "reason": "It holds, receives, or can see confidential information.",
+            "when": {
+              "field": "answers.information",
+              "op": "eq",
+              "value": "confidential"
+            }
+          },
+          {
+            "reason": "It reaches the organization's network, accounts, or systems.",
+            "when": {
+              "field": "answers.access",
+              "op": "contains_any",
+              "value": [
+                "remote",
+                "accounts",
+                "integration"
+              ]
+            }
+          },
+          {
+            "reason": "It holds records about 500 or more people.",
+            "when": {
+              "field": "answers.people",
+              "op": "eq",
+              "value": "many"
+            }
+          },
+          {
+            "reason": "Critical work stops without it.",
+            "when": {
+              "field": "answers.dependency",
+              "op": "eq",
+              "value": "stops"
+            }
+          }
+        ]
+      },
+      {
+        "key": "tier_3",
+        "label": "Tier 3",
+        "description": "Holds internal information, works on the premises, passes work to others, or would be missed.",
+        "review_months": 36,
+        "rules": [
+          {
+            "reason": "It holds, receives, or can see internal information.",
+            "when": {
+              "field": "answers.information",
+              "op": "eq",
+              "value": "internal"
+            }
+          },
+          {
+            "reason": "It works on the premises, or has unescorted access to them.",
+            "when": {
+              "field": "answers.access",
+              "op": "contains_any",
+              "value": [
+                "on_site",
+                "physical"
+              ]
+            }
+          },
+          {
+            "reason": "Work would slow without it.",
+            "when": {
+              "field": "answers.dependency",
+              "op": "eq",
+              "value": "slows"
+            }
+          },
+          {
+            "reason": "It passes the organization's information or access on to others.",
+            "when": {
+              "field": "answers.subcontractors",
+              "op": "eq",
+              "value": true
+            }
+          },
+          {
+            "reason": "The information is held or reached from outside the United States.",
+            "when": {
+              "field": "answers.offshore",
+              "op": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      {
+        "key": "tier_4",
+        "label": "Tier 4",
+        "description": "Little is at stake: no information beyond what is public, no access, and easily replaced.",
+        "review_months": null,
+        "rules": []
+      }
+    ]
+  },
+  "sharing": {
+    "rules": [
+      {
+        "key": "health_information",
+        "reason": "Identifiable health information that a third party creates, receives, keeps, or sends on the organization's behalf needs a business associate agreement under HIPAA.",
+        "when": {
+          "all": [
+            {
+              "field": "information.kind",
+              "op": "eq",
+              "value": "patient_records"
+            },
+            {
+              "field": "third_party.kind",
+              "op": "in",
+              "value": [
+                "service_provider",
+                "contractor",
+                "supplier"
+              ]
+            }
+          ]
+        },
+        "kinds": [
+          "business_associate"
+        ]
+      },
+      {
+        "key": "participant_data",
+        "reason": "Information about research participants shared with a collaborator, sponsor, or subrecipient is shared under a data use agreement, or the terms of the award or contract it is shared for.",
+        "when": {
+          "all": [
+            {
+              "field": "information.kind",
+              "op": "in",
+              "value": [
+                "participant_data",
+                "patient_records"
+              ]
+            },
+            {
+              "field": "third_party.kind",
+              "op": "in",
+              "value": [
+                "collaborator",
+                "sponsor",
+                "subrecipient"
+              ]
+            }
+          ]
+        },
+        "kinds": [
+          "data_use",
+          "award",
+          "contract"
+        ]
+      },
+      {
+        "key": "controlled_data",
+        "reason": "Data held under another party's terms is shared only as a data use agreement allows.",
+        "when": {
+          "field": "information.kind",
+          "op": "eq",
+          "value": "controlled_data"
+        },
+        "kinds": [
+          "data_use"
+        ]
+      },
+      {
+        "key": "restricted",
+        "reason": "Restricted information is shared only under an agreement that binds the third party to protect it.",
+        "when": {
+          "field": "information.data_class",
+          "op": "eq",
+          "value": "restricted"
+        },
+        "kinds": [
+          "contract",
+          "confidentiality",
+          "business_associate",
+          "data_use",
+          "award"
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "impact_assessment_classes": [
+      "restricted"
+    ],
+    "impact_assessment_months": 36
+  }
+}

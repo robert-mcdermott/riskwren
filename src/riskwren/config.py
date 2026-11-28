@@ -36,8 +36,9 @@ class ServerConfig:
     port: int = 8000
     workers: int = 1
     base_url: str = ""
-    session_idle_hours: int = 12
-    session_max_days: int = 7
+    # Fractions are allowed: 0.5 hours idle and 0.5 days in all meet ASVS level 2.
+    session_idle_hours: float = 12
+    session_max_days: float = 7
     scheduler: bool = True  # run scheduled work inside this server
 
 
@@ -242,6 +243,15 @@ def _convert(value: Any, kind: Any, *, from_env: bool) -> Any:
             except ValueError:
                 pass
         raise ValueError("must be a whole number")
+    if kind is float:
+        if isinstance(value, int | float) and not isinstance(value, bool):
+            return float(value)
+        if from_env:
+            try:
+                return float(str(value).strip())
+            except ValueError:
+                pass
+        raise ValueError("must be a number")
     if kind is Path:
         if isinstance(value, str) and value.strip():
             return Path(value).expanduser()
@@ -276,10 +286,10 @@ def _validate(config: Config, raw: Mapping[str, Any]) -> list[str]:
         problems.append("[server] port must be between 1 and 65535")
     if not 1 <= server.workers <= 64:
         problems.append("[server] workers must be between 1 and 64")
-    if server.session_idle_hours < 1:
-        problems.append("[server] session_idle_hours must be at least 1")
-    if server.session_max_days < 1:
-        problems.append("[server] session_max_days must be at least 1")
+    if server.session_idle_hours < 0.25:
+        problems.append("[server] session_idle_hours must be at least 0.25 (fifteen minutes)")
+    if server.session_max_days < 0.25:
+        problems.append("[server] session_max_days must be at least 0.25 (six hours)")
     if server.base_url and not re.fullmatch(r"https?://[^/\s]+", server.base_url):
         problems.append(
             '[server] base_url must look like "https://riskwren.example.org", with no path'

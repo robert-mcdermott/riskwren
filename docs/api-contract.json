@@ -1,0 +1,4292 @@
+{
+ "DELETE /api/v1/admin/branding/images/{kind}": {
+  "parameters": {
+   "path:kind": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/admin/webhooks/{hook_id}": {
+  "parameters": {
+   "path:hook_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/controls/{ref}/requirements/{mapping_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:mapping_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/documents/{ref}/controls/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/documents/{ref}/draft": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/documents/{ref}/requirements/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/frameworks/{key}/requirement": {
+  "parameters": {
+   "path:key": true,
+   "query:code": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/information/{ref}/links/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/processes/{ref}/links/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/risks/{ref}/controls/{control_ref}": {
+  "parameters": {
+   "path:ref": true,
+   "path:control_ref": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/scopes/{ref}/controls/{implementation_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:implementation_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/scopes/{ref}/frameworks/{key}": {
+  "parameters": {
+   "path:ref": true,
+   "path:key": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/services/{ref}/links/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/session": {
+  "parameters": {},
+  "body": {}
+ },
+ "DELETE /api/v1/sessions/{ref}/items/{item_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:item_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/sites/{ref}/links/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/systems/{ref}/links/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/tests/{test_id}": {
+  "parameters": {
+   "path:test_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/third-parties/{ref}/links/{link_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:link_id": true
+  },
+  "body": {}
+ },
+ "DELETE /api/v1/views/{view_id}": {
+  "parameters": {
+   "path:view_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/acceptances": {
+  "parameters": {
+   "query:state": false,
+   "query:expiring_within": false,
+   "query:unit": false,
+   "query:mine": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/accounts": {
+  "parameters": {
+   "query:q": false,
+   "query:status": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/accounts/{account_id}": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/accounts/{account_id}/holdings": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/actions": {
+  "parameters": {
+   "query:q": false,
+   "query:status": false,
+   "query:overdue": false,
+   "query:unit": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/admin/anonymous-reporting": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/branding": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/leadership-readers": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/operations": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/tokens": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/visibility": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/vocabularies": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/admin/webhooks": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/agreements": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:kind": false,
+   "query:status": false,
+   "query:state": false,
+   "query:framework": false,
+   "query:covers": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/agreements/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/agreements/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/anonymous-reports": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/as-of": {
+  "parameters": {
+   "query:type": false,
+   "query:on": false,
+   "query:live": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/as-of/{ref}": {
+  "parameters": {
+   "path:ref": true,
+   "query:on": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/assessments": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:scope": false,
+   "query:lead": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/assessments/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/assessments/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/assurance-kinds": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/audit/outside": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/audit/plans": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/audit/plans/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/audit/plans/{ref}/committee-report": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/audit/requests/{request_id}": {
+  "parameters": {
+   "path:request_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/audit/universe": {
+  "parameters": {
+   "query:kind": false,
+   "query:left_out": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/audit/universe/{kind}/{key}": {
+  "parameters": {
+   "path:kind": true,
+   "path:key": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/auditors": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/campaign-items/{item_id}": {
+  "parameters": {
+   "path:item_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/campaigns": {
+  "parameters": {
+   "query:status": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/campaigns/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/compliance": {
+  "parameters": {
+   "query:unit": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/continuity": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/continuity/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/continuity/{ref}/offline": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/control-library": {
+  "parameters": {
+   "query:q": false,
+   "query:keys": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/controls": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:nature": false,
+   "query:frequency": false,
+   "query:state": false,
+   "query:tested": false,
+   "query:is_key": false,
+   "query:stale": false,
+   "query:risk": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/controls/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/controls/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/controls/{ref}/ratings": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/controls/{ref}/requirements": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/coverage": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/dashboard": {
+  "parameters": {
+   "query:unit": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:kind": false,
+   "query:status": false,
+   "query:state": false,
+   "query:parent": false,
+   "query:awaiting_me": false,
+   "query:acknowledge": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}/acknowledgments": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}/compare": {
+  "parameters": {
+   "path:ref": true,
+   "query:from": true,
+   "query:to": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}/governs": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}/versions/{version_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:version_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/documents/{ref}/versions/{version_id}/file": {
+  "parameters": {
+   "path:ref": true,
+   "path:version_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/dossiers/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/engagements/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/evidence": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:state": false,
+   "query:subject": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/evidence-for/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/evidence/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/evidence/{ref}/file": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/evidence/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/exceptions": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:state": false,
+   "query:scope": false,
+   "query:document": false,
+   "query:framework": false,
+   "query:about": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/exceptions/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/exceptions/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/exports/{kind}": {
+  "parameters": {
+   "path:kind": true,
+   "query:format": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/framework-packs": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/frameworks": {
+  "parameters": {
+   "query:retired": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}/change": {
+  "parameters": {
+   "path:key": true,
+   "query:from": true,
+   "query:code": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}/changes": {
+  "parameters": {
+   "path:key": true,
+   "query:from": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}/coverage": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}/requirement": {
+  "parameters": {
+   "path:key": true,
+   "query:code": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}/requirements": {
+  "parameters": {
+   "path:key": true,
+   "query:parent": false,
+   "query:q": false,
+   "query:baseline": false,
+   "query:mapped": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/frameworks/{key}/suggestions": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/graph/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/health/live": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/health/ready": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/heat-map": {
+  "parameters": {
+   "query:kind": false,
+   "query:unit": false,
+   "query:category": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/history": {
+  "parameters": {
+   "query:actor": false,
+   "query:about": false,
+   "query:kind": false,
+   "query:since": false,
+   "query:until": false,
+   "query:before": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/home": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/incidents": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:category": false,
+   "query:severity": false,
+   "query:about": false,
+   "query:reported": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/incidents/summary": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/incidents/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/incidents/{ref}/breach": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/incidents/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/indicators": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:state": false,
+   "query:risk": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/indicators/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/indicators/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/information": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:criticality": false,
+   "query:data_class": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/information/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/information/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/issues": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:severity": false,
+   "query:source_kind": false,
+   "query:about": false,
+   "query:overdue": false,
+   "query:age": false,
+   "query:raised": false,
+   "query:closed": false,
+   "query:root_cause": false,
+   "query:framework": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/issues/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/issues/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/jobs": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/leadership-reports": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/leadership-reports/next": {
+  "parameters": {
+   "query:from": false,
+   "query:to": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/leadership-reports/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/library": {
+  "parameters": {
+   "query:q": false,
+   "query:all": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/library/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/mail": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/measures": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/meta": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/notices": {
+  "parameters": {
+   "query:unread": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/notices/count": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/objectives": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/objectives/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/objectives/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/outside": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/plans": {
+  "parameters": {
+   "query:status": false,
+   "query:overdue": false,
+   "query:unit": false,
+   "query:mine": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/plans/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/portfolio": {
+  "parameters": {
+   "query:by": false,
+   "query:period": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/privacy": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/processes": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:criticality": false,
+   "query:data_class": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/processes/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/processes/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/processes/{ref}/impact": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/program": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/program/fields": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/questionnaires": {
+  "parameters": {
+   "query:purpose": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/questionnaires/{key}": {
+  "parameters": {
+   "path:key": true,
+   "query:version": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/resilience": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/respond": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/responses/{response_id}": {
+  "parameters": {
+   "path:response_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/reviews": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:third_party": false,
+   "query:late": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/reviews/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/reviews/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risk-analyses": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/risk-analyses/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risk-analyses/{ref}/assets/{subject}": {
+  "parameters": {
+   "path:ref": true,
+   "path:subject": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risk-analyses/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risk-library": {
+  "parameters": {
+   "query:q": false,
+   "query:category": false,
+   "query:key": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:at": false,
+   "query:category": false,
+   "query:status": false,
+   "query:standing": false,
+   "query:residual_rating": false,
+   "query:inherent_rating": false,
+   "query:response": false,
+   "query:subject": false,
+   "query:above_appetite": false,
+   "query:overdue": false,
+   "query:in_doubt": false,
+   "query:added": false,
+   "query:inherent_likelihood": false,
+   "query:inherent_impact": false,
+   "query:residual_likelihood": false,
+   "query:residual_impact": false,
+   "query:target_likelihood": false,
+   "query:target_impact": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/assessments": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/bow-tie": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/controls": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/estimate": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/indicators": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/risks/{ref}/treatment": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/roles": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/scenarios": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:risk": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/scenarios/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scenarios/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:framework": false,
+   "query:offers": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/controls": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/controls/candidates": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/controls/offered": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/oscal/{document}": {
+  "parameters": {
+   "path:ref": true,
+   "path:document": true,
+   "query:framework": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/plan-of-action": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/requirements": {
+  "parameters": {
+   "path:ref": true,
+   "query:framework": true,
+   "query:state": false,
+   "query:q": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/scopes/{ref}/security-plan": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/search": {
+  "parameters": {
+   "query:q": true,
+   "query:type": false,
+   "query:limit": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/services": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:criticality": false,
+   "query:data_class": false,
+   "query:third_party": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/services/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/services/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/services/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/session": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/session/preferences": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/sessions": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:when": false,
+   "query:about": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/sessions/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/sessions/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/similar": {
+  "parameters": {
+   "query:type": true,
+   "query:name": true,
+   "query:unit": false,
+   "query:apart_from": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/sites": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:criticality": false,
+   "query:data_class": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/sites/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/sites/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/sites/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/sso": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/sso/callback": {
+  "parameters": {
+   "query:code": false,
+   "query:state": false,
+   "query:error": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/sso/start": {
+  "parameters": {
+   "query:next": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/systems": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:criticality": false,
+   "query:data_class": false,
+   "query:hosting": false,
+   "query:lifecycle": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/systems/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/systems/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/systems/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/third-parties": {
+  "parameters": {
+   "query:q": false,
+   "query:unit": false,
+   "query:status": false,
+   "query:kind": false,
+   "query:criticality": false,
+   "query:data_class": false,
+   "query:tier": false,
+   "query:review": false,
+   "query:owner": false,
+   "query:mine": false,
+   "query:sort": false,
+   "query:limit": false,
+   "query:cursor": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/third-parties/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/third-parties/{ref}/assurance": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/third-parties/{ref}/history": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/third-parties/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/third-parties/{ref}/tiering": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/tidy": {
+  "parameters": {
+   "query:unit": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/tiers": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/units": {
+  "parameters": {},
+  "body": {}
+ },
+ "GET /api/v1/units/{unit_id}": {
+  "parameters": {
+   "path:unit_id": true
+  },
+  "body": {}
+ },
+ "GET /api/v1/views": {
+  "parameters": {
+   "query:path": false
+  },
+  "body": {}
+ },
+ "GET /api/v1/vocabularies": {
+  "parameters": {},
+  "body": {}
+ },
+ "PATCH /api/v1/accounts/{account_id}": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {
+   "display_name": false,
+   "title": false,
+   "time_zone": false,
+   "status": false
+  }
+ },
+ "PATCH /api/v1/actions/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "status": false,
+   "completion_note": false,
+   "due_on": false,
+   "reason": false,
+   "title": false,
+   "detail": false,
+   "owner_id": false
+  }
+ },
+ "PATCH /api/v1/admin/webhooks/{hook_id}": {
+  "parameters": {
+   "path:hook_id": true
+  },
+  "body": {
+   "name": false,
+   "url": false,
+   "events": false,
+   "active": false
+  }
+ },
+ "PATCH /api/v1/agreements/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "kind": false,
+   "parties": false,
+   "reference": false,
+   "url": false,
+   "starts_on": false,
+   "ends_on": false,
+   "notice_days": false,
+   "renews": false,
+   "framework": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/assessments/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "scope": false,
+   "framework": false,
+   "controls": false,
+   "lead_id": false,
+   "period_start": false,
+   "period_end": false,
+   "approach": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/contacts/{contact_id}": {
+  "parameters": {
+   "path:contact_id": true
+  },
+  "body": {
+   "name": false,
+   "email": false,
+   "role": false,
+   "phone": false,
+   "status": false
+  }
+ },
+ "PATCH /api/v1/controls/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "statement": false,
+   "objective": false,
+   "summary": false,
+   "org_unit_id": false,
+   "kind": false,
+   "nature": false,
+   "frequency": false,
+   "is_key": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "library_key": false,
+   "external_refs": false,
+   "custom": false
+  }
+ },
+ "PATCH /api/v1/documents/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "kind": false,
+   "parent": false,
+   "review_months": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false,
+   "form": false,
+   "body": false,
+   "url": false,
+   "acknowledge": false
+  }
+ },
+ "PATCH /api/v1/documents/{ref}/draft": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "form": false,
+   "body": false,
+   "url": false,
+   "change_note": false,
+   "ask_again": false
+  }
+ },
+ "PATCH /api/v1/evidence/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "kind": false,
+   "url": false,
+   "note": false,
+   "data_class": false,
+   "collected_on": false,
+   "covers_from": false,
+   "covers_to": false,
+   "valid_until": false,
+   "org_unit_id": false,
+   "status": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/exceptions/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "control": false,
+   "requirement": false,
+   "document": false,
+   "scope": false,
+   "justification": false,
+   "compensating": false,
+   "starts_on": false,
+   "expires_on": false,
+   "renews": false
+  }
+ },
+ "PATCH /api/v1/frameworks/{key}": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "title": false,
+   "key": false,
+   "kind": false,
+   "version": false,
+   "publisher": false,
+   "summary": false,
+   "source_url": false,
+   "status": false
+  }
+ },
+ "PATCH /api/v1/frameworks/{key}/requirement": {
+  "parameters": {
+   "path:key": true,
+   "query:code": true
+  },
+  "body": {
+   "code": false,
+   "title": false,
+   "text": false,
+   "guidance": false,
+   "parent": false,
+   "is_citable": false
+  }
+ },
+ "PATCH /api/v1/incidents/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "kind": false,
+   "name": false,
+   "summary": false,
+   "occurred_on": false,
+   "location": false,
+   "tags": false
+  }
+ },
+ "PATCH /api/v1/indicators/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "measure": false,
+   "source": false,
+   "direction": false,
+   "warn_at": false,
+   "breach_at": false,
+   "frequency": false,
+   "org_unit_id": false,
+   "status": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/information/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "held_in": false,
+   "shared_with": false,
+   "agreement": false
+  }
+ },
+ "PATCH /api/v1/issues/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "severity": false,
+   "source_kind": false,
+   "owner_id": false,
+   "subjects": false,
+   "requirements": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/objectives/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "period": false,
+   "measure": false,
+   "status": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/processes/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "purpose": false
+  }
+ },
+ "PATCH /api/v1/questionnaires/{key}": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "title": false,
+   "summary": false,
+   "purpose": false,
+   "status": false,
+   "document": false,
+   "note": false
+  }
+ },
+ "PATCH /api/v1/reviews/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "questionnaire": false,
+   "due_on": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/risk-analyses/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "restricted": false,
+   "tags": false
+  }
+ },
+ "PATCH /api/v1/risk-categories/{key}": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "name": false,
+   "description": false,
+   "appetite": false,
+   "status": false,
+   "move": false
+  }
+ },
+ "PATCH /api/v1/risks/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "cause": false,
+   "event": false,
+   "consequence": false,
+   "category": false,
+   "org_unit_id": false,
+   "status": false,
+   "closed_reason": false,
+   "tags": false,
+   "restricted": false,
+   "library_key": false,
+   "external_refs": false,
+   "custom": false
+  }
+ },
+ "PATCH /api/v1/scenarios/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "assumptions": false,
+   "conclusion": false,
+   "status": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/scopes/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "boundary": false,
+   "org_unit_id": false,
+   "offers_controls": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "external_refs": false
+  }
+ },
+ "PATCH /api/v1/services/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "third_party": false
+  }
+ },
+ "PATCH /api/v1/sessions/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "committee": false,
+   "held_on": false,
+   "attendees": false,
+   "minutes": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "PATCH /api/v1/sessions/{ref}/items/{item_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:item_id": true
+  },
+  "body": {
+   "record": false,
+   "title": false,
+   "note": false
+  }
+ },
+ "PATCH /api/v1/sites/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "address": false
+  }
+ },
+ "PATCH /api/v1/systems/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "hosting": false,
+   "lifecycle": false,
+   "url": false
+  }
+ },
+ "PATCH /api/v1/tests/{test_id}": {
+  "parameters": {
+   "path:test_id": true
+  },
+  "body": {
+   "procedure": false,
+   "method": false,
+   "assigned_to": false
+  }
+ },
+ "PATCH /api/v1/third-parties/{ref}": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "website": false,
+   "notes": false
+  }
+ },
+ "PATCH /api/v1/units/{unit_id}": {
+  "parameters": {
+   "path:unit_id": true
+  },
+  "body": {
+   "name": false,
+   "kind": false,
+   "code": false,
+   "parent_id": false,
+   "status": false
+  }
+ },
+ "PATCH /api/v1/views/{view_id}": {
+  "parameters": {
+   "path:view_id": true
+  },
+  "body": {
+   "name": false,
+   "path": false,
+   "query": false,
+   "shared": false
+  }
+ },
+ "POST /api/v1/acceptances/{acceptance_id}/withdrawal": {
+  "parameters": {
+   "path:acceptance_id": true
+  },
+  "body": {
+   "reason": true
+  }
+ },
+ "POST /api/v1/accounts": {
+  "parameters": {},
+  "body": {
+   "email": true,
+   "display_name": true,
+   "title": false,
+   "password": false,
+   "roles": false,
+   "unit_ids": false
+  }
+ },
+ "POST /api/v1/accounts/{account_id}/handover": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {
+   "to": true,
+   "only": false
+  }
+ },
+ "POST /api/v1/accounts/{account_id}/password": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {
+   "new_password": true
+  }
+ },
+ "POST /api/v1/admin/branding/check": {
+  "parameters": {},
+  "body": {
+   "accent": true,
+   "accent_dark": false
+  }
+ },
+ "POST /api/v1/admin/branding/images/{kind}": {
+  "parameters": {
+   "path:kind": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/admin/tokens": {
+  "parameters": {},
+  "body": {
+   "name": true,
+   "role": true,
+   "org_unit_id": false,
+   "read_only": false,
+   "days": true
+  }
+ },
+ "POST /api/v1/admin/tokens/{token_id}/revoke": {
+  "parameters": {
+   "path:token_id": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/admin/webhooks": {
+  "parameters": {},
+  "body": {
+   "name": true,
+   "url": true,
+   "events": true
+  }
+ },
+ "POST /api/v1/admin/webhooks/{hook_id}/test": {
+  "parameters": {
+   "path:hook_id": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/agreements": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "kind": false,
+   "parties": false,
+   "reference": false,
+   "url": false,
+   "starts_on": false,
+   "ends_on": false,
+   "notice_days": false,
+   "renews": false,
+   "framework": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/agreements/{ref}/close": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/agreements/{ref}/reopen": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/anonymous-reports": {
+  "parameters": {},
+  "body": {
+   "kind": false,
+   "name": false,
+   "summary": false,
+   "occurred_on": false,
+   "location": false,
+   "org_unit_id": false
+  }
+ },
+ "POST /api/v1/anonymous-reports/follow-up": {
+  "parameters": {},
+  "body": {
+   "code": true
+  }
+ },
+ "POST /api/v1/anonymous-reports/messages": {
+  "parameters": {},
+  "body": {
+   "code": true,
+   "body": true
+  }
+ },
+ "POST /api/v1/assessments": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "scope": false,
+   "framework": false,
+   "controls": false,
+   "lead_id": false,
+   "period_start": false,
+   "period_end": false,
+   "approach": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/assessments/{ref}/cancellation": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/assessments/{ref}/completion": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/assessments/{ref}/tests": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "control": true
+  }
+ },
+ "POST /api/v1/audit/outside": {
+  "parameters": {},
+  "body": {
+   "name": true,
+   "organization": true,
+   "email": false,
+   "purpose": false,
+   "kind": true,
+   "ref": true,
+   "days": true
+  }
+ },
+ "POST /api/v1/audit/outside/{access_id}/revoke": {
+  "parameters": {
+   "path:access_id": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/audit/plans": {
+  "parameters": {},
+  "body": {
+   "name": true,
+   "starts_on": true,
+   "ends_on": true,
+   "summary": false
+  }
+ },
+ "POST /api/v1/audit/plans/{ref}/approve": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/audit/plans/{ref}/close": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/audit/plans/{ref}/engagements": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "name": true,
+   "kind": true,
+   "key": true,
+   "reason": true,
+   "planned_start": false,
+   "planned_end": false
+  }
+ },
+ "POST /api/v1/audit/requests/{request_id}/accept": {
+  "parameters": {
+   "path:request_id": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/audit/requests/{request_id}/answer": {
+  "parameters": {
+   "path:request_id": true
+  },
+  "body": {
+   "answer": false,
+   "evidence": false
+  }
+ },
+ "POST /api/v1/audit/requests/{request_id}/return": {
+  "parameters": {
+   "path:request_id": true
+  },
+  "body": {
+   "reason": true
+  }
+ },
+ "POST /api/v1/campaign-items/{item_id}/answer": {
+  "parameters": {
+   "path:item_id": true
+  },
+  "body": {
+   "answers": true,
+   "complete": false
+  }
+ },
+ "POST /api/v1/campaign-items/{item_id}/excuse": {
+  "parameters": {
+   "path:item_id": true
+  },
+  "body": {
+   "note": true
+  }
+ },
+ "POST /api/v1/campaigns": {
+  "parameters": {},
+  "body": {
+   "kind": true,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "scope": false,
+   "due_on": false,
+   "wanted": false,
+   "document": false
+  }
+ },
+ "POST /api/v1/campaigns/preview": {
+  "parameters": {},
+  "body": {
+   "kind": true,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "scope": false,
+   "due_on": false,
+   "wanted": false,
+   "document": false
+  }
+ },
+ "POST /api/v1/campaigns/{ref}/cancel": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/campaigns/{ref}/close": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/campaigns/{ref}/remind": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/continuity/{ref}/exercises": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "kind": true,
+   "held_on": true,
+   "scenario": true,
+   "participants": false,
+   "outcome": true,
+   "result": true,
+   "achieved_hours": false
+  }
+ },
+ "POST /api/v1/continuity/{ref}/exercises/{exercise_id}/issues": {
+  "parameters": {
+   "path:ref": true,
+   "path:exercise_id": true
+  },
+  "body": {
+   "name": false,
+   "summary": false,
+   "severity": false,
+   "subjects": false,
+   "owner_id": false
+  }
+ },
+ "POST /api/v1/controls": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "statement": false,
+   "objective": false,
+   "summary": false,
+   "org_unit_id": false,
+   "kind": false,
+   "nature": false,
+   "frequency": false,
+   "is_key": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "library_key": false,
+   "external_refs": false,
+   "custom": false
+  }
+ },
+ "POST /api/v1/controls/{ref}/ratings": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "design": true,
+   "operation": true,
+   "note": true
+  }
+ },
+ "POST /api/v1/controls/{ref}/requirements/suggested": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/documents": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "kind": false,
+   "parent": false,
+   "review_months": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false,
+   "form": false,
+   "body": false,
+   "url": false,
+   "acknowledge": false
+  }
+ },
+ "POST /api/v1/documents/{ref}/draft": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/documents/{ref}/draft/decision": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "decision": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/documents/{ref}/draft/file": {
+  "parameters": {
+   "path:ref": true,
+   "query:name": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/documents/{ref}/draft/publish": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/documents/{ref}/draft/submit": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "approvers": true
+  }
+ },
+ "POST /api/v1/documents/{ref}/draft/withdraw": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/documents/{ref}/reinstate": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/documents/{ref}/retire": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/documents/{ref}/review": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/dossiers/check": {
+  "parameters": {},
+  "body": {}
+ },
+ "POST /api/v1/engagements/{ref}/advance": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "summary": false,
+   "opinion": false
+  }
+ },
+ "POST /api/v1/engagements/{ref}/drop": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "reason": true
+  }
+ },
+ "POST /api/v1/engagements/{ref}/findings": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "name": true,
+   "summary": false,
+   "severity": true,
+   "owner_id": true,
+   "subjects": false
+  }
+ },
+ "POST /api/v1/engagements/{ref}/requests": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "what": true,
+   "assignee": true,
+   "due_on": true
+  }
+ },
+ "POST /api/v1/engagements/{ref}/restore": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/engagements/{ref}/start": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "lead": true,
+   "members": false,
+   "scope_note": false
+  }
+ },
+ "POST /api/v1/engagements/{ref}/workpapers": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "title": true,
+   "procedure": false
+  }
+ },
+ "POST /api/v1/evidence": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "kind": false,
+   "url": false,
+   "note": false,
+   "data_class": false,
+   "collected_on": false,
+   "covers_from": false,
+   "covers_to": false,
+   "valid_until": false,
+   "org_unit_id": false,
+   "status": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/evidence/{ref}/file": {
+  "parameters": {
+   "path:ref": true,
+   "query:name": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/exceptions": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "control": false,
+   "requirement": false,
+   "document": false,
+   "scope": false,
+   "justification": false,
+   "compensating": false,
+   "starts_on": false,
+   "expires_on": false,
+   "renews": false
+  }
+ },
+ "POST /api/v1/exceptions/{ref}/decision": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "approve": true,
+   "note": false,
+   "expires_on": false
+  }
+ },
+ "POST /api/v1/exceptions/{ref}/withdrawal": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "reason": false
+  }
+ },
+ "POST /api/v1/framework-packs": {
+  "parameters": {},
+  "body": {
+   "key": false,
+   "pack": false
+  }
+ },
+ "POST /api/v1/frameworks": {
+  "parameters": {},
+  "body": {
+   "title": false,
+   "key": false,
+   "kind": false,
+   "version": false,
+   "publisher": false,
+   "summary": false,
+   "source_url": false,
+   "status": false
+  }
+ },
+ "POST /api/v1/frameworks/{key}/requirements": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "code": false,
+   "title": false,
+   "text": false,
+   "guidance": false,
+   "parent": false,
+   "is_citable": false
+  }
+ },
+ "POST /api/v1/frameworks/{key}/requirements/paste": {
+  "parameters": {
+   "path:key": true,
+   "query:dry_run": false
+  },
+  "body": {
+   "text": true
+  }
+ },
+ "POST /api/v1/frameworks/{key}/suggestions/confirm": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "control": true,
+   "code": true
+  }
+ },
+ "POST /api/v1/frameworks/{key}/suggestions/set-aside": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "control": true,
+   "code": true
+  }
+ },
+ "POST /api/v1/frameworks/{key}/versions": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "title": true,
+   "version": false
+  }
+ },
+ "POST /api/v1/imports/people": {
+  "parameters": {
+   "query:dry_run": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/imports/records/{path}": {
+  "parameters": {
+   "path:path": true,
+   "query:dry_run": false,
+   "query:mapping": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/imports/records/{path}/columns": {
+  "parameters": {
+   "path:path": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/imports/requirements/{key}": {
+  "parameters": {
+   "path:key": true,
+   "query:dry_run": false,
+   "query:mapping": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/imports/requirements/{key}/columns": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/imports/units": {
+  "parameters": {
+   "query:dry_run": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/incidents": {
+  "parameters": {},
+  "body": {
+   "kind": false,
+   "name": false,
+   "summary": false,
+   "occurred_on": false,
+   "location": false,
+   "org_unit_id": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/breach": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "discovered_at": true,
+   "information": false,
+   "people": false,
+   "most_in_one_state": false,
+   "secured": false,
+   "exception": false,
+   "factors": false,
+   "conclusion": false,
+   "rationale": false,
+   "regimes": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/close": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/issues": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "name": false,
+   "summary": false,
+   "severity": false,
+   "subjects": false,
+   "owner_id": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/losses": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "kind": true,
+   "amount": true,
+   "currency": false,
+   "note": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/messages": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "body": true,
+   "shared": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/notifications": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "regime": true,
+   "duty": true,
+   "recipient": true,
+   "sent_on": true,
+   "count": false,
+   "method": false,
+   "reference": false,
+   "note": false
+  }
+ },
+ "POST /api/v1/incidents/{ref}/reopen": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/incidents/{ref}/triage": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "category": false,
+   "severity": false,
+   "org_unit_id": false,
+   "subjects": false,
+   "handler_id": false
+  }
+ },
+ "POST /api/v1/indicators": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "measure": false,
+   "source": false,
+   "direction": false,
+   "warn_at": false,
+   "breach_at": false,
+   "frequency": false,
+   "org_unit_id": false,
+   "status": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/indicators/{ref}/readings": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "value": true,
+   "read_on": false,
+   "note": false
+  }
+ },
+ "POST /api/v1/information": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "held_in": false,
+   "shared_with": false,
+   "agreement": false
+  }
+ },
+ "POST /api/v1/information/{ref}/links": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "relation": true,
+   "to": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/issues": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "severity": false,
+   "source_kind": false,
+   "owner_id": false,
+   "subjects": false,
+   "requirements": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/issues/{ref}/actions": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "title": true,
+   "owner_id": true,
+   "due_on": true,
+   "detail": false,
+   "contact_id": false
+  }
+ },
+ "POST /api/v1/issues/{ref}/cancellation": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "reason": false
+  }
+ },
+ "POST /api/v1/issues/{ref}/closure": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": true,
+   "root_cause": true,
+   "evidence": false
+  }
+ },
+ "POST /api/v1/issues/{ref}/due-date": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "due_on": true,
+   "reason": true
+  }
+ },
+ "POST /api/v1/issues/{ref}/reopening": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "reason": false
+  }
+ },
+ "POST /api/v1/issues/{ref}/validation": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "confirm": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/jobs/{key}/run": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/leadership-reports": {
+  "parameters": {},
+  "body": {
+   "title": false,
+   "summary": false,
+   "from": false,
+   "to": false
+  }
+ },
+ "POST /api/v1/library/{ref}/acknowledge": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/mail/test": {
+  "parameters": {},
+  "body": {}
+ },
+ "POST /api/v1/notices/read": {
+  "parameters": {},
+  "body": {
+   "ids": false
+  }
+ },
+ "POST /api/v1/objectives": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "period": false,
+   "measure": false,
+   "status": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/plans/{ref}/actions": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "title": true,
+   "owner_id": true,
+   "due_on": true,
+   "detail": false
+  }
+ },
+ "POST /api/v1/plans/{ref}/cancellation": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "reason": true
+  }
+ },
+ "POST /api/v1/privacy/reviews/{item_id}": {
+  "parameters": {
+   "path:item_id": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/processes": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "purpose": false
+  }
+ },
+ "POST /api/v1/processes/{ref}/impact": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "impacts": false,
+   "recovery_hours": true,
+   "data_loss_hours": true,
+   "minimum": false,
+   "note": false
+  }
+ },
+ "POST /api/v1/processes/{ref}/links": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "relation": true,
+   "to": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/program/preview": {
+  "parameters": {},
+  "body": {
+   "method": false,
+   "appetites": false,
+   "cadences": false
+  }
+ },
+ "POST /api/v1/program/publish": {
+  "parameters": {},
+  "body": {
+   "method": false,
+   "appetites": false,
+   "cadences": false
+  }
+ },
+ "POST /api/v1/questionnaires": {
+  "parameters": {},
+  "body": {
+   "key": true,
+   "title": true,
+   "summary": false,
+   "purpose": false,
+   "document": true
+  }
+ },
+ "POST /api/v1/questionnaires/check": {
+  "parameters": {},
+  "body": {
+   "document": true,
+   "answers": false
+  }
+ },
+ "POST /api/v1/questionnaires/{key}/responses": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "answers": true,
+   "complete": false,
+   "response_id": false
+  }
+ },
+ "POST /api/v1/respond/files": {
+  "parameters": {
+   "query:name": false
+  },
+  "body": {}
+ },
+ "POST /api/v1/respond/submit": {
+  "parameters": {},
+  "body": {
+   "answers": true
+  }
+ },
+ "POST /api/v1/results/{result_id}/review": {
+  "parameters": {
+   "path:result_id": true
+  },
+  "body": {
+   "confirm": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/review-notes/{note_id}/answer": {
+  "parameters": {
+   "path:note_id": true
+  },
+  "body": {
+   "answer": true
+  }
+ },
+ "POST /api/v1/review-notes/{note_id}/clear": {
+  "parameters": {
+   "path:note_id": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/reviews/{ref}/cancel": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/reviews/{ref}/conclude": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "conclusion": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/reviews/{ref}/findings": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "name": true,
+   "summary": false,
+   "severity": true,
+   "owner_id": false
+  }
+ },
+ "POST /api/v1/reviews/{ref}/send": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "contact_id": true,
+   "due_on": false,
+   "days": false
+  }
+ },
+ "POST /api/v1/reviews/{ref}/withdraw": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/risk-analyses": {
+  "parameters": {},
+  "body": {
+   "name": false,
+   "summary": false,
+   "scope": false,
+   "org_unit_id": false,
+   "threats": false,
+   "categories": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/risk-analyses/preview": {
+  "parameters": {},
+  "body": {
+   "name": false,
+   "summary": false,
+   "scope": false,
+   "org_unit_id": false,
+   "threats": false,
+   "categories": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/risk-analyses/{ref}/assets/{subject}/rest": {
+  "parameters": {
+   "path:ref": true,
+   "path:subject": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/risk-analyses/{ref}/close": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "conclusion": false
+  }
+ },
+ "POST /api/v1/risk-analyses/{ref}/items/{item_id}": {
+  "parameters": {
+   "path:ref": true,
+   "path:item_id": true
+  },
+  "body": {
+   "outcome": true,
+   "note": false,
+   "risk": false,
+   "look_again": false,
+   "name": false
+  }
+ },
+ "POST /api/v1/risk-analyses/{ref}/reopen": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/risk-categories": {
+  "parameters": {},
+  "body": {
+   "name": true,
+   "key": false,
+   "parent": false,
+   "description": false,
+   "appetite": false
+  }
+ },
+ "POST /api/v1/risks": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "cause": false,
+   "event": false,
+   "consequence": false,
+   "category": false,
+   "org_unit_id": false,
+   "status": false,
+   "closed_reason": false,
+   "tags": false,
+   "restricted": false,
+   "library_key": false,
+   "external_refs": false,
+   "custom": false
+  }
+ },
+ "POST /api/v1/risks/{ref}/acceptances": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "rationale": true,
+   "expires_on": true,
+   "conditions": false
+  }
+ },
+ "POST /api/v1/risks/{ref}/assessments": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "kind": true,
+   "likelihood": true,
+   "impact_levels": true,
+   "rationale": true
+  }
+ },
+ "POST /api/v1/risks/{ref}/estimate": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "frequency_low": true,
+   "frequency_likely": true,
+   "frequency_high": true,
+   "loss_low": true,
+   "loss_likely": true,
+   "loss_high": true,
+   "currency": false,
+   "assumptions": true
+  }
+ },
+ "POST /api/v1/risks/{ref}/plans": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "objective": true,
+   "owner_id": true,
+   "due_on": true,
+   "target_rating": false
+  }
+ },
+ "POST /api/v1/scenarios": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "assumptions": false,
+   "conclusion": false,
+   "status": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/scopes": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "boundary": false,
+   "org_unit_id": false,
+   "offers_controls": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "external_refs": false
+  }
+ },
+ "POST /api/v1/scopes/{ref}/controls/inherited": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "implementation": true,
+   "inheritance": true,
+   "status": false,
+   "responsibility": false,
+   "statement": false
+  }
+ },
+ "POST /api/v1/scopes/{ref}/frameworks/{key}/move": {
+  "parameters": {
+   "path:ref": true,
+   "path:key": true
+  },
+  "body": {
+   "to": true
+  }
+ },
+ "POST /api/v1/services": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "third_party": false
+  }
+ },
+ "POST /api/v1/services/{ref}/links": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "relation": true,
+   "to": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/services/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "recovery_hours": true,
+   "data_loss_hours": false,
+   "basis": true
+  }
+ },
+ "POST /api/v1/session": {
+  "parameters": {},
+  "body": {
+   "email": true,
+   "password": true
+  }
+ },
+ "POST /api/v1/session/demo": {
+  "parameters": {},
+  "body": {
+   "email": true
+  }
+ },
+ "POST /api/v1/session/password": {
+  "parameters": {},
+  "body": {
+   "current_password": false,
+   "new_password": true
+  }
+ },
+ "POST /api/v1/sessions": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "committee": false,
+   "held_on": false,
+   "attendees": false,
+   "minutes": false,
+   "org_unit_id": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/sessions/{ref}/cancel": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/sessions/{ref}/held": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
+ "POST /api/v1/sessions/{ref}/items": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "record": false,
+   "title": false,
+   "note": false
+  }
+ },
+ "POST /api/v1/sessions/{ref}/items/{item_id}/decision": {
+  "parameters": {
+   "path:ref": true,
+   "path:item_id": true
+  },
+  "body": {
+   "outcome": true,
+   "decision": false
+  }
+ },
+ "POST /api/v1/sessions/{ref}/items/{item_id}/move": {
+  "parameters": {
+   "path:ref": true,
+   "path:item_id": true
+  },
+  "body": {
+   "up": true
+  }
+ },
+ "POST /api/v1/sites": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "address": false
+  }
+ },
+ "POST /api/v1/sites/{ref}/links": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "relation": true,
+   "to": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/sites/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "recovery_hours": true,
+   "data_loss_hours": false,
+   "basis": true
+  }
+ },
+ "POST /api/v1/sso/check": {
+  "parameters": {},
+  "body": {}
+ },
+ "POST /api/v1/systems": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "hosting": false,
+   "lifecycle": false,
+   "url": false
+  }
+ },
+ "POST /api/v1/systems/{ref}/links": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "relation": true,
+   "to": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/systems/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "recovery_hours": true,
+   "data_loss_hours": false,
+   "basis": true
+  }
+ },
+ "POST /api/v1/tests/{test_id}/results": {
+  "parameters": {
+   "path:test_id": true
+  },
+  "body": {
+   "design": true,
+   "operation": true,
+   "note": true,
+   "sample": false,
+   "evidence": false
+  }
+ },
+ "POST /api/v1/third-parties": {
+  "parameters": {},
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "org_unit_id": false,
+   "criticality": false,
+   "data_class": false,
+   "status": false,
+   "tags": false,
+   "restricted": false,
+   "kind": false,
+   "external_refs": false,
+   "custom": false,
+   "website": false,
+   "notes": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/assurance": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "name": false,
+   "summary": false,
+   "url": false,
+   "collected_on": false,
+   "covers_from": false,
+   "covers_to": false,
+   "valid_until": false,
+   "data_class": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/assurance/{document}/reviews": {
+  "parameters": {
+   "path:ref": true,
+   "path:document": true
+  },
+  "body": {
+   "kind": true,
+   "issuer": false,
+   "opinion": false,
+   "services": false,
+   "carve_outs": false,
+   "exceptions": false,
+   "responsibilities": false,
+   "reliance": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/call-review": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "event": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/contacts": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "name": false,
+   "email": false,
+   "role": false,
+   "phone": false,
+   "status": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/links": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "relation": true,
+   "to": true,
+   "note": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/offboarding": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "reason": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/offboarding/cancel": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/offboarding/steps/{step}": {
+  "parameters": {
+   "path:ref": true,
+   "path:step": true
+  },
+  "body": {
+   "note": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/recovery": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "recovery_hours": true,
+   "data_loss_hours": false,
+   "basis": true
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/reviews": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "version": false,
+   "name": false,
+   "summary": false,
+   "questionnaire": false,
+   "due_on": false,
+   "tags": false,
+   "restricted": false
+  }
+ },
+ "POST /api/v1/third-parties/{ref}/tiering": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "answers": true,
+   "tier": false,
+   "rationale": false
+  }
+ },
+ "POST /api/v1/tidy/not-duplicates": {
+  "parameters": {},
+  "body": {
+   "refs": true
+  }
+ },
+ "POST /api/v1/units": {
+  "parameters": {},
+  "body": {
+   "name": true,
+   "kind": true,
+   "code": false,
+   "parent_id": false
+  }
+ },
+ "POST /api/v1/views": {
+  "parameters": {},
+  "body": {
+   "name": false,
+   "path": false,
+   "query": false,
+   "shared": false
+  }
+ },
+ "POST /api/v1/workpapers/{paper_id}/notes": {
+  "parameters": {
+   "path:paper_id": true
+  },
+  "body": {
+   "note": true
+  }
+ },
+ "POST /api/v1/workpapers/{paper_id}/sign-off": {
+  "parameters": {
+   "path:paper_id": true
+  },
+  "body": {}
+ },
+ "PUT /api/v1/accounts/{account_id}/roles": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {
+   "roles": true
+  }
+ },
+ "PUT /api/v1/accounts/{account_id}/units": {
+  "parameters": {
+   "path:account_id": true
+  },
+  "body": {
+   "unit_ids": true
+  }
+ },
+ "PUT /api/v1/admin/anonymous-reporting": {
+  "parameters": {},
+  "body": {
+   "open": true
+  }
+ },
+ "PUT /api/v1/admin/branding": {
+  "parameters": {},
+  "body": {
+   "product_name": true,
+   "organization_name": false,
+   "palette": true,
+   "accent": false,
+   "accent_dark": false,
+   "rating_ramp": false,
+   "show_powered_by": false,
+   "sign_in_message": false,
+   "footer_links": false,
+   "email_footer": false,
+   "terms": false
+  }
+ },
+ "PUT /api/v1/admin/leadership-readers": {
+  "parameters": {},
+  "body": {
+   "reach": true,
+   "people": false
+  }
+ },
+ "PUT /api/v1/admin/visibility": {
+  "parameters": {},
+  "body": {
+   "visibility": true
+  }
+ },
+ "PUT /api/v1/agreements/{ref}/covers": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "covers": true
+  }
+ },
+ "PUT /api/v1/agreements/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/agreements/{ref}/parties": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "parties": true
+  }
+ },
+ "PUT /api/v1/assessments/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/audit/universe/{kind}/{key}": {
+  "parameters": {
+   "path:kind": true,
+   "path:key": true
+  },
+  "body": {
+   "adjustment": false,
+   "adjustment_reason": false,
+   "last_audited_on": false,
+   "last_audit_note": false,
+   "left_out": false,
+   "left_out_reason": false
+  }
+ },
+ "PUT /api/v1/continuity/{ref}/covers": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "processes": false
+  }
+ },
+ "PUT /api/v1/controls/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/controls/{ref}/requirements": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "framework": true,
+   "code": true,
+   "coverage": false,
+   "note": false
+  }
+ },
+ "PUT /api/v1/documents/{ref}/audience": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "everyone": true,
+   "units": false,
+   "roles": false
+  }
+ },
+ "PUT /api/v1/documents/{ref}/controls": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "control": true,
+   "note": false
+  }
+ },
+ "PUT /api/v1/documents/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/documents/{ref}/requirements": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "framework": true,
+   "code": true,
+   "note": false
+  }
+ },
+ "PUT /api/v1/evidence/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/evidence/{ref}/subjects": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "subjects": true
+  }
+ },
+ "PUT /api/v1/incidents/{ref}/case": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "restricted": true,
+   "members": false
+  }
+ },
+ "PUT /api/v1/incidents/{ref}/learning": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "realized": false,
+   "failed": false,
+   "held": false,
+   "lessons": false,
+   "root_cause": false
+  }
+ },
+ "PUT /api/v1/incidents/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/indicators/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/indicators/{ref}/risks": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "risks": true
+  }
+ },
+ "PUT /api/v1/information/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/issues/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/issues/{ref}/subjects": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "subjects": false,
+   "requirements": false
+  }
+ },
+ "PUT /api/v1/jobs/{key}": {
+  "parameters": {
+   "path:key": true
+  },
+  "body": {
+   "enabled": true
+  }
+ },
+ "PUT /api/v1/objectives/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/processes/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/program/fields/{type_key}": {
+  "parameters": {
+   "path:type_key": true
+  },
+  "body": {
+   "fields": true
+  }
+ },
+ "PUT /api/v1/respond": {
+  "parameters": {},
+  "body": {
+   "answers": true
+  }
+ },
+ "PUT /api/v1/reviews/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/risk-analyses/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/risks/{ref}/controls": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "control": true,
+   "reduces": true,
+   "reliance": true,
+   "note": false
+  }
+ },
+ "PUT /api/v1/risks/{ref}/escalation": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "unit_id": true,
+   "reason": false
+  }
+ },
+ "PUT /api/v1/risks/{ref}/objectives": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "objectives": true
+  }
+ },
+ "PUT /api/v1/risks/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/risks/{ref}/response": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "response": true,
+   "rationale": true
+  }
+ },
+ "PUT /api/v1/risks/{ref}/subjects": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "subjects": true
+  }
+ },
+ "PUT /api/v1/scenarios/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/scenarios/{ref}/subjects": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "subjects": true
+  }
+ },
+ "PUT /api/v1/scopes/{ref}/controls": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "control": true,
+   "status": false,
+   "responsibility": false,
+   "statement": false
+  }
+ },
+ "PUT /api/v1/scopes/{ref}/frameworks": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "framework": true,
+   "baseline": false
+  }
+ },
+ "PUT /api/v1/scopes/{ref}/members": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "records": false,
+   "units": false
+  }
+ },
+ "PUT /api/v1/scopes/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/scopes/{ref}/requirements": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "framework": true,
+   "code": true,
+   "applicable": true,
+   "reason": false
+  }
+ },
+ "PUT /api/v1/services/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/session/preferences": {
+  "parameters": {},
+  "body": {
+   "email_notices": true
+  }
+ },
+ "PUT /api/v1/sessions/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/sites/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/sso/mappings": {
+  "parameters": {},
+  "body": {
+   "mappings": true
+  }
+ },
+ "PUT /api/v1/systems/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/third-parties/{ref}/owners": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "owners": true
+  }
+ },
+ "PUT /api/v1/vocabularies/{name}": {
+  "parameters": {
+   "path:name": true
+  },
+  "body": {
+   "items": true
+  }
+ },
+ "PUT /api/v1/workpapers/{paper_id}": {
+  "parameters": {
+   "path:paper_id": true
+  },
+  "body": {
+   "done": true,
+   "found": false,
+   "evidence": false
+  }
+ }
+}

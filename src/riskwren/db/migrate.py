@@ -75,7 +75,7 @@ def upgrade(engine: Engine, revision: str = "head") -> None:
 
 def downgrade(engine: Engine, revision: str) -> None:
     """Step the schema back, for tests and development. To undo an upgrade in production,
-    restore the export taken before it."""
+    restore the backup taken before it (`riskwren backup`)."""
     _run(engine, command.downgrade, revision)
 
 

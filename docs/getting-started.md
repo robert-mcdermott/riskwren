@@ -33,6 +33,21 @@ uv run riskwren init
 
 The password needs at least 12 characters. Length matters more than symbols: a few unrelated words make a good one.
 
+The default program is written for a research institute with a clinic. To start from one written for another kind of organization, name it:
+
+```bash
+uv run riskwren init --program university
+```
+
+| Program | For | What differs |
+|---|---|---|
+| `research-institute` | A research institute, with or without a clinic (the default) | |
+| `academic-medical-center` | Hospitals and clinics, with research and the education of clinicians | Patient care and safety, with quality of care and emergency preparedness; education and training; billing and referrals; hospitals and service lines; patient care and the revenue cycle |
+| `university` | Teaching, research, and the life of a campus | Teaching and learning; students; enrollment; student records and campus safety reporting; colleges and schools; teaching, student services, and admissions. No clinical family |
+| `nonprofit` | Programs and services funded by grants and gifts | Programs and services; donor restrictions and tax-exempt status; programs and chapters; fundraising. No research or clinical family |
+
+Each is the default program with those differences: families of risk that do not apply are retired, not removed, so they can be taken up again. The libraries of common risks and controls are the same for all. Everything can be changed afterwards under **Admin → Program**, and a program can be loaded later with `riskwren program import university`.
+
 `init` is safe to run again. It leaves an existing configuration file alone, adds only what is missing from the program, and creates an administrator only if there is none.
 
 To set up without being asked anything, name the administrator and pipe the password in:
