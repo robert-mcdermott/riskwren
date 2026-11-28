@@ -76,7 +76,7 @@ A control the scope inherits, or shares with a provider, is not tested here. It 
 
 Each test has a **Method** (examine records and settings, interview the people who do it, or test it and see), **What to do** (the procedure), and a person it is **Assigned to**. **Plan** on a test changes them. A test that is assigned appears on that person's Home, due on the last day of the assessment's period.
 
-A test can be assigned to anyone, but only an assessor or a manager for the scope's unit can record its result. Assign tests to assessors.
+A test is assigned to someone who can record its result: an assessor or a manager for the scope's unit who does not own the control.
 
 On the **Tests** tab, **Add a control** adds a test for a control the scope does itself that is not in the assessment yet, such as one it started using after the assessment began. **Remove** takes out a test that has no result; once a test has a result, it stays.
 
@@ -105,7 +105,7 @@ Two rules always hold, and the server enforces both.
 
 Recording a result changes nothing. It waits as **Awaiting review**, and the assessment's lead sees it on Home. **Review** (an assessor or a manager for the unit, who neither recorded it nor owns the control) then either confirms it or returns it with a note saying what needs another look. A returned result is recorded again (**Record again**); the earlier one stays in the assessment's history.
 
-The lead is not asked to review a result they recorded themselves, and nobody else is told of it. If the lead tests too, ask another assessor to open the assessment and review those results.
+A result the lead records themselves cannot be reviewed by them, so it waits on the Home of the others with tests in the assessment, any of whom may review it if they do not own the control. A lead who works alone needs a second assessor in the assessment.
 
 ![Reviewing a result someone else recorded: confirm it, or return it with a note](img/assessment-review-light.webp)
 

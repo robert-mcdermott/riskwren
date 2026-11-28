@@ -464,6 +464,28 @@ def test_tests_and_reviews_appear_on_the_home_of_whoever_they_wait_on(
         assert not [i for i in reporting.home(session, assessor)["items"] if i["kind"] == "test"]
         waiting = [i for i in reporting.home(session, manager)["items"] if i["kind"] == "confirm"]
         assert [i["title"] for i in waiting] == ["Review the result for Backups"]
+    # A test goes only to someone who could record its result.
+    member = who(db, people, "member")
+    with db.write(manager.actor) as session:
+        made = records.load(session, manager, ASSESSMENT, made.ref)
+        others = [row for row in assessments.tests_of(session, manager, made)
+                  if row["control"]["name"] != "Backups"]  # fmt: skip
+        assert others
+        if others:
+            test = session.get(ControlTest, others[0]["id"])
+            with pytest.raises(Invalid) as refused:
+                assessments.update_test(session, manager, test,
+                                        {"assigned_to": member.account_id})  # fmt: skip
+            assert "assigned_to" in refused.value.errors
+            # The lead records a result: it waits for the others with tests in it.
+            assessments.update_test(session, manager, test, {"assigned_to": assessor.account_id})
+            assessments.record(session, manager, test, design="effective",
+                               operation="effective", note=FOUND)  # fmt: skip
+    with db.read() as session:
+        waiting = [i for i in reporting.home(session, assessor)["items"] if i["kind"] == "confirm"]
+        assert [i["title"] for i in waiting] == [
+            f"Review the result for {others[0]['control']['name']}"
+        ]
 
 
 def test_the_api_runs_an_assessment_from_plan_to_counted_result(
