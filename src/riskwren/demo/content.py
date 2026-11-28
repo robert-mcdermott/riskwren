@@ -2634,3 +2634,38 @@ SYSTEM_FIELD_VALUES = [
     ("backup", "CC-3100", "Business hours"), ("record", "CC-7200", "Around the clock"),
     ("cabinets", "CC-7350", "Around the clock"), ("survey", "CC-5300", "Best effort"),
 ]  # fmt: skip
+
+
+# What the patch scanner reports: days ago, the control, and what it says.
+REPORTED = [
+    (10, "Systems kept patched", {
+        "kind": "result", "outcome": "failed",
+        "title": "Nine servers more than 30 days behind on critical patches",
+        "detail": "The virtual server platform's hosts in the research network.",
+        "url": "https://scanner.northmere.example/reports/2026-11-17"}),
+    (3, "Vulnerabilities found and followed up", {
+        "kind": "result", "outcome": "partial",
+        "title": "Two critical findings open past their date",
+        "url": "https://scanner.northmere.example/reports/2026-11-24"}),
+    (2, "Systems kept patched", {
+        "kind": "evidence", "title": "Patch compliance report, November",
+        "url": "https://scanner.northmere.example/reports/2026-11-25/compliance"}),
+]  # fmt: skip
+
+
+# What a security engineer's desktop assistant drafted through the tool server, with a token
+# that may only read: each waits for a person to open it in the ordinary form (wave 10).
+DRAFTS = [
+    (3, "risk", "IT", {
+        "name": "Unmanaged laptops on the research network",
+        "cause": "Visiting researchers connect their own laptops in the new lab wing, where the "
+                 "network does not yet check a device before letting it on",
+        "event": "A laptop with malware reaches the instruments and the shared research storage",
+        "consequence": "Instrument time and research data are lost while systems are rebuilt"},
+     "From the network team's notes on the lab wing, and two reports of unknown devices there."),
+    (2, "issue", "IT", {
+        "name": "Firewall rules for the imaging network not reviewed in over a year",
+        "summary": "The last review on record is fourteen months old; the standard asks for one "
+                   "every six months.", "severity": "moderate"},
+     "The control's latest rating and the firewall standard's review interval."),
+]  # fmt: skip

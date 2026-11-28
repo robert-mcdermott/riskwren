@@ -641,6 +641,29 @@ def cmd_backup(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_tools(args: argparse.Namespace) -> int:
+    """A tool server for an assistant, over standard input and output, with a token."""
+    from urllib.parse import urlsplit
+
+    from riskwren.core.errors import ConfigError
+    from riskwren.integration import mcp
+
+    url = args.url or os.environ.get("RISKWREN_URL", "")
+    token = os.environ.get("RISKWREN_TOKEN", "")
+    where = urlsplit(url)
+    if where.scheme not in ("https", "http") or not where.hostname:
+        raise ConfigError("Give the RiskWren server's address with --url or RISKWREN_URL.")
+    if where.scheme == "http" and where.hostname not in ("localhost", "127.0.0.1", "::1"):
+        raise ConfigError("Use an https:// address: the token goes with every request.")
+    if not token.startswith("rwt_"):
+        raise ConfigError("Put a token in RISKWREN_TOKEN, never on the command line. An "
+                          "administrator makes one under Admin → Other systems.")  # fmt: skip
+    print(f"RiskWren tools for {url}, {'reading and drafting' if args.drafts else 'reading'}.",
+          file=sys.stderr)  # fmt: skip
+    mcp.run(url, token, drafting=args.drafts)
+    return EXIT_OK
+
+
 def cmd_restore(args: argparse.Namespace) -> int:
     from riskwren import backup
 
@@ -1014,6 +1037,20 @@ def build_parser() -> argparse.ArgumentParser:
     restored.add_argument("file", metavar="FILE", help="the backup to restore")
     restored.add_argument("--describe", action="store_true", help="only say what the backup holds")
     restored.set_defaults(handler=cmd_restore)
+
+    served = commands.add_parser(
+        "tools",
+        help="serve tools to an assistant, over standard input and output",
+        description="A Model Context Protocol server for an assistant on this computer. Each "
+        "tool calls a RiskWren server's API with the token in RISKWREN_TOKEN, so the "
+        "assistant sees only what the token may. The tools read, and draft risks, issues, and "
+        "controls that a person then opens, changes, and saves in RiskWren.",
+    )
+    served.add_argument("--url", help="the RiskWren server's address (or RISKWREN_URL)")
+    served.add_argument(
+        "--no-drafts", dest="drafts", action="store_false", help="offer only the tools that read"
+    )
+    served.set_defaults(handler=cmd_tools)
 
     doctor = commands.add_parser(
         "doctor",

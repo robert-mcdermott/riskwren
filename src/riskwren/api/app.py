@@ -100,6 +100,10 @@ def create_app(config: Config) -> FastAPI:
     install_problem_handlers(app)
     for module in ROUTERS:
         app.include_router(module.router)
+    if config.assistant.enabled:  # off by default; while off, none of it is installed
+        from riskwren.api.routers import assistant
+
+        app.include_router(assistant.router)
     install_branding(app)
     install_static(app)  # last: its catch-all would shadow anything registered after it
     return app

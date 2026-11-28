@@ -500,6 +500,24 @@
         "title": "AnonymousSetting",
         "type": "object"
       },
+      "AsideBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "title": "AsideBody",
+        "type": "object"
+      },
       "AskBody": {
         "properties": {
           "assignee": {
@@ -1704,71 +1722,31 @@
         "title": "DocumentIn",
         "type": "object"
       },
-      "DraftBody": {
-        "description": "The draft's content. Send only what changes.",
+      "DraftRiskBody": {
         "properties": {
-          "ask_again": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Whether those who acknowledged earlier must do so again",
-            "title": "Ask Again"
+          "description": {
+            "description": "What could go wrong, in your words",
+            "maxLength": 4000,
+            "title": "Description",
+            "type": "string"
           },
-          "body": {
+          "org_unit_id": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "integer"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Its text, in a simple Markdown",
-            "title": "Body"
-          },
-          "change_note": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "What changed, and why",
-            "title": "Change Note"
-          },
-          "form": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "text, link, or file",
-            "title": "Form"
-          },
-          "url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Where it is kept, if not here",
-            "title": "Url"
+            "description": "The unit it belongs to",
+            "title": "Org Unit Id"
           }
         },
-        "title": "DraftBody",
+        "required": [
+          "description"
+        ],
+        "title": "DraftRiskBody",
         "type": "object"
       },
       "DueBody": {
@@ -6159,6 +6137,21 @@
         "title": "SuggestionBody",
         "type": "object"
       },
+      "SummaryBody": {
+        "properties": {
+          "ref": {
+            "description": "The record to summarize",
+            "maxLength": 32,
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "SummaryBody",
+        "type": "object"
+      },
       "SystemBody": {
         "properties": {
           "criticality": {
@@ -6792,6 +6785,21 @@
         "title": "Units",
         "type": "object"
       },
+      "UseBody": {
+        "properties": {
+          "ref": {
+            "description": "The record made from it",
+            "maxLength": 32,
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "UseBody",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -6956,6 +6964,12 @@
             "title": "Events",
             "type": "array"
           },
+          "format": {
+            "default": "plain",
+            "description": "plain, ticket, or chat",
+            "title": "Format",
+            "type": "string"
+          },
           "name": {
             "maxLength": 200,
             "title": "Name",
@@ -7002,6 +7016,17 @@
               }
             ],
             "title": "Events"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format"
           },
           "name": {
             "anyOf": [
@@ -7582,6 +7607,73 @@
         "title": "DecisionBody",
         "type": "object"
       },
+      "riskwren__api__routers__documents__DraftBody": {
+        "description": "The draft's content. Send only what changes.",
+        "properties": {
+          "ask_again": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether those who acknowledged earlier must do so again",
+            "title": "Ask Again"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Its text, in a simple Markdown",
+            "title": "Body"
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What changed, and why",
+            "title": "Change Note"
+          },
+          "form": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "text, link, or file",
+            "title": "Form"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where it is kept, if not here",
+            "title": "Url"
+          }
+        },
+        "title": "DraftBody",
+        "type": "object"
+      },
       "riskwren__api__routers__documents__NoteBody": {
         "properties": {
           "note": {
@@ -7791,6 +7883,176 @@
           }
         },
         "title": "ReviewBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__integration__DecisionBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a failure: who puts it right",
+            "title": "Owner Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a failure: the issue's severity",
+            "title": "Severity"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For evidence: until when it counts",
+            "title": "Valid Until"
+          }
+        },
+        "title": "DecisionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__integration__DraftBody": {
+        "properties": {
+          "kind": {
+            "description": "risk, issue, or control",
+            "title": "Kind",
+            "type": "string"
+          },
+          "values": {
+            "additionalProperties": true,
+            "description": "The ordinary form's fields by name, and org_unit_id; at least a name",
+            "title": "Values",
+            "type": "object"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What it rests on",
+            "title": "Why"
+          }
+        },
+        "required": [
+          "kind",
+          "values"
+        ],
+        "title": "DraftBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__integration__ReportBody": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "kind": {
+            "description": "result or evidence",
+            "title": "Kind",
+            "type": "string"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When, with its time zone; now if left out",
+            "title": "Observed At"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a result: passed, partial, or failed",
+            "title": "Outcome"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A scope that uses the control, by reference",
+            "title": "Scope"
+          },
+          "title": {
+            "description": "What was checked, or what the evidence is",
+            "maxLength": 600,
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where to see it",
+            "title": "Url"
+          }
+        },
+        "required": [
+          "kind",
+          "title"
+        ],
+        "title": "ReportBody",
         "type": "object"
       },
       "riskwren__api__routers__internal_audit__AnswerBody": {
@@ -9569,6 +9831,48 @@
         "summary": "Open or close reporting without a name",
         "tags": [
           "incidents"
+        ]
+      }
+    },
+    "/api/v1/admin/assistant": {
+      "get": {
+        "operationId": "assistant_settings_api_v1_admin_assistant_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Assistant Settings Api V1 Admin Assistant Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "How the assistant is set up, and its log",
+        "tags": [
+          "assistant"
+        ]
+      }
+    },
+    "/api/v1/admin/assistant/check": {
+      "post": {
+        "operationId": "check_assistant_api_v1_admin_assistant_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Check Assistant Api V1 Admin Assistant Check Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check that the provider answers",
+        "tags": [
+          "assistant"
         ]
       }
     },
@@ -11792,6 +12096,90 @@
         "summary": "Add a control to an assessment",
         "tags": [
           "assessments"
+        ]
+      }
+    },
+    "/api/v1/assistant/draft-risk": {
+      "post": {
+        "description": "The assistant searches for a risk that already says the same, and otherwise keeps a\ndraft for you to open in the ordinary form. Nothing is made until a person saves it.",
+        "operationId": "draft_risk_api_v1_assistant_draft_risk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftRiskBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Draft Risk Api V1 Assistant Draft Risk Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A risk drafted by the assistant from your words",
+        "tags": [
+          "assistant"
+        ]
+      }
+    },
+    "/api/v1/assistant/summary": {
+      "post": {
+        "description": "Written from what you may see, through the same tools the tool server offers, and from\nno data class the configuration keeps back. It is not saved on the record.",
+        "operationId": "summarize_api_v1_assistant_summary_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SummaryBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Summarize Api V1 Assistant Summary Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A summary of a record, by the assistant",
+        "tags": [
+          "assistant"
         ]
       }
     },
@@ -14158,6 +14546,102 @@
         ]
       }
     },
+    "/api/v1/controls/{ref}/reported": {
+      "get": {
+        "operationId": "reported_of_api_v1_controls__ref__reported_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reported Of Api V1 Controls  Ref  Reported Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What other systems have said of a control",
+        "tags": [
+          "integration"
+        ]
+      },
+      "post": {
+        "operationId": "report_onto_api_v1_controls__ref__reported_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__ReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Report Onto Api V1 Controls  Ref  Reported Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report a check or a piece of evidence onto a control, from another system",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
     "/api/v1/controls/{ref}/requirements": {
       "get": {
         "operationId": "control_requirements_api_v1_controls__ref__requirements_get",
@@ -15139,7 +15623,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DraftBody"
+                "$ref": "#/components/schemas/riskwren__api__routers__documents__DraftBody"
               }
             }
           },
@@ -16041,6 +16525,223 @@
         "summary": "A dossier of a scope, a risk, or a third party: a ZIP with a manifest that verifies",
         "tags": [
           "reporting"
+        ]
+      }
+    },
+    "/api/v1/drafts": {
+      "get": {
+        "operationId": "list_drafts_api_v1_drafts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Drafts Api V1 Drafts Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Drafts waiting for a person who may make them",
+        "tags": [
+          "integration"
+        ]
+      },
+      "post": {
+        "description": "Kept for a person to open in the ordinary form; nothing is made until they save it. A\ntoken that may only read may still propose one.",
+        "operationId": "propose_draft_api_v1_drafts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__DraftBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Propose Draft Api V1 Drafts Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Propose a risk, an issue, or a control",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/drafts/{draft_id}": {
+      "get": {
+        "operationId": "show_draft_api_v1_drafts__draft_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "draft_id",
+            "required": true,
+            "schema": {
+              "title": "Draft Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Show Draft Api V1 Drafts  Draft Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One draft",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/drafts/{draft_id}/set-aside": {
+      "post": {
+        "operationId": "set_draft_aside_api_v1_drafts__draft_id__set_aside_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "draft_id",
+            "required": true,
+            "schema": {
+              "title": "Draft Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AsideBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Draft Aside Api V1 Drafts  Draft Id  Set Aside Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a draft aside, saying why",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/drafts/{draft_id}/use": {
+      "post": {
+        "operationId": "use_draft_api_v1_drafts__draft_id__use_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "draft_id",
+            "required": true,
+            "schema": {
+              "title": "Draft Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UseBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Use Draft Api V1 Drafts  Draft Id  Use Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mark a draft as used, naming what was made",
+        "tags": [
+          "integration"
         ]
       }
     },
@@ -25083,6 +25784,137 @@
         ]
       }
     },
+    "/api/v1/reported": {
+      "get": {
+        "operationId": "reported_waiting_api_v1_reported_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reported Waiting Api V1 Reported Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "What other systems have said, waiting for a person to confirm",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/reported/{report_id}/confirm": {
+      "post": {
+        "operationId": "confirm_report_api_v1_reported__report_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "title": "Report Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__DecisionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Confirm Report Api V1 Reported  Report Id  Confirm Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm a report: a failure raises an issue",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/reported/{report_id}/set-aside": {
+      "post": {
+        "operationId": "set_report_aside_api_v1_reported__report_id__set_aside_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "title": "Report Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__DecisionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Report Aside Api V1 Reported  Report Id  Set Aside Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a report aside, saying why",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
     "/api/v1/resilience": {
       "get": {
         "operationId": "show_resilience_api_v1_resilience_get",
@@ -32921,6 +33753,60 @@
         "summary": "Begin single sign-on",
         "tags": [
           "single sign-on"
+        ]
+      }
+    },
+    "/api/v1/standing/{kind}/{ref}": {
+      "get": {
+        "description": "Yes or no, with the reasons by kind and nothing of the record's contents. A record the\nasker may not see is not found.",
+        "operationId": "check_standing_api_v1_standing__kind___ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Standing Api V1 Standing  Kind   Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Whether a third party, a scope, or an exception is in good standing",
+        "tags": [
+          "integration"
         ]
       }
     },

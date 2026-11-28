@@ -24,6 +24,7 @@ riskwren [-h] [--version] [-c FILE] [-v | -q] COMMAND ...
 | [`riskwren program`](#riskwren-program) | Move the program between installations |
 | [`riskwren backup`](#riskwren-backup) | Back the whole installation up to one file |
 | [`riskwren restore`](#riskwren-restore) | Restore a backup into an empty database |
+| [`riskwren tools`](#riskwren-tools) | Serve tools to an assistant, over standard input and output |
 | [`riskwren doctor`](#riskwren-doctor) | Check that this installation is healthy |
 | [`riskwren jobs`](#riskwren-jobs) | See scheduled work, or run it now |
 | [`riskwren mail`](#riskwren-mail) | Send waiting email, or test the mail settings |
@@ -215,6 +216,15 @@ Load a backup into an empty database and data home, then check every table, ever
 |---|---|
 | `FILE` | the backup to restore |
 | `--describe` | only say what the backup holds |
+
+## `riskwren tools`
+
+A Model Context Protocol server for an assistant on this computer. Each tool calls a RiskWren server's API with the token in RISKWREN_TOKEN, so the assistant sees only what the token may. The tools read, and draft risks, issues, and controls that a person then opens, changes, and saves in RiskWren.
+
+| Option | Meaning |
+|---|---|
+| `--url` | the RiskWren server's address (or RISKWREN_URL) |
+| `--no-drafts` | offer only the tools that read |
 
 ## `riskwren doctor`
 

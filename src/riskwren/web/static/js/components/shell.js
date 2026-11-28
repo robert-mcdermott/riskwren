@@ -23,7 +23,7 @@ function named(item) {
 const NAMED = new Set(["processes", "systems", "third-parties", "services", "information", "sites", "issues", "exceptions", "incidents"]);
 
 export const NAV = [
-  { items: [{ href: "/", label: "Home", iconName: "home", exact: true }] },
+  { items: [{ href: "/", label: "Home", iconName: "home", exact: true }, { href: "/drafts", label: "Drafts", iconName: "edit", when: ["steward", "assess"] }] },
   {
     heading: "Risks",
     items: [
@@ -53,6 +53,7 @@ export const NAV = [
       { href: "/assessments", label: "Assessments", iconName: "assessment" },
       { href: "/issues", label: "Issues", iconName: "issue" },
       { href: "/exceptions", label: "Exceptions", iconName: "exception" },
+      { href: "/reported", label: "From other systems", iconName: "link", when: "assess" },
       { href: "/agreements", label: "Agreements", iconName: "agreement" },
       { href: "/privacy", label: "Privacy impact", iconName: "shield-check" },
       { href: "/campaigns", label: "Campaigns", iconName: "bell", when: ["assess", "read_all"] },
@@ -125,13 +126,14 @@ export const NAV = [
       { href: "/admin/appearance", label: "Appearance", iconName: "appearance", when: "admin" },
       { href: "/admin/sso", label: "Single sign-on", iconName: "key", when: "admin" },
       { href: "/admin/integrations", label: "Other systems", iconName: "link", when: "admin" },
+      { href: "/admin/assistant", label: "Assistant", iconName: "document", when: "admin", only: () => session()?.assistant },
       { href: "/admin/operations", label: "Operations", iconName: "history", when: "admin" },
     ],
   },
 ];
 
 export function visibleNav() {
-  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => !item.when || [item.when].flat().some((need) => can(need))).map(named) }))
+  return NAV.map((group) => ({ ...group, items: group.items.filter((item) => (!item.when || [item.when].flat().some((need) => can(need))) && (!item.only || item.only())).map(named) }))
     .filter((group) => group.items.length);
 }
 

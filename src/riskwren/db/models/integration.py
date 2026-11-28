@@ -49,6 +49,9 @@ class Webhook(Base):
     url: Mapped[str] = mapped_column(String(500))
     events: Mapped[list[str]] = mapped_column(JsonType, default=list)
     secret: Mapped[str] = mapped_column(String(80))
+    # How a message is shaped: plain (RiskWren's own), ticket (a title, a description, and a
+    # link, for a ticketing system), or chat (a line of text, for a chat channel).
+    format: Mapped[str] = mapped_column(String(16), default="plain", server_default="plain")
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_by_name: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
@@ -85,3 +88,92 @@ class WebhookCursor(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     event_id: Mapped[int] = mapped_column(Integer)
+
+
+class ReportedResult(Base):
+    """What another system says of a control: a check it ran, or a piece of evidence. Shown
+    on the control at once, as its source's; it counts only once a person confirms it, which
+    raises an issue for a failure or files the evidence, and it never replaces a person's."""
+
+    __tablename__ = "reported_result"
+    __audit_parent__ = ("control", "control_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id", ondelete="CASCADE"))
+    scope_id: Mapped[int | None] = mapped_column(ForeignKey("scope.id"))
+    kind: Mapped[str] = mapped_column(String(16))  # result, evidence
+    outcome: Mapped[str | None] = mapped_column(String(16))  # passed, partial, failed
+    title: Mapped[str] = mapped_column(String(300))
+    detail: Mapped[str | None] = mapped_column(Text)
+    url: Mapped[str | None] = mapped_column(String(500))
+    observed_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    source: Mapped[str] = mapped_column(String(120))  # the token's name
+    reported_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    status: Mapped[str] = mapped_column(String(16), default="reported")
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    decided_by_name: Mapped[str | None] = mapped_column(String(200))
+    decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    issue_id: Mapped[int | None] = mapped_column(Integer)
+    evidence_id: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (Index("ix_reported_result_control", "control_id", "status"),)
+
+
+class Draft(Base):
+    """What an assistant or another system proposes: a risk, an issue, or a control, made only
+    when a person opens it in the ordinary form and saves it. Setting one aside leaves no
+    record behind; the draft itself stays, with why."""
+
+    __tablename__ = "draft"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(16))  # risk, issue, or control
+    values: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict)
+    why: Mapped[str | None] = mapped_column(Text)  # what the drafter says it rests on
+    source: Mapped[str] = mapped_column(String(200))  # the token's name, or the assistant's
+    org_unit_id: Mapped[int | None] = mapped_column(ForeignKey("org_unit.id"))
+    made_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))  # the asker, if a person
+    made_by_name: Mapped[str] = mapped_column(String(200))
+    made_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    status: Mapped[str] = mapped_column(String(16))  # waiting, used, or set_aside
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    decided_by_name: Mapped[str | None] = mapped_column(String(200))
+    decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    record_ref: Mapped[str | None] = mapped_column(String(32))  # what was made from it
+
+    __table_args__ = (Index("ix_draft_status", "status", "made_at"),)
+
+
+class AssistantExchange(Base):
+    """One exchange with the assistant: who asked, what for, which tools it used, what it
+    answered, and what it cost. Kept in the history, so the record of it cannot be changed
+    unnoticed. The row is made before the provider is asked, so the daily limit is counted
+    from rows that exist."""
+
+    __tablename__ = "assistant_exchange"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asked_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))  # a person
+    token_id: Mapped[int | None] = mapped_column(Integer)  # or a token
+    asked_by_name: Mapped[str] = mapped_column(String(200))
+    task: Mapped[str] = mapped_column(String(32))  # summarize, draft_risk, or check
+    ref: Mapped[str | None] = mapped_column(String(32))  # the record it was about
+    asked: Mapped[str | None] = mapped_column(Text)  # what the person wrote, if anything
+    answer: Mapped[str | None] = mapped_column(Text)
+    tools_used: Mapped[list[dict[str, Any]]] = mapped_column(JsonType, default=list)
+    provider: Mapped[str] = mapped_column(String(16))
+    model: Mapped[str] = mapped_column(String(200))
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(16))  # asking, answered, failed, or refused
+    error: Mapped[str | None] = mapped_column(Text)
+    draft_id: Mapped[int | None] = mapped_column(Integer)
+    asked_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    took_ms: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (
+        Index("ix_assistant_exchange_person", "asked_by", "asked_at"),
+        Index("ix_assistant_exchange_token", "token_id", "asked_at"),
+    )

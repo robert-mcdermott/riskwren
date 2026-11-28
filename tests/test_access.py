@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 from datetime import timedelta
 
 import pytest
@@ -13,6 +14,7 @@ from sqlalchemy import select
 from riskwren.access.policy import POLICIES, Needs, record_policies
 from riskwren.api.app import create_app
 from riskwren.auth import sessions
+from riskwren.config import AssistantConfig
 from riskwren.core.clock import frozen_at, utc_now
 from riskwren.db.models import Event
 from tests.conftest import Instance
@@ -258,6 +260,22 @@ REACH: dict[tuple[str, str], set[str]] = {
     ("PATCH", "/api/v1/admin/webhooks/{hook_id}"): {"admin"},
     ("DELETE", "/api/v1/admin/webhooks/{hook_id}"): {"admin"},
     ("POST", "/api/v1/admin/webhooks/{hook_id}/test"): {"admin"},
+    ("POST", "/api/v1/controls/{ref}/reported"): EVERYONE,
+    ("GET", "/api/v1/controls/{ref}/reported"): EVERYONE,
+    ("GET", "/api/v1/reported"): {"manager", "assessor"},
+    ("POST", "/api/v1/reported/{report_id}/confirm"): {"manager", "assessor"},
+    ("POST", "/api/v1/reported/{report_id}/set-aside"): {"manager", "assessor"},
+    ("GET", "/api/v1/standing/{kind}/{ref}"): EVERYONE,
+    # The assistant, when it is turned on (checked below with an app that has it on)
+    ("POST", "/api/v1/assistant/summary"): EVERYONE,
+    ("POST", "/api/v1/assistant/draft-risk"): EVERYONE,
+    ("GET", "/api/v1/admin/assistant"): {"admin"},
+    ("POST", "/api/v1/admin/assistant/check"): {"admin"},
+    ("POST", "/api/v1/drafts"): EVERYONE,
+    ("GET", "/api/v1/drafts"): EVERYONE,
+    ("GET", "/api/v1/drafts/{draft_id}"): EVERYONE,
+    ("POST", "/api/v1/drafts/{draft_id}/use"): EVERYONE,
+    ("POST", "/api/v1/drafts/{draft_id}/set-aside"): EVERYONE,
     ("POST", "/api/v1/jobs/{key}/run"): {"admin"},
     ("PUT", "/api/v1/jobs/{key}"): {"admin"},
     ("GET", "/api/v1/mail"): {"admin"},
@@ -578,9 +596,13 @@ for _path in RECORD_PATHS:
         REACH[(_method, _template)] = {"manager", "steward"} if adding else EVERYONE
 
 
+ASSISTANT_ON = AssistantConfig(enabled=True, model="m", url="http://127.0.0.1:9/v1")
+
+
 def api_routes(instance: Instance) -> set[tuple[str, str]]:
-    """Every API route, read from the document the app publishes about itself."""
-    paths = create_app(instance.config).openapi()["paths"]
+    """Every API route, read from the document the app publishes about itself, with every
+    optional part turned on."""
+    paths = create_app(replace(instance.config, assistant=ASSISTANT_ON)).openapi()["paths"]
     return {(method.upper(), path) for path, methods in paths.items() for method in methods}
 
 
@@ -613,6 +635,8 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
         for (method, template), may in sorted(REACH.items()):
             if (method, template) in {("DELETE", "/api/v1/session"), ("POST", "/api/v1/session")}:
                 continue  # exercised above; they would end or replace the session under test
+            if "/assistant" in template:
+                continue  # not there while the assistant is off: checked below
             client = as_role(None if role == "nobody" else role)
             path = template.replace("{account_id}", str(own)).replace(
                 "{unit_id}", str(people.units["HALE"])
@@ -736,6 +760,29 @@ def test_each_role_reaches_exactly_what_it_should(as_role: Clients, people: Peop
                 assert status == 401, where
             else:
                 assert status == 403, where
+
+
+def test_each_role_reaches_the_assistant_as_it_should(instance: Instance, people: People) -> None:
+    app = create_app(replace(instance.config, assistant=ASSISTANT_ON))
+    with TestClient(app, base_url="http://localhost") as client:
+        for role in [*ROLES, "nobody"]:
+            client.cookies.clear()
+            client.headers.pop("X-CSRF-Token", None)
+            if role != "nobody":
+                sign_in(client, email_of(role))
+            for (method, template), may in REACH.items():
+                if "/assistant" not in template:
+                    continue
+                # An empty question is refused once reached, so no provider is asked.
+                kwargs = {"json": {}} if method == "POST" and "check" not in template else {}
+                status = client.request(method, template, **kwargs).status_code
+                where = f"{role}: {method} {template} → {status}"
+                if role in may:
+                    assert status not in (401, 403), where
+                elif role == "nobody":
+                    assert status == 401, where
+                else:
+                    assert status == 403, where
 
 
 def test_policies_name_real_needs() -> None:

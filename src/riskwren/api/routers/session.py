@@ -60,12 +60,17 @@ def _may_use_password(request: Request, session: Any, account_id: int) -> bool:
     return any(grant.role == "admin" for grant in accounts.grants_of(session, account_id))
 
 
+def _me(request: Request, principal: Any) -> dict[str, Any]:
+    """Who is signed in, and whether the assistant is on: said only to someone signed in."""
+    return {**principal.to_json(), "assistant": request.app.state.config.assistant.enabled}
+
+
 @router.get("/session", summary="Who is signed in")
 def show(request: Request) -> Any:
     principal = getattr(request.state, "principal", None)
     if principal is None:
         return problem(401, "Nobody is signed in.", instance=request.url.path)
-    return envelope(principal.to_json())
+    return envelope(_me(request, principal))
 
 
 @router.post("/session", summary="Sign in with an email address and password")
@@ -135,7 +140,7 @@ def _start(
         sessions.COOKIE, token, httponly=True, samesite="strict", secure=_secure(request), path="/",
         max_age=int(config.session_max_days * 86400),
     )  # fmt: skip
-    return envelope(principal.to_json())
+    return envelope(_me(request, principal))
 
 
 @router.post("/session/demo", summary="Sign in as a sample person (demo installations only)")

@@ -15,20 +15,21 @@ import { levelPicker, rating, suggestionView } from "./risk.js";
 import { toast } from "./toast.js";
 
 /** Raise a risk, or edit the one given. A new risk can be started from the library. */
-export function editRisk({ record = null, program, units, onDone }) {
+export function editRisk({ record = null, draft = null, program, units, onDone }) {
+  const from = draft?.values ?? {};
   openOverlay({
     title: record ? "Edit risk" : "Raise a risk",
     subtitle: record ? record.ref : "Something that could happen, and would matter.",
     render: (body, footer, close) => {
-      const name = field("Title", { value: record?.name ?? "", required: true,
+      const name = field("Title", { value: record?.name ?? from.name ?? "", required: true,
         hint: "A few words that name it. For example: Loss of irreplaceable specimens." });
       const category = select("Category", categoryOptions(program, { blank: record ? null : "Choose…" }),
-        { value: record?.category ?? "", required: true, hint: "Its category sets the appetite it is held to." });
+        { value: record?.category ?? from.category ?? "", required: true, hint: "Its category sets the appetite it is held to." });
       const unit = select("Unit", unitOptions(units.tree, { only: ownUnits(), blank: record ? null : "Choose…" }),
-        { value: record?.org_unit_id ?? "", required: true, hint: "The unit that owns the risk." });
-      const cause = field("Cause", { type: "textarea", value: record?.cause ?? "", hint: "What makes it possible." });
-      const event = field("Event", { type: "textarea", value: record?.event ?? "", hint: "What would happen." });
-      const consequence = field("Consequence", { type: "textarea", value: record?.consequence ?? "", hint: "What it would mean for the organization." });
+        { value: record?.org_unit_id ?? draft?.org_unit?.id ?? "", required: true, hint: "The unit that owns the risk." });
+      const cause = field("Cause", { type: "textarea", value: record?.cause ?? from.cause ?? "", hint: "What makes it possible." });
+      const event = field("Event", { type: "textarea", value: record?.event ?? from.event ?? "", hint: "What would happen." });
+      const consequence = field("Consequence", { type: "textarea", value: record?.consequence ?? from.consequence ?? "", hint: "What it would mean for the organization." });
       const restricted = checkbox("Restricted", { checked: record?.restricted ?? false,
         hint: "Known only to its owners, its unit's stewards and leaders, managers, and auditors." });
       let libraryKey = null;
@@ -83,6 +84,7 @@ export function editRisk({ record = null, program, units, onDone }) {
           toast("Saved.");
           onDone?.(done.data);
         } else {
+          if (draft) await post(`/api/v1/drafts/${draft.id}/use`, { ref: done.data.ref }).catch(() => toast("It was made, but the draft could not be marked as used."));
           toast(`${done.data.ref} was raised. Assess it next.`);
           navigate(`/risks/${done.data.ref}`);
         }

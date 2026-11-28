@@ -29,8 +29,8 @@ def test_the_command_reference_is_current() -> None:
     _check(DOCS / "cli.md", reference.render())
 
 
-def test_the_openapi_document_is_current(client: TestClient) -> None:
-    document = client.get("/api/openapi.json").json()
+def test_the_openapi_document_is_current(full_client: TestClient) -> None:
+    document = full_client.get("/api/openapi.json").json()
     document["info"]["version"] = "current"  # the version changes every release
     _check(DOCS / "openapi.json", json.dumps(document, indent=2, sort_keys=True) + "\n")
 

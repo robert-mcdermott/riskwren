@@ -16,6 +16,7 @@ const ROLE_LABELS = {
 };
 const STATE_TONES = { active: "ok", expired: "warn", withdrawn: "" };
 const DELIVERY_TONES = { sent: "ok", queued: "info", failed: "danger" };
+const FORMAT_LABELS = { plain: "The plain message", ticket: "A ticket", chat: "A chat message" };
 
 function shownOnce(title, value, note) {
   return alert("warn", h("div", { class: "stack-sm" },
@@ -89,7 +90,8 @@ function webhooksCard(data, reload, reveal) {
       } })) },
     h("div", { class: "stack" },
       h("dl", { class: "dl" }, h("dt", {}, "Address"), h("dd", {}, h("code", {}, hook.url)),
-        h("dt", {}, "Told of"), h("dd", {}, hook.events.join(", "))),
+        h("dt", {}, "Told of"), h("dd", {}, hook.events.join(", ")),
+        h("dt", {}, "Sent as"), h("dd", {}, FORMAT_LABELS[hook.format] ?? hook.format)),
       hook.deliveries.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
         h("caption", { class: "sr-only" }, `The latest messages to ${hook.name}`),
         h("thead", {}, h("tr", {}, ["Event", "Record", "Made", "Tries", "Result"].map((text) => h("th", { scope: "col" }, text)))),
@@ -105,17 +107,19 @@ function webhooksCard(data, reload, reveal) {
   const url = field("Address", { type: "url", placeholder: "https://", hint: "Only https:// addresses." });
   const events = field("Told of", { value: "issue.*, incident.*",
     hint: `Separated by commas: * for everything; a family such as issue.*; or an event such as issue.close or risk.assess. The families: ${data.families.map((each) => `${each.key} (${each.label.toLowerCase()})`).join(", ")}.` });
+  const shape = select("Sent as", Object.entries(FORMAT_LABELS), { value: "plain",
+    hint: "A ticket gives a title, a description, and a link; a chat message is one line of text. Each still names only the event and the record." });
   const problem = banner();
   const make = button("Register it", { kind: "btn-primary", type: "submit" });
   const form = h("form", { class: "stack", novalidate: true, onsubmit: async (event) => {
     event.preventDefault();
-    const done = await submit({ button: make, banner: problem, fields: { name, url, events },
-      run: () => post("/api/v1/admin/webhooks", { name: name.input.value, url: url.input.value,
+    const done = await submit({ button: make, banner: problem, fields: { name, url, events, format: shape },
+      run: () => post("/api/v1/admin/webhooks", { name: name.input.value, url: url.input.value, format: shape.input.value,
         events: events.input.value.split(",").map((each) => each.trim()).filter(Boolean) }) });
     if (!done) return;
     reveal(shownOnce(`The signing secret for ${done.data.name}`, done.meta.secret,
       "Copy it now: it is not shown again. Each message carries an X-RiskWren-Signature header, t=time,v1=HMAC-SHA256 of the time, a dot, and the body, made with this secret."));
-  } }, problem, h("div", { class: "grid-2" }, name.node, url.node), events.node, h("div", { class: "form-actions" }, make));
+  } }, problem, h("div", { class: "grid-2" }, name.node, url.node), h("div", { class: "grid-2" }, events.node, shape.node), h("div", { class: "form-actions" }, make));
 
   return h("div", { class: "stack-lg" },
     card({ title: "Webhooks" }, h("div", { class: "stack" },

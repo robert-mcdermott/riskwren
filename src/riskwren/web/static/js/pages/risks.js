@@ -7,7 +7,7 @@ import { button, h } from "../core/dom.js";
 import { date, plural } from "../core/format.js";
 import { categoryOptions, program as loadProgram, unitOptions, units } from "../core/lookups.js";
 import { query } from "../core/router.js";
-import { can } from "../core/session.js";
+import { can, session } from "../core/session.js";
 import { hrefOf, TYPES } from "../components/record.js";
 import { flags, rating, ratingOptions, standingOptions, standingPill } from "../components/risk.js";
 import { editRisk } from "../components/risk-forms.js";
@@ -79,6 +79,7 @@ export function riskRegister(main) {
       return h("div", { class: "stack-lg" },
         pageHeader({ eyebrow: "Risks", title: "Register", lede: meta.lede,
           actions: [mayAdd ? button("Raise a risk", { kind: "btn-primary", iconName: "plus", onclick: add }) : null,
+            session()?.assistant ? button("Draft with the assistant", { iconName: "edit", onclick: async () => (await import("../components/assistant.js")).draftRisk({ program, units: data.units, onDone: reload }) }) : null,
             can("steward") ? button("Import", { iconName: "upload", onclick: async () => (await import("../components/exchange.js")).openRecordImport({ path: `records/${meta.path}`, what: meta.nouns, onDone: reload }) }) : null, exportButton("risks")] }),
         bar,
         card({ title: plural(total, "risk"), flush: true, footer: pager(data.page.meta, rows.length) }, body));

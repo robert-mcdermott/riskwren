@@ -103,6 +103,14 @@ A result of partly effective or ineffective also opens an issue for the control'
 
 While a test result holds, the control cannot be re-rated by judgment. Otherwise the quickest way to clear a failing test would be to have an opinion. A later test replaces it, and so does the passing of time: a result holds for as long as any rating does, twelve months by default.
 
+### What other systems report
+
+A scanner or a monitoring tool may report onto a control, with a token: that a check passed, partly passed, or failed, or a piece of evidence such as a monthly patch report. What it says is shown on the control's page at once, under **Reported by other systems**, in its source's name, and counts for nothing until a person who assesses the control's unit, and does not own the control, confirms it under **Compliance → From other systems**.
+
+![Checks and evidence a patch scanner has reported onto controls, waiting for an assessor to confirm or set them aside](img/reported-light.webp)
+
+Confirming a failure raises an issue on the control, as a person's finding would; confirming evidence files it with the control, counting for a year unless it says otherwise. Neither becomes the control's rating: only a test in an assessment does that. Setting a report aside keeps it on record with why. See [the API guide](api.md#reporting-onto-a-control) for what a system sends.
+
 ### Finish
 
 **Complete** closes an assessment once every test in it has a result that counts. A test that will not be done is taken out first. **Cancel it** abandons an assessment; results already confirmed still count.

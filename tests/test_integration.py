@@ -137,3 +137,44 @@ def test_webhooks_carry_references_signed(
     listed = admin.get("/api/v1/admin/webhooks").json()["data"]
     assert listed[0]["deliveries"][0]["status"] == "sent"
     assert as_role("manager").get("/api/v1/admin/webhooks").status_code == 403
+
+
+def test_a_webhook_can_speak_as_a_ticket_or_a_chat_message(
+    as_role: Clients, people: People, instance: Instance
+) -> None:
+    admin = as_role("admin")
+    wrong = admin.post("/api/v1/admin/webhooks", json={
+        "name": "x", "url": "https://chat.example.org/in", "events": ["issue.*"],
+        "format": "email"})  # fmt: skip
+    assert wrong.status_code == 422
+    chat = admin.post("/api/v1/admin/webhooks", json={
+        "name": "Team chat", "url": "https://chat.example.org/in", "events": ["issue.*"],
+        "format": "chat"}).json()["data"]  # fmt: skip
+    assert chat["format"] == "chat"
+    ticket = admin.post("/api/v1/admin/webhooks", json={
+        "name": "Service desk", "url": "https://desk.example.org/in",
+        "events": ["issue.*"]}).json()["data"]  # fmt: skip
+    assert ticket["format"] == "plain"
+    changed = admin.patch(f"/api/v1/admin/webhooks/{ticket['id']}", json={"format": "ticket"})
+    assert changed.status_code == 200 and changed.json()["data"]["format"] == "ticket"
+    with instance.db.bookkeeping() as session:
+        webhooks.queue(session)
+    made = as_role("manager").post("/api/v1/issues", json={
+        "name": "Backups not tested", "severity": "high", "summary": "Never restored.",
+        "org_unit_id": people.units["HALE"], "source_kind": "observation"})  # fmt: skip
+    made = made.json()["data"]
+    with instance.db.bookkeeping() as session:
+        assert webhooks.queue(session, base_url="https://grc.example.org") == 2
+    bodies: dict[str, dict] = {}
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        bodies[request.url.host] = json.loads(request.content)
+        return httpx.Response(204)
+
+    sent = webhooks.send_due(instance.db, transport=httpx.MockTransport(answer))
+    assert sent["webhooks_sent"] == 2
+    where = f"https://grc.example.org/issues/{made['ref']}"
+    assert bodies["chat.example.org"] == {"text": f"RiskWren: issue.create: {made['ref']} {where}"}
+    desk = bodies["desk.example.org"]
+    assert desk["title"] == f"RiskWren: issue.create: {made['ref']}" and desk["link"] == where
+    assert "Backups" not in json.dumps(bodies)  # still references, never contents

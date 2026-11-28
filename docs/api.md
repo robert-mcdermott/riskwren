@@ -66,7 +66,103 @@ A message names the event and the record, and never says what the record says: t
 
 Each message carries `X-RiskWren-Event`, `X-RiskWren-Delivery`, and `X-RiskWren-Signature: t=TIME,v1=HEX`, where `HEX` is the HMAC-SHA256, keyed with the webhook's secret, of the time, a dot, and the body exactly as sent. The secret is shown once, when the webhook is registered. To check a message, recompute the signature and compare it in constant time, and refuse one whose time is more than five minutes away from your own.
 
+A webhook can be sent as the plain message above, as a **ticket** (`title`, `description`, `link`, with the `event` and `record`), for a service desk that makes a ticket of what it is sent, or as a **chat message** (`{"text": "RiskWren: issue.close: ISS-0031 https://…"}`), for a channel that takes an incoming message. Each still names only the event and the record.
+
 An answer of 2xx is a delivery. Anything else, or no answer within ten seconds, is tried again after a minute, five minutes, half an hour, two hours, and twelve hours, and then given up. The latest deliveries, with how each went, are shown with the webhook, and kept for thirty days. A webhook can be paused, and sent a test message.
+
+## Reporting onto a control
+
+A scanner, a monitoring tool, or another system reports what it has found of a control with a token that acts as a manager, an assessor, or a steward, and may change things:
+
+```bash
+curl -s -X POST -H "Authorization: Bearer rwt_…" -H "Content-Type: application/json" \
+  https://grc.example.org/api/v1/controls/CTL-0042/reported \
+  -d '{"kind": "result", "outcome": "failed", "title": "12 servers missing patches",
+       "detail": "Hosts are listed in the scan.", "url": "https://scanner.example.org/r/9",
+       "observed_at": "2026-11-27T06:00:00Z", "scope": "SCP-0003"}'
+```
+
+`kind` is `result` (with an `outcome` of `passed`, `partial`, or `failed`) or `evidence` (with no outcome, and usually a `url`). `observed_at` is when it was seen, with its time zone; it defaults to now and may not be in the future. `scope` is optional and must be a scope that uses the control. Only a token reports: a person records a result in an assessment.
+
+What is reported is shown on the control at once, under its source's name, and counts for nothing until a person who assesses the control's unit, and does not own the control, confirms it under **Compliance → From other systems**. Confirming a failure raises an issue on the control (and the scope); confirming evidence files it with the control, for a year unless it says otherwise; confirming a pass keeps it as checked. Setting one aside keeps it on record with why. A report never replaces a person's result and never changes a rating by itself.
+
+## Asking whether something is in good standing
+
+Another process (purchasing, a data-access request, a deployment pipeline) asks whether a third party, a scope, or an exception is in good standing:
+
+```bash
+curl -s -H "Authorization: Bearer rwt_…" https://grc.example.org/api/v1/standing/third-party/TP-0007
+```
+
+```json
+{"data": {"kind": "third-party", "ref": "TP-0007", "name": "Halden Research Partners",
+          "in_good_standing": false,
+          "reasons": [{"code": "review_overdue", "text": "Its review was due on 2026-10-01."}],
+          "as_of": "2026-11-27T15:04:00Z"}}
+```
+
+The kinds are `third-party`, `scope`, and `exception`. A third party is not in good standing when it is not active (`not_active`), its review is overdue (`review_overdue`), or information is shared with it that no agreement of the kind the program requires covers (`no_agreement`). A scope is not when it is not active, a control it uses has failed a test (`failing`), or a critical or high issue about it is past its date (`issues_overdue`). An exception is in good standing only while it is in force; otherwise the reason is its state (`requested`, `expired`, and so on). The answer says nothing else of the record. A record the token may not see is not found.
+
+### Recipes
+
+**Before buying from a supplier.** Give the purchasing system an auditor's token that may only read. When a purchase names a supplier's third-party reference, it asks `GET /standing/third-party/{ref}` and holds the purchase for a person when the answer is `false`, showing the reasons' texts; when the answer is 404, the supplier is not on record, and the purchase goes to whoever adds third parties. The purchasing system learns that the review is overdue, never what the review found.
+
+```bash
+answer=$(curl -s -H "Authorization: Bearer $RISKWREN_TOKEN" \
+  "https://grc.example.org/api/v1/standing/third-party/$SUPPLIER_REF")
+echo "$answer" | jq -e '.data.in_good_standing' > /dev/null || echo "Hold: $(echo "$answer" | jq -r '.data.reasons[].text')"
+```
+
+**Before granting access to data.** A data-access request names the scope the data sits in (the research enclave, the clinical systems). The request process asks `GET /standing/scope/{ref}` and, when a control has failed a test or a high issue is overdue, sends the request to the security team instead of granting it. A request that rests on an exception (an unencrypted laptop allowed until a date) asks `GET /standing/exception/{ref}` and is refused once the exception is no longer in force.
+
+**Before a deployment.** A pipeline that deploys into a scope asks the same question of the scope, and stops for a person rather than failing on its own: the answer is a reason to look, not a verdict.
+
+**Ticketing and chat.** Register a webhook with the format **A ticket** at the service desk's incoming address, told of `issue.*`, and each issue raised or changed opens or updates a ticket whose link leads back to the issue. Register one with **A chat message** at a channel's incoming address, told of `incident.report` and `exception.request`, for the few things a team should see as they happen. Neither carries what the record says.
+
+## An assistant: the tool server
+
+`riskwren tools` is a Model Context Protocol server, over standard input and output, for an assistant on someone's own computer. It gives the assistant tools that call RiskWren's API with a token, so the assistant sees only what the token may:
+
+| Tool | What it does |
+|---|---|
+| `search` | Search every kind of record the token may see |
+| `get_record` | One record in full, by its reference |
+| `risk_with_controls` | A risk, with its ratings and the controls that bear on it |
+| `scope_readiness` | A scope: what it is held to, how far it meets it, and its open issues |
+| `whats_overdue` | Risks whose review is overdue, issues past their date, controls whose rating is stale |
+| `draft_risk` · `draft_issue` · `draft_control` | A draft, for a person to open, change, and save |
+
+Make a token for it under **Admin → Other systems**: an auditor's that may only read is enough, because a token that may only read may still draft. Then tell the assistant to start the server, with the token in its environment and never on the command line:
+
+```json
+{
+  "mcpServers": {
+    "riskwren": {
+      "command": "riskwren",
+      "args": ["tools", "--url", "https://grc.example.org"],
+      "env": {"RISKWREN_TOKEN": "rwt_…"}
+    }
+  }
+}
+```
+
+`--no-drafts` offers only the tools that read. The address must be `https://`, except on the same computer. An answer is cut short past 24,000 characters, so one record cannot fill a conversation. What the assistant does with what it reads is between it and whoever provides it, so choose one the organization trusts with what the token may see. The drafts it makes are in the history under the token's name, and when the token was last used is shown beside it.
+
+### Drafts
+
+A draft is a proposal, never a half-made record. It waits under **Drafts** for a person who may add that kind of record in its unit: a unit's steward or a manager for a risk or a control, and an assessor too for an issue. **Open** puts it in the ordinary form, where the person changes what they like and saves it, so every rule that applies to a record they make applies to this one; the draft is then marked as used, naming what was made. **Set aside** keeps it on record with why, and makes nothing.
+
+![A risk and an issue drafted by a security engineer's assistant, waiting under Drafts to be opened in the ordinary form or set aside](img/drafts-light.webp)
+
+```bash
+curl -s -X POST -H "Authorization: Bearer rwt_…" -H "Content-Type: application/json" \
+  https://grc.example.org/api/v1/drafts \
+  -d '{"kind": "issue", "values": {"name": "Firewall rules not reviewed in a year",
+       "summary": "The last review is fourteen months old.", "severity": "moderate",
+       "org_unit_id": 4}, "why": "The firewall standard asks for one every six months."}'
+```
+
+A risk draft may say `name`, `summary`, `cause`, `event`, `consequence`, and `category`; an issue draft `name`, `summary`, `severity`, and `source_kind`; a control draft `name`, `statement`, `objective`, `kind`, `nature`, and `frequency`. Each may say `org_unit_id`, and needs a `name`. Anything else is refused.
 
 ## The contract
 
@@ -230,7 +326,12 @@ Every route requires a signed-in account except those marked public. What a rout
 | `POST /questionnaires/{key}/responses` · `GET /responses/{id}` | Answer a questionnaire, as a draft or in full; read answers as they were asked |
 | `GET /jobs` · `POST /jobs/{key}/run` · `PUT /jobs/{key}` | Scheduled work: how it is going, run one job now, pause or resume one (administrators) |
 | `GET` · `POST /admin/tokens` · `POST /admin/tokens/{token_id}/revoke` | Tokens for other systems: list them, make one (`name`, `role`, `org_unit_id`, `read_only`, `days`; the token is in `meta.token` this once), withdraw one (administrators) |
-| `GET` · `POST /admin/webhooks` · `PATCH` · `DELETE /admin/webhooks/{hook_id}` · `POST /admin/webhooks/{hook_id}/test` | Webhooks with their latest deliveries; register one (`name`, `url`, `events`; the secret is in `meta.secret` this once), change, pause or resume (`active`), remove, or send a test (administrators) |
+| `GET` · `POST /admin/webhooks` · `PATCH` · `DELETE /admin/webhooks/{hook_id}` · `POST /admin/webhooks/{hook_id}/test` | Webhooks with their latest deliveries; register one (`name`, `url`, `events`, `format`; the secret is in `meta.secret` this once), change, pause or resume (`active`), remove, or send a test (administrators) |
+| `GET` · `POST /controls/{ref}/reported` · `GET /reported` · `POST /reported/{id}/confirm` · `POST /reported/{id}/set-aside` | What other systems report of a control: report one (a token acting as a manager, an assessor, or a steward); see a control's; what waits for you to decide; confirm one (`note`, `severity`) or set it aside (`note`), as a person who assesses the control's unit and does not own the control |
+| `GET /standing/{kind}/{ref}` | Whether a third party, a scope, or an exception is in good standing, with the reasons by code |
+| `GET` · `POST /drafts` · `GET /drafts/{id}` · `POST /drafts/{id}/use` · `POST /drafts/{id}/set-aside` | Drafts: propose one (`kind`, `values`, `why`; a token that may only read may too); those waiting for you; one draft; mark one as used, naming the record you made from it (`ref`); set one aside (`note`) |
+| `POST /assistant/summary` · `POST /assistant/draft-risk` | Only when the assistant is turned on: a summary of a record (`ref`), or a risk drafted from a description (`description`, `org_unit_id`), as whoever asks; `429` past the day's limit, `502` when the provider fails or runs out of time |
+| `GET /admin/assistant` · `POST /admin/assistant/check` | Only when the assistant is turned on: how it is set up, with its log; check that the provider answers (administrators) |
 | `GET /mail` · `POST /mail/test` | How email is set up and how it is doing; send yourself a test message (administrators) |
 | `GET /sso` · `POST /sso/check` · `PUT /sso/mappings` | How single sign-on is set up; whether the provider answers; which of its roles give which roles here (administrators) |
 
