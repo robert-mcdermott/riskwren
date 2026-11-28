@@ -496,6 +496,9 @@ def test_accepting_a_risk(db: Database, people: People) -> None:
         assert (risk.standing, risk.residual_rating) == ("accepted", "high")
         view = treatment.of_risk(session, leader, risk)
         assert view["acceptances"][0]["state"] == "in_force"
+        # Withdraw is offered to whoever gave it, and not to the steward who keeps the risk.
+        assert view["acceptances"][0]["can_withdraw"] is True
+        assert treatment.of_risk(session, steward, risk)["acceptances"][0]["can_withdraw"] is False
         assert view["acceptances"][0]["expires_in_days"] == 213
         assert [a["risk"]["ref"] for a in treatment.search_acceptances(
             session, leader, {"expiring_within": 220})] == [risk.ref]  # fmt: skip

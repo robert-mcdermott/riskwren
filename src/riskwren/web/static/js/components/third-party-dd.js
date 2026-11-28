@@ -1,7 +1,7 @@
 // A third party's Due diligence tab: the people there who can be asked, and its reviews.
 // Fetched when the tab is first opened.
 
-import { patch, post } from "../core/api.js";
+import { get, patch, post } from "../core/api.js";
 import { button, h } from "../core/dom.js";
 import { date } from "../core/format.js";
 import { navigate } from "../core/router.js";
@@ -52,14 +52,40 @@ function contactForm(record, contact, onDone) {
   });
 }
 
+/** Start a review: the questionnaire its tier asks for, or another chosen here. A third party
+ *  whose tier asks for none, or that has no tier, is reviewed with the one chosen. */
 async function startReview(record) {
-  try {
-    const done = await post(`/api/v1/third-parties/${record.ref}/reviews`, {});
-    toast(`${done.data.ref} was started.`);
-    navigate(`/reviews/${done.data.ref}`);
-  } catch (error) {
-    toast(error.fields?.questionnaire ?? error.detail ?? "That did not work.");
-  }
+  const listed = (await get("/api/v1/questionnaires", null, { fresh: true })).data.questionnaires
+    .filter((each) => each.status === "active" && each.current_version);
+  const dueDiligence = listed.filter((each) => each.purpose === "due_diligence");
+  const others = listed.filter((each) => each.purpose !== "due_diligence");
+  openOverlay({
+    title: "Start a review",
+    subtitle: record.name,
+    render: (body, footer, close) => {
+      const choices = [
+        ...(record.tier ? [["", "The one its tier asks for"]] : [["", "Choose…"]]),
+        ...dueDiligence.map((each) => [each.key, each.title]),
+        ...others.map((each) => [each.key, `${each.title} (${each.purpose.replace("_", " ")})`]),
+      ];
+      const questionnaire = select("Questionnaire", choices, { value: "",
+        hint: record.tier ? "Its tier sets one; choose another only for a reason." : "It has no tier yet, so choose what to ask. Tiering it first sets the right one." });
+      const problem = banner();
+      const go = button("Start it", { kind: "btn-primary" });
+      go.addEventListener("click", async () => {
+        const chosen = questionnaire.input.value;
+        const done = await submit({ button: go, banner: problem, fields: { questionnaire },
+          run: () => post(`/api/v1/third-parties/${record.ref}/reviews`, chosen ? { questionnaire: chosen } : {}) });
+        if (!done) return;
+        close();
+        toast(`${done.data.ref} was started.`);
+        navigate(`/reviews/${done.data.ref}`);
+      });
+      body.append(h("div", { class: "stack" }, problem, questionnaire.node));
+      footer.replaceChildren(h("div", { class: "row" }, go, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    },
+  });
 }
 
 export function dueDiligenceTab(record, ctx) {

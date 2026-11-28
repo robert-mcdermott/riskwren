@@ -137,7 +137,7 @@ A scope says four things.
 
 - **Leave out** takes one out, and needs a reason. **Bring back** returns one that was left out.
 - A scope started from **every requirement** lists every citable requirement, so each one applies until someone leaves it out.
-- A scope started from **a baseline** lists only the baseline's requirements. One outside the baseline is not listed, and the page has no way to bring it in. To hold the scope to it, those who keep the scope send `PUT /api/v1/scopes/{ref}/requirements` with the framework, the code, and `applicable` set to `true`; it is then listed, marked *Added to the baseline*, and can be left out again from the page.
+- A scope started from **a baseline** lists only the baseline's requirements. To hold it to one outside the baseline, those who keep the scope use **Add a requirement** on the **Requirements** tab, find it by its code or words, and say why if they wish. It is then listed, marked *Added to the baseline*, and can be left out again like any other.
 
 A published framework carries some entries that only say how it is to be read, or that bind another kind of organization: leave those out, with the reason. The tab is the scope's **statement of applicability**, and it prints.
 

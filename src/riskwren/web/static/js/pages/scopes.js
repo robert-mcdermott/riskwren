@@ -165,7 +165,7 @@ function holdTo(scope, reload) {
       const drawBaseline = () => {
         const chosen = all.find((item) => item.key === framework.input.value);
         baseline = chosen.baselines.length ? select("Start from", [["", `Every requirement (${chosen.citable_count})`], ...chosen.baselines.map((b) => [b.key, `${b.title} (${b.count})`])],
-          { hint: "A baseline is the publisher's own selection. Requirements can be added to it or left out afterwards, with a reason." }) : null;
+          { hint: "A baseline is the publisher's own selection. On the Requirements tab, requirements can be added to it (Add a requirement) or left out, with a reason." }) : null;
         baselineHolder.replaceChildren(baseline ? baseline.node : h("p", { class: "subtle" }, `Every one of its ${chosen.citable_count} requirements applies until you say otherwise.`));
       };
       framework.input.addEventListener("change", drawBaseline);
@@ -183,6 +183,50 @@ function holdTo(scope, reload) {
       });
       body.append(h("div", { class: "stack-lg" }, problem, framework.node, baselineHolder));
       footer.replaceChildren(h("div", { class: "row" }, save, button("Cancel", { kind: "btn-ghost", onclick: close })));
+      footer.hidden = false;
+    },
+  });
+}
+
+/** Bring in a requirement the scope's baseline leaves out: found by words or its code. */
+function addRequirement(scope, framework, reload) {
+  openOverlay({
+    title: "Add a requirement",
+    subtitle: `To ${scope.name}, beyond its baseline`,
+    render: (body, footer, close) => {
+      const search = h("input", { class: "input", type: "search", placeholder: "A code, or words from its title or text", "aria-label": "Find a requirement" });
+      const found = h("div", { class: "pick-results", role: "listbox", "aria-label": "Requirements found" });
+      const note = field("Why it applies here", { type: "textarea", rows: 2, hint: "Optional. It is kept with the statement of applicability." });
+      const problem = banner();
+      let latest = 0;
+      const look = async () => {
+        const mine = ++latest;
+        const words = search.value.trim();
+        if (words.length < 2) {
+          found.replaceChildren();
+          return;
+        }
+        const rows = (await get(`/api/v1/frameworks/${framework}/requirements`, { q: words, limit: 8 })).data;
+        if (mine !== latest) return;
+        found.replaceChildren(...(rows.length ? rows.map((row) => h("button", { type: "button", class: "pick-item", role: "option", onclick: async (event) => {
+          const done = await submit({ button: event.currentTarget, banner: problem, fields: { reason: note },
+            run: () => put(`/api/v1/scopes/${scope.ref}/requirements`, { framework, code: row.code, applicable: true, reason: note.input.value || null }) });
+          if (!done) return;
+          close();
+          toast(`${row.code} applies here now.`);
+          reload();
+        } }, h("span", { class: "requirement-code" }, row.code), " ", h("span", {}, row.title ?? "")))
+          : [h("div", { class: "subtle pick-none" }, "No requirement of this framework matches.")]));
+      };
+      let timer = null;
+      search.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(look, 200);
+      });
+      body.append(h("div", { class: "stack" }, problem,
+        h("p", { class: "muted" }, "The scope started from a baseline, so requirements outside it are not listed. Choosing one here makes it apply, beside the baseline's."),
+        h("div", { class: "field" }, search, found), note.node));
+      footer.replaceChildren(h("div", { class: "row" }, button("Cancel", { kind: "btn-ghost", onclick: close })));
       footer.hidden = false;
     },
   });
@@ -396,7 +440,8 @@ function requirementsTab(scope, found, reload) {
     button("Print", { class: "btn no-print", onclick: () => window.print() }),
     h("span", { class: "no-print" }, exportButton("statement", { scope: scope.ref, framework: chosen, state: query().get("state"), q: query().get("q") })),
     h("a", { class: "btn no-print", href: `/api/v1/scopes/${scope.ref}/security-plan`, download: "" }, icon("download", "icon icon-sm"), "Security plan"),
-    h("a", { class: "btn no-print", href: `/api/v1/scopes/${scope.ref}/oscal/ssp?framework=${encodeURIComponent(chosen)}`, download: "" }, icon("download", "icon icon-sm"), "OSCAL"));
+    h("a", { class: "btn no-print", href: `/api/v1/scopes/${scope.ref}/oscal/ssp?framework=${encodeURIComponent(chosen)}`, download: "" }, icon("download", "icon icon-sm"), "OSCAL"),
+    found.baseline && found.can_edit ? button("Add a requirement", { class: "btn no-print", iconName: "plus", onclick: () => addRequirement(scope, chosen, reload) }) : null);
   const rows = found.requirements;
   const table = rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
     h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Requirement"), h("th", { scope: "col" }, "Here"), h("th", { scope: "col" }, "Answered by"), h("th", { scope: "col", class: "no-print" }, h("span", { class: "sr-only" }, "Actions")))),
