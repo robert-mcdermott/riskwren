@@ -463,7 +463,7 @@ function visibilityTab(seen) {
     h("div", { class: "stack-sm" },
       h("label", { class: "label", for: "register-visibility" }, "What a person with no role sees"),
       node,
-      h("p", { class: "subtle" }, "Leaders and stewards always see their unit and everything beneath it; managers, auditors, and assessors see what their role covers. A record marked restricted is seen only by its owners, its unit's steward and leaders, managers, and auditors. The inventory of processes, systems, and third parties is open to everyone signed in.")));
+      h("p", { class: "subtle" }, "Leaders and stewards always see their unit and everything beneath it; managers, auditors, and assessors see what their role covers. A record marked restricted is seen only by whoever made it, its owners, its unit's steward and leaders, managers, auditors, and administrators. The inventory (processes, systems, third parties, services, information, and sites) is open to everyone signed in.")));
 }
 
 function readersTab(seen) {

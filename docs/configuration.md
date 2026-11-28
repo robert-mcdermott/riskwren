@@ -1,6 +1,8 @@
 # Configuration
 
-This guide is for whoever runs the server. It covers `riskwren.toml`, environment overrides, the data home, PostgreSQL, running behind a reverse proxy, and the guard on demo installations.
+This guide is for whoever runs the server. It covers `riskwren.toml` and every key in it, environment variables and where secrets go, the data home, single sign-on, scheduled work, email, the optional assistant, PostgreSQL, backups, sizing, upgrades, running behind a reverse proxy, and the guard on demo installations. [Deployment](deployment.md) puts these together for a server that real people rely on.
+
+Commands here are written `uv run riskwren …`, as they are run from a checkout of the repository. An installation made as a package, as a service on a host, or in a container runs the same commands as `riskwren …`, without `uv run`.
 
 ## What is configured where
 
@@ -31,7 +33,15 @@ Relative paths in the file are resolved against the file's own directory, not th
 
 ## Every section and key
 
-The file has five sections. Only the first three matter for a new installation; `[sso]` and `[mail]` are optional. A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
+The file has seven sections: `[server]`, `[database]`, `[data]`, `[sso]`, `[mail]`, `[assistant]`, and `[branding]`. Every section and every key may be left out, and then takes its default.
+
+| Section | Needed? |
+|---|---|
+| `[server]`, `[database]`, `[data]` | How and where the server runs. The defaults serve one machine with SQLite, so a new installation can start with the file `init` writes |
+| `[sso]`, `[mail]`, `[assistant]` | Optional. Each turns on something that is off until it is set: single sign-on, email, the assistant |
+| `[branding]` | Optional. It fixes the look exactly, in place of what is set in the app |
+
+A section or key that RiskWren does not know is an error, not something it ignores. Every problem in the file is reported together.
 
 ### `[server]`
 
@@ -40,10 +50,10 @@ The file has five sections. Only the first three matter for a new installation; 
 | `host` | `"127.0.0.1"` | The address the web server listens on. Keep `127.0.0.1` when a reverse proxy on the same machine terminates TLS. Use `0.0.0.0` only behind one |
 | `port` | `8000` | The port |
 | `workers` | `1` | How many server processes to run. One is enough for SQLite and small teams |
-| `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`. Used for the single sign-on redirect address, and for links in messages RiskWren sends. Set it when you use single sign-on |
+| `base_url` | `""` | The public address people use to reach RiskWren, such as `"https://riskwren.example.org"`, with no path. Used for the single sign-on redirect address, for links in email, and for the record's address in webhook messages, which leave it out without one. Set it when you use single sign-on or email, and on any server people rely on |
 | `session_idle_hours` | `12` | A sign-in ends after this long without activity. Fractions are allowed: `0.5` is half an hour, as OWASP's verification standard asks at its level 2 |
 | `session_max_days` | `7` | A sign-in ends after this long in any case. `0.5` is twelve hours, the same standard's level 2 |
-| `scheduler` | `true` | Run scheduled work inside this server. See [Scheduled work](#scheduled-work) |
+| `scheduler` | `true` | Run scheduled work inside this server. With `false`, nothing is sent and no reminder is made unless `riskwren jobs run` is scheduled some other way. See [Scheduled work](#scheduled-work) |
 
 `host`, `port`, and `workers` can also be given to `uv run riskwren serve` as `--host`, `--port`, and `--workers`, which take precedence for that run.
 
@@ -100,7 +110,7 @@ An assistant that summarizes records and drafts risks. Optional and off; see [Th
 | `provider` | `"openai"` | The protocol the provider speaks: `"openai"` (the Chat Completions API, which servers on your own machines speak too), `"anthropic"` (the Messages API), or `"bedrock"` (Amazon Bedrock's Converse API) |
 | `url` | `""` | The API's root. Empty means the provider's own service. It must be `https://` unless it is on this computer |
 | `model` | `""` | The model to use. Needed when it is on |
-| `key_env` | `""` | The name of the environment variable that holds the key. The key itself is refused in the file |
+| `key_env` | `""` | The name of the environment variable that holds the key, such as `OPENAI_API_KEY`. The key itself is refused in the file. A server on this computer may need none. For Bedrock, empty means `AWS_BEARER_TOKEN_BEDROCK`, or else `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` |
 | `region` | `"us-east-1"` | For Bedrock |
 | `send` | `"public, internal"` | The data classes whose records may be sent, besides records with none. Restricted records never are |
 | `daily_limit` | `40` | Exchanges for one person, or one token, in a day |
@@ -110,7 +120,7 @@ An assistant that summarizes records and drafts risks. Optional and off; see [Th
 
 ### `[branding]`
 
-Optional. Leave it out and the look is set in the app, under **Admin → Appearance**, as before.
+Optional. Leave it out and the look is set in the app, under **Admin → Appearance**.
 
 Use this section when the look has to be exact: every color by day and after dark, the official logo files, the brand's typefaces. It is also the way to keep a brand in version control, or to give several installations the same look.
 
@@ -203,30 +213,46 @@ RiskWren also gives advice that does not stop it running. `serve` and `doctor` w
 
 ## Environment overrides
 
-Any value can be overridden by an environment variable named `RISKWREN_<SECTION>_<KEY>`, in capitals. The environment wins over the file.
+Every key in `[server]`, `[database]`, `[data]`, `[sso]`, `[mail]`, and `[assistant]` can be set by an environment variable named `RISKWREN_<SECTION>_<KEY>`, in capitals. The environment wins over the file. `[branding]` cannot be set this way: it is read only from the file.
 
-| Variable | Overrides |
+A value from the environment is read as the key's kind: a number for a number, and for a switch `true` or `false` (or `1` and `0`, `yes` and `no`, `on` and `off`). A wrong value is reported with the variable's name. A variable that names no key is ignored, so check the spelling.
+
+The ones most often set this way:
+
+| Variable | Sets |
 |---|---|
-| `RISKWREN_SERVER_HOST` | `[server] host` |
-| `RISKWREN_SERVER_PORT` | `[server] port` |
-| `RISKWREN_SERVER_WORKERS` | `[server] workers` |
+| `RISKWREN_SERVER_HOST`, `RISKWREN_SERVER_PORT`, `RISKWREN_SERVER_WORKERS` | `[server] host`, `port`, `workers` |
 | `RISKWREN_SERVER_BASE_URL` | `[server] base_url` |
-| `RISKWREN_SERVER_SESSION_IDLE_HOURS` | `[server] session_idle_hours` |
-| `RISKWREN_SERVER_SESSION_MAX_DAYS` | `[server] session_max_days` |
-| `RISKWREN_DATABASE_URL` | `[database] url` |
+| `RISKWREN_SERVER_SCHEDULER` | `[server] scheduler` |
+| `RISKWREN_SERVER_SESSION_IDLE_HOURS`, `RISKWREN_SERVER_SESSION_MAX_DAYS` | `[server] session_idle_hours`, `session_max_days` |
+| `RISKWREN_DATABASE_URL` | `[database] url`, which may carry its password here, unlike in the file |
 | `RISKWREN_DATA_HOME` | `[data] home` |
+| `RISKWREN_SSO_ISSUER`, `RISKWREN_SSO_CLIENT_ID` | `[sso] issuer`, `client_id` |
+| `RISKWREN_MAIL_HOST`, `RISKWREN_MAIL_FROM_ADDRESS` | `[mail] host`, `from_address` |
+| `RISKWREN_ASSISTANT_ENABLED`, `RISKWREN_ASSISTANT_MODEL` | `[assistant] enabled`, `model` |
 
 ```bash
 RISKWREN_SERVER_PORT=8080 uv run riskwren serve
 ```
 
-`RISKWREN_CONFIG` is separate: it names the file itself.
+### Other variables RiskWren reads
+
+These are not keys of the file. Most hold a secret, which is why they live only in the environment.
+
+| Variable | Holds |
+|---|---|
+| `RISKWREN_CONFIG` | The configuration file itself. See [Where the file is found](#where-the-file-is-found) |
+| `PGPASSWORD` | The PostgreSQL password, read by the database driver |
+| `RISKWREN_SSO_CLIENT_SECRET` | The single sign-on client secret, unless `[sso] client_secret_env` names another variable |
+| `RISKWREN_MAIL_PASSWORD` | The mail server's password, unless `[mail] password_env` names another variable |
+| The variable `[assistant] key_env` names | The assistant provider's key. For Bedrock, `AWS_BEARER_TOKEN_BEDROCK`, or `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (with `AWS_SESSION_TOKEN` for short-lived keys) |
+| `RISKWREN_URL`, `RISKWREN_TOKEN` | For `riskwren tools` only, on someone's own computer: the server's address and the token the tools use. See [The API](api.md#an-assistant-the-tool-server) |
 
 ## Secrets are refused in the file
 
-`riskwren.toml` is meant to be safe to read, copy, and keep under version control. RiskWren refuses to start if the file holds a secret: a key that looks like a password, secret, token, or key, or a database address with a password in it.
+`riskwren.toml` is meant to be safe to read, copy, and keep under version control. RiskWren refuses to start if the file holds a secret: a key whose name ends in `password`, `secret`, `token`, or `key`, or a database address with a password in it.
 
-Put secrets in the environment instead. For the database, set the password in `PGPASSWORD`, or put the whole address, password and all, in `RISKWREN_DATABASE_URL`.
+Put secrets in the environment instead, in the variables listed under [Other variables RiskWren reads](#other-variables-riskwren-reads). For the database, set the password in `PGPASSWORD`, or put the whole address, password and all, in `RISKWREN_DATABASE_URL`. Where the file needs to say which variable holds a secret, it names the variable (`client_secret_env`, `password_env`, `key_env`), never the value. [Deployment](deployment.md) shows where the environment is kept for a container and for a service.
 
 ## The data home
 
@@ -234,14 +260,15 @@ The data home is created by `init`. With the default settings it is `./var`.
 
 | Path | Holds |
 |---|---|
-| The SQLite database | When no database address is set |
+| `riskwren.db` | The SQLite database, when no database address is set |
 | `brand/` | Uploaded logos and the tab icon |
-| `logs/` | The server's log, rotated |
+| `logs/` | The server's log, `riskwren.log`, rotated at 5 MB with five kept |
 | `files/` | Evidence files, each stored once under the SHA-256 of its content. Nothing here is served directly |
 | `exports/` | Reserved for exports |
+| `backups.json` | When and where the last backup was taken, for `doctor` and **Admin → Operations** |
 | `.riskwren-home` | A marker that says this directory is a data home |
 
-- Back it up as a whole. With PostgreSQL, back up the database as well.
+- Back it up with `riskwren backup`, which takes the database and the stored files together, as of one moment. See [Back up and restore](#back-up-and-restore).
 - Do not edit its contents by hand.
 - It must be writable by the account that runs the server.
 - Request bodies and tokens are never written to the log.
@@ -278,7 +305,6 @@ The redirect address to give the provider is `<base_url>/api/v1/sso/callback`. *
    ```toml
    [server]
    base_url = "https://riskwren.example.org"
-
    [sso]
    issuer = "https://login.microsoftonline.com/<tenant id>/v2.0"
    client_id = "<application id>"
@@ -340,24 +366,31 @@ Then set `issuer = "http://127.0.0.1:8099"`, `client_id = "riskwren-dev"`, and `
 
 ## Scheduled work
 
-RiskWren does four things by itself, so that nobody has to remember to.
+RiskWren does six things by itself, so that nobody has to remember to. Each job has a key, which names it to `riskwren jobs run`.
 
-| Job | How often | What it does |
-|---|---|---|
-| The calendar | Hourly | Brings risks up to date when a plan passes its date or an acceptance ends |
-| Reminders | Hourly | Reminds people of what is nearly due, and tells stewards and leaders what stays late. See [Reminders](running-the-program.md#reminders) |
-| Email | Every minute | Queues notices and daily summaries and sends what is waiting, where [email](#email) is set up |
-| Measures | Every six hours | Takes the day's snapshot of every measure, for its trend; a later one the same day replaces it |
-| Housekeeping | Daily | Removes run records older than ninety days and sign-ins that were never finished |
+| Job | Key | How often | What it does |
+|---|---|---|---|
+| The calendar | `calendar` | Every hour | Brings risks up to date when a plan passes its date or an acceptance ends |
+| Reminders | `reminders` | Every hour | Reminds people of what is nearly due, and tells stewards and leaders what stays late; marks an evidence request met once its evidence is attached. See [Reminders](running-the-program.md#reminders) |
+| Email | `mail` | Every minute | Queues notices and daily summaries and sends what is waiting, where [email](#email) is set up |
+| Webhooks | `webhooks` | Every minute | Tells the addresses an administrator registered of what has happened, and tries again those that did not answer. See [webhooks](other-systems.md#being-told-what-happens-webhooks) |
+| Measures | `measures` | Every six hours | Takes the day's snapshot of every measure, for its trend; a later one the same day replaces it |
+| Housekeeping | `tidy` | Every day | Removes run records older than ninety days and sign-ins that were never finished |
 
-The server runs them while it is up. Nothing needs to be installed or scheduled.
+The `tidy` job clears out RiskWren's own bookkeeping and changes no record. It has nothing to do with **Reports → Tidy**, the page that finds missing facts and duplicate records.
+
+The server runs the jobs while it is up, looking for what is due every twenty seconds. Nothing needs to be installed or scheduled.
 
 - **Each job runs once.** Before a process runs a job it claims the job in the database. With several workers, or several servers on one database, whichever claims it has it and the others leave it alone. A process that dies mid-job loses its claim after fifteen minutes.
 - **A restart loses nothing.** What is due is worked out from the database and the clock, so a server that was down catches up when it starts.
-- **Admin → Operations** shows each job, when it last ran and what it did, and can run one now or pause it. A failed run is shown with its reason and tried again when next due.
-- `uv run riskwren jobs` lists the same from the command line, and `uv run riskwren jobs run` runs whatever is due.
+- **Admin → Operations** shows each job, how often it runs, when it last ran and what it did, and when it is next due. **Run now** runs one at once; **Pause** stops one from running when due until **Resume**. A failed run is shown with its reason and tried again when next due.
+- `uv run riskwren jobs` lists the same from the command line. `uv run riskwren jobs run` runs every job that is due and not paused; `uv run riskwren jobs run mail`, or any other key, runs that one job now, whether or not it is due or paused.
 
-To run the jobs from the operating system's scheduler instead, set `scheduler = false` under `[server]` and run `uv run riskwren jobs run` every few minutes. `doctor` warns if the scheduler is off and nothing has run for two days.
+### Running the jobs from the operating system
+
+To run the jobs from the operating system's scheduler instead of inside the server, set `scheduler = false` under `[server]` (or `RISKWREN_SERVER_SCHEDULER=false`) and run `uv run riskwren jobs run` every minute, from cron or a systemd timer, with the same configuration and environment as the server. A longer interval works, but email and webhooks then wait that long.
+
+With the scheduler off and nothing else running the jobs, **nothing is sent**: no reminders are made, no email leaves, no webhook is told, risks are not brought up to date with the calendar, and measures have no trend. Notices of what is assigned to someone or decided for them are written as it happens, so those still appear in the app; they are not emailed. `doctor` warns when the scheduler is off and nothing has run for two days, and when the last run of any job failed.
 
 ## Email
 
@@ -366,23 +399,32 @@ To run the jobs from the operating system's scheduler instead, set `scheduler = 
 1. Under `[mail]` in `riskwren.toml`, set `host` and `from_address`. If the mail server needs a sign-in, set `username`, and put the password in the `RISKWREN_MAIL_PASSWORD` environment variable.
 2. Set `base_url` under `[server]`, so that messages can link back.
 3. Restart RiskWren, and run `uv run riskwren doctor`: it connects and signs in to the mail server, and sends nothing.
-4. Send yourself a message from **Admin → Operations**, or with `uv run riskwren mail test you@example.org`.
+4. Send yourself a message with **Send me a test message** under **Admin → Operations**, or send one to any account with `uv run riskwren mail test you@example.org`. Either says whether the mail server took it.
 
 Then each person chooses, under **Your account**: each notice as it happens, one summary a day, or no email. The choice appears only once email is set up.
 
-- **Nothing is sent from the request that caused it.** A notice is written to the database, the mailer turns it into a message in an outbox in the same database, and sends from there. A mail server that is down is tried again later, with longer waits, and given up on after six attempts.
+- **Nothing is sent from the request that caused it.** A notice is written to the database, the **Email** job turns it into a message in an outbox in the same database, and sends from there, every minute while [scheduled work](#scheduled-work) runs. A mail server that is down is tried again later, with longer waits, and given up on after six attempts.
+- **To send by hand,** `uv run riskwren mail run` queues notices and daily summaries and sends what is waiting, then says how many were sent and how many could not be. It exits with 1 if any could not be sent.
+- **Admin → Operations** shows how many messages are waiting, sent, and given up on, and the most recent problem.
 - **Turning email on does not send people their history.** Only notices written after it is set up are sent.
 - **A daily summary** gathers what a person has not yet read in the app, once a day after `digest_hour`.
 - Messages say what happened and link to it. They carry no record's contents beyond its name.
 
 ## The assistant
 
-**You do not need this to use RiskWren, and it is off.** Turned on, it does two things for anyone signed in: **Summarize** on a record's page writes a short summary of it, and **Draft with the assistant** on the register turns someone's own description of what could go wrong into a draft risk, which opens in the ordinary form for them to check, change, and save. Administrators see how it is set up, check that the provider answers, and read every exchange under **Admin → Assistant**.
+**You do not need this to use RiskWren, and it is off.** Turned on, it summarizes a record and drafts a risk from someone's own description, for whoever is signed in and from what they may see; [The assistant in RiskWren](other-systems.md#the-assistant-in-riskwren) describes what people see. While it is off, none of it is installed and nothing is sent anywhere. Administrators see how it is set up, check that the provider answers, and read every exchange under **Admin → Assistant**.
 
 1. Choose a provider the organization trusts with what people may see: its own model server (Ollama, vLLM, or anything that speaks the Chat Completions API), or a service it has an agreement with.
 2. Under `[assistant]`, set `enabled = true`, the `provider`, the `model`, and, for a server of your own, its `url`. Put the key, if one is needed, in an environment variable and name it in `key_env`.
 3. Decide what may be sent: `send` lists the data classes whose records may go to the provider.
 4. Restart RiskWren, and use **Check the connection** under **Admin → Assistant**.
+
+| Provider | `provider` | `url` | The key |
+|---|---|---|---|
+| A model server of the organization's own, on this computer or its network | `"openai"` | Its address, such as `"http://127.0.0.1:11434/v1"`; `https://` unless it is on this computer | Often none |
+| A service that speaks the Chat Completions API | `"openai"` | Empty for the default service, or the service's address | The variable named in `key_env` |
+| A service that speaks the Messages API | `"anthropic"` | Empty for the default service | The variable named in `key_env` |
+| Amazon Bedrock | `"bedrock"` | Empty; set `region` | `AWS_BEARER_TOKEN_BEDROCK`, or access keys |
 
 For a model on the same computer, with nothing leaving it:
 
@@ -440,17 +482,26 @@ uv run riskwren backup /backups/riskwren-2026-12-01.zip
 
 `backup` writes the whole installation to one file: every table, every file the data home stores (evidence, attachments, uploaded logos), and a manifest that counts and fingerprints each of them and says which version of RiskWren took it. It reads everything as of one moment, so the server can go on running and people can go on working while it does. The file must not exist already. It holds everything, so keep it as carefully as the database itself: somewhere other than the server, and encrypted where your other backups are.
 
-The data home's exports and logs are not in it: exports can be made again, and logs belong to the machine.
+Some things are not in it, and are kept with the server's own configuration instead:
 
-To restore, set up an empty database and data home (a new `riskwren.toml`, and for PostgreSQL an empty database), then:
+| Not in a backup | Why |
+|---|---|
+| `riskwren.toml` | It describes the server, not the records. Keep it in version control |
+| The secrets in the environment | They live only in the environment |
+| The image files a `[branding]` section names | They sit beside the configuration file, not in the data home |
+| The data home's exports and logs | Exports can be made again, and logs belong to the machine |
+
+Take one every day, from a scheduled task, and keep the files away from the server; [Deployment](deployment.md#back-it-up) shows how for a container and for a service. `doctor --production` fails when no backup has been taken and warns when the last is more than two days old.
+
+To restore, use the installation's `riskwren.toml`, pointed at an empty database and a data home with no files in it (for SQLite, a new data home is enough; for PostgreSQL, create an empty database), and do not run `init` first, since that makes a database that is no longer empty. Then:
 
 ```bash
 uv run riskwren --config new/riskwren.toml restore /backups/riskwren-2026-12-01.zip
 ```
 
-`restore` goes only into an empty database and a data home without files, so that nothing already there is overwritten or mixed in. It needs the same version of RiskWren that took the backup: restore with that version, then upgrade. Once loaded, every table is read back and fingerprinted, every file is checked, and the history is verified, and it says so; anything that does not match is named, and the command exits with 1. `restore --describe FILE` says what a backup holds without restoring it.
+`restore` goes only into an empty database and a data home without files, so that nothing already there is overwritten or mixed in. It needs the same version of RiskWren that took the backup: restore with that version, then upgrade. Once loaded, every table is read back and fingerprinted, every file is checked, and the history is verified, and it says so; anything that does not match is named, and the command exits with 1. `restore --describe FILE` says what a backup holds, and which version took it, without restoring it.
 
-Restore a backup now and then, onto a spare machine, to know that it works.
+Restore a backup now and then, onto a spare machine, to know that it works: [Deployment](deployment.md#test-a-restore) has the steps. [When something goes wrong](help.md#restore-from-a-backup) covers restoring after a loss.
 
 ### Move between SQLite and PostgreSQL
 
@@ -479,20 +530,25 @@ Nothing failed. With one person, every page answered in under 120 milliseconds; 
 
 ## Upgrade
 
-After updating the code:
+From a checkout of the repository:
 
-```bash
-uv sync
-uv run riskwren db upgrade
-```
+1. Read the new release's entry in the [changelog](../CHANGELOG.md). Its **Upgrading from** part says which migrations it brings, what it adds, and what looks or behaves differently afterwards.
+2. Stop the server, so that nothing is written after the backup.
+3. Back up, before updating the code: `uv run riskwren backup /backups/riskwren-before-upgrade.zip`. Once the code is newer than the database, `backup` refuses until `db upgrade` has run.
+4. Update the code (`git pull`, or check out the release's tag), then `uv sync`, adding `--extra postgres` if the installation uses PostgreSQL: without it, `uv sync` removes the driver.
+5. `uv run riskwren db upgrade`.
+6. `uv run riskwren doctor`.
+7. Start the server.
 
-`db upgrade` applies any migrations the database has not had and adds anything new in the default program without overwriting what you have shaped. Coming from 0.4.0, that is the questionnaire tiering asks and the three due diligence questionnaires. Coming from 0.3.0, that is also the publishers' mappings carried with the built-in frameworks: where each SP 800-53 Rev. 4 control went in Rev. 5, and the SP 800-53 controls each SP 800-171 requirement comes from. Coming from 0.2.1, that is the four built-in questionnaires; the [changelog](../CHANGELOG.md) says what behaves differently afterwards. Coming from 0.1.0, that is also the four public frameworks and the mappings the common controls carry to them; your own controls are not mapped for you, and each one that came from the library offers the mappings on its **Requirements** tab. [Back up](#back-up-and-restore) first: an upgrade cannot be undone except by restoring. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
+`db upgrade` applies any migrations the database has not had, and adds what is new in the default program and the starter libraries without overwriting what you have shaped. It refuses a database that a newer version of RiskWren has already upgraded. `serve` refuses to start on a schema that is behind, and `uv run riskwren db current` shows where the database is.
+
+An upgrade cannot be undone except by restoring: to go back, restore the backup from step 3, with the version that took it, into an empty database. [Deployment](deployment.md#upgrade) has the same steps for a container and for a service.
 
 ## Run behind a reverse proxy
 
-RiskWren speaks plain HTTP and expects a reverse proxy to terminate TLS in front of it.
+RiskWren speaks plain HTTP and expects a reverse proxy to terminate TLS in front of it. The repository's `deploy/` folder has examples for Caddy and nginx: see [Behind a proxy](deployment.md#behind-a-proxy).
 
-- Keep `host = "127.0.0.1"` when the proxy is on the same machine.
+- Keep `host = "127.0.0.1"` when the proxy is on the same machine, and let nothing but the proxy reach the port.
 - Have the proxy send `X-Forwarded-Proto: https`. RiskWren marks its session cookie `Secure` when the request arrived over HTTPS, by that header or directly.
 - Forward the `Host` header unchanged. Requests that change anything are refused when their origin does not match the host, which is part of the protection against requests from other sites.
 - Requests larger than 32 MB are refused.

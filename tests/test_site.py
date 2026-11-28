@@ -40,7 +40,7 @@ def test_the_site_builds_with_no_broken_links(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-3000:]
     # Every guide is a page: a new guide that is not in the menu would never be published.
     for guide in DOCS.glob("*.md"):
-        page = "index" if guide.stem == "README" else guide.stem
+        page = "guides" if guide.stem == "README" else guide.stem
         assert (out / f"{page}.html").is_file(), f"{guide.name} is not in the site's menu"
     for page in ("api-reference", "changelog"):
         assert (out / f"{page}.html").is_file()

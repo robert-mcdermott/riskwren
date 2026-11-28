@@ -24,11 +24,12 @@ const IMAGES = "img"; // the directory of screenshots, inside docs/ and on the s
 
 // Reading order, in groups. Each guide becomes a page of the same name.
 export const MENU = [
-  ["Start", [["index", "Overview"], ["getting-started", "Getting started"], ["adopting", "Adopting RiskWren"]]],
+  ["Start", [["index", "Overview"], ["guides", "All the guides"], ["concepts", "How RiskWren works"], ["roles", "Your part in it"],
+    ["getting-started", "Getting started"], ["adopting", "Adopting RiskWren"]]],
   ["Use", [["handbook", "The program handbook"], ["the-register", "The register"], ["compliance", "Compliance"], ["evidence-and-testing", "Evidence and testing"],
     ["issues-and-exceptions", "Issues and exceptions"], ["policies", "Policies"], ["third-parties", "Third parties"], ["internal-audit", "Internal audit"],
-    ["incidents", "Incidents"], ["running-the-program", "Running the program"]]],
-  ["Run", [["configuration", "Configuration"], ["deployment", "Deployment"]]],
+    ["incidents", "Incidents"], ["running-the-program", "Running the program"], ["other-systems", "Other systems and assistants"]]],
+  ["Run", [["configuration", "Configuration"], ["deployment", "Deployment"], ["help", "When something goes wrong"]]],
   ["Reference", [["api", "The API"], ["api-reference", "API reference"], ["cli", "Command reference"], ["changelog", "Changelog"]]],
 ];
 
@@ -166,7 +167,8 @@ function linker(fromDir) {
     const [path, anchor] = href.split("#");
     const target = relative(REPO, resolve(fromDir, path)).replaceAll("\\", "/");
     const hash = anchor ? `#${anchor}` : "";
-    if (target === "docs/README.md" || target === "README.md") return `index.html${hash}`;
+    if (target === "docs/README.md") return `guides.html${hash}`;
+    if (target === "README.md") return `index.html${hash}`;
     if (target === "CHANGELOG.md") return `changelog.html${hash}`;
     if (target === "docs/openapi.json") return "api-reference.html";
     if (target.startsWith(`docs/${IMAGES}/`)) return target.slice("docs/".length);
@@ -377,6 +379,7 @@ export function build(out) {
     if (name === "index") source = null;
     else if (name === "changelog") { source = readFileSync(join(REPO, "CHANGELOG.md"), "utf8"); fromDir = REPO; }
     else if (name === "api-reference") ({ md: source, blocks } = apiReference(spec));
+    else if (name === "guides") source = readFileSync(join(DOCS, "README.md"), "utf8"); // the index of guides
     else source = readFileSync(join(DOCS, `${name}.md`), "utf8");
     const { html: rendered, headings } = source === null
       ? home()
