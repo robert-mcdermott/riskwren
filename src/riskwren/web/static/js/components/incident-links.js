@@ -16,7 +16,7 @@ export function incidentsCard(found) {
   if (!found?.items.length) return null;
   const cost = money(found.loss_totals);
   return card({ title: "Incidents" }, h("div", { class: "stack" },
-    h("p", { class: "muted" }, `${plural(found.last_year, "incident or near miss", "incidents and near misses")} in the last year${cost ? `, costing ${cost} in all` : ""}.`),
+    h("p", { class: "muted" }, `${plural(found.last_year, "report", "reports")} (incidents, near misses, and concerns) in the last year${cost ? `, costing ${cost} in all` : ""}.`),
     h("ul", { class: "plain-list stack-sm" }, found.items.map((item) => h("li", {},
       h("a", { class: "cell-main", href: `/incidents/${item.ref}` }, item.name),
       h("div", { class: "row-sm wrap" }, pill(...ROLE[item.role]), h("span", { class: "cell-sub" }, [item.ref, item.kind === "near_miss" ? "near miss" : item.kind,

@@ -78,6 +78,18 @@ def ancestors(session: Session, unit_id: int) -> list[OrgUnit]:
     return chain
 
 
+def _check_kind(session: Session, kind: str, current: str | None = None) -> None:
+    """A unit's kind is one the program names, so a typo does not make a new kind. A unit
+    keeps the kind it has even if that kind has since been retired. With no program loaded
+    yet, as on a bare database, any kind is taken."""
+    from riskwren.program import vocab
+
+    known = set(vocab.keys(session, "unit_kinds", active_only=True))
+    if known and kind != current and kind not in known:
+        raise Invalid("The unit is not valid.", {
+            "kind": f"Use one of the kinds of unit: {', '.join(sorted(known))}."})  # fmt: skip
+
+
 def _clean(name: str, kind: str, code: str | None) -> tuple[str, str, str | None]:
     name, kind = name.strip(), kind.strip().lower()
     code = (code or "").strip() or None
@@ -102,6 +114,7 @@ def create(
 ) -> OrgUnit:
     _require_admin(principal)
     name, kind, code = _clean(name, kind, code)
+    _check_kind(session, kind)
     if code and by_code(session, code):
         raise Conflict(f"Another unit already has the code {code}.")
     if parent_id is None:
@@ -126,6 +139,7 @@ def update(
         changes.get("kind", unit.kind),
         changes.get("code", unit.code),
     )
+    _check_kind(session, kind, unit.kind)
     if code and code != unit.code and by_code(session, code):
         raise Conflict(f"Another unit already has the code {code}.")
     if "parent_id" in changes and changes["parent_id"] != unit.parent_id:

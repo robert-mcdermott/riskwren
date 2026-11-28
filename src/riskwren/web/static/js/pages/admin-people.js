@@ -114,6 +114,8 @@ function editPerson({ account, roles, units, reload }) {
     subtitle: account.email,
     render: (body, footer, close) => {
       const name = field("Name", { value: account.display_name, required: true });
+      const email = field("Email address", { type: "email", value: account.email, required: true,
+        hint: "What they sign in with, and where notices are sent. Single sign-on matches people by it." });
       const title = field("Title", { value: account.title ?? "" });
       const worksIn = unitPicker("Works in", units, account.units.map((u) => u.org_unit_id),
         "The first unit ticked is their main one. It sets the default unit on the records they add.");
@@ -121,8 +123,9 @@ function editPerson({ account, roles, units, reload }) {
       const problem = banner();
       const save = button("Save", { kind: "btn-primary" });
       save.addEventListener("click", async () => {
-        const done = await submit({ button: save, fields: { display_name: name, title }, banner: problem, run: async () => {
-          await patch(`/api/v1/accounts/${account.id}`, { display_name: name.input.value, title: title.input.value });
+        const done = await submit({ button: save, fields: { display_name: name, email, title }, banner: problem, run: async () => {
+          await patch(`/api/v1/accounts/${account.id}`, { display_name: name.input.value, title: title.input.value,
+            ...(email.input.value.trim().toLowerCase() !== account.email ? { email: email.input.value } : {}) });
           await put(`/api/v1/accounts/${account.id}/units`, { unit_ids: worksIn.values() });
           return put(`/api/v1/accounts/${account.id}/roles`, { roles: editor.values() });
         } });
@@ -176,7 +179,7 @@ function editPerson({ account, roles, units, reload }) {
       body.append(h("div", { class: "stack-lg" }, problem,
         h("div", { class: "row" }, statusPill(account.status),
           account.has_password ? null : pill("No password", "warn")),
-        name.node, title.node, worksIn.node, editor.node,
+        name.node, email.node, title.node, worksIn.node, editor.node,
         h("div", { class: "stack-sm" }, h("div", { class: "label" }, "Sign-in"),
           h("div", { class: "row wrap" }, mine ? null : setPassword, mine || account.status === "invited" ? null : toggle,
             button("What they hold", { onclick: () => {

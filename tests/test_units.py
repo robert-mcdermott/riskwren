@@ -81,3 +81,15 @@ def test_only_administrators_change_units(db: Database, people: People) -> None:
     nobody = Principal(account_id=people.accounts["member"], name="Member Person")
     with db.write(nobody.actor) as session, pytest.raises(PermissionDenied):
         units.create(session, nobody, name="Mine", kind="lab", parent_id=people.units["NMI"])
+
+
+def test_a_unit_kind_is_one_the_program_names(db: Database, people: People) -> None:
+    with db.write(ME.actor) as session:
+        parent = units.by_code(session, "IMM")
+        with pytest.raises(Invalid) as caught:
+            units.create(session, ME, name="Typo Lab", kind="labb", code="TYPO",
+                         parent_id=parent.id)  # fmt: skip
+        assert "kinds of unit" in caught.value.errors["kind"]
+        made = units.create(session, ME, name="Proper Lab", kind="lab", code="PROP",
+                            parent_id=parent.id)  # fmt: skip
+        assert made.kind == "lab"

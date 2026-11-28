@@ -75,6 +75,14 @@ def ask(
         )
         session.add(request)
         session.flush()
+        # Whoever is asked is told, as with any other work that comes to them.
+        from riskwren.people import notices
+
+        notices.tell(
+            session, person.id, "audit",
+            f"Internal audit asks, for {engagement.ref}, by {due.isoformat()}: {what}"[:300],
+            f"/audit/requests/{request.id}", by=principal,
+        )  # fmt: skip
     return request
 
 

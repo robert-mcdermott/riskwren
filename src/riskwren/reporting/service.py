@@ -644,6 +644,28 @@ def home(session: Session, principal: Principal) -> dict[str, Any]:
                 f"/exceptions/{item.ref}", item.expires_on, ref=item.ref,
             )  # fmt: skip
 
+    # What other systems reported, and what an assistant or another system drafted, waiting
+    # for someone who may decide it: one line each, leading to the page that lists them.
+    if principal.person is not None:
+        from riskwren.integration import drafts as drafting
+        from riskwren.integration import results
+
+        reported = [row for row in results.waiting(session, principal) if row["control"]]
+        if reported:
+            number = len(reported)
+            add(
+                "reported", "Confirm what other systems reported",
+                f"{number} waiting: a check or evidence counts once someone who does not own "
+                "the control confirms it", "/reported", None,
+            )  # fmt: skip
+        proposed = [row for row in drafting.waiting(session, principal) if row["can"]["use"]]
+        if proposed:
+            add(
+                "drafts", "Open or set aside drafts",
+                f"{len(proposed)} proposed by an assistant or another system: nothing is made "
+                "until someone saves it", "/drafts", None,
+            )  # fmt: skip
+
     # A leader is shown what waits on someone with their authority.
     led = principal.units_for(roles.LEADER)
     if led:

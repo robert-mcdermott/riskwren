@@ -185,19 +185,26 @@ def confirm(
     note = records.text(values.get("note"))
     with audit.operation(session, "control.report_confirmed", source=row.source):
         if row.kind == "result" and row.outcome in ("partial", "failed"):
-            severity = values.get("severity") or ("high" if row.outcome == "failed" else "moderate")
-            subjects = [control.ref] + (
-                [session.get(Scope, row.scope_id).ref] if row.scope_id else []
-            )
-            found = issues.create(session, principal, {
-                "name": f"{row.source}: {row.title}"[:300],
-                "summary": "\n\n".join(part for part in (row.detail, row.url) if part) or row.title,
-                "severity": severity, "org_unit_id": control.org_unit_id,
-                "source_kind": "security_test", "subjects": subjects,
-                "owner_id": values.get("owner_id")})  # fmt: skip
-            row.issue_id = found.id
-            if not values.get("owner_id"):
-                _to_control_owners(session, principal, found, control)
+            already = open_issue_for(session, control)
+            if already is not None:
+                # The same control found wanting again: one issue, as for failed tests.
+                row.issue_id = already.id
+            else:
+                severity = values.get("severity") or (
+                    "high" if row.outcome == "failed" else "moderate"
+                )
+                subjects = [control.ref] + (
+                    [session.get(Scope, row.scope_id).ref] if row.scope_id else []
+                )
+                found = issues.create(session, principal, {
+                    "name": f"{row.source}: {row.title}"[:300],
+                    "summary": "\n\n".join(p for p in (row.detail, row.url) if p) or row.title,
+                    "severity": severity, "org_unit_id": control.org_unit_id,
+                    "source_kind": "security_test", "subjects": subjects,
+                    "owner_id": values.get("owner_id")})  # fmt: skip
+                row.issue_id = found.id
+                if not values.get("owner_id"):
+                    _to_control_owners(session, principal, found, control)
         elif row.kind == "evidence":
             until = values.get("valid_until") or (row.observed_at.date() + timedelta(days=365))
             item = records.create(session, principal, evidence.EVIDENCE, {
@@ -216,6 +223,23 @@ def confirm(
         )
         session.flush()
     return row
+
+
+def open_issue_for(session: Session, control: Control) -> Any:
+    """The issue still open because this control was found wanting, by a test or by a report
+    confirmed earlier, if there is one."""
+    from riskwren.compliance import issues
+    from riskwren.db.models import Issue
+
+    by_test = issues.open_for_test(session, control)
+    if by_test is not None:
+        return by_test
+    return session.scalars(
+        select(Issue)
+        .join(ReportedResult, ReportedResult.issue_id == Issue.id)
+        .where(ReportedResult.control_id == control.id, Issue.status.in_(issues.LIVE))
+        .order_by(Issue.id)
+    ).first()
 
 
 def _to_control_owners(

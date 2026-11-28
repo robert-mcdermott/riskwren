@@ -42,7 +42,7 @@ Everything audit says is in the history.
 
 A plan is **approved** by someone with the standing to: an auditor other than the one who drafted it, recording the approval of the audit committee, or a leader of the whole organization. **Approve the plan** asks on whose authority, and when; it is not offered to the auditor who drafted it. A plan with nothing in it is not approved. Once approved it is tracked against: each engagement says where it stands (planned, under way, reported, or dropped), and the plan counts them.
 
-An engagement can still be added after approval, and is marked as added after approval. Until it starts, an engagement can be **dropped** with the reason (**Drop**), never deleted, and a dropped one can be put back (**Restore**). Once an engagement has started, the page offers no way to drop it.
+An engagement can still be added after approval, and is marked as added after approval. Until it is reported, an engagement can be **dropped** with the reason (**Drop**), never deleted: before it starts, or part way through when it can no longer be done. A dropped one can be put back (**Restore**).
 
 Plans and engagements are not edited once added: a plan's name and period, and an engagement's name, reason, and dates, stay as they were given. To change an engagement that has not started, drop it, saying why, and plan it again.
 
@@ -80,7 +80,7 @@ Each step of the program of work has a **workpaper**: what was to be done, what 
 
 While an engagement is being planned or in fieldwork, its team asks the audited for what it needs: **Ask for something** on the engagement, with **What is needed**, who it is **Asked of** (anyone who can sign in), and **By** when. The request waits on that person's Home as "Internal audit asks: …". They see what is asked, by whom, for which engagement, and by when, and nothing else of the engagement's work.
 
-The person asked is not sent a notice or an email, and requests are not in the [email reminders](running-the-program.md#reminders), so one that runs late is chased by the team: the engagement's list of requests marks it **Past its date**. Tell the person when you ask.
+The person asked is told, under the bell and by email where it is set up, and finds the request on their Home. Requests are not in the [reminders](running-the-program.md#reminders) before or after their date, so one that runs late is chased by the team: the engagement's list of requests marks it **Past its date**.
 
 They answer in words, with evidence, or both, and **Send the answer**. The evidence already kept about the thing being audited is offered first, under **Already on file**, so that nothing already on file is sent again:
 

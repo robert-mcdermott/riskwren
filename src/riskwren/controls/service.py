@@ -558,10 +558,20 @@ def unlink(session: Session, principal: Principal, risk: Risk, control: Control)
         check_doubt(session, risk)
 
 
+# How a doubt the controls raised begins, so that they lift only their own.
+FROM_CONTROLS = "Since it was assessed, "
+
+
 def check_doubt(session: Session, risk: Risk) -> bool:
     """After something about a risk's controls changes: does what is now known suggest a
     worse rating than the one on record? If so the risk is flagged, the reason named, and its
-    owner asked to assess it again. The rating itself is never changed by the system."""
+    owner asked to assess it again. The rating itself is never changed by the system.
+
+    Doubt raised for another reason (a plan completed, an indicator past its limit, an
+    analysis asking for another look) is not the controls' to lift: it stays until the risk
+    is assessed again."""
+    if risk.residual_in_doubt and not (risk.residual_doubt_reason or "").startswith(FROM_CONTROLS):
+        return True
     newest = risks.latest(session, risk).get("residual")
     now = risks.suggestion(session, risk)
     if newest is None or now is None:
@@ -588,7 +598,7 @@ def check_doubt(session: Session, risk: Risk) -> bool:
         ]
         because = "; ".join(changed + gone) or "what is known about its controls has changed"
         reason = (
-            f"Since it was assessed, {because}. The controls now suggest "
+            f"{FROM_CONTROLS}{because}. The controls now suggest "
             f"{ratings_.get(now['rating'], now['rating'])}."
         )
     if risk.residual_in_doubt != doubt or risk.residual_doubt_reason != reason:

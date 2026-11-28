@@ -1085,19 +1085,17 @@ def build_parser() -> argparse.ArgumentParser:
         "running it from a scheduled task where the server's own scheduler is turned off.",
     )
     job_commands = scheduled.add_subparsers(title="commands", metavar="COMMAND")
+    from riskwren.jobs import JOBS  # the keys, read from the jobs themselves
+
+    keys = ", ".join(JOBS)
     job_run = job_commands.add_parser(
         "run",
         help="run the jobs that are due, or one job now",
-        description="Run every job that is due and not paused. With a job's key (calendar, "
-        "reminders, mail, webhooks, measures, or tidy), run that one now whether or not it is "
-        "due or paused. A job another process is running is left to it.",
+        description=f"Run every job that is due and not paused. With a job's key ({keys}), "
+        "run that one now whether or not it is due or paused. A job another process is "
+        "running is left to it.",
     )
-    job_run.add_argument(
-        "key",
-        nargs="?",
-        metavar="JOB",
-        help="one job to run now: calendar, reminders, mail, webhooks, measures, or tidy",
-    )
+    job_run.add_argument("key", nargs="?", metavar="JOB", help=f"one job to run now: {keys}")
     job_run.set_defaults(handler=cmd_jobs, action="run")
     scheduled.set_defaults(handler=cmd_jobs, action="list")
 

@@ -34,7 +34,7 @@ An assistant, or another system with a token, may propose an issue without raisi
 - **Open** fills in the **Raise an issue** form with what the draft proposes. Change what you like and save it; every rule for raising an issue applies, and the draft is marked as used.
 - **Set aside** keeps the draft on record with your reason, which is required, and raises nothing.
 
-Drafts do not appear on Home or under the bell, so whoever expects them should look. See [Drafts](other-systems.md#drafts).
+Home has a line for those who may make drafts that are waiting; nothing is said under the bell. See [Drafts](other-systems.md#drafts).
 
 ### From a failed test
 
@@ -49,7 +49,7 @@ If an issue is already open for that control from an earlier test, that one stan
 
 ### From a report by another system
 
-A scanner or another system may report that a check on a control failed or partly passed. When someone who assesses the control's unit confirms the report, an issue is raised on the control, and on the scope if the report named one. It is found by **Security testing**, is high for a failure and moderate for partly unless the confirmer chooses otherwise, and goes to the control's owners, who are told. If the control has no owner, the confirmer keeps it. Unlike a failed test, every confirmed report raises an issue of its own, so set repeats of the same failure aside. See [What other systems report](evidence-and-testing.md#what-other-systems-report).
+A scanner or another system may report that a check on a control failed or partly passed. When someone who assesses the control's unit confirms the report, an issue is raised on the control, and on the scope if the report named one. It is found by **Security testing**, is high for a failure and moderate for partly unless the confirmer chooses otherwise, and goes to the control's owners, who are told. If the control has no owner, the confirmer keeps it. As with a failed test, while an issue about the control is open for that reason, a confirmed repeat joins it rather than raising another. See [What other systems report](evidence-and-testing.md#what-other-systems-report).
 
 ### Severity sets the date
 

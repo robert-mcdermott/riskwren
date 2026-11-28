@@ -97,9 +97,9 @@ A report never rates the control and never replaces a person's test result: only
 
 Three things to know:
 
-- **Reports do not appear on Home or under the bell.** Assessors should look at **From other systems** as a routine, weekly at least.
+- **Home says when reports are waiting.** Those who may confirm them see one line, with how many, leading to **From other systems**; nothing is said under the bell.
 - **The page lists only what is waiting.** A report once decided stays on the control's card, with who decided it and how.
-- **A scanner that reports the same failure every night** raises a new issue each time one is confirmed. Confirm the first and set the repeats aside, saying that the issue is already open.
+- **A scanner that reports the same failure every night** raises one issue. While an issue is open because the control was found wanting, by a test or an earlier report, confirming another failure joins it rather than raising a second.
 
 ## Is it in good standing?
 
@@ -107,17 +107,13 @@ Another process can ask whether a **third party**, a **scope**, or an **exceptio
 
 | Asked about | It is not in good standing when |
 |---|---|
-| **A third party** | It is not active (`not_active`); its review is past its date (`review_overdue`); or information is shared with it that no agreement of the kind the program requires covers (`no_agreement`) |
+| **A third party** | It is not active (`not_active`) or is being offboarded (`offboarding`); it has not been tiered (`not_tiered`); its tier calls for a review and none has been concluded (`never_reviewed`); its last review was not approved (`not_approved`); its review is past its date (`review_overdue`); or information is shared with it that no agreement of the kind the program requires covers (`no_agreement`) |
 | **A scope** | It is not active; a requirement it is held to is failing, because a control that answers it failed a test that still holds (`failing`; an exception in force keeps a requirement out of this); or a critical or high issue about it is past its date (`issues_overdue`) |
 | **An exception** | It is not in force: still requested, refused, withdrawn, approved but not yet begun (`upcoming`), or ended (`expired`); the reason's code is its state |
 
-Read a yes for what it is. For a third party it means: active, no review overdue, and no gap in coverage. It does not mean a review has been done and approved:
+Read a yes for what it is. For a third party it means: active and not being ended, tiered, reviewed as its tier asks and approved, the review in date, and no gap in coverage. A gap counts whatever the asking token may see, and the answer says only that there is one. It does not mean the supplier was asked anything beyond what its tier calls for: a supplier in the lowest tier, which calls for no reviews, is in good standing once it is tiered and covered.
 
-- A supplier that was never tiered, or is in a tier with no reviews, has no review to be overdue.
-- A newly tiered supplier is not overdue until its first review falls due.
-- A review concluded as not approved restarts the clock like any other.
-- A supplier being offboarded stays active until the relationship ends.
-- A gap in coverage is counted only if the asking token can see what is shared. Give the asking process an **auditor's** token that may only read: it sees everything and changes nothing.
+Give the asking process an **auditor's** token that may only read: it can ask about anything and changes nothing.
 
 The answer is a reason to look, not a verdict: a process that gets no should stop for a person rather than refuse on its own. The [API guide](api.md#recipes) has recipes for purchasing, data access, and deployments.
 
@@ -132,7 +128,7 @@ Each draft shows what it proposes, where it came from, and what it rests on, in 
 - **Open** puts it in the ordinary form: **Raise a risk**, **Raise an issue**, or **Add a control**, filled in. Change what you like and save it. Every rule that applies to a record you make applies to this one, and the draft is marked as used, naming the record.
 - **Set aside** keeps the draft on record with your reason, and makes nothing.
 
-Drafts do not appear on Home or under the bell. A token that may only read may still propose one.
+Those who may make drafts that are waiting see one line on Home, with how many, leading to **Drafts**; nothing is said under the bell. A token that may only read may still propose one.
 
 ## An assistant on your own computer
 

@@ -240,6 +240,17 @@ def test_only_administrators_manage_accounts(db: Database, people: People) -> No
         )
         with pytest.raises(PermissionDenied):
             accounts.update(session, manager, myself, {"status": "disabled"})
+        # The address a person signs in with is an administrator's to change, and stays unique.
+        with pytest.raises(PermissionDenied):
+            accounts.update(session, manager, myself, {"email": "sam@northmere.example"})
+        admin = accounts.principal_for(session, accounts.get(session, people.accounts["admin"]))
+        taken = accounts.get(session, people.accounts["steward"]).email
+        with pytest.raises(Conflict):
+            accounts.update(session, admin, member, {"email": taken.upper()})
+        with pytest.raises(Invalid):
+            accounts.update(session, admin, member, {"email": "not an address"})
+        accounts.update(session, admin, member, {"email": " New.Member@Northmere.example "})
+        assert member.email == "new.member@northmere.example"
 
 
 def test_everything_about_accounts_is_in_the_history_except_secrets(

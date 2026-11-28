@@ -39,6 +39,7 @@ const KINDS = {
   review_answers: ["file", "Read"], review_chase: ["file", "Chase"], third_party_review: ["third_party", "Review"],
   audit_request: ["evidence", "Answer"], audit_answer: ["file", "Read"],
   incident_triage: ["alert", "Triage"], incident_handle: ["alert", "Handle"], incident_notify: ["bell", "Notify"], plan_exercise: ["document", "Exercise"],
+  reported: ["link", "Confirm"], drafts: ["edit", "Open"],
 };
 
 function owed(listing) {

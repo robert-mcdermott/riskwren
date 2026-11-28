@@ -182,6 +182,17 @@ def update(
         account.title = (changes["title"] or "").strip() or None
     if "time_zone" in changes:
         account.time_zone = (changes["time_zone"] or "").strip() or None
+    if changes.get("email") is not None:
+        # The address a person signs in with, and is told at: an administrator's to change,
+        # since it is how an account is matched at sign-in, single sign-on included.
+        _require_admin(principal)
+        email = normalize_email(str(changes["email"]))
+        if not EMAIL.match(email) or len(email) > 254:
+            raise Invalid("The account is not valid.", {"email": "Enter an email address."})
+        other = by_email(session, email)
+        if other is not None and other.id != account.id:
+            raise Conflict(f"There is already an account for {email}.")
+        account.email = email
     if "status" in changes and changes["status"] != account.status:
         _require_admin(principal)
         set_status(session, principal, account, changes["status"])

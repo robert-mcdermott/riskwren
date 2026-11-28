@@ -498,16 +498,20 @@ def accept(
     return acceptance
 
 
+def may_withdraw(principal: Principal, acceptance: Acceptance, risk: Risk) -> bool:
+    """Whoever gave an acceptance may take it back, and so may a manager of the unit."""
+    return acceptance.accepted_by == principal.account_id or principal.manages_unit(
+        risk.org_unit_id
+    )
+
+
 def withdraw(
     session: Session, principal: Principal, acceptance: Acceptance, reason: str | None
 ) -> Acceptance:
     """Take an acceptance back. Whoever gave it may, and so may a manager."""
     risk = session.get(Risk, acceptance.risk_id)
     assert risk is not None
-    allowed = acceptance.accepted_by == principal.account_id or principal.manages_unit(
-        risk.org_unit_id
-    )
-    if not allowed:
+    if not may_withdraw(principal, acceptance, risk):
         raise PermissionDenied("Only whoever accepted the risk, or a manager, can withdraw it.")
     if acceptance.withdrawn_at is not None:
         raise Conflict("This acceptance has already been withdrawn.")
@@ -744,7 +748,13 @@ def of_risk(session: Session, principal: Principal, risk: Risk) -> dict[str, Any
         "response": risk.response,
         "response_rationale": risk.response_rationale,
         "plans": [plan_view(session, principal, plan) for plan in plans],
-        "acceptances": [acceptance_view(session, acceptance) for acceptance in acceptances],
+        "acceptances": [
+            {
+                **acceptance_view(session, acceptance),
+                "can_withdraw": may_withdraw(principal, acceptance, risk),
+            }
+            for acceptance in acceptances
+        ],
         "authority": authority(session, principal, risk),
     }
 

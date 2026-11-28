@@ -54,6 +54,10 @@ def test_a_draft_is_made_only_by_a_person_in_the_ordinary_form(
     steward = as_role("steward")
     shown = steward.get("/api/v1/drafts").json()["data"]
     assert [row["id"] for row in shown] == [draft["id"]] and shown[0]["can"]["use"]
+    owed = steward.get("/api/v1/home").json()["data"]["items"]
+    assert [item["href"] for item in owed if item["kind"] == "drafts"] == ["/drafts"]
+    assert not [i for i in as_role("member").get("/api/v1/home").json()["data"]["items"]
+                if i["kind"] == "drafts"]  # fmt: skip
     assert as_role("member").get(f"/api/v1/drafts/{draft['id']}").status_code == 404
     # A token never decides one; a record someone else made does not use it.
     assert (

@@ -11,12 +11,12 @@ Home is the page for what you owe. **Waiting on you** lists, most urgent first, 
 - **Risks:** a risk of yours to assess, to assess again because its rating is in doubt, or to review; a risk that needs a decision, and, for a leader, every risk in the units they lead that does; an acceptance you gave that is about to expire; a risk analysis you lead, to carry on.
 - **Controls and assurance:** a control of yours to rate; evidence of yours that has stopped counting or soon will; a test you have been asked to do; a result waiting for your review.
 - **Actions, issues, and exceptions:** an action that is yours; an issue that is yours to put right; a closure for you to confirm; an exception to decide, or one of yours about to end.
-- **What others ask of you:** a campaign's questionnaire to answer; an indicator's reading to record; a document to approve, publish, rework, review, or acknowledge; a committee session to prepare; a request from internal audit, or an answer to one to read.
+- **What others ask of you:** a campaign's questionnaire to answer; an indicator's reading to record; a document to approve, publish, rework, review, or acknowledge; a committee session to prepare; a request from internal audit, or an answer to one to read; drafts from an assistant or another system to open or set aside; checks and evidence other systems reported, to confirm.
 - **Third parties and agreements:** a third party due for review; a due diligence review's answers to read or chase; an agreement whose notice date or end is near.
 - **Incidents and continuity:** an incident to triage, to handle, or to notify someone about; a continuity plan to exercise.
 - **Who answers for what:** for those who can name a new owner, a record with nobody answering for it; for whoever is standing in for someone who has left, what to pass on.
 
-The bell at the top right counts what has been assigned to you or decided for you since you last looked. See [Notices](issues-and-exceptions.md#notices). Drafts from an assistant or another system are not on Home or under the bell: they wait under [Drafts](#drafts).
+The bell at the top right counts what has been assigned to you or decided for you since you last looked. See [Notices](issues-and-exceptions.md#notices). Drafts from an assistant or another system, and what other systems have reported onto controls, are not under the bell; Home has one line for each, with how many are waiting, for those who may act on them.
 
 Above the list, stewards, leaders, managers, auditors, and administrators see six figures: **Risks need a decision**, **Risks above appetite**, **Reviews overdue**, **Actions overdue**, **Controls failing a test**, and **Issues overdue**. Each counts everything its reader may see, and opens the list it counts. An assessor with no other role, and a member, see the list without the figures. An administrator also sees the three steps of setting up: units, people, and appearance. The card is titled **Set up your installation** until all three are done, and **Your installation is set up** after.
 
@@ -323,7 +323,7 @@ A risk's residual rating is put **in doubt** when something it rested on changes
 | An indicator | An indicator that warns of the risk passes its limit ([Indicators](#indicators)) |
 | A risk analysis | An analysis names the risk as covering a thing and ticks **its rating needs another look** ([Risk analyses](#risk-analyses)) |
 
-A new residual assessment lifts the doubt. So does any later change to the risk's controls (a rating, a link, or an unlink) that does not itself put the rating in doubt, whatever the doubt came from: a completed plan's or an indicator's doubt can be lifted that way without anyone assessing the risk again. When a plan completes or an indicator passes its limit, assess the risk again anyway.
+A new residual assessment lifts the doubt. A doubt the controls raised also lifts when they no longer suggest a worse rating, as when a control is put right. A doubt from a plan, an indicator, or an analysis stays until someone assesses the risk again: no change to its controls lifts it.
 
 ## Treatment
 
@@ -359,7 +359,7 @@ An acceptance can carry **Conditions**, the things that must stay true while it 
 
 An acceptance covers the rating that was accepted. If the residual rating later rises above it, or the acceptance expires or is withdrawn, the risk needs a decision again. **Acceptances** in the sidebar lists them, soonest to expire first, and can show only those expiring within 30 or 90 days.
 
-**Withdraw**, with a reason, is for whoever gave the acceptance, or a manager for the risk's unit. The page offers **Withdraw** to anyone who may edit the risk, but refuses anyone else when they try.
+**Withdraw**, with a reason, is for whoever gave the acceptance, or a manager for the risk's unit, and is offered only to them.
 
 Choosing **Accept** as the response is not an acceptance. It records what is intended and why, and changes nothing about standing: the risk still needs a decision until a leader with the authority records an acceptance.
 
@@ -430,7 +430,7 @@ An assistant, or another system with a token, may propose a risk, an issue, or a
 - **Open** puts the draft in the ordinary form (**Raise a risk**, **Raise an issue**, or **Add a control**) filled in. Change what you like and save it: every rule for a record you make applies, and saving marks the draft as used, naming the record.
 - **Set aside** keeps the draft on record with why, which is required, and makes nothing.
 
-Drafts do not appear on Home or under the bell, so a steward looks under **Drafts** from time to time. See [Drafts](other-systems.md#drafts) for where they come from.
+Home shows a line when drafts are waiting for you to make or set aside; nothing is said under the bell. See [Drafts](other-systems.md#drafts) for where they come from.
 
 ### The assistant
 

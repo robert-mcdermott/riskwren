@@ -35,7 +35,7 @@ Once the record is in place, the program is the same work on a calendar. Schedul
 
 | When | What | Where |
 |---|---|---|
-| **Every week** | Triage new incidents and concerns; read what is waiting on Home. Stewards and assessors look at **Drafts**, and assessors at what other systems have reported, since neither appears on Home or under the bell | Incidents; Home; **Drafts**; **Compliance → From other systems** |
+| **Every week** | Triage new incidents and concerns; work through what is waiting on Home, which includes drafts to open and reports from other systems to confirm | Incidents; Home; **Drafts**; **Compliance → From other systems** |
 | **Every month** | Issues past their date, exceptions ending, indicators past their limit, evidence about to stop counting | The compliance and risk dashboards; Indicators |
 | **Every quarter** | Critical risks reviewed; the risk committee meets on an agenda drawn from the register; a leadership report is issued and kept as it was given; control owners attest | The review cadence; Committee sessions; Leadership reports; Campaigns |
 | **Twice a year** | Key controls tested again; high risks reviewed | Assessments; the review cadence |

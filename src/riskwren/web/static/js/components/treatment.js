@@ -385,10 +385,9 @@ export function withdrawAcceptance({ acceptance, onDone }) {
 }
 
 function acceptanceCard(acceptance, ctx) {
-  const mine = acceptance.accepted_by_id === session().account.id;
   return card({ title: `Accepted by ${acceptance.accepted_by}`,
     actions: h("div", { class: "row-sm" }, acceptanceState(acceptance),
-      acceptance.state === "in_force" && (mine || ctx.canManage) ? button("Withdraw", { kind: "btn-ghost btn-sm", onclick: () => withdrawAcceptance({ acceptance, onDone: ctx.reload }) }) : null) },
+      acceptance.state === "in_force" && acceptance.can_withdraw ? button("Withdraw", { kind: "btn-ghost btn-sm", onclick: () => withdrawAcceptance({ acceptance, onDone: ctx.reload }) }) : null) },
   h("dl", { class: "dl" },
     h("dt", {}, "What was accepted"), h("dd", {}, rating(ctx.program, acceptance.rating_accepted), h("div", { class: "cell-sub" }, `Likelihood ${acceptance.likelihood} · Impact ${acceptance.impact}`)),
     h("dt", {}, "Why"), h("dd", { class: "prose" }, acceptance.rationale),

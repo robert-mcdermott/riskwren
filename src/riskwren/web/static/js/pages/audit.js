@@ -198,7 +198,7 @@ export function planPage(main, { ref }) {
         h("td", {}, row.reason ?? ""),
         h("td", {}, row.planned_start ? `${date(row.planned_start)}${row.planned_end ? ` to ${date(row.planned_end)}` : ""}` : h("span", { class: "subtle" }, "Not set")),
         h("td", {}, pill(row.status_label, STATUS_TONE[row.status]), row.dropped_reason ? h("div", { class: "cell-sub" }, row.dropped_reason) : null),
-        h("td", { class: "no-print" }, plan.can.work && row.status === "planned" ? button("Drop", { kind: "btn-sm btn-ghost", "aria-label": `Drop ${row.name}`,
+        h("td", { class: "no-print" }, plan.can.work && !["reported", "dropped"].includes(row.status) ? button("Drop", { kind: "btn-sm btn-ghost", "aria-label": `Drop ${row.name}`,
           onclick: () => ask(`Drop ${row.name}`, "Why it will not be done", { required: true, run: (why) => post(`/api/v1/engagements/${row.ref}/drop`, { reason: why }), done: reload }) })
           : plan.can.work && row.status === "dropped" ? button("Restore", { kind: "btn-sm btn-ghost", "aria-label": `Restore ${row.name}`, onclick: async () => { await post(`/api/v1/engagements/${row.ref}/restore`); reload(); } }) : null)));
       return h("div", { class: "stack-lg" },

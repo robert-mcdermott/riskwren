@@ -181,6 +181,10 @@ def test_closing_and_reopening(as_role: Clients, people: People) -> None:
     assert any("is closed" in n["text"] for n in member.get("/api/v1/notices").json()["data"])
     refused = steward.post(f"/api/v1/incidents/{ref}/messages", json={"body": "One more thing"})
     assert refused.status_code == 409
+    # Nor is anything added to what it taught until it is reopened.
+    later = steward.put(f"/api/v1/incidents/{ref}/learning",
+                        json={"lessons": "Label the cabinet."})  # fmt: skip
+    assert later.status_code == 409, later.text
     assert steward.post(f"/api/v1/incidents/{ref}/reopen").status_code == 403
     reopened = as_role("assessor").post(f"/api/v1/incidents/{ref}/reopen")
     assert reopened.json()["data"]["status"] == "handling"

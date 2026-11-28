@@ -128,7 +128,7 @@ def close_plan(request: Request, ref: str) -> dict[str, Any]:
         return envelope(plans.view(session, principal, plan))
 
 
-@router.post("/engagements/{ref}/drop", summary="Drop a planned engagement, with the reason")
+@router.post("/engagements/{ref}/drop", summary="Drop an engagement not yet reported, saying why")
 def drop_engagement(request: Request, ref: str, body: ReasonBody) -> dict[str, Any]:
     principal = current(request)
     with writing(request, principal.actor) as session:

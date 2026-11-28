@@ -78,7 +78,7 @@ A **contact** is a person at the third party who can be asked: a name, an email 
 
 ### Start a review
 
-**Start a review** on the third party's **Due diligence** tab starts one at once, with the questionnaire its tier names, and opens it. Nothing is asked of anyone until it is sent. As shipped:
+**Start a review** on the third party's **Due diligence** tab asks which **Questionnaire** to send: the one its tier names, which is the usual choice, or another. **Start it** makes the review and opens it. Nothing is asked of anyone until it is sent. As shipped:
 
 | Tier | Questionnaire |
 |---|---|
@@ -87,7 +87,7 @@ A **contact** is a person at the third party who can be asked: a name, an email 
 | Tier 3 | **Due diligence: short**, eight questions |
 | Tier 4, or not tiered | None |
 
-The page offers no choice of questionnaire. For a third party in Tier 4, or one not tiered, **Start a review** stops with "Choose the questionnaire to ask. A tier 4 third party has none of its own." To ask one of them, or to ask a Tier 1 supplier the short questionnaire, choose it through the [API](api.md): give `questionnaire` (such as `due-diligence-short`) when starting it, with `POST /api/v1/third-parties/{ref}/reviews`, or change it while the review is still a draft, with `PATCH /api/v1/reviews/{ref}`.
+A third party in Tier 4, or one not tiered, has no questionnaire of its own: choose one to review it. Choosing another for a tiered supplier, the short questionnaire for a Tier 1 supplier say, is for a reason worth recording in the review. Through the [API](api.md), give `questionnaire` (such as `due-diligence-short`) with `POST /api/v1/third-parties/{ref}/reviews`, or change it while the review is a draft with `PATCH /api/v1/reviews/{ref}`.
 
 The questionnaires are written for organizations in the United States: they ask about a business associate agreement where health information is involved, about notice of an incident within 72 hours, and where the information is held. They can be edited, or others added, under **Admin → Questionnaires**. A review records the tier when it was started, and asks the version of the questionnaire in use when it was first sent.
 
@@ -203,19 +203,16 @@ Another system, a purchasing process for one, can ask with a token whether a thi
 | Code | When |
 |---|---|
 | `not_active` | The relationship is not active: the third party is retired |
-| `review_overdue` | Its next review date has passed |
+| `offboarding` | The relationship is being ended: an offboarding is open |
+| `not_tiered` | It has not been tiered, so nothing says how closely it is to be reviewed |
+| `never_reviewed` | Its tier calls for reviews, and none has been concluded |
+| `not_approved` | Its last concluded review was **Not approved** |
+| `review_overdue` | Its next review date has passed, or a review called for is not yet concluded |
 | `no_agreement` | Information is shared with it that no agreement of the kind the program requires covers: a [stop](#coverage) |
 
-That is all it checks, so a yes says less than it may seem to. It is yes for a third party:
+A yes means: active and not being ended, tiered, reviewed as its tier asks and approved (with or without conditions), the review in date, and no stop. A third party in the lowest tier, which calls for no reviews, is in good standing once it is tiered and covered. A stop counts whatever the asking token may see, and the answer says only that there is one.
 
-- never tiered, or in Tier 4, since it has no review date to be past;
-- newly tiered, until its first review falls due, a full cadence after it was tiered, whether or not anyone has asked it anything;
-- whose last review was concluded **Not approved**, since concluding restarts the clock whatever the conclusion;
-- being offboarded, since it stays active until the last step is recorded.
-
-A review called for is due that day, so the answer is no from the next day until a review is concluded.
-
-A stop is counted only if the asking token can see the information and the third party. Give the purchasing process an auditor's token, which reads everything, made to only read. Read a yes as "nothing on record says stop", and keep the decision to rely on a supplier with a person. Tokens, and what else can be asked, are in [Is it in good standing?](other-systems.md#is-it-in-good-standing); the [API guide](api.md#asking-whether-something-is-in-good-standing) has the exact answer and a recipe.
+A review called for is due that day, so the answer is no from the next day until a review is concluded. Give the purchasing process an auditor's token that may only read. Read a yes as "nothing on record says stop", and keep the decision to rely on a supplier with a person. Tokens, and what else can be asked, are in [Is it in good standing?](other-systems.md#is-it-in-good-standing); the [API guide](api.md#asking-whether-something-is-in-good-standing) has the exact answer and a recipe.
 
 ### Ending a relationship
 
@@ -278,4 +275,4 @@ The stop goes from all three pages and from **Coverage**. Patient records are al
 
 **Ask what another process would hear.**
 
-Purchasing, asking `GET /api/v1/standing/third-party/TP-…` with an auditor's token, hears yes: the supplier is active, its review is not overdue, and nothing shared with it lacks an agreement. That is true and useful, and it is all. It does not say that the review was approved with conditions, that a finding is open with the supplier, or that the SOC 2 report leaves gaps; a person reads those on the supplier's page. Nor does a yes mean the supplier has been asked anything. Before step 14 the answer was no, with `no_agreement`, because nothing covered the patient records. Had the agreement been in place from the start, the answer would have been yes all along, even before the review in step 6.
+Purchasing, asking `GET /api/v1/standing/third-party/TP-…` with an auditor's token, hears yes: the supplier is active, tiered, reviewed and approved as its tier asks, its next review is not due, and nothing shared with it lacks an agreement. That is true and useful, and it is all. It does not say that the review was approved with conditions, that a finding is open with the supplier, or that the SOC 2 report leaves gaps; a person reads those on the supplier's page. Before the review was concluded the answer was no, with `never_reviewed`, and before step 14 it was no with `no_agreement` as well, because nothing covered the patient records.

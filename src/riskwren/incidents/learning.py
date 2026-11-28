@@ -25,7 +25,7 @@ from riskwren.compliance import issues
 from riskwren.compliance.issues import ISSUE
 from riskwren.controls.service import CONTROL
 from riskwren.core.clock import utc_now
-from riskwren.core.errors import Invalid, NotFound, PermissionDenied
+from riskwren.core.errors import Conflict, Invalid, NotFound, PermissionDenied
 from riskwren.db.models import Incident, IncidentLoss, IncidentSubject, Issue
 from riskwren.db.models.incidents import LOSS_KINDS
 from riskwren.events import audit
@@ -48,6 +48,8 @@ LONGEST = 20_000
 def _require(session: Session, principal: Principal, incident: Incident) -> None:
     if not reports.can_edit(session, principal, incident):
         raise PermissionDenied("What an incident teaches is said by those who handle or triage it.")
+    if incident.status == "closed":
+        raise Conflict("This incident is closed. Reopen it to add to what it taught.")
 
 
 # --- What it realized, and what failed or held --------------------------------------------

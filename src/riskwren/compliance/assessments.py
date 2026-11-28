@@ -431,6 +431,9 @@ def update_test(
             test.assigned_to = None
         elif person is None or person.status == "disabled":
             errors.add("assigned_to", "Choose a person whose account is not disabled.")
+        elif not _may_record(session, person, test):
+            said = "Choose an assessor or a manager for the unit who does not own the control."
+            errors.add("assigned_to", said)
         else:
             test.assigned_to = person.id
     if errors:
@@ -710,6 +713,18 @@ def tests_of(
     return [view_of_test(session, principal, row) for row in rows]
 
 
+def _may_record(session: Session, person: Account, test: ControlTest) -> bool:
+    """Whether this person could record the test's result: someone who assesses the unit
+    and does not own the control."""
+    from riskwren.people import accounts
+
+    assessment = session.get(Assessment, test.assessment_id)
+    if assessment is None:
+        return False
+    them = accounts.principal_for(session, person)
+    return them.assesses_unit(assessment.org_unit_id) and not _owns(session, them, test.control_id)
+
+
 def waiting_on(session: Session, principal: Principal) -> list[dict[str, Any]]:
     """Tests a person has been asked to do, and results in assessments they lead that wait
     for a second pair of eyes."""
@@ -746,4 +761,30 @@ def waiting_on(session: Session, principal: Principal) -> list[dict[str, Any]]:
     for _result, assessment, control in led:
         if not _owns(session, principal, control.id):  # which someone else must review
             found.append({"kind": "review", "assessment": assessment, "control": control})
+    # A result the lead recorded cannot be reviewed by the lead: it waits for the others with
+    # tests in the same assessment who may review it.
+    teamed = session.scalars(
+        select(ControlTest.assessment_id).where(ControlTest.assigned_to == me).distinct()
+    ).all()
+    if teamed:
+        by_lead = session.execute(
+            select(TestResult, Assessment, Control)
+            .join(Assessment, Assessment.id == TestResult.assessment_id)
+            .join(ControlTest, ControlTest.id == TestResult.test_id)
+            .join(Control, Control.id == ControlTest.control_id)
+            .where(
+                Assessment.id.in_(teamed),
+                Assessment.status.in_(OPEN),
+                Assessment.lead_id != me,
+                TestResult.tested_by == Assessment.lead_id,
+                TestResult.review.is_(None),
+                TestResult.superseded_by.is_(None),
+            )
+            .order_by(TestResult.tested_at)
+        ).all()
+        for _result, assessment, control in by_lead:
+            if principal.assesses_unit(assessment.org_unit_id) and not _owns(
+                session, principal, control.id
+            ):
+                found.append({"kind": "review", "assessment": assessment, "control": control})
     return found

@@ -69,7 +69,7 @@ Those handling an incident, and those who see all of it, write on it under **Wha
 
 When it is done, **Close** asks how it ended, and the reporter is told it is closed. Its handlers close it, or those who triage it.
 
-A closed incident takes nothing more: no messages, no breach assessment or notification, no change to who sees it, and the page offers no change to what it taught, what it cost, or the issues raised from it. Those who triage it can **Reopen** it, and it goes back to being handled. The reporter is not told of a reopening, so write to them if they should know.
+A closed incident takes nothing more: no messages, no breach assessment or notification, no change to who sees it, and no change to what it taught, what it cost, or the issues raised from it. Those who triage it can **Reopen** it, and it goes back to being handled. The reporter is not told of a reopening, so write to them if they should know.
 
 ## What it taught
 
@@ -100,7 +100,7 @@ An incident that may involve protected information is assessed for whether it mu
 | The conclusion | It must be notified, it need not be, or not yet decided; and why. Why is needed for either of the first two, and "it must be notified" needs at least one rule that applies |
 | The rules that apply | Ticked by hand from those built in; and any state's law (**Add a state's law**), named, with the days it allows, or contract (**Add a contract**), named, with the days or hours it allows |
 
-No rule is ticked for you on a first assessment, whatever information you choose: tick each that applies. Each later assessment starts from the rules ticked on the one before.
+On a first assessment, ticking a kind of information ticks the rules that usually apply to it, such as the HIPAA Breach Notification Rule for health information, until you change a rule's box yourself. Check each: the suggestion is a start, not a judgment. Each later assessment starts from the rules ticked on the one before.
 
 Beside it is **what the factors point to**. A use or disclosure that was not allowed is presumed a breach, to be notified, unless the information was secured, an exception applies, or the factors show a low probability that it was compromised. That is the HIPAA Breach Notification Rule's test, and a sound one for other information too. The conclusion is yours, and the reason you give is what a regulator will ask about.
 
@@ -183,7 +183,7 @@ The demo's dispensing cabinets at the pharmacy are serviced by Meridian Pharmacy
 
 **Assess it for breach, while the clock runs.**
 
-5. On **Breach assessment**, **Assess it**: discovered today, at the hour the engineer told the pharmacist; **Health information**; about 140 people, and 140 the most in any one state; not secured; no exception; the factors you can weigh so far. Tick **HIPAA Breach Notification Rule** (nothing is ticked for you), and **Add a state's law**: the state, with the days its law allows. Conclusion **Not yet decided**. **Save the assessment**.
+5. On **Breach assessment**, **Assess it**: discovered today, at the hour the engineer told the pharmacist; **Health information**; about 140 people, and 140 the most in any one state; not secured; no exception; the factors you can weigh so far. **HIPAA Breach Notification Rule** is ticked as **Health information** is; leave it ticked, and **Add a state's law**: the state, with the days its law allows. Conclusion **Not yet decided**. **Save the assessment**.
 6. **What is due** shows, if it is a breach: each patient within 60 days, the Secretary within 60 days after the end of the year (fewer than 500 people), and the state's deadline. No media notice is listed: 140 is not more than 500. Had the count been left empty, the Secretary's line would read the same, and a breach of 600 people would have been timed as one of fewer than 500. The handler's Home lists each, soonest first; nothing comes by email.
 7. When Meridian confirms the stick is not found and was not encrypted, **Assess it again**: the factors weighed, **It must be notified**, and why. The rules ticked last time are ticked again.
 8. As each notice goes out, **Record a notification**: the rule and whom it was for, who was notified ("140 patients, by first-class mail"), the day it was sent, how many were told, and how. Each leaves **What is due** as done.
