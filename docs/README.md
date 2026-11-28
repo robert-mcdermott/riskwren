@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.9.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.10.0. Read them in this order if you are new, or go straight to the one for your part. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## The guides
 
@@ -113,10 +113,14 @@ These two are written from the code, so they always match the version they ship 
 | Someone has left. What happens to what they owned? | [When someone leaves](running-the-program.md#when-someone-leaves) |
 | How do I let people sign in with Entra ID or another identity provider? | [Single sign-on](configuration.md#single-sign-on) |
 | Nobody can sign in. How do I get back in? | [`riskwren users`](cli.md#riskwren-users) |
+| How does a scanner report a failed check onto a control? | [Reporting onto a control](api.md#reporting-onto-a-control) |
+| Can purchasing ask whether a supplier has been reviewed? | [Asking whether something is in good standing](api.md#asking-whether-something-is-in-good-standing) |
+| How do I let an assistant on my computer read RiskWren? | [An assistant: the tool server](api.md#an-assistant-the-tool-server) |
+| How do I turn on the assistant, with a model of our own? | [The assistant](configuration.md#the-assistant) |
 
 ## What this release does not do yet
 
-Version 0.9.0 is the register, compliance, the means of keeping both current, the organization's own word, its third parties, insight (measures, portfolio views, leadership reports, the record as it stood on a date, and dossiers that prove they are unchanged), internal audit's own workspace, incidents and resilience, and what an organization needs to adopt it: backups, deployment, starter programs, tokens and webhooks, and a security review. Other systems cannot yet post a test result onto a control, ask whether a supplier is in good standing, or draft through an assistant; those follow in the next release. A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action. An outside auditor's link lists the evidence on file but does not yet download its files. Two records that are the same thing cannot yet be merged, only found. People cannot yet see or end their own other sessions, and passwords are not yet checked against a list of breached ones; see the [security review](../spec/security-review.md) for what else is planned. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
+Version 0.10.0 is the register, compliance, the means of keeping both current, the organization's own word, its third parties, insight (measures, portfolio views, leadership reports, the record as it stood on a date, and dossiers that prove they are unchanged), internal audit's own workspace, incidents and resilience, what an organization needs to adopt it (backups, deployment, starter programs, tokens and webhooks, and a security review), and its connections: results from other systems, good-standing checks, a tool server for assistants, drafts, and an optional assistant. It never goes looking: it does not yet collect evidence from other systems on a schedule, and the assistant summarizes and drafts risks only, not issues or controls of its own accord (an assistant through the tool server may draft those). A contact at a third party answers through a link and cannot yet be sent a link to report progress on an action. An outside auditor's link lists the evidence on file but does not yet download its files. Two records that are the same thing cannot yet be merged, only found. People cannot yet see or end their own other sessions, and passwords are not yet checked against a list of breached ones; see the [security review](../spec/security-review.md) for what else is planned. The next release, 1.0, waits for what the first adopters ask for. The [roadmap](../spec/roadmap.md) says what comes next and in what order, and the [changelog](../CHANGELOG.md) lists what is in each release.
 
 ## More
 

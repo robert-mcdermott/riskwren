@@ -2,7 +2,7 @@
 
 **Goal:** fit into the systems around it while staying passive: others tell RiskWren, or ask it; it never goes looking. Wave 9 gave other systems a token and told them what happens. Wave 10 lets them put results in, ask whether something is in good standing, and lets an assistant read the record and draft what a person then confirms. All of it is optional, and off until an administrator turns it on.
 
-**Branch:** `wave-10` · **Target version:** `0.10.0` · **Status:** ◐ in progress
+**Branch:** `wave-10` · **Target version:** `0.10.0` · **Status:** ☑ done
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security team, this wave is the scanner that reports a failed check onto the control it tests, the purchasing process that asks whether a supplier has been reviewed before it buys, the ticket opened when an issue is raised, and an assistant that drafts a risk from what an engineer wrote, all without RiskWren reaching into anything.
 
@@ -50,9 +50,11 @@ The wave is done when, on a fresh checkout:
 
 **Done:** `riskwren.assistant` holds the providers (each a plain HTTP call, no vendor library; Bedrock signed with Signature Version 4 from the standard library, or a Bedrock API key), and the service. While `enabled` is false its routes are not mounted, the session says so, and the app neither shows nor loads anything of it. When on, **Summarize** sits beside **Connections** on every record's page, and **Draft with the assistant** on the register: a description becomes a draft that opens in the ordinary **Raise a risk** form. Both use the tools of slice 3 through RiskWren's own API in the same process, with the asker's cookie and CSRF token or their token, so a token reaches the assistant as itself. Everything a tool reads passes `withhold`, which turns a restricted record, and a record whose data class is not in `send`, into its reference and why. Each exchange is an `assistant_exchange` row (migration 0050), written before the provider is asked with the asker's account or token row locked while the day's exchanges are counted, so the limit holds under concurrency, and written again when it ends, both as events in the hash-chained history. One overall time limit covers every call; six rounds of tools at most. **Admin → Assistant** shows the setup, checks the connection, and lists the log. The API's own documents and the role-by-route matrix are made with the assistant on. Tried end to end against a small model running on the same computer: the connection check, a summary through three tools, and a drafted risk opening in the form. The tests are `tests/test_assistant.py`, with a scripted provider: nothing is sent anywhere.
 
-### Slice 5: Release prep ☐
+### Slice 5: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.9.0 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.9.0 on both databases, audits, release, and the site republished
+
+**Done:** version 0.10.0; the changelog's introduction and upgrade notes; the README's account of the release; the guides' index, with its questions and what this release does not do yet; a section on the site's home page for the connections; every picture taken again, with From other systems and Drafts new. The upgrade from 0.9.0 was run from that release's own code with its demo organization on both databases: migrations 0048 to 0050 applied, every row of every table unchanged, the history verifies, the old webhook kept the plain format, and a token's report, an assessor's confirmation raising an issue, a standing check, and a draft from a reading token ran over the old data; a second upgrade changed nothing. The whole suite passed (761 tests). The accessibility audit found nothing in 325 scenes, the screen-reader check nothing in fifteen journeys, the keyboard check nothing, and the site's audit nothing in nineteen pages.
 
 ## Decisions
 

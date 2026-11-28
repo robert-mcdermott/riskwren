@@ -30,6 +30,10 @@ const JOURNEYS = [
   { name: "the policy library", as: "member", path: "/library" },
   { name: "notices", as: "ciso", path: "/notices" },
   { name: "appearance", as: "admin", path: "/admin/appearance" },
+  { name: "from other systems", as: "assess1", path: "/reported" },
+  { name: "confirm a report", as: "assess1", path: "/reported", step: press("Confirm") },
+  { name: "drafts", as: "cro", path: "/drafts" },
+  { name: "open a draft", as: "cro", path: "/drafts", step: press("Open") },
 ];
 
 const INTERACTIVE = new Set(["button", "link", "textbox", "searchbox", "combobox", "checkbox", "radio", "switch",

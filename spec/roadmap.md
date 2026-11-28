@@ -188,17 +188,19 @@ Detail: [waves/wave-8.md](waves/wave-8.md)
 
 Detail: [waves/wave-9.md](waves/wave-9.md)
 
-## Wave 10: Connected (v0.10.0) ☐
+## Wave 10: Connected (v0.10.0) ☑
 
 **Goal:** fit into the systems around it while staying passive: others tell RiskWren, or ask it; it never goes looking.
 
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
-| 1 | Results pushed in | An endpoint through which another system posts a test result or evidence onto a control, recorded with its source and never overriding a person | ☐ |
-| 2 | A reference others can check | Other processes ask whether a third party, scope, or exception is in good standing; recipes for purchasing and data-access processes; ticket and chat notifications by webhook | ☐ |
-| 3 | Tool server for assistants | An optional server through which an AI assistant reads records and drafts changes that a person confirms | ☐ |
-| 4 | Optional assistant | Off and invisible by default; drafts risk statements and summarizes records, with any compatible provider including a local one; every exchange logged | ☐ |
-| 5 | Release prep | Guides, changelog, release | ☐ |
+| 1 | Results pushed in | An endpoint through which another system posts a test result or evidence onto a control, recorded with its source and never overriding a person | ☑ |
+| 2 | A reference others can check | Other processes ask whether a third party, scope, or exception is in good standing; recipes for purchasing and data-access processes; ticket and chat notifications by webhook | ☑ |
+| 3 | Tool server for assistants | An optional server through which an AI assistant reads records and drafts changes that a person confirms | ☑ |
+| 4 | Optional assistant | Off and invisible by default; drafts risk statements and summarizes records, with any compatible provider including a local one; every exchange logged | ☑ |
+| 5 | Release prep | Guides, changelog, release | ☑ |
+
+Detail: [waves/wave-10.md](waves/wave-10.md)
 
 ## Wave 11: Stable (v1.0.0) ☐
 

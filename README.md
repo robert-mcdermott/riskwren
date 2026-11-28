@@ -60,9 +60,18 @@ A demo listens only on the machine it runs on. See [Configuration](docs/configur
 
 ## What is in this release
 
-Version 0.9.0 is *Adoption*: what an organization that has never seen RiskWren needs to install it, make it its own, and run it in production. It follows 0.8.0, which added incidents and resilience, and 0.7.0, which gave internal audit its own workspace on the same record.
+Version 0.10.0 is *Connected*: RiskWren fits into the systems around it and still never goes looking. Others tell it, or ask it; an assistant reads what it may and drafts what a person then makes. It follows 0.9.0, which made it ready for another organization to adopt, and 0.8.0, which added incidents and resilience.
 
-**Adoption, new in 0.9.0**
+**Connected, new in 0.10.0**
+
+- **Results from other systems:** a scanner or a monitoring tool reports a check or a piece of evidence onto a control, with a token; it counts once a person who assesses the control, and does not own it, confirms it.
+- **Good standing:** another process asks whether a third party, a scope, or an exception is in good standing, and learns yes or no and the kind of reason, never the record's contents; with recipes for purchasing, data access, and deployments.
+- **Webhooks shaped for a ticketing system or a chat channel.**
+- **`riskwren tools`:** a Model Context Protocol server for an assistant on someone's own computer, which reads what its token may and drafts risks, issues, and controls.
+- **Drafts,** opened by a person in the ordinary form and saved, or set aside with why: nothing proposed becomes a record on its own.
+- **An optional assistant,** off until an administrator turns it on: summaries of records and risks drafted from someone's own words, with a provider the organization chooses (one on its own machines included), from what the asker may see and no data class it keeps back, with a daily limit, a time limit, and every exchange in the history.
+
+**Adoption, from 0.9.0**
 
 - **Backup and restore** to one portable file, checked against itself; moving between SQLite and PostgreSQL is a backup and a restore. Measured at 10,000 records and many people at once, with the results in the configuration guide.
 - **Deployment:** a container image, a compose file with PostgreSQL, a locked-down systemd unit, proxy examples, `riskwren doctor --production`, and **Admin → Operations**.

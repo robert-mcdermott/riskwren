@@ -4,6 +4,72 @@ RiskWren follows semantic versioning. Each wave of the [roadmap](spec/roadmap.md
 release. Before 1.0, a release may contain breaking changes; they are listed under
 **Breaking**.
 
+## 0.10.0 (2026-11-27)
+
+Wave 10, *Connected*: RiskWren fits into the systems around it and still never goes looking.
+A scanner reports a failed check onto the control it tests, and it counts once a person who
+does not own the control confirms it. A purchasing process asks whether a supplier is in good
+standing before it buys, and learns yes or no and why, and nothing more. A service desk or a
+chat channel is told when an issue is raised, in the shape it reads. An assistant on someone's
+own computer reads what its token may and drafts risks, issues, and controls that a person then
+makes in the ordinary form. And an optional assistant inside RiskWren, off until an
+administrator turns it on, summarizes records and drafts risks with a provider the organization
+chooses, one on its own machines included, recording every exchange.
+
+### Upgrading from 0.9.0
+
+Run `uv sync`, then `uv run riskwren db upgrade` (migrations 0048, 0049, and 0050). Every row
+is kept, and the history still verifies. A few things look different afterwards:
+
+- **The menu has Drafts,** under Home, for stewards, managers, and assessors, and **Compliance
+  → From other systems**, for assessors and managers. Both are empty until another system or
+  an assistant sends something.
+- **A webhook has a format:** the plain message it has always had, unless an administrator
+  chooses a ticket or a chat message.
+- **`riskwren.toml` may have an `[assistant]` section.** Without one, nothing changes: the
+  assistant is off, and none of it is installed.
+
+### Added
+
+- **Results from other systems:** a token that acts as a manager, an assessor, or a steward
+  reports a check (passed, partly, or failed) or a piece of evidence onto a control, with
+  `POST /controls/{ref}/reported`. It is shown on the control at once, in its source's name,
+  and counts only once a person who assesses the control's unit, and does not own it, confirms
+  it under **Compliance → From other systems**: a failure then raises an issue, and evidence is
+  filed with the control. Setting one aside keeps it, with why. None of it rates the control.
+- **Good standing:** `GET /standing/{kind}/{ref}` answers whether a third party, a scope, or an
+  exception is in good standing, with each reason as a code and a sentence and nothing of the
+  record's contents. The API guide has recipes for purchasing, data access, deployments,
+  ticketing, and chat.
+- **Webhooks for a ticketing system or a chat channel:** a webhook may send a ticket (a title,
+  a description, and a link) or a chat message (one line of text), still naming only the event
+  and the record.
+- **`riskwren tools`:** a Model Context Protocol server, over standard input and output, for an
+  assistant on someone's own computer. Its tools search, read a record, a risk with its
+  controls, a scope's readiness, and what is overdue, and draft a risk, an issue, or a control,
+  each calling the API with the token in `RISKWREN_TOKEN`. `--no-drafts` offers only the
+  tools that read.
+- **Drafts:** what an assistant or another system proposes waits under **Drafts** for a person
+  who may add that kind of record. **Open** puts it in the ordinary form; saving it marks the
+  draft as used, naming the record. A token that may only read may still draft.
+- **The assistant,** optional and off: under `[assistant]`, a provider named by the protocol it
+  speaks (the Chat Completions API, which servers on the organization's own machines speak;
+  the Messages API; or Amazon Bedrock's Converse API), with its key only in the environment.
+  **Summarize** on every record's page and **Draft with the assistant** on the register work
+  from what the person asking may see, through the same tools; a restricted record, or one of
+  a data class not listed in `send`, is withheld. Each person has a daily limit, each exchange
+  a time limit, and every exchange is in the history and under **Admin → Assistant**, where
+  an administrator also checks that the provider answers.
+
+### Security
+
+- The assistant reads through the API as whoever asks, with their session or their token, and
+  is told that a record's text is data and not instructions; the most a record's text could
+  make it do is read what the asker may and propose a draft that a person must still save.
+- Keys for the assistant are refused in the configuration file, as every secret is.
+- The daily limit is counted from the record of exchanges, under a lock on the asker, so two
+  requests at once cannot both take the last one.
+
 ## 0.9.0 (2026-11-27)
 
 Wave 9, *Adoption*: what an organization that has never seen RiskWren needs to install it, make

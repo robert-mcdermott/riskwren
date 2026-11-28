@@ -152,6 +152,8 @@ Make a token for it under **Admin → Other systems**: an auditor's that may onl
 
 A draft is a proposal, never a half-made record. It waits under **Drafts** for a person who may add that kind of record in its unit: a unit's steward or a manager for a risk or a control, and an assessor too for an issue. **Open** puts it in the ordinary form, where the person changes what they like and saves it, so every rule that applies to a record they make applies to this one; the draft is then marked as used, naming what was made. **Set aside** keeps it on record with why, and makes nothing.
 
+![A risk and an issue drafted by a security engineer's assistant, waiting under Drafts to be opened in the ordinary form or set aside](img/drafts-light.webp)
+
 ```bash
 curl -s -X POST -H "Authorization: Bearer rwt_…" -H "Content-Type: application/json" \
   https://grc.example.org/api/v1/drafts \
