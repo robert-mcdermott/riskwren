@@ -1,6 +1,6 @@
 """Webhooks (INT-03): addresses an administrator registers are told of named events.
 
-An event's name is the operation that made it, such as ``risk.assess``, ``issue.close``, or
+An event's name is the operation that made it, such as ``risk.assess``, ``issue.create``, or
 ``incident.report``; a webhook subscribes to whole families (``issue.*``) or to names. A
 message carries references and never contents: the event, when, and the record's type and
 reference. The receiver asks the API, with a token, for what it may see. A restricted record is
@@ -100,7 +100,7 @@ def _check(values: dict[str, Any]) -> dict[str, str]:
         or not all(isinstance(e, str) and (e == "*" or e.split(".")[0] in FAMILIES) for e in events)
     ):
         errors["events"] = ("Choose what it is told of: * for everything, a family such as "
-                            "issue.*, or an event such as issue.close.")  # fmt: skip
+                            "issue.*, or an event such as issue.create.")  # fmt: skip
     return errors
 
 

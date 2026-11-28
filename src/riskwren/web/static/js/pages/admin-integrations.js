@@ -106,7 +106,7 @@ function webhooksCard(data, reload, reveal) {
   const name = field("What receives it", { maxlength: 80 });
   const url = field("Address", { type: "url", placeholder: "https://", hint: "Only https:// addresses." });
   const events = field("Told of", { value: "issue.*, incident.*",
-    hint: `Separated by commas: * for everything; a family such as issue.*; or an event such as issue.close or risk.assess. The families: ${data.families.map((each) => `${each.key} (${each.label.toLowerCase()})`).join(", ")}.` });
+    hint: `Separated by commas: * for everything; a family such as issue.*; or an event such as issue.create or risk.assess. The families: ${data.families.map((each) => `${each.key} (${each.label.toLowerCase()})`).join(", ")}.` });
   const shape = select("Sent as", Object.entries(FORMAT_LABELS), { value: "plain",
     hint: "A ticket gives a title, a description, and a link; a chat message is one line of text. Each still names only the event and the record." });
   const problem = banner();

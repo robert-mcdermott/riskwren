@@ -32,7 +32,7 @@ class WebhookBody(BaseModel):
     url: str = Field(max_length=1000, description="An https:// address")
     format: str = Field(default="plain", description="plain, ticket, or chat")
     events: list[str] = Field(
-        description="*, a family such as issue.*, or names such as issue.close"
+        description="*, a family such as issue.*, or names such as issue.create"
     )
 
 

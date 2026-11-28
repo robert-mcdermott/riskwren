@@ -354,6 +354,14 @@ def test_an_issue_is_closed_only_by_someone_who_does_not_own_it(
     with db.write(assessor.actor) as session:
         issue = records.load(session, assessor, ISSUE, "ISS-0001")
         issues.validate(session, assessor, issue, confirm=False, note="Not yet.")
+    # An owner who could withdraw their own issue would never need its closure confirmed.
+    with db.write(manager.actor) as session:
+        mine = raise_issue(session, manager, hale, subjects=[], severity="low")
+        assert issues._owns(session, manager, mine)
+        with pytest.raises(PermissionDenied, match="does not own"):
+            issues.cancel(session, manager, mine, reason="Mine, and not wanted.")
+    with db.write(assessor.actor) as session:
+        issue = records.load(session, assessor, ISSUE, "ISS-0001")
         issues.cancel(session, assessor, issue, reason="Recorded twice; see the other.")
         assert issue.status == "cancelled"
 
