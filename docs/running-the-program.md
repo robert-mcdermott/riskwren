@@ -267,7 +267,7 @@ A question, or a whole section, can be asked only when an earlier answer makes i
 - **An answer is read against the version it was given to.** Reword a question or remove one, and what people answered before still reads as it was asked then.
 - A draft begun under one version is finished under that version.
 - A built-in questionnaire you have edited is yours from then on, and a later release leaves it alone. One you have not touched is brought up to date, as a new version.
-- **Versions** lists every one, with who published it and what they said had changed. **Retiring** a questionnaire, through the API, stops new answers and keeps the old.
+- **Versions** lists every one, with who published it and what they said had changed. **Retire**, on the questionnaire's page, stops it being asked in a new review and keeps every answer already given; **Bring it back** undoes it.
 
 The **Try it** tab asks the questions and shows how the answers would be kept, without saving anything.
 
@@ -522,7 +522,7 @@ The **Admin** menu holds what keeps the installation running. Its pages are for 
 
 | Page | What it is for | Explained in |
 |---|---|---|
-| **People** | Add, import, edit, and disable accounts. **Works in** says which units a person belongs to; the first ticked is their main one, and the default unit on the records they add. Their roles are ticked beneath, with **May accept risks** for a leader: one acceptance limit covers all of a person's leader roles. Roles that come from single sign-on are shown, and are managed at the provider. **What they hold** lists and passes on what they answer for | [People and roles](getting-started.md#people-and-roles), [When someone leaves](#when-someone-leaves) |
+| **People** | Add, import, edit, and disable accounts. Editing changes a person's name, title, and **Email address**, which they sign in with and single sign-on matches them by. **Works in** says which units a person belongs to; the first ticked is their main one, and the default unit on the records they add. Their roles are ticked beneath, with **May accept risks** for a leader: one acceptance limit covers all of a person's leader roles. Roles that come from single sign-on are shown, and are managed at the provider. **What they hold** lists and passes on what they answer for | [People and roles](getting-started.md#people-and-roles), [When someone leaves](#when-someone-leaves) |
 | **Units** | The organization as a tree, added by hand or imported from a spreadsheet | [Units](getting-started.md#units) |
 | **Appearance** | Names, logos, colors, the sign-in page, and **Your own words** for kinds of record and units | [Appearance](#appearance) |
 | **Single sign-on** | The connection to the organization's identity provider, and **Roles from the provider** | [Single sign-on](configuration.md#single-sign-on) |

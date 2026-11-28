@@ -65,6 +65,19 @@
             ],
             "title": "Display Name"
           },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The address they sign in with (administrators)",
+            "title": "Email"
+          },
           "status": {
             "anyOf": [
               {
@@ -16891,7 +16904,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Drop a planned engagement, with the reason",
+        "summary": "Drop an engagement not yet reported, saying why",
         "tags": [
           "internal audit"
         ]

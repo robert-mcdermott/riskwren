@@ -42,7 +42,9 @@ export function editEvidence({ item = null, subject = null, vocab, units, onDone
       const until = field("Holds until", { type: "date", value: item?.valid_until ?? "", hint: item ? "After this date it stays on the record and stops counting." : "Leave empty for a year after it was collected. After this date it stops counting." });
       const dataClass = select("Data class", options(vocab, "data_classes", { blank: "Not said" }), { value: item?.data_class ?? "",
         hint: "Evidence of the most sensitive class is seen only by those with a role in it." });
-      const unit = select("Unit", unitOptions(units.tree, { only: evidenceUnits(), blank: item || subject ? null : "Choose…" }), { value: item?.org_unit_id ?? subject?.org_unit_id ?? "", required: true });
+      const unit = select("Unit", unitOptions(units.tree, { only: evidenceUnits(), blank: item || subject ? null : "Choose…", keep: item?.org_unit_id ?? null }), { value: item?.org_unit_id ?? subject?.org_unit_id ?? "", required: true });
+      const status = item ? select("Status", [["active", "In use"], ["retired", "Retired"]], { value: item.status ?? "active",
+        hint: "Retired evidence stays on the record, with its history, and counts toward nothing." }) : null;
       const restricted = checkbox("Restricted", { checked: item?.restricted ?? false, hint: "Seen only by its owners, its unit's steward and leaders, managers, and auditors." });
       const which = () => item?.kind ?? kind.input.value;
       const arrange = () => {
@@ -64,7 +66,8 @@ export function editEvidence({ item = null, subject = null, vocab, units, onDone
         const values = { name: name.input.value, url: which() === "link" ? url.input.value : null, note: note.input.value || null,
           collected_on: collected.input.value || null, covers_from: from.input.value || null, covers_to: to.input.value || null,
           valid_until: until.input.value || null, data_class: dataClass.input.value || null,
-          org_unit_id: unit.input.value ? Number(unit.input.value) : null, restricted: restricted.input.checked };
+          org_unit_id: unit.input.value ? Number(unit.input.value) : null, restricted: restricted.input.checked,
+          ...(status ? { status: status.input.value } : {}) };
         const done = await submit({ button: saveButton, fields, banner: problem, run: async () => {
           const saved = item ? await patch(`/api/v1/evidence/${item.ref}`, { version: item.version, ...values })
             : await post("/api/v1/evidence", { ...values, kind: which() });
@@ -83,7 +86,7 @@ export function editEvidence({ item = null, subject = null, vocab, units, onDone
         save();
       } }, problem,
       section("What it is", name.node, kind?.node ?? null, file.node, url.node, note.node),
-      section("When", h("div", { class: "grid-2" }, collected.node, until.node), h("div", { class: "grid-2" }, from.node, to.node)),
+      section("When", h("div", { class: "grid-2" }, collected.node, until.node), h("div", { class: "grid-2" }, from.node, to.node), status?.node ?? null),
       section("Who may see it", h("div", { class: "grid-2" }, unit.node, dataClass.node), restricted.node)));
       saveButton.addEventListener("click", save);
       footer.replaceChildren(h("div", { class: "row" }, saveButton, button("Cancel", { kind: "btn-ghost", onclick: close })));

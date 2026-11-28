@@ -38,6 +38,9 @@ class NewAccount(BaseModel):
 
 class AccountChanges(BaseModel):
     display_name: str | None = Field(default=None, max_length=200)
+    email: str | None = Field(
+        default=None, max_length=254, description="The address they sign in with (administrators)"
+    )
     title: str | None = Field(default=None, max_length=200)
     time_zone: str | None = Field(default=None, max_length=64)
     status: str | None = None

@@ -185,8 +185,15 @@ def restore(session: Session, principal: Principal, engagement: Engagement) -> N
     universe.require_work(principal)
     if engagement.status != "dropped":
         raise Conflict("Only a dropped engagement is restored.")
+    # Back to the stage it had reached: one dropped part way through carries on from there.
+    stage = (
+        "reporting" if engagement.reporting_on
+        else "fieldwork" if engagement.fieldwork_on
+        else "planning" if engagement.started_on
+        else "planned"
+    )  # fmt: skip
     with audit.operation(session, "engagement.restore"):
-        engagement.status, engagement.dropped_reason = "planned", None
+        engagement.status, engagement.dropped_reason = stage, None
         engagement.updated_at = utc_now()
         engagement.version += 1
 

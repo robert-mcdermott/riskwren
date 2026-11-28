@@ -192,7 +192,7 @@ The last active administrator can never be disabled or lose that role. Every cha
 
 ### Import units and people
 
-**Admin → Units** and **Admin → People** each take a spreadsheet saved as CSV, which is the quick way to load an organization. **Import**, choose the file, and **Check the file**: every problem is listed by row and nothing is changed. **Import** once every row is good. Nothing is loaded unless every row can be.
+**Admin → Units** and **Admin → People** each take a spreadsheet saved as CSV, which is the quick way to load an organization. A unit's kind must be one the program names (organization, division, department, center, core, lab, clinic, or office as shipped; **Admin → Program → Vocabularies** adds others). **Import**, choose the file, and **Check the file**: every problem is listed by row and nothing is changed. **Import** once every row is good. Nothing is loaded unless every row can be.
 
 **Units** are matched by code, so importing the same file again updates names, kinds, and parents.
 

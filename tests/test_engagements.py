@@ -227,3 +227,23 @@ def test_a_finding_is_an_issue_that_audit_confirms_closed(
     assert high["closed"] == 1 and high["open"] == 0
     assert report["engagements"][0]["findings"] == 1 and report["late_findings"] == []
     assert as_role("steward").get(f"/api/v1/audit/plans/{plan}/committee-report").status_code == 403
+
+
+def test_an_engagement_dropped_part_way_is_restored_where_it_was(
+    as_role: Clients, people: People, db: Database
+) -> None:
+    ref, ids = planned(as_role, people, db)
+    chief = as_person(as_role, "Chief Auditor")
+    path = f"/api/v1/engagements/{ref}"
+    chief.post(f"{path}/start", json={"lead": ids["Chief Auditor"],
+                                      "members": [ids["Auditor Person"]]})  # fmt: skip
+    chief.post(f"{path}/workpapers", json={"title": "Backups are taken"})
+    moved = chief.post(f"{path}/advance", json={})
+    assert moved.status_code == 200, moved.text
+    assert chief.get(path).json()["data"]["status"] == "fieldwork"
+    dropped = chief.post(f"{path}/drop", json={"reason": "The process is being retired."})
+    assert dropped.status_code == 200, dropped.text
+    assert chief.get(path).json()["data"]["status"] == "dropped"
+    restored = chief.post(f"{path}/restore", json={})
+    assert restored.status_code == 200, restored.text
+    assert chief.get(path).json()["data"]["status"] == "fieldwork"

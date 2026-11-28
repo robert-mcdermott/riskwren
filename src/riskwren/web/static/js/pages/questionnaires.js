@@ -15,7 +15,7 @@ import { show } from "./page.js";
 import { tabBar } from "./record.js";
 
 const PURPOSES = { attestation: "Attestation", self_assessment: "Self-assessment", completeness: "Completeness check",
-  due_diligence: "Due diligence", review: "Review", privacy_impact: "Privacy impact", other: "Other" };
+  due_diligence: "Due diligence", review: "Review", privacy_impact: "Privacy impact", tiering: "Tiering", other: "Other" };
 const TYPES = { yes_no: "Yes or no", choice: "One of a list", choices: "Any of a list", text: "A line of text",
   long_text: "A paragraph", number: "A number", date: "A date" };
 const STARTER = { sections: [{ key: "first", title: "First section", questions: [{ key: "question_1", label: "", type: "yes_no", required: true }] }] };
@@ -122,7 +122,14 @@ export function questionnairePage(main, params) {
     view: (item, reload) => h("div", { class: "stack-lg" },
       h("a", { class: "back-link", href: "/questionnaires" }, icon("chevron-left", "icon icon-sm"), "Questionnaires"),
       pageHeader({ eyebrow: `${PURPOSES[item.purpose] ?? "Questionnaire"} · version ${item.current_version}`, title: item.title, lede: item.summary,
-        actions: h("div", { class: "row-sm wrap" }, item.status === "retired" ? pill("Retired") : null, pill(item.origin === "pack" ? "Built in" : "Your own")) }),
+        actions: h("div", { class: "row-sm wrap" }, item.status === "retired" ? pill("Retired") : null, pill(item.origin === "pack" ? "Built in" : "Your own"),
+          editable ? button(item.status === "retired" ? "Bring it back" : "Retire", { kind: "btn-sm btn-ghost", onclick: async () => {
+            const retiring = item.status !== "retired";
+            if (retiring && !window.confirm(`Retire ${item.title}? It can no longer be asked in a new review; answers already given are kept.`)) return;
+            await patch(`/api/v1/questionnaires/${item.key}`, { status: retiring ? "retired" : "active" });
+            toast(retiring ? "It is retired." : "It is in use again.");
+            reload();
+          } }) : null) }),
       tabBar(tabs, tab),
       tab === "questions" ? card({ title: item.version === item.current_version ? "What it asks" : `What version ${item.version} asked` },
         h("div", { class: "stack-lg" },

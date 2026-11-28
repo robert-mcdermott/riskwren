@@ -240,11 +240,11 @@ Scheduled work brings risks up to date with the calendar, sends reminders, sends
 
 ### `riskwren jobs run`
 
-Run every job that is due and not paused. With a job's key (calendar, reminders, mail, webhooks, measures, or tidy), run that one now whether or not it is due or paused. A job another process is running is left to it.
+Run every job that is due and not paused. With a job's key (calendar, reminders, mail, webhooks, measures, tidy), run that one now whether or not it is due or paused. A job another process is running is left to it.
 
 | Option | Meaning |
 |---|---|
-| `JOB` | one job to run now: calendar, reminders, mail, webhooks, measures, or tidy |
+| `JOB` | one job to run now: calendar, reminders, mail, webhooks, measures, tidy |
 
 ## `riskwren mail`
 

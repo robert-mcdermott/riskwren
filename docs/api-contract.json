@@ -1528,6 +1528,7 @@
   },
   "body": {
    "display_name": false,
+   "email": false,
    "title": false,
    "time_zone": false,
    "status": false

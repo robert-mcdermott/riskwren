@@ -69,7 +69,7 @@ Those handling an incident, and those who see all of it, write on it under **Wha
 
 When it is done, **Close** asks how it ended, and the reporter is told it is closed. Its handlers close it, or those who triage it.
 
-A closed incident takes nothing more: no messages, no breach assessment or notification, no change to who sees it, and the page offers no change to what it taught, what it cost, or the issues raised from it. Those who triage it can **Reopen** it, and it goes back to being handled. The reporter is not told of a reopening, so write to them if they should know.
+A closed incident takes nothing more: no messages, no breach assessment or notification, no change to who sees it, and no change to what it taught, what it cost, or the issues raised from it. Those who triage it can **Reopen** it, and it goes back to being handled. The reporter is not told of a reopening, so write to them if they should know.
 
 ## What it taught
 

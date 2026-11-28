@@ -31,7 +31,7 @@ Evidence is true of a moment. An item holds for twelve months from the day it wa
 
 Stale evidence is never deleted and never quietly renewed. Collect it again and add a new item; the old one remains as what was true then.
 
-An item can also be **retired**, which stops it counting at once, whatever its date. The evidence page has no button for it: it is done through the API, with `status` set to `retired` on `PATCH /api/v1/evidence/{ref}`. A retired item stays on the record, marked as retired.
+An item can also be **retired**, which stops it counting at once, whatever its date: **Edit**, then **Status**: **Retired**. A retired item stays on the record, marked as retired, and can be put back in use the same way.
 
 ### Attach it
 
