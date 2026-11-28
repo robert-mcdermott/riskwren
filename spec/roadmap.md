@@ -177,14 +177,16 @@ Detail: [waves/wave-8.md](waves/wave-8.md)
 
 | Slice | Name | Delivers | Status |
 |---|---|---|---|
-| 1 | Production | Measured performance at 10,000 records and many people at once; several workers; backup, restore, and moving between SQLite and PostgreSQL | ☐ |
-| 2 | Brand kit | The organization's own terms, an email header; exact colors, the sign-in message and picture, footer links, and contrast checks arrived in 0.8.0 | ☐ |
-| 3 | Starter programs | Program packs for a research institute, an academic medical center, a university, and a general nonprofit; custom fields; identifier-only framework packs | ☐ |
-| 4 | API for others | Scoped tokens, signed webhooks, a recorded API contract | ☐ |
-| 5 | Deployment | A container image, a compose file, a hardened systemd unit, proxy examples, the operations view, `doctor --production` | ☐ |
-| 6 | Security and accessibility review | The standard security verification review; the full accessibility audit and screen-reader check | ☐ |
-| 7 | The program handbook | One guide for a risk and compliance team, from first decisions to the yearly rhythm; the adopter's guide | ☐ |
+| 1 | Production | Measured performance at 10,000 records and many people at once; several workers; backup, restore, and moving between SQLite and PostgreSQL | ☑ |
+| 2 | Brand kit | The organization's own terms, an email header; exact colors, the sign-in message and picture, footer links, and contrast checks arrived in 0.8.0 | ☑ |
+| 3 | Starter programs | Program packs for a research institute, an academic medical center, a university, and a general nonprofit; custom fields; identifier-only framework packs | ☑ |
+| 4 | API for others | Scoped tokens, signed webhooks, a recorded API contract | ☑ |
+| 5 | Deployment | A container image, a compose file, a hardened systemd unit, proxy examples, the operations view, `doctor --production` | ☑ |
+| 6 | Security and accessibility review | The standard security verification review; the full accessibility audit and screen-reader check | ☑ |
+| 7 | The program handbook | One guide for a risk and compliance team, from first decisions to the yearly rhythm; the adopter's guide | ☑ |
 | 8 | Release prep | Guides, changelog, release | ☐ |
+
+Detail: [waves/wave-9.md](waves/wave-9.md)
 
 ## Wave 10: Connected (v0.10.0) ☐
 
