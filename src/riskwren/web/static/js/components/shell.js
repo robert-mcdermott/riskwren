@@ -53,6 +53,7 @@ export const NAV = [
       { href: "/assessments", label: "Assessments", iconName: "assessment" },
       { href: "/issues", label: "Issues", iconName: "issue" },
       { href: "/exceptions", label: "Exceptions", iconName: "exception" },
+      { href: "/reported", label: "From other systems", iconName: "link", when: "assess" },
       { href: "/agreements", label: "Agreements", iconName: "agreement" },
       { href: "/privacy", label: "Privacy impact", iconName: "shield-check" },
       { href: "/campaigns", label: "Campaigns", iconName: "bell", when: ["assess", "read_all"] },

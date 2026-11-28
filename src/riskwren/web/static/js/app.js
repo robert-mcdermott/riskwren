@@ -163,6 +163,7 @@ async function boot() {
     route("/admin/appearance", page("admin-appearance", "adminAppearance"));
     route("/admin/sso", page("admin-sso", "adminSso"));
     route("/admin/integrations", page("admin-integrations", "adminIntegrations"));
+    route("/reported", page("reported", "reportedPage"));
     route("/admin/operations", page("admin-operations", "adminOperations"));
     route("/admin/scheduled-work", page("admin-operations", "adminOperations")); // its earlier address
   }

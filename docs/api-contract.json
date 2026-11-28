@@ -413,6 +413,12 @@
   },
   "body": {}
  },
+ "GET /api/v1/controls/{ref}/reported": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {}
+ },
  "GET /api/v1/controls/{ref}/requirements": {
   "parameters": {
    "path:ref": true
@@ -975,6 +981,10 @@
   },
   "body": {}
  },
+ "GET /api/v1/reported": {
+  "parameters": {},
+  "body": {}
+ },
  "GET /api/v1/resilience": {
   "parameters": {},
   "body": {}
@@ -1377,6 +1387,13 @@
   },
   "body": {}
  },
+ "GET /api/v1/standing/{kind}/{ref}": {
+  "parameters": {
+   "path:kind": true,
+   "path:ref": true
+  },
+  "body": {}
+ },
  "GET /api/v1/systems": {
   "parameters": {
    "query:q": false,
@@ -1523,6 +1540,7 @@
   "body": {
    "name": false,
    "url": false,
+   "format": false,
    "events": false,
    "active": false
   }
@@ -2134,6 +2152,7 @@
   "body": {
    "name": true,
    "url": true,
+   "format": false,
    "events": true
   }
  },
@@ -2432,6 +2451,20 @@
    "design": true,
    "operation": true,
    "note": true
+  }
+ },
+ "POST /api/v1/controls/{ref}/reported": {
+  "parameters": {
+   "path:ref": true
+  },
+  "body": {
+   "kind": true,
+   "outcome": false,
+   "title": true,
+   "detail": false,
+   "url": false,
+   "observed_at": false,
+   "scope": false
   }
  },
  "POST /api/v1/controls/{ref}/requirements/suggested": {
@@ -3144,6 +3177,28 @@
    "answers": true,
    "complete": false,
    "response_id": false
+  }
+ },
+ "POST /api/v1/reported/{report_id}/confirm": {
+  "parameters": {
+   "path:report_id": true
+  },
+  "body": {
+   "note": false,
+   "severity": false,
+   "owner_id": false,
+   "valid_until": false
+  }
+ },
+ "POST /api/v1/reported/{report_id}/set-aside": {
+  "parameters": {
+   "path:report_id": true
+  },
+  "body": {
+   "note": false,
+   "severity": false,
+   "owner_id": false,
+   "valid_until": false
   }
  },
  "POST /api/v1/respond/files": {

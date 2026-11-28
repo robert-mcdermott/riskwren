@@ -56,6 +56,13 @@ POLICIES: dict[tuple[str, str], Needs] = {
     ("PATCH", "/api/v1/admin/webhooks/{hook_id}"): Needs.ADMIN,
     ("DELETE", "/api/v1/admin/webhooks/{hook_id}"): Needs.ADMIN,
     ("POST", "/api/v1/admin/webhooks/{hook_id}/test"): Needs.ADMIN,
+    # Results pushed in: reported by a token, confirmed by a person
+    ("POST", "/api/v1/controls/{ref}/reported"): Needs.MEMBER,  # the service wants a token
+    ("GET", "/api/v1/controls/{ref}/reported"): Needs.MEMBER,
+    ("GET", "/api/v1/reported"): Needs.ASSESS,
+    ("POST", "/api/v1/reported/{report_id}/confirm"): Needs.ASSESS,
+    ("POST", "/api/v1/reported/{report_id}/set-aside"): Needs.ASSESS,
+    ("GET", "/api/v1/standing/{kind}/{ref}"): Needs.MEMBER,
     ("POST", "/api/v1/jobs/{key}/run"): Needs.ADMIN,
     ("PUT", "/api/v1/jobs/{key}"): Needs.ADMIN,
     ("GET", "/api/v1/mail"): Needs.ADMIN,
@@ -624,6 +631,8 @@ PERSON_ONLY = frozenset({
     ("POST", "/api/v1/reviews/{ref}/conclude"),
     ("POST", "/api/v1/incidents/{ref}/triage"),
     ("PUT", "/api/v1/incidents/{ref}/case"),
+    ("POST", "/api/v1/reported/{report_id}/confirm"),
+    ("POST", "/api/v1/reported/{report_id}/set-aside"),
     ("POST", "/api/v1/privacy/reviews/{item_id}"),
 })  # fmt: skip
 

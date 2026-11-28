@@ -42,6 +42,7 @@ TRIES = (timedelta(minutes=1), timedelta(minutes=5), timedelta(minutes=30), time
          timedelta(hours=12))  # fmt: skip
 KEEP = timedelta(days=30)
 MOST_HOOKS = 20
+FORMATS = ("plain", "ticket", "chat")
 TIMEOUT = 10.0
 SIGNATURE = "X-RiskWren-Signature"
 
@@ -54,6 +55,7 @@ def _require_admin(principal: Principal) -> None:
 def view(row: Webhook, deliveries: list[WebhookDelivery] | None = None) -> dict[str, Any]:
     return {
         "id": row.id, "name": row.name, "url": row.url, "events": row.events, "active": row.active,
+        "format": row.format,
         "created_by": row.created_by_name, "created_at": row.created_at,
         "deliveries": [
             {"id": d.id, "event": d.event, "status": d.status, "attempts": d.attempts,
@@ -89,6 +91,8 @@ def _check(values: dict[str, Any]) -> dict[str, str]:
         errors["url"] = (
             "Give an address that starts with https://, without a name or password in it."
         )
+    if values.get("format", "plain") not in FORMATS:
+        errors["format"] = f"Use one of: {', '.join(FORMATS)}."
     events = values.get("events")
     if (
         not isinstance(events, list)
@@ -111,6 +115,7 @@ def create(session: Session, principal: Principal, values: dict[str, Any]) -> tu
     secret = "whsec_" + secrets.token_urlsafe(32)
     row = Webhook(name=str(values["name"]).strip(), url=str(values["url"]).strip(),
                   events=sorted(set(values["events"])), secret=secret, active=True,
+                  format=values.get("format") or "plain",
                   created_by_name=principal.name, created_at=utc_now())  # fmt: skip
     with audit.operation(session, "webhook.create"):
         session.add(row)
@@ -123,13 +128,15 @@ def update(session: Session, principal: Principal, hook_id: int, values: dict[st
     row = session.get(Webhook, hook_id)
     if row is None:
         raise NotFound("There is no such webhook.")
-    merged = {"name": row.name, "url": row.url, "events": row.events, **values}
+    merged = {"name": row.name, "url": row.url, "events": row.events, "format": row.format,
+              **values}  # fmt: skip
     errors = _check(merged)
     if errors:
         raise Invalid("The webhook was not changed.", errors)
     with audit.operation(session, "webhook.edit"):
         row.name, row.url = str(merged["name"]).strip(), str(merged["url"]).strip()
         row.events = sorted(set(merged["events"]))
+        row.format = merged["format"]
         if "active" in values:
             row.active = bool(values["active"])
         session.flush()
@@ -216,6 +223,23 @@ def queue(session: Session, *, base_url: str = "") -> int:
     return queued
 
 
+def shape(hook_format: str, payload: dict[str, Any]) -> dict[str, Any]:
+    """The message as the receiver reads it: still references only, never contents."""
+    record = payload.get("record") or {}
+    where = record.get("url") or ""
+    said = payload["event"] + (f": {record['ref']}" if record.get("ref") else "")
+    if hook_format == "chat":
+        return {"text": f"RiskWren: {said}" + (f" {where}" if where else "")}
+    if hook_format == "ticket":
+        told = f"RiskWren recorded {payload['event']} at {payload['at']}." + (
+            f" See {where}" if where else ""
+        )
+        return {"title": f"RiskWren: {said}", "description": told,
+                "link": where or None, "event": payload["event"],
+                "record": record or None}  # fmt: skip
+    return payload
+
+
 def sign(secret: str, timestamp: int, body: bytes) -> str:
     mac = hmac.new(secret.encode(), f"{timestamp}.".encode() + body, hashlib.sha256)
     return f"t={timestamp},v1={mac.hexdigest()}"
@@ -251,7 +275,8 @@ def send_due(db: Database, *, transport: httpx.BaseTransport | None = None) -> d
                     delivery.status = "failed"
                     delivery.error = "The webhook was paused or removed."
                     continue
-                body = json.dumps(delivery.payload, separators=(",", ":")).encode()
+                body = json.dumps(shape(hook.format, delivery.payload),
+                                  separators=(",", ":")).encode()  # fmt: skip
                 stamp = int(time.time())
                 delivery.attempts += 1
                 try:

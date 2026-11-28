@@ -6956,6 +6956,12 @@
             "title": "Events",
             "type": "array"
           },
+          "format": {
+            "default": "plain",
+            "description": "plain, ticket, or chat",
+            "title": "Format",
+            "type": "string"
+          },
           "name": {
             "maxLength": 200,
             "title": "Name",
@@ -7002,6 +7008,17 @@
               }
             ],
             "title": "Events"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format"
           },
           "name": {
             "anyOf": [
@@ -7791,6 +7808,142 @@
           }
         },
         "title": "ReviewBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__integration__DecisionBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a failure: who puts it right",
+            "title": "Owner Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a failure: the issue's severity",
+            "title": "Severity"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For evidence: until when it counts",
+            "title": "Valid Until"
+          }
+        },
+        "title": "DecisionBody",
+        "type": "object"
+      },
+      "riskwren__api__routers__integration__ReportBody": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "kind": {
+            "description": "result or evidence",
+            "title": "Kind",
+            "type": "string"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When, with its time zone; now if left out",
+            "title": "Observed At"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a result: passed, partial, or failed",
+            "title": "Outcome"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A scope that uses the control, by reference",
+            "title": "Scope"
+          },
+          "title": {
+            "description": "What was checked, or what the evidence is",
+            "maxLength": 600,
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where to see it",
+            "title": "Url"
+          }
+        },
+        "required": [
+          "kind",
+          "title"
+        ],
+        "title": "ReportBody",
         "type": "object"
       },
       "riskwren__api__routers__internal_audit__AnswerBody": {
@@ -14155,6 +14308,102 @@
         "summary": "Rate how well a control works",
         "tags": [
           "controls"
+        ]
+      }
+    },
+    "/api/v1/controls/{ref}/reported": {
+      "get": {
+        "operationId": "reported_of_api_v1_controls__ref__reported_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reported Of Api V1 Controls  Ref  Reported Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What other systems have said of a control",
+        "tags": [
+          "integration"
+        ]
+      },
+      "post": {
+        "operationId": "report_onto_api_v1_controls__ref__reported_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__ReportBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Report Onto Api V1 Controls  Ref  Reported Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report a check or a piece of evidence onto a control, from another system",
+        "tags": [
+          "integration"
         ]
       }
     },
@@ -25083,6 +25332,137 @@
         ]
       }
     },
+    "/api/v1/reported": {
+      "get": {
+        "operationId": "reported_waiting_api_v1_reported_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Reported Waiting Api V1 Reported Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "What other systems have said, waiting for a person to confirm",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/reported/{report_id}/confirm": {
+      "post": {
+        "operationId": "confirm_report_api_v1_reported__report_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "title": "Report Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__DecisionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Confirm Report Api V1 Reported  Report Id  Confirm Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm a report: a failure raises an issue",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/v1/reported/{report_id}/set-aside": {
+      "post": {
+        "operationId": "set_report_aside_api_v1_reported__report_id__set_aside_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "title": "Report Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/riskwren__api__routers__integration__DecisionBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Set Report Aside Api V1 Reported  Report Id  Set Aside Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set a report aside, saying why",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
     "/api/v1/resilience": {
       "get": {
         "operationId": "show_resilience_api_v1_resilience_get",
@@ -32921,6 +33301,60 @@
         "summary": "Begin single sign-on",
         "tags": [
           "single sign-on"
+        ]
+      }
+    },
+    "/api/v1/standing/{kind}/{ref}": {
+      "get": {
+        "description": "Yes or no, with the reasons by kind and nothing of the record's contents. A record the\nasker may not see is not found.",
+        "operationId": "check_standing_api_v1_standing__kind___ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Check Standing Api V1 Standing  Kind   Ref  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Whether a third party, a scope, or an exception is in good standing",
+        "tags": [
+          "integration"
         ]
       }
     },

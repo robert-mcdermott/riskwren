@@ -135,6 +135,8 @@ Where a rule applies and no agreement meets it, the sharing is a **stop**. It is
 
 ![A dispensing cabinet supplier that handles patient records with no business associate agreement: the stop at the top of its page](img/third-party-stop-light.webp)
 
+Another system, a purchasing process for one, can ask whether a third party is in good standing before it buys: active, its review in date, and nothing shared with it that an agreement should cover and does not. It learns yes or no and the kind of reason, never what a review found ([the API guide](api.md#asking-whether-something-is-in-good-standing)).
+
 A third party's page lists the agreements it is party to, with how each stands. The rules are part of the program, written in the condition language over the information's kind and class and the third party's kind and tier, and travel with it when it is exported and imported.
 
 ## Over time

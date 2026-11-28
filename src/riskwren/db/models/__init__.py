@@ -73,7 +73,13 @@ from riskwren.db.models.incidents import (
 )
 from riskwren.db.models.indicators import Indicator, IndicatorReading, IndicatorRisk
 from riskwren.db.models.insight import LeadershipReport, MeasureSnapshot
-from riskwren.db.models.integration import ApiToken, Webhook, WebhookCursor, WebhookDelivery
+from riskwren.db.models.integration import (
+    ApiToken,
+    ReportedResult,
+    Webhook,
+    WebhookCursor,
+    WebhookDelivery,
+)
 from riskwren.db.models.inventory import (
     CustomValue,
     ExternalRef,
@@ -219,6 +225,7 @@ __all__ = [
     "RecordOwner",
     "RecoveryCapability",
     "Reminder",
+    "ReportedResult",
     "Requirement",
     "RespondentLink",
     "Response",

@@ -2309,11 +2309,38 @@ class Builder:
             tokens.issue(session, who, {"name": "Asset inventory sync", "role": "steward",
                                         "org_unit_id": self.units["IT"], "read_only": False,
                                         "days": 90})  # fmt: skip
+            scanner, _ = tokens.issue(session, who, {
+                "name": "Patch scanner", "role": "assessor", "read_only": False, "days": 180})  # fmt: skip
             hook, _ = webhooks.create(session, who, {
                 "name": "Service desk", "url": "https://servicedesk.northmere.example/hooks/grc",
                 "events": ["issue.*", "incident.*"]})  # fmt: skip
             webhooks.update(session, who, hook.id, {"active": False})
             self.tally("tokens")
+            scanner_id = scanner.id
+        # The patch scanner reports what it finds; the security office confirms the failure.
+        from riskwren.db.models import ApiToken, Control
+        from riskwren.integration import results
+
+        for days, name, values in c.REPORTED:
+            yield self._on(days, hour=6)
+            with self.db.write(self.principal(self.cast["admin"]).actor) as session:
+                row = session.get(ApiToken, scanner_id)
+                assert row is not None
+                bot = tokens.principal_for(session, row)
+                session.info["actor"] = bot.actor
+                control = session.scalars(select(Control).where(Control.name == name)).one()
+                results.report(session, bot, control, {
+                    **values, "observed_at": self._on(days, hour=5).isoformat()})  # fmt: skip
+                self.tally("reports from other systems")
+        yield self._on(9, hour=10)
+        from riskwren.db.models import ReportedResult
+
+        with self.act(self.cast["assess1"]) as (session, who):
+            first = session.scalars(
+                select(ReportedResult).where(ReportedResult.outcome == "failed")
+            ).first()
+            if first is not None:
+                results.confirm(session, who, first, {"note": "Confirmed against the console."})
 
     def _story_resilience(self) -> Script:
         """The risk office facilitates business impact analyses of the critical processes, and

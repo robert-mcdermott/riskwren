@@ -49,6 +49,9 @@ class Webhook(Base):
     url: Mapped[str] = mapped_column(String(500))
     events: Mapped[list[str]] = mapped_column(JsonType, default=list)
     secret: Mapped[str] = mapped_column(String(80))
+    # How a message is shaped: plain (RiskWren's own), ticket (a title, a description, and a
+    # link, for a ticketing system), or chat (a line of text, for a chat channel).
+    format: Mapped[str] = mapped_column(String(16), default="plain", server_default="plain")
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_by_name: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
@@ -85,3 +88,33 @@ class WebhookCursor(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     event_id: Mapped[int] = mapped_column(Integer)
+
+
+class ReportedResult(Base):
+    """What another system says of a control: a check it ran, or a piece of evidence. Shown
+    on the control at once, as its source's; it counts only once a person confirms it, which
+    raises an issue for a failure or files the evidence, and it never replaces a person's."""
+
+    __tablename__ = "reported_result"
+    __audit_parent__ = ("control", "control_id")
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    control_id: Mapped[int] = mapped_column(ForeignKey("control.id", ondelete="CASCADE"))
+    scope_id: Mapped[int | None] = mapped_column(ForeignKey("scope.id"))
+    kind: Mapped[str] = mapped_column(String(16))  # result, evidence
+    outcome: Mapped[str | None] = mapped_column(String(16))  # passed, partial, failed
+    title: Mapped[str] = mapped_column(String(300))
+    detail: Mapped[str | None] = mapped_column(Text)
+    url: Mapped[str | None] = mapped_column(String(500))
+    observed_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    source: Mapped[str] = mapped_column(String(120))  # the token's name
+    reported_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    status: Mapped[str] = mapped_column(String(16), default="reported")
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("account.id"))
+    decided_by_name: Mapped[str | None] = mapped_column(String(200))
+    decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    issue_id: Mapped[int | None] = mapped_column(Integer)
+    evidence_id: Mapped[int | None] = mapped_column(Integer)
+
+    __table_args__ = (Index("ix_reported_result_control", "control_id", "status"),)

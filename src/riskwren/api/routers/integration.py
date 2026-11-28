@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from riskwren.access.policy import current
 from riskwren.api.common import envelope, reading, writing
-from riskwren.integration import tokens, webhooks
+from riskwren.integration import results, standing, tokens, webhooks
 
 router = APIRouter(prefix="/api/v1", tags=["integration"])
 
@@ -30,6 +30,7 @@ class TokenBody(BaseModel):
 class WebhookBody(BaseModel):
     name: str = Field(max_length=200)
     url: str = Field(max_length=1000, description="An https:// address")
+    format: str = Field(default="plain", description="plain, ticket, or chat")
     events: list[str] = Field(
         description="*, a family such as issue.*, or names such as issue.close"
     )
@@ -38,6 +39,7 @@ class WebhookBody(BaseModel):
 class WebhookChange(BaseModel):
     name: str | None = Field(default=None, max_length=200)
     url: str | None = Field(default=None, max_length=1000)
+    format: str | None = None
     events: list[str] | None = None
     active: bool | None = None
 
@@ -104,3 +106,96 @@ def test_webhook(request: Request, hook_id: int) -> dict[str, Any]:
     with writing(request, principal.actor) as session:
         delivery = webhooks.test(session, principal, hook_id)
         return envelope({"queued": delivery.id})
+
+
+# --- Results pushed in ------------------------------------------------------------------------
+
+
+class ReportBody(BaseModel):
+    kind: str = Field(description="result or evidence")
+    outcome: str | None = Field(
+        default=None, description="For a result: passed, partial, or failed"
+    )
+    title: str = Field(max_length=600, description="What was checked, or what the evidence is")
+    detail: str | None = Field(default=None, max_length=8000)
+    url: str | None = Field(default=None, max_length=1000, description="Where to see it")
+    observed_at: str | None = Field(
+        default=None, description="When, with its time zone; now if left out"
+    )
+    scope: str | None = Field(
+        default=None, description="A scope that uses the control, by reference"
+    )
+
+
+class DecisionBody(BaseModel):
+    note: str | None = Field(default=None, max_length=4000)
+    severity: str | None = Field(default=None, description="For a failure: the issue's severity")
+    owner_id: int | None = Field(default=None, description="For a failure: who puts it right")
+    valid_until: str | None = Field(default=None, description="For evidence: until when it counts")
+
+
+def _control(session: Any, principal: Any, ref: str) -> Any:
+    from riskwren.controls.service import CONTROL
+    from riskwren.inventory import records
+
+    return records.load(session, principal, CONTROL, ref)
+
+
+@router.post(
+    "/controls/{ref}/reported",
+    status_code=201,
+    summary="Report a check or a piece of evidence onto a control, from another system",
+)
+def report_onto(request: Request, ref: str, body: ReportBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        control = _control(session, principal, ref)
+        row = results.report(session, principal, control, body.model_dump())
+        return envelope(results.view(session, row))
+
+
+@router.get("/controls/{ref}/reported", summary="What other systems have said of a control")
+def reported_of(request: Request, ref: str) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(results.of_control(session, principal, _control(session, principal, ref)))
+
+
+@router.get("/reported", summary="What other systems have said, waiting for a person to confirm")
+def reported_waiting(request: Request) -> dict[str, Any]:
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(results.waiting(session, principal))
+
+
+@router.post("/reported/{report_id}/confirm", summary="Confirm a report: a failure raises an issue")
+def confirm_report(request: Request, report_id: int, body: DecisionBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        row = results.confirm(session, principal, results.load(session, principal, report_id),
+                              body.model_dump())  # fmt: skip
+        return envelope(results.view(session, row))
+
+
+@router.post("/reported/{report_id}/set-aside", summary="Set a report aside, saying why")
+def set_report_aside(request: Request, report_id: int, body: DecisionBody) -> dict[str, Any]:
+    principal = current(request)
+    with writing(request, principal.actor) as session:
+        row = results.set_aside(session, principal, results.load(session, principal, report_id),
+                                body.note)  # fmt: skip
+        return envelope(results.view(session, row))
+
+
+# --- A reference others can check -------------------------------------------------------------
+
+
+@router.get(
+    "/standing/{kind}/{ref}",
+    summary="Whether a third party, a scope, or an exception is in good standing",
+)
+def check_standing(request: Request, kind: str, ref: str) -> dict[str, Any]:
+    """Yes or no, with the reasons by kind and nothing of the record's contents. A record the
+    asker may not see is not found."""
+    principal = current(request)
+    with reading(request) as session:
+        return envelope(standing.check(session, principal, kind, ref))

@@ -2634,3 +2634,20 @@ SYSTEM_FIELD_VALUES = [
     ("backup", "CC-3100", "Business hours"), ("record", "CC-7200", "Around the clock"),
     ("cabinets", "CC-7350", "Around the clock"), ("survey", "CC-5300", "Best effort"),
 ]  # fmt: skip
+
+
+# What the patch scanner reports: days ago, the control, and what it says.
+REPORTED = [
+    (10, "Systems kept patched", {
+        "kind": "result", "outcome": "failed",
+        "title": "Nine servers more than 30 days behind on critical patches",
+        "detail": "The virtual server platform's hosts in the research network.",
+        "url": "https://scanner.northmere.example/reports/2026-11-17"}),
+    (3, "Vulnerabilities found and followed up", {
+        "kind": "result", "outcome": "partial",
+        "title": "Two critical findings open past their date",
+        "url": "https://scanner.northmere.example/reports/2026-11-24"}),
+    (2, "Systems kept patched", {
+        "kind": "evidence", "title": "Patch compliance report, November",
+        "url": "https://scanner.northmere.example/reports/2026-11-25/compliance"}),
+]  # fmt: skip
