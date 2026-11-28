@@ -2,7 +2,7 @@
 
 **Goal:** an organization that has never seen RiskWren installs it, makes it its own, and runs it in production. Waves 1 to 8 built the record and everything a program does with it, shaped by one fictional research institute. Wave 9 is about the second organization: one that is not a research institute, has its own words for things, runs its own servers, connects its own systems, and needs to know that what it is trusting has been reviewed.
 
-**Branch:** `wave-9` · **Target version:** `0.9.0` · **Status:** ◐ in progress
+**Branch:** `wave-9` · **Target version:** `0.9.0` · **Status:** ☑ released
 
 The security team comes first here as everywhere ([roadmap](../roadmap.md#whose-work-comes-first)). For a security team adopting RiskWren, this wave answers the questions asked before anything goes into production: can it be backed up and restored, how does it behave with our numbers, can our other systems reach it with a token that can do only what it should, how do we deploy it the way we deploy everything else, and has it been reviewed against a standard we recognize.
 
@@ -82,9 +82,11 @@ The wave is done when, on a fresh checkout:
 
 **Done:** two new guides. **The program handbook** (`docs/handbook.md`): the decisions to make first and where each is set, the first month (the record) and the first quarter (the evidence), the yearly rhythm as a table from every week to every year, who does what, and what to watch. **Adopting RiskWren** (`docs/adopting.md`): looking at the demo as the people who would use it, a pilot of six to twelve weeks and how to judge it, the decisions about the installation, going live, and keeping it current. Both are in the guides' index and the site's menu, and link only to what the other guides say.
 
-### Slice 8: Release prep ☐
+### Slice 8: Release prep ☑
 
-- [ ] Guides, changelog, upgrade from 0.8.0 on both databases, audits, release, and the site republished
+- [x] Guides, changelog, upgrade from 0.8.0 on both databases, audits, release, and the site republished
+
+**Done:** version 0.9.0; the changelog's introduction and upgrade notes; the README's account of the release and its guides; the guides' index, with what this release does not do yet; a section on the site's home page for production; every picture taken again, with the operations page new. The upgrade from 0.8.0 was run from that release's own code with its demo organization on both databases: migrations 0046 and 0047 applied, every row of every table unchanged, the history verifies, and a token, a webhook, a field of the organization's own, the operations view, and a backup ran over the old data; a second upgrade changed nothing. A fresh clone installs and serves on both databases. The accessibility audit found nothing in 319 scenes, the screen-reader check nothing in eleven journeys, and the site's audit nothing in nineteen pages.
 
 ## Decisions
 

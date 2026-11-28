@@ -171,7 +171,7 @@ Detail: [waves/wave-7.md](waves/wave-7.md)
 
 Detail: [waves/wave-8.md](waves/wave-8.md)
 
-## Wave 9: Adoption (v0.9.0) ☐
+## Wave 9: Adoption (v0.9.0) ☑
 
 **Goal:** an organization that has never seen RiskWren installs it, makes it its own, and runs it in production.
 
@@ -184,7 +184,7 @@ Detail: [waves/wave-8.md](waves/wave-8.md)
 | 5 | Deployment | A container image, a compose file, a hardened systemd unit, proxy examples, the operations view, `doctor --production` | ☑ |
 | 6 | Security and accessibility review | The standard security verification review; the full accessibility audit and screen-reader check | ☑ |
 | 7 | The program handbook | One guide for a risk and compliance team, from first decisions to the yearly rhythm; the adopter's guide | ☑ |
-| 8 | Release prep | Guides, changelog, release | ☐ |
+| 8 | Release prep | Guides, changelog, release | ☑ |
 
 Detail: [waves/wave-9.md](waves/wave-9.md)
 
