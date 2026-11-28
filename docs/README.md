@@ -1,6 +1,6 @@
 # RiskWren documentation
 
-These guides describe RiskWren 0.10.0. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
+These guides describe RiskWren 0.10.1. They are also published, with search, at <https://robert-mcdermott.github.io/riskwren/>.
 
 ## Start here
 
