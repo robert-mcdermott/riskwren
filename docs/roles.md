@@ -67,7 +67,7 @@ Roles are given under **Admin → People**, imported with people from a spreadsh
 
 ## Assessors
 
-**On Home:** tests they have been asked to do, results waiting for their review, and closures to confirm. An assessor with no other role sees no figures. What scanners and other systems report waits under **Compliance → From other systems**, and drafts of issues under **Drafts**; neither is on Home.
+**On Home:** tests they have been asked to do, results waiting for their review, and closures to confirm. An assessor with no other role sees no figures. When scanners and other systems have reported something they may confirm, or an issue has been drafted, Home has a line leading to **Compliance → From other systems** or **Drafts**.
 
 **In the first week:**
 
@@ -75,7 +75,7 @@ Roles are given under **Admin → People**, imported with people from a spreadsh
 2. Start an assessment of one scope against its framework, and plan its tests: [Assessments](evidence-and-testing.md#assessments).
 3. Rate the key controls by judgment where no test has been done yet, so that the risks they reduce can be weighed.
 
-**After that:** record results with the evidence they rest on, confirm colleagues' results, confirm or return proposed closures of issues, and look at **From other systems** each week, because reports from scanners wait there for a person and do not appear on Home.
+**After that:** record results with the evidence they rest on, confirm colleagues' results, confirm or return proposed closures of issues, and confirm or set aside what scanners report, from the line on Home that leads to **From other systems**.
 
 **Read next:** [Evidence and testing](evidence-and-testing.md), [Issues and exceptions](issues-and-exceptions.md), [Compliance](compliance.md#readiness).
 

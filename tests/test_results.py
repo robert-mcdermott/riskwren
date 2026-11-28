@@ -60,6 +60,8 @@ def test_a_failed_check_counts_once_a_person_confirms_it(as_role: Clients, peopl
     assert [row["id"] for row in shown] == [report["id"]]
     waiting = as_role("assessor").get("/api/v1/reported").json()["data"]
     assert report["id"] in {row["id"] for row in waiting}
+    owed = as_role("assessor").get("/api/v1/home").json()["data"]["items"]
+    assert [item["href"] for item in owed if item["kind"] == "reported"] == ["/reported"]
     # Neither a token nor the control's owner confirms it.
     assert scanner.post(f"/api/v1/reported/{report['id']}/confirm", json={}).status_code == 403
     confirmed = as_role("assessor").post(f"/api/v1/reported/{report['id']}/confirm", json={})

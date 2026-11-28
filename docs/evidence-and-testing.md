@@ -147,7 +147,7 @@ No report becomes the control's rating: only a test in an assessment does that. 
 
 Three things to know when you assess:
 
-- **Nothing reaches Home or the bell.** Look at **Compliance → From other systems** as a routine, weekly at least.
+- **Home says when reports are waiting.** Those who may confirm them see one line, with how many, leading to **From other systems**; nothing is said under the bell.
 - **That page lists only what waits.** A report once decided stays on the control's **Reported by other systems** card (the last 50), which has **Confirm** and **Set aside** too.
 - **A repeated failure joins the open issue.** As with failed tests, while an issue is open because the control was found wanting, by a test or an earlier report, confirming another failure joins it rather than raising a second.
 

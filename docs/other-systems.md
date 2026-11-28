@@ -97,7 +97,7 @@ A report never rates the control and never replaces a person's test result: only
 
 Three things to know:
 
-- **Reports do not appear on Home or under the bell.** Assessors should look at **From other systems** as a routine, weekly at least.
+- **Home says when reports are waiting.** Those who may confirm them see one line, with how many, leading to **From other systems**; nothing is said under the bell.
 - **The page lists only what is waiting.** A report once decided stays on the control's card, with who decided it and how.
 - **A scanner that reports the same failure every night** raises one issue. While an issue is open because the control was found wanting, by a test or an earlier report, confirming another failure joins it rather than raising a second.
 
@@ -128,7 +128,7 @@ Each draft shows what it proposes, where it came from, and what it rests on, in 
 - **Open** puts it in the ordinary form: **Raise a risk**, **Raise an issue**, or **Add a control**, filled in. Change what you like and save it. Every rule that applies to a record you make applies to this one, and the draft is marked as used, naming the record.
 - **Set aside** keeps the draft on record with your reason, and makes nothing.
 
-Drafts do not appear on Home or under the bell. A token that may only read may still propose one.
+Those who may make drafts that are waiting see one line on Home, with how many, leading to **Drafts**; nothing is said under the bell. A token that may only read may still propose one.
 
 ## An assistant on your own computer
 

@@ -34,7 +34,7 @@ An assistant, or another system with a token, may propose an issue without raisi
 - **Open** fills in the **Raise an issue** form with what the draft proposes. Change what you like and save it; every rule for raising an issue applies, and the draft is marked as used.
 - **Set aside** keeps the draft on record with your reason, which is required, and raises nothing.
 
-Drafts do not appear on Home or under the bell, so whoever expects them should look. See [Drafts](other-systems.md#drafts).
+Home has a line for those who may make drafts that are waiting; nothing is said under the bell. See [Drafts](other-systems.md#drafts).
 
 ### From a failed test
 
