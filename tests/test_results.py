@@ -4,8 +4,10 @@ control; it counts only once a person who does not own the control confirms it."
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import Any
 
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from tests.people import People
 
@@ -107,7 +109,8 @@ def test_standing_is_yes_or_no_with_reasons(as_role: Clients, people: People) ->
     said = purchasing.get(f"/api/v1/standing/third-party/{host['ref']}")
     assert said.status_code == 200, said.text
     body = said.json()["data"]
-    assert body["in_good_standing"] is True and body["reasons"] == []
+    assert body["in_good_standing"] is False  # nothing yet says how closely to look at it
+    assert [reason["code"] for reason in body["reasons"]] == ["not_tiered"]
     assert set(body) == {"kind", "ref", "name", "in_good_standing", "reasons", "as_of"}
     assert purchasing.get("/api/v1/standing/third-party/TP-9999").status_code == 404
     assert purchasing.get(f"/api/v1/standing/supplier/{host['ref']}").status_code == 404
@@ -128,3 +131,45 @@ def test_standing_is_yes_or_no_with_reasons(as_role: Clients, people: People) ->
     assert as_role("member").get(f"/api/v1/standing/exception/{ref}").status_code == 404
     as_role("leader").post(f"/api/v1/exceptions/{ref}/decision", json={"approve": True})
     assert steward.get(f"/api/v1/standing/exception/{ref}").json()["data"]["in_good_standing"]
+
+
+def test_a_supplier_is_in_good_standing_only_once_reviewed_and_approved(
+    as_role: Clients, people: People, db: Any
+) -> None:
+    from riskwren.core.clock import utc_now
+    from riskwren.db.models import ThirdParty
+    from riskwren.thirdparty import lifecycle, reviews
+    from tests.test_risks import who
+
+    steward = as_role("steward")
+    made = steward.post("/api/v1/third-parties", json={
+        "name": "Coldline Service", "kind": "service_provider",
+        "org_unit_id": people.units["HALE"], "criticality": "high"}).json()["data"]  # fmt: skip
+    ref = made["ref"]
+    tiered = steward.post(f"/api/v1/third-parties/{ref}/tiering", json={"answers": {
+        "information": "confidential", "access": ["on_site"], "dependency": "slows"}})  # fmt: skip
+    assert tiered.status_code in (200, 201), tiered.text
+    asker = _token(as_role, "auditor")
+
+    def codes() -> list[str]:
+        found = asker.get(f"/api/v1/standing/third-party/{ref}").json()["data"]
+        return [reason["code"] for reason in found["reasons"]]
+
+    assert codes() == ["never_reviewed"]  # its tier asks for a review, and none is done
+    keeper = who(db, people, "steward")
+    with db.write(keeper.actor) as session:
+        row = session.scalars(select(ThirdParty).where(ThirdParty.ref == ref)).one()
+        review = reviews.start(session, keeper, row, {})
+        review.status, review.conclusion, review.concluded_at = "concluded", "declined", utc_now()
+        lifecycle.after_review(session, review)
+    assert codes() == ["not_approved"]
+    with db.write(keeper.actor) as session:
+        row = session.scalars(select(ThirdParty).where(ThirdParty.ref == ref)).one()
+        later = reviews.start(session, keeper, row, {})
+        later.status, later.conclusion, later.concluded_at = "concluded", "approved", utc_now()
+        lifecycle.after_review(session, later)
+    assert codes() == []
+    with db.write(keeper.actor) as session:
+        row = session.scalars(select(ThirdParty).where(ThirdParty.ref == ref)).one()
+        lifecycle.start(session, keeper, row, "Moving to another service.")
+    assert codes() == ["offboarding"]

@@ -20,16 +20,34 @@ KINDS = ("third-party", "scope", "exception")
 
 
 def _third_party(session: Session, principal: Principal, row: Any) -> list[dict[str, str]]:
-    from riskwren.thirdparty import coverage
+    """In good standing means: active and not on its way out, tiered, reviewed as its tier
+    asks and approved, the review in date, and nothing shared with it that an agreement
+    should cover and does not. Coverage is judged whatever the asker may see, and only the
+    kind of gap is said."""
+    from riskwren.thirdparty import coverage, lifecycle
 
     reasons = []
     today = utc_now().date()
     if row.status != "active":
         reasons.append({"code": "not_active", "text": "The relationship is not active."})
+    ending = lifecycle.current_offboarding(session, row)
+    if ending is not None and ending.status == "open":
+        reasons.append({"code": "offboarding", "text": "The relationship is being ended."})
+    if not row.tier:
+        reasons.append({"code": "not_tiered",
+                        "text": "It has not been tiered, so nothing says how closely it is "
+                                "to be reviewed."})  # fmt: skip
+    last = lifecycle.last_concluded(session, row)
+    if row.tier and lifecycle.months_for(session, row.tier) and last is None:
+        said = "Its tier calls for a review, and none has been concluded."
+        reasons.append({"code": "never_reviewed", "text": said})
+    if last is not None and last.conclusion == "declined":
+        reasons.append({"code": "not_approved",
+                        "text": "Its last review concluded that it is not approved."})  # fmt: skip
     if row.next_review_on is not None and row.next_review_on < today:
         due = row.next_review_on.isoformat()
         reasons.append({"code": "review_overdue", "text": f"Its review was due on {due}."})
-    if coverage.stops_for(session, principal, "third_party", row.id):
+    if any(found["sharing"].third_party.id == row.id for found in coverage.stops(session)):
         reasons.append({"code": "no_agreement",
                         "text": "Information is shared with it that no agreement of the kind "
                                 "the program requires covers."})  # fmt: skip
