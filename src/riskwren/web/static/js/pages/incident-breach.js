@@ -59,6 +59,20 @@ function assessForm(record, view, vocab, reload) {
       const fixed = choices.regimes.filter((regime) => !regime.named).map((regime) => ({ key: regime.key,
         box: checkbox(`${regime.label}${regime.cite ? ` (${regime.cite})` : ""}`, { hint: regime.note,
           checked: prev ? prev.regimes.some((each) => each.key === regime.key) : regime.suggested_for.some((kind) => had.has(kind)) }) }));
+      // On a first assessment, the rules that apply to the kinds of information ticked are
+      // ticked with them, until the handler changes a rule's box themselves.
+      if (!prev) {
+        const touched = new Set();
+        const suggest = () => {
+          const chosen = new Set(kinds.filter((each) => each.box.input.checked).map((each) => each.key));
+          for (const rule of fixed) {
+            const regime = choices.regimes.find((each) => each.key === rule.key);
+            if (!touched.has(rule.key)) rule.box.input.checked = regime.suggested_for.some((kind) => chosen.has(kind));
+          }
+        };
+        for (const rule of fixed) rule.box.input.addEventListener("change", () => touched.add(rule.key));
+        for (const kind of kinds) kind.box.input.addEventListener("change", suggest);
+      }
       const named = [];
       const namedList = h("div", { class: "stack-sm" });
       const drawNamed = () => namedList.replaceChildren(...named.map((each) => each.node));
